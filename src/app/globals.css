@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Brand blue, anchored on the logo's #5267f7 */
+  --color-brand-50: #eef1ff;
+  --color-brand-100: #e0e5ff;
+  --color-brand-200: #c6cfff;
+  --color-brand-300: #a3b0fd;
+  --color-brand-400: #7f8bfa;
+  --color-brand-500: #5267f7;
+  --color-brand-600: #3f4ceb;
+  --color-brand-700: #333cd0;
+  --color-brand-800: #2b34a8;
+  --color-brand-900: #283285;
+  --color-brand-950: #171b4d;
+
+  /* Deep navy from the brand banner */
+  --color-ink-700: #16203f;
+  --color-ink-800: #0d1530;
+  --color-ink-900: #080e24;
+  --color-ink-950: #050917;
+}
+
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: var(--color-ink-900);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Offset anchor targets so the sticky nav never covers a heading. */
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* clip, not hidden, since hidden would break the sticky nav */
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-ink-900);
+}
+
+/* Orbit rotation. Kept in CSS so it stays on the compositor. */
+@keyframes coere-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
