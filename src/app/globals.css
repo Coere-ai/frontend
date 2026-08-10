@@ -50,13 +50,14 @@ body {
   color: var(--color-ink-900);
 }
 
-/* Orbit rotation. Kept in CSS so it stays on the compositor. */
-@keyframes coere-spin {
+/* Orbit travel. Each logo rides the path itself, so nothing spins on its own
+   axis and separate animations cannot drift apart. */
+@keyframes coere-orbit {
   from {
-    transform: rotate(0deg);
+    offset-distance: 0%;
   }
   to {
-    transform: rotate(360deg);
+    offset-distance: 100%;
   }
 }
 

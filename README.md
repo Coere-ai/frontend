@@ -63,8 +63,47 @@ Sections, in page order:
 The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly four links, one per
 anchor above.
 
-`orbit` rotates with a CSS keyframe animation (compositor friendly, one
-direction) and each logo counter-rotates at the same rate to stay upright.
+## The demo film
+
+`/demo` is an unlisted page holding a 60 second product film built entirely in
+HTML. Nothing links to it, it is `noindex`, and `robots.txt` disallows it.
+
+- Space bar plays and pauses, `r` restarts, arrow keys jump five seconds, and
+  the scrubber can be clicked or dragged.
+- `/demo?t=24` starts at that second, which is how you grab a still.
+- It plays on a fixed 1280x720 canvas that scales to the window, so it records
+  cleanly at any size. For a video, screen record the stage at 1280x720.
+- With `prefers-reduced-motion` it waits on the play button instead of
+  autoplaying.
+
+The film runs on named beats in
+[`src/components/demo/timeline.ts`](src/components/demo/timeline.ts); React
+re-renders only when a beat is crossed and every scene animates declaratively
+from there. To retime a moment, change one number in `BEATS`. The film runs:
+
+1. `scene-intro` — mark, name, and every model orbiting it.
+2. `scene-workspace` — the ChatGPT to Claude transfer. A caption names each beat
+   and the window you are not meant to be watching dims, so the focus is never
+   ambiguous.
+3. The montage: the same two windows cut between eight products, held perfectly
+   still, cycling coding, research and writing. The first switch holds a second
+   and each one after is a tenth faster until it settles at half a second. Left
+   is always the original chat, right is always the capsule.
+4. The zoom out. The cadence settles first and runs at half a second for
+   several more cycles before the camera moves, then pulls back slowly over
+   4.6 seconds. The pair is the middle cell of a 5 by 5 grid scaled up until
+   this point, so pulling back reveals 24 more fully built pairs on different
+   products, all still switching on the same beat. It holds fully wide for two
+   seconds before anything else happens.
+5. The wall blurs, `scene-dashboard` pops over it with the totals, then it
+   clears and `scene-outro` delivers the line.
+
+Everything shown on screen lives in
+[`src/components/demo/data.ts`](src/components/demo/data.ts).
+
+`orbit` sends each logo around a CSS motion path with `offset-rotate: 0deg`, so
+the logos travel the ring while staying face up and no two animations can drift
+out of sync.
 Only `site-nav` and the reveal wrappers are client components; the comparison
 and capsule sections are static. All motion respects
 `prefers-reduced-motion`, and a `noscript` style reveals the scroll animations
