@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { InstallButton } from "@/components/install-button";
 import { Orbit } from "@/components/orbit";
 import { Container } from "@/components/ui";
 
@@ -12,14 +11,13 @@ const fadeUp = {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export function Hero() {
+export function WhatWeDo() {
   return (
-    <section id="top" className="pt-20 pb-16 sm:pt-28">
+    <section id="what-we-do" className="pt-20 pb-16 sm:pt-28">
       <Container>
         <motion.div
           initial="hidden"
           animate="shown"
-          transition={{ staggerChildren: 0.08 }}
           className="mx-auto flex max-w-3xl flex-col items-center text-center"
         >
           <motion.h1
@@ -27,26 +25,9 @@ export function Hero() {
             transition={{ duration: 0.5, ease }}
             className="text-[2.75rem] leading-[1.04] font-semibold tracking-[-0.04em] text-ink-900 sm:text-6xl"
           >
-            Never explain your
-            <br className="hidden sm:block" /> project twice
+            Building the memory
+            <br className="hidden sm:block" /> layer of the future
           </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            transition={{ duration: 0.5, ease }}
-            className="mt-6 max-w-lg text-lg leading-relaxed text-ink-900/60"
-          >
-            Unified memory for AI. Your context follows you into every model, so
-            a new chat picks up where the last one left off.
-          </motion.p>
-
-          <motion.div
-            variants={fadeUp}
-            transition={{ duration: 0.5, ease }}
-            className="mt-8"
-          >
-            <InstallButton />
-          </motion.div>
         </motion.div>
 
         <motion.div

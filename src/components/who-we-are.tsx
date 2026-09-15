@@ -2,12 +2,12 @@ import Image from "next/image";
 import { Container, Reveal, SectionHeading } from "@/components/ui";
 import { founders } from "@/lib/site";
 
-export function FoundersSection() {
+export function WhoWeAre() {
   return (
-    <section id="team" className="py-20 sm:py-24">
+    <section id="who-we-are" className="py-20 sm:py-24">
       <Container>
         <SectionHeading
-          title="Our team"
+          title="Who we are"
           description="Coere comes from the Latin cohaerere, to connect."
         />
 

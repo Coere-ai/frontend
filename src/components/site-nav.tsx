@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { InstallButton } from "@/components/install-button";
 import { Logo } from "@/components/logo";
 import { navLinks } from "@/lib/site";
 
@@ -31,7 +30,7 @@ export function SiteNav() {
         className="mx-auto grid h-16 w-full max-w-[86rem] grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-8"
       >
         <a
-          href="#top"
+          href="#what-we-do"
           aria-label="Coere home"
           className="justify-self-start rounded-md text-ink-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
         >
@@ -50,10 +49,6 @@ export function SiteNav() {
           ))}
         </div>
         <span className="md:hidden" />
-
-        <div className="hidden justify-self-end md:block">
-          <InstallButton size="sm" />
-        </div>
 
         <button
           type="button"
@@ -96,9 +91,6 @@ export function SiteNav() {
                   {link.label}
                 </a>
               ))}
-              <div className="pt-2">
-                <InstallButton size="sm" className="w-full" />
-              </div>
             </div>
           </motion.div>
         ) : null}

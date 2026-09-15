@@ -19,10 +19,9 @@ export function SiteFooter() {
             </p>
           </div>
 
-          {/* two rows, two columns */}
           <nav
             aria-label="Footer"
-            className="grid grid-cols-2 justify-items-start gap-x-12 gap-y-2.5 text-[13px]"
+            className="flex flex-wrap gap-x-8 gap-y-2.5 text-[13px]"
           >
             {footerLinks.map((link) => (
               <a

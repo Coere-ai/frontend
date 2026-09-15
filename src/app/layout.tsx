@@ -23,16 +23,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
-  keywords: [
-    "AI memory",
-    "unified memory for AI",
-    "Chrome extension",
-    "ChatGPT",
-    "Claude",
-    "Gemini",
-    "AI context transfer",
-    "continue conversations across AI agents",
-  ],
+  keywords: ["Coere", "Coere AI", "memory layer"],
   authors: founders.map((f) => ({ name: f.name })),
   creator: siteConfig.legalName,
   openGraph: {
