@@ -113,5 +113,6 @@ export const executives: readonly TeamMember[] = [
       "Top 3 finalist for the International Children's Peace Prize and winner of the JED Foundation's Student Voice of Mental Health Award",
       "Leads go-to-market and adoption at Coere",
     ],
+    photo: "/founders/sarah-shelke.jpeg",
   },
 ] as const;
