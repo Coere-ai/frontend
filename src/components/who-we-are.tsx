@@ -1,6 +1,40 @@
-import Image from "next/image";
+import { TeamCard } from "@/components/team-card";
 import { Container, Reveal, SectionHeading } from "@/components/ui";
-import { founders } from "@/lib/site";
+import { executives, founders, type TeamMember } from "@/lib/site";
+
+function TeamGroup({
+  title,
+  description,
+  members,
+}: {
+  title: string;
+  description: string;
+  members: readonly TeamMember[];
+}) {
+  return (
+    <div className="mx-auto mt-14 max-w-5xl">
+      <Reveal className="text-center">
+        <h3 className="text-2xl font-semibold tracking-[-0.03em] text-ink-900">
+          {title}
+        </h3>
+        <p className="mt-2 text-[15px] text-ink-900/55">{description}</p>
+      </Reveal>
+
+      {/* A lone card takes one column's width, so it sits centered under the pair above. */}
+      <div className="mt-8 flex flex-wrap justify-center gap-5 md:gap-6">
+        {members.map((member, index) => (
+          <Reveal
+            key={member.name}
+            delay={index * 0.08}
+            className="w-full md:w-[calc(50%-0.75rem)]"
+          >
+            <TeamCard member={member} />
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function WhoWeAre() {
   return (
@@ -11,33 +45,17 @@ export function WhoWeAre() {
           description="Coere comes from the Latin cohaerere, to connect."
         />
 
-        <div className="mx-auto mt-14 grid max-w-2xl gap-10 sm:grid-cols-2">
-          {founders.map((founder, index) => (
-            <Reveal key={founder.name} delay={index * 0.08}>
-              <article className="flex flex-col items-center text-center">
-                <span className="relative h-20 w-20 overflow-hidden rounded-full">
-                  <Image
-                    src={founder.photo}
-                    alt={founder.name}
-                    fill
-                    // Larger than the box so the zoomed crop stays sharp.
-                    sizes="200px"
-                    className={`object-cover ${founder.photoClassName}`}
-                  />
-                </span>
-                <h3 className="mt-4 text-[16px] font-semibold tracking-[-0.02em] text-ink-900">
-                  {founder.name}
-                </h3>
-                <p className="mt-1 text-[13px] text-brand-600">
-                  {founder.role}
-                </p>
-                <p className="mt-0.5 text-[12.5px] text-ink-900/45">
-                  {founder.affiliation}
-                </p>
-              </article>
-            </Reveal>
-          ))}
-        </div>
+        <TeamGroup
+          title="Founders"
+          description="Building the product and the codebase together."
+          members={founders}
+        />
+
+        <TeamGroup
+          title="Executive team"
+          description="Leading go-to-market and adoption."
+          members={executives}
+        />
       </Container>
     </section>
   );

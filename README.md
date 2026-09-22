@@ -50,18 +50,16 @@ public/banner.png         social share image
 
 Sections, in page order:
 
-| Component            | Anchor          | What it shows                                            |
-| -------------------- | --------------- | -------------------------------------------------------- |
-| `hero` + `orbit`     | `#top`          | Headline, install button, AI logos orbiting the mark      |
-| `comparison`         | `#how-it-works` | Two Chrome windows: pasted context vs a Coere capsule     |
-| `capsule-flow`       |                 | Four past chats becoming one capsule, plus what it saves  |
-| `how-it-works`       | `#why`          | Three steps, then fewer tokens / less time / nothing lost |
-| `costs`              | `#costs`        | Consumer and enterprise AI spend against Coere savings    |
-| `founders-section`   | `#team`         | Michelle and Edison                                       |
-| `closing-cta`        |                 | Final install prompt                                      |
+| Component     | Anchor         | What it shows                                                         |
+| ------------- | -------------- | --------------------------------------------------------------------- |
+| `what-we-do`  | `#what-we-do`  | Headline, AI logos orbiting the mark                                  |
+| `products`    | `#products`    | Coere Connect (phase 1) beside Coere Developer (phase 2)              |
+| `who-we-are`  | `#who-we-are`  | Founders (Michelle and Edison), then the executive team (Sarah)       |
 
-The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly four links, one per
-anchor above.
+The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly three links, one per
+anchor above. Product copy and team details (education plus short highlight
+bullets, rendered by `team-card`) live there too; a member without a `photo`
+gets an initials avatar.
 
 ## The demo film
 

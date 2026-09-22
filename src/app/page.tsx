@@ -1,8 +1,14 @@
+import { Products } from "@/components/products";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { WhatWeDo } from "@/components/what-we-do";
 import { WhoWeAre } from "@/components/who-we-are";
-import { founders, siteConfig } from "@/lib/site";
+import { executives, founders, siteConfig } from "@/lib/site";
+
+const berkeley = {
+  "@type": "CollegeOrUniversity",
+  name: "University of California, Berkeley",
+};
 
 /** Structured data so search + AI crawlers understand who Coere is. */
 const structuredData = {
@@ -16,10 +22,13 @@ const structuredData = {
     "@type": "Person",
     name: founder.name,
     jobTitle: founder.role,
-    affiliation: {
-      "@type": "CollegeOrUniversity",
-      name: "University of California, Berkeley",
-    },
+    affiliation: berkeley,
+  })),
+  employee: executives.map((executive) => ({
+    "@type": "Person",
+    name: executive.name,
+    jobTitle: executive.role,
+    affiliation: berkeley,
   })),
 };
 
@@ -34,6 +43,7 @@ export default function Home() {
       <SiteNav />
       <main className="flex-1">
         <WhatWeDo />
+        <Products />
         <WhoWeAre />
       </main>
       <SiteFooter />
