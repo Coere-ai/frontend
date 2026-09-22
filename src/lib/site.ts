@@ -31,40 +31,30 @@ export const agents = [
 ] as const;
 
 export type Product = {
-  /** Roadmap step, e.g. "Phase 1". */
-  phase: string;
-  /** What the step is about, e.g. "Adoption". */
-  stage: string;
   name: string;
-  /** What the product is, in one breath. */
+  /** What it is, in a few words: the extension, or the developer surface. */
+  kind: string;
+  /** Which symbol the card shows. */
+  icon: "chrome" | "code";
+  /** What the product does, in one breath. */
   description: string;
-  /** What the phase is for. */
-  purpose: string;
-  /** Short chips under the copy. */
-  tags: readonly string[];
 };
 
-/** The roadmap in two products: the connector first, then the developer layer. */
+/** Two ways into the same memory layer: the extension for people, the API for apps. */
 export const products: readonly Product[] = [
   {
-    phase: "Phase 1",
-    stage: "Adoption",
     name: "Coere Connect",
+    kind: "Chrome extension",
+    icon: "chrome",
     description:
-      "A free Chrome extension that carries your memory across every AI you use. Install it once, and a new chat in any of them picks up where the last one left off.",
-    purpose:
-      "Get the connector into as many hands as possible. Every person who installs it adds their memory to the layer, and stops losing and repeating context.",
-    tags: ["Chrome extension", "Free"],
+      "A Chrome extension that carries your memory across every AI you use. Install it once, and a new chat in any of them picks up where the last one left off.",
   },
   {
-    phase: "Phase 2",
-    stage: "Developer release",
     name: "Coere Developer",
+    kind: "API, MCP and SDK",
+    icon: "code",
     description:
-      "The same memory layer, opened up to apps. Developers plug in through an API, MCP or SDK, so when a user signs in, the product already knows them.",
-    purpose:
-      "Let startups and new AI apps read the layer instead of asking users to start from zero. Coere becomes the memory behind their product.",
-    tags: ["API", "MCP", "SDK"],
+      "The same memory layer, opened up to apps. Plug in through the API, MCP or SDK, and when a user signs in, your product already knows them.",
   },
 ] as const;
 

@@ -1,7 +1,8 @@
-import { TeamCard } from "@/components/team-card";
+import { TeamProfile } from "@/components/team-profile";
 import { Container, Reveal, SectionHeading } from "@/components/ui";
 import { executives, founders, type TeamMember } from "@/lib/site";
 
+/** A titled panel of people, one row each, split by hairlines. */
 function TeamGroup({
   title,
   description,
@@ -12,23 +13,18 @@ function TeamGroup({
   members: readonly TeamMember[];
 }) {
   return (
-    <div className="mx-auto mt-14 max-w-5xl">
-      <Reveal className="text-center">
-        <h3 className="text-2xl font-semibold tracking-[-0.03em] text-ink-900">
+    <div className="mx-auto mt-12 max-w-4xl first:mt-14">
+      <Reveal className="mb-4 flex flex-col gap-1 px-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+        <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink-900">
           {title}
         </h3>
-        <p className="mt-2 text-[15px] text-ink-900/55">{description}</p>
+        <p className="text-[13.5px] text-ink-900/50">{description}</p>
       </Reveal>
 
-      {/* A lone card takes one column's width, so it sits centered under the pair above. */}
-      <div className="mt-8 flex flex-wrap justify-center gap-5 md:gap-6">
+      <div className="divide-y divide-ink-900/6 overflow-hidden rounded-3xl border border-ink-900/8 bg-white">
         {members.map((member, index) => (
-          <Reveal
-            key={member.name}
-            delay={index * 0.08}
-            className="w-full md:w-[calc(50%-0.75rem)]"
-          >
-            <TeamCard member={member} />
+          <Reveal key={member.name} delay={index * 0.08}>
+            <TeamProfile member={member} />
           </Reveal>
         ))}
       </div>

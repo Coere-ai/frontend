@@ -53,12 +53,12 @@ Sections, in page order:
 | Component     | Anchor         | What it shows                                                         |
 | ------------- | -------------- | --------------------------------------------------------------------- |
 | `what-we-do`  | `#what-we-do`  | Headline, AI logos orbiting the mark                                  |
-| `products`    | `#products`    | Coere Connect (phase 1) beside Coere Developer (phase 2)              |
+| `products`    | `#products`    | Coere Connect (Chrome extension) beside Coere Developer (API, MCP, SDK) |
 | `who-we-are`  | `#who-we-are`  | Founders (Michelle and Edison), then the executive team (Sarah)       |
 
 The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly three links, one per
 anchor above. Product copy and team details (education plus short highlight
-bullets, rendered by `team-card`) live there too; a member without a `photo`
+bullets, rendered by `team-profile`) live there too; a member without a `photo`
 gets an initials avatar.
 
 ## The demo film
