@@ -9,7 +9,7 @@ function TeamGroup({
   members,
 }: {
   title: string;
-  description: string;
+  description?: string;
   members: readonly TeamMember[];
 }) {
   return (
@@ -18,7 +18,9 @@ function TeamGroup({
         <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink-900">
           {title}
         </h3>
-        <p className="text-[13.5px] text-ink-900/50">{description}</p>
+        {description ? (
+          <p className="text-[13.5px] text-ink-900/50">{description}</p>
+        ) : null}
       </Reveal>
 
       <div className="divide-y divide-ink-900/6 overflow-hidden rounded-3xl border border-ink-900/8 bg-white">
@@ -43,7 +45,6 @@ export function WhoWeAre() {
 
         <TeamGroup
           title="Founders"
-          description="Building the product and the codebase together."
           members={founders}
         />
 

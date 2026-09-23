@@ -8,6 +8,12 @@ const initialsOf = (name: string) =>
     .join("")
     .slice(0, 2);
 
+/** Joins majors the way a sentence would: "A", "A and B", "A, B and C". */
+const listOf = (items: readonly string[]) =>
+  items.length > 1
+    ? `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`
+    : (items[0] ?? "");
+
 function Portrait({ member }: { member: TeamMember }) {
   return (
     <span className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full ring-1 ring-ink-900/8 sm:h-28 sm:w-28">
@@ -36,7 +42,7 @@ function CapIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="mt-[3px] h-4 w-4 shrink-0 text-ink-900/40"
+      className="mt-[3px] h-4 w-4 shrink-0 text-ink-900"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.7"
@@ -50,7 +56,7 @@ function CapIcon() {
   );
 }
 
-/** One person: portrait beside their name and role, then education, then short bullets. */
+/** One person: portrait beside their name and role, then school and majors, then short bullets. */
 export function TeamProfile({ member }: { member: TeamMember }) {
   return (
     <article className="flex flex-col gap-5 p-6 sm:flex-row sm:gap-8 sm:p-8">
@@ -67,20 +73,11 @@ export function TeamProfile({ member }: { member: TeamMember }) {
         <p className="mt-3 flex gap-2 text-[14px] leading-relaxed text-ink-900/60">
           <CapIcon />
           <span>
-            {member.education.map((line, index) => (
-              <span key={line}>
-                {index > 0 ? (
-                  <span className="mx-1.5 text-ink-900/25" aria-hidden="true">
-                    ·
-                  </span>
-                ) : null}
-                {line}
-              </span>
-            ))}
+            {member.school}, {listOf(member.majors)}
           </span>
         </p>
 
-        <ul className="mt-5 space-y-2 border-t border-ink-900/6 pt-5">
+        <ul className="mt-5 space-y-2">
           {member.highlights.map((line) => (
             <li
               key={line}

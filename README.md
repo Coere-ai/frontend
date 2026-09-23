@@ -57,7 +57,7 @@ Sections, in page order:
 | `who-we-are`  | `#who-we-are`  | Founders (Michelle and Edison), then the executive team (Sarah)       |
 
 The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly three links, one per
-anchor above. Product copy and team details (education plus short highlight
+anchor above. Product copy and team details (school, majors and short highlight
 bullets, rendered by `team-profile`) live there too; a member without a `photo`
 gets an initials avatar.
 

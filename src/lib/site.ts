@@ -61,8 +61,9 @@ export const products: readonly Product[] = [
 export type TeamMember = {
   name: string;
   role: string;
-  /** Schools and programs, one per line. */
-  education: readonly string[];
+  /** Shown as "School, Major and Major". */
+  school: string;
+  majors: readonly string[];
   /** Experience and accomplishments, kept to short bullets. */
   highlights: readonly string[];
   /** Portrait in /public. Falls back to initials when missing. */
@@ -75,7 +76,8 @@ export const founders: readonly TeamMember[] = [
   {
     name: "Michelle Dong",
     role: "Co-founder, CEO",
-    education: ["Business, Berkeley Haas", "Computer Science, UC Berkeley"],
+    school: "UC Berkeley",
+    majors: ["Business", "Computer Science"],
     highlights: [
       "Came up with Coere while building an AI app for gym users and re-explaining the project to every AI she switched to",
       "Owns the product side and works in the codebase with Edison",
@@ -88,12 +90,14 @@ export const founders: readonly TeamMember[] = [
   {
     name: "Edison Law",
     role: "Co-founder, CTO",
-    education: ["EECS and Bioengineering, UC Berkeley", "Walt Disney Scholar"],
+    school: "UC Berkeley",
+    majors: ["EECS", "Bioengineering"],
     highlights: [
       "Software engineer at Optagon Labs, owning production backend APIs, databases, authentication, billing, cloud infrastructure and security",
       "Three years building secure full-stack cloud applications",
       "Built ML pipelines for medical imaging and contributed to the MDAnalysis open source project",
       "Shipped apps used by over 5,000 people",
+      "Walt Disney Scholar",
       "Leads engineering at Coere",
     ],
     photo: "/founders/edison-law.jpeg",
@@ -104,7 +108,8 @@ export const executives: readonly TeamMember[] = [
   {
     name: "Sarah Shelke",
     role: "COO and CMO",
-    education: ["Economics and Neuroscience, UC Berkeley"],
+    school: "UC Berkeley",
+    majors: ["Economics", "Neuroscience"],
     highlights: [
       "Co-founded Mind4Youth at 14, now one of the largest youth-led mental health nonprofits in the world",
       "170+ chapters, 25,000+ volunteers in 71 countries, 2.5 million people reached and $519,000+ raised",
