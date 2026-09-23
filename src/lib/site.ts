@@ -54,7 +54,7 @@ export const products: readonly Product[] = [
     kind: "API, MCP and SDK",
     icon: "code",
     description:
-      "The same memory layer, opened up to apps. Plug in through the API, MCP or SDK, and when a user signs in, your product already knows them.",
+      "Developers can read the memory layer through the API, MCP or SDK, making every user known on day one.",
   },
 ] as const;
 
@@ -64,7 +64,7 @@ export type TeamMember = {
   /** Shown as "School, Major and Major". */
   school: string;
   majors: readonly string[];
-  /** Experience and accomplishments, kept to short bullets. */
+  /** Their own experience and accomplishments as short bullets, not their role at Coere. */
   highlights: readonly string[];
   /** Portrait in /public. Falls back to initials when missing. */
   photo?: string;
@@ -79,9 +79,12 @@ export const founders: readonly TeamMember[] = [
     school: "UC Berkeley",
     majors: ["Business", "Computer Science"],
     highlights: [
-      "Came up with Coere while building an AI app for gym users and re-explaining the project to every AI she switched to",
-      "Owns the product side and works in the codebase with Edison",
-      "Before Coere, scaled a business to 25 locations across the Bay Area",
+      "Scaled a business to 25 locations across the Bay Area",
+      "Founded MyNeighborExpert, a platform connecting learners with local experts for coaching and tutoring in sports, academics and music",
+      "Lectures 150+ students at Berkeley Haas on bringing 3D modeling and CAD tools into product development",
+      "Interned on Sam Liccardo's campaign, working on fundraising and survey research",
+      "Inspirit AI Scholar in machine learning and deep learning",
+      "Competed in the 2024 Blue Ocean Student Entrepreneur Competition",
     ],
     photo: "/founders/michelle-dong.jpeg",
     // Zooms the wide-framed original in on the face so both portraits match.
@@ -98,7 +101,6 @@ export const founders: readonly TeamMember[] = [
       "Built ML pipelines for medical imaging and contributed to the MDAnalysis open source project",
       "Shipped apps used by over 5,000 people",
       "Walt Disney Scholar",
-      "Leads engineering at Coere",
     ],
     photo: "/founders/edison-law.jpeg",
   },
@@ -116,7 +118,6 @@ export const executives: readonly TeamMember[] = [
       "Partnerships with the United Nations, Google and BetterHelp",
       "Named to TIME's inaugural Visionaries list and a Forbes 30 Under 30 semifinalist",
       "Top 3 finalist for the International Children's Peace Prize and winner of the JED Foundation's Student Voice of Mental Health Award",
-      "Leads go-to-market and adoption at Coere",
     ],
     photo: "/founders/sarah-shelke.jpeg",
   },
