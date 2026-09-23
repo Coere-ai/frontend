@@ -97,9 +97,10 @@ export const founders: readonly TeamMember[] = [
     majors: ["EECS", "Bioengineering"],
     highlights: [
       "Software engineer at Optagon Labs, owning production backend APIs, databases, authentication, billing, cloud infrastructure and security",
-      "Three years building secure full-stack cloud applications",
+      "Shipped apps used by over 10,000 people, including multiple featured by Google",
       "Built ML pipelines for medical imaging and contributed to the MDAnalysis open source project",
-      "Shipped apps used by over 5,000 people",
+      "Three years building secure full-stack cloud applications",
+      "Regents Scholar at multiple UC campuses",
       "Walt Disney Scholar",
     ],
     photo: "/founders/edison-law.jpeg",
