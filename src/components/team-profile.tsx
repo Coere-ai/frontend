@@ -70,7 +70,7 @@ export function TeamProfile({ member }: { member: TeamMember }) {
           {member.role}
         </p>
 
-        <p className="mt-3 flex gap-2 text-[14px] leading-relaxed text-ink-900/60">
+        <p className="mt-3 flex gap-2 text-[14px] leading-relaxed text-ink-900">
           <CapIcon />
           <span>
             {member.school}, {listOf(member.majors)}
