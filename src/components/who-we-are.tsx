@@ -5,22 +5,17 @@ import { executives, founders, type TeamMember } from "@/lib/site";
 /** A titled panel of people, one row each, split by hairlines. */
 function TeamGroup({
   title,
-  description,
   members,
 }: {
   title: string;
-  description?: string;
   members: readonly TeamMember[];
 }) {
   return (
-    <div className="mx-auto mt-12 max-w-4xl first:mt-14">
-      <Reveal className="mb-4 flex flex-col gap-1 px-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+    <div className="mx-auto mt-12 max-w-4xl">
+      <Reveal className="mb-4 px-1">
         <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink-900">
           {title}
         </h3>
-        {description ? (
-          <p className="text-[13.5px] text-ink-900/50">{description}</p>
-        ) : null}
       </Reveal>
 
       <div className="divide-y divide-ink-900/6 overflow-hidden rounded-3xl border border-ink-900/8 bg-white">
@@ -43,16 +38,8 @@ export function WhoWeAre() {
           description="Coere comes from the Latin cohaerere, to connect."
         />
 
-        <TeamGroup
-          title="Founders"
-          members={founders}
-        />
-
-        <TeamGroup
-          title="Executive team"
-          description="Leading go-to-market and adoption."
-          members={executives}
-        />
+        <TeamGroup title="Founders" members={founders} />
+        <TeamGroup title="Executive team" members={executives} />
       </Container>
     </section>
   );
