@@ -34,7 +34,7 @@ export type Product = {
   name: string;
   /** What it is, in a few words: the extension, or the developer surface. */
   kind: string;
-  /** Which symbol the card shows. */
+  /** Which symbol the card shows: the Chrome wheel, or code brackets. */
   icon: "chrome" | "code";
   /** What the product does, in one breath. */
   description: string;
@@ -47,7 +47,7 @@ export const products: readonly Product[] = [
     kind: "Chrome extension",
     icon: "chrome",
     description:
-      "A Chrome extension that carries your memory across every AI you use. Install it once, and a new chat in any of them picks up where the last one left off.",
+      "An app that carries your memory across every AI you use. Install it once, and a new chat in any of them picks up where the last one left off.",
   },
   {
     name: "Coere Developer",
