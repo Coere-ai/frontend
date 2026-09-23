@@ -77,10 +77,7 @@ export function Products() {
   return (
     <section id="products" className="py-16 sm:py-24">
       <Container>
-        <SectionHeading
-          title="Products"
-          description="Two ways into the same memory layer. People first, then apps."
-        />
+        <SectionHeading title="Products" />
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-2 md:gap-6">
           {products.map((product, index) => (
