@@ -21,17 +21,11 @@ import { coereMaterial, coereMarkGeometry, loadLogo } from "./logos";
 
 export type HeroAgent = { name: string; logo: string };
 
-export type HeroFrame = {
-  /** 0 on the wave, 1 once the logos have formed the orbit. */
-  morph: number;
-};
-
 type Options = {
   canvas: HTMLCanvasElement;
   host: HTMLElement;
   agents: readonly HeroAgent[];
   getProgress: () => number;
-  onFrame?: (frame: HeroFrame) => void;
   /** The GPU dropped the scene for good; show the flat page instead. */
   onFail?: () => void;
 };
@@ -49,17 +43,22 @@ const GRID_ANGLE = 0.6;
 /** How much of the morph the agents spread their departures over. Small, so
  * neighbours leave together and never overtake one another. */
 const STAGGER = 0.12;
-/** Where each agent waits on the wave, as a fraction of the spread. */
+/**
+ * Where each agent waits on the wave, as a fraction of the spread: an even
+ * ring on screen around Coere, in the orbit's order, so nothing bunches up and
+ * none of them leaves for its place in the orbit across another's path. The
+ * wave runs from near left to far right, so the left of the ring sits deeper.
+ */
 const WAVE_SPOTS: Record<string, [number, number]> = {
-  ChatGPT: [-1.0, 0.18],
-  Claude: [-0.86, -0.5],
-  Gemini: [-0.56, -1.02],
-  Perplexity: [0.52, -1.02],
-  Grok: [0.88, -0.5],
-  Copilot: [1.02, 0.14],
-  "Meta AI": [0.64, 0.66],
-  Kimi: [0.08, 0.8],
-  DeepSeek: [-0.56, 0.68],
+  Perplexity: [0.4, -0.47],
+  Grok: [0.99, -0.28],
+  Copilot: [1.08, 0.06],
+  "Meta AI": [0.66, 0.55],
+  Kimi: [0, 0.83],
+  DeepSeek: [-0.62, 0.84],
+  ChatGPT: [-0.99, 0.56],
+  Claude: [-1.07, -0.82],
+  Gemini: [-0.48, -1.45],
 };
 /** Clockwise from the top, as the flat orbit had them. */
 const RING_ORDER = [
@@ -132,6 +131,7 @@ export class HeroScene {
   // Layout, set on resize.
   private aspect = 1;
   private spread = new THREE.Vector2(8.6, 6.3);
+  private waveScale = 1;
   private waveCamera = {
     target: new THREE.Vector3(0, 2.6, 0),
     elevation: 0.27,
@@ -466,7 +466,9 @@ export class HeroScene {
 
     // Spread the agents to the screen: wide on desktop, deep on phones.
     const wide = smoothstep(0.55, 1.6, a);
-    this.spread.set(lerp(4.9, 8.6, wide), lerp(7.2, 6.3, wide));
+    this.spread.set(lerp(4.3, 8.6, wide), lerp(8.4, 6.3, wide));
+    // Phones draw the wave small, so the logos on it get a little bigger.
+    this.waveScale = lerp(1.25, 1, wide);
 
     // Low over the surface, as in a landscape shot.
     this.waveCamera.distance = lerp(44, 40, wide);
@@ -644,7 +646,6 @@ export class HeroScene {
     dustMaterial.uniforms.uOpacity.value = 1 - smoothstep(0.3, 0.7, m);
 
     this.stage.renderer.render(this.scene, this.camera);
-    this.options.onFrame?.({ morph: m });
   }
 
   private updateCamera(m: number) {
@@ -686,7 +687,7 @@ export class HeroScene {
     const bob = Math.sin(t * 0.9) * 0.12;
     const waveY = this.height(0, 0, t) * amp + 2 + bob;
     this.rig.position.set(0, lerp(waveY, ORBIT_Y + bob * 0.5, e), 0);
-    this.rig.scale.setScalar(lerp(this.aspect < 0.9 ? 2.15 : 2.6, 3.2, e));
+    this.rig.scale.setScalar(lerp(this.aspect < 0.9 ? 2.45 : 2.6, 3.2, e));
 
     // Spin: free on the wave; in the orbit it settles facing out with a sway.
     if (!this.drag || this.drag.mode !== "mark") {
@@ -752,7 +753,7 @@ export class HeroScene {
       }
       // Far ones a touch larger, so perspective does not shrink them away.
       const scale =
-        lerp(1.4 - a.spot.y * 0.2, 1.42, local) *
+        lerp((1.4 - a.spot.y * 0.2) * this.waveScale, 1.42, local) *
         (1 + a.hover * 0.14) *
         // Entrance: each logo rises out of the wave in turn.
         Math.max(

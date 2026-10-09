@@ -7,6 +7,7 @@ import {
   createGlowTexture,
   damp,
   disposeTree,
+  easeInOutCubic,
   easeOutBack,
   easeOutCubic,
   isLowPowerDevice,
@@ -15,16 +16,21 @@ import {
 } from "./core";
 import { createDatabaseGeometry, createDatabaseMaterial } from "./database";
 import {
-  createAppTile,
-  createLaptop,
-  createPhone,
-  type Device,
-} from "./devices";
+  TILE_DEPTH,
+  brandTileMaterial,
+  getBrandTileGeometry,
+  getGlyphGeometry,
+  getTileGeometry,
+  glyphMaterial,
+  lightTileMaterial,
+  type GlyphName,
+} from "./glyphs";
 import { coereMaterial, coereMarkGeometry, loadLogo } from "./logos";
 
 export type ProductsAgent = { name: string; logo: string };
 export type ProductsFocus = "connect" | "developer" | null;
-type Hover = { kind: "source" | "reader" | "core"; index: number } | null;
+type Side = "source" | "reader";
+type Hover = { kind: Side; index: number } | { kind: "core" } | null;
 
 type Options = {
   canvas: HTMLCanvasElement;
@@ -38,75 +44,71 @@ type Options = {
 
 export const PRODUCTS_BACKGROUND = "#f2f5fc";
 
-/**
- * One disk of a database column. A column of three reads as one database,
- * each disk carrying a logo, with a lit seam between them and nothing
- * crossing the logos.
- */
-const UNIT_RADIUS = 0.6;
-const UNIT_DISK = 0.66;
-const UNIT_HEIGHT = UNIT_DISK + UNIT_RADIUS * 0.05;
-const UNIT_GAP = 0.05;
-const UNITS_PER_TOWER = 3;
-const TOWER_HEIGHT =
-  UNITS_PER_TOWER * UNIT_HEIGHT + (UNITS_PER_TOWER - 1) * UNIT_GAP;
+/** What reads from Coere, a row each: devices, then apps, then code. */
+export const READERS: readonly GlyphName[] = [
+  "laptop",
+  "phone",
+  "watch",
+  "browser",
+  "chat",
+  "terminal",
+  "code",
+  "cube",
+  "database",
+];
+
+const COLUMNS = 3;
+/** Centre to centre, between tiles in a grid. */
+const PITCH = 1.3;
+/** Where a symbol sits: just proud of the tile's face. */
+const FACE_Z = TILE_DEPTH / 2 + 0.03;
 
 /** Light runs through the picture once per cycle: in, through Coere, out. */
 const CYCLE = 5.4;
 /** When, as a fraction of the cycle, Coere lights. */
-const CORE_AT = 0.36;
+const CORE_AT = 0.32;
 
-/** A quick flash that fades: 1 at `at`, gone a little after. */
-const flash = (phase: number, at: number, width = 0.12) => {
+/** A quick rise to 1 at `at`, then a fade over `width` of the cycle. */
+const flash = (phase: number, at: number, width = 0.13) => {
   let u = phase - at;
-  if (u < 0) u += 1;
-  return u < width ? Math.pow(1 - u / width, 2) : 0;
+  if (u < -0.5) u += 1;
+  if (u < -0.02 || u > width) return 0;
+  if (u < 0) return 1 - (u / -0.02) ** 2;
+  return (1 - u / width) ** 2;
 };
 
-type Unit = {
-  tower: number;
-  /** 0 at the bottom. */
-  level: number;
-  logo: THREE.Group;
-  body: THREE.Mesh | null;
-  fireAt: number;
-  energy: number;
-};
-
-type Tower = {
-  x: number;
-  z: number;
+type Tile = {
+  side: Side;
+  /** Its column in the grid as seen, 0 on the left, and its row from the top. */
+  column: number;
+  row: number;
+  /** 0 for the tiles nearest Coere, 2 for the farthest. */
+  near: number;
+  /** Placed and turned in the layout. */
+  group: THREE.Group;
+  /** Moves inside the group: pops, hovers, flips. */
+  body: THREE.Group;
+  material: THREE.MeshPhysicalMaterial;
+  face: THREE.Object3D;
   hit: THREE.Mesh;
   halo: THREE.Sprite;
-  hover: number;
-};
-
-type Reader = {
-  device: Device;
-  base: THREE.Vector3;
-  /** Height of its middle above `base`, for its halo and hit area. */
-  middle: number;
-  scale: number;
-  facing: number;
-  float: boolean;
   fireAt: number;
+  appearAt: number;
   energy: number;
   hover: number;
-  hit: THREE.Mesh;
-  halo: THREE.Sprite;
-  appear: number;
+  flipAt: number;
 };
 
 const place = new THREE.Vector3();
-const matrix = new THREE.Matrix4();
 
 /**
- * Coere Connect and Coere Developer as one centered picture. On the left,
- * three columns of databases, one for each AI with its logo on the front. In
- * the middle, Coere. On the right, the things that read from it: a database,
- * a laptop with an app above it, and a phone. No lines: a wave of light runs
- * through the picture from left to right, the databases flaring as it
- * leaves them, Coere as it passes, then everything that reads from it.
+ * Coere Connect and Coere Developer as one centered picture, like two pages
+ * of app icons either side of Coere. On the left, a white icon for each AI
+ * with its logo. In the middle, Coere on a database. On the right, blue icons
+ * for what reads from it: a laptop, a phone and a watch, a browser, a chat and
+ * a terminal, then code, an SDK and a database. No lines: light runs through
+ * the picture, the AI icons flaring column by column toward Coere, Coere as
+ * it passes, then the icons on the right column by column away from it.
  */
 export class ProductsScene {
   readonly ready: Promise<void>;
@@ -119,29 +121,26 @@ export class ProductsScene {
   private readonly reducedMotion = prefersReducedMotion();
   private readonly options: Options;
 
-  private readonly units: Unit[] = [];
-  private readonly towers: Tower[] = [];
-  private readonly sourceMesh: THREE.InstancedMesh;
-  private readonly sourceData: THREE.InstancedBufferAttribute;
-  private readonly blueMesh: THREE.InstancedMesh;
-  private readonly blueData: THREE.InstancedBufferAttribute;
-  private readonly readers: Reader[] = [];
-
+  private readonly tiles: Tile[] = [];
   private readonly core = new THREE.Group();
   private readonly pedestalUniforms: { uData: { value: THREE.Vector4 } };
   private readonly mark: THREE.Mesh;
   private readonly markHit: THREE.Mesh;
   private readonly coreGlow: THREE.Sprite;
   private readonly coreLight: THREE.PointLight;
-  private readonly floor: THREE.ShaderMaterial;
+  private readonly floor: THREE.Group;
+  private readonly floorMaterial: THREE.ShaderMaterial;
   private readonly key: THREE.DirectionalLight;
 
   private portrait = false;
   private distance = 18;
-  private elevation = 0.2;
-  private targetY = 1.3;
+  private elevation = 0.14;
+  private targetY = 2;
+  private markY = 2.2;
+  private markScale = 2.3;
 
   private time = 0;
+  private loaded = false;
   private introStart = -1;
   private focus: ProductsFocus = null;
   private focusAmount = { connect: 0, developer: 0 };
@@ -179,35 +178,55 @@ export class ProductsScene {
     this.scene.background = new THREE.Color(PRODUCTS_BACKGROUND);
     this.scene.fog = new THREE.Fog(PRODUCTS_BACKGROUND, 26, 48);
     this.scene.environment = createEnvironment(renderer);
-    this.scene.environmentIntensity = 0.7;
-    this.scene.add(new THREE.HemisphereLight("#ffffff", "#b6c3e6", 0.8));
-    this.key = new THREE.DirectionalLight("#ffffff", 2.3);
-    // Nearly overhead, so shadows pool under things instead of smearing.
-    this.key.position.set(-1.5, 14, 5);
+    this.scene.environmentIntensity = 0.75;
+    this.scene.add(new THREE.HemisphereLight("#ffffff", "#b6c3e6", 0.85));
+    this.key = new THREE.DirectionalLight("#ffffff", 2.2);
+    // High and a little in front, so shadows pool under the icons.
+    this.key.position.set(-1.5, 14, 3);
     this.key.castShadow = true;
     const shadowSize = this.lowPower ? 1024 : 2048;
     this.key.shadow.mapSize.set(shadowSize, shadowSize);
     const sc = this.key.shadow.camera;
-    sc.left = -11;
-    sc.right = 11;
+    sc.left = -10;
+    sc.right = 10;
     sc.top = 8;
     sc.bottom = -8;
     sc.near = 1;
     sc.far = 36;
-    this.key.shadow.radius = 7;
+    this.key.shadow.radius = 8;
     this.key.shadow.bias = -0.0004;
     this.key.shadow.normalBias = 0.02;
     this.scene.add(this.key, this.key.target);
-    const rim = new THREE.DirectionalLight("#dfe6ff", 0.9);
+    const rim = new THREE.DirectionalLight("#dfe6ff", 0.8);
     rim.position.set(5, 6, -10);
-    this.scene.add(rim);
+    // From the viewer, so the faces of the icons read bright and clean.
+    const fill = new THREE.DirectionalLight("#ffffff", 0.6);
+    fill.position.set(0, 3, 12);
+    this.scene.add(rim, fill);
 
     this.scene.add(this.root);
-    this.floor = this.buildFloor();
+    const floor = this.buildFloor();
+    this.floor = floor.group;
+    this.floorMaterial = floor.material;
 
     const glowMap = createGlowTexture(BRAND[500]);
-    const halo = () => {
-      const sprite = new THREE.Sprite(
+    const hitGeometry = new THREE.BoxGeometry(1.1, 1.1, 0.5);
+    const hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
+
+    // The icons. Sources take the agents in reading order; readers take
+    // READERS the same way.
+    const makeTile = (side: Side, index: number, face: THREE.Object3D) => {
+      const material =
+        side === "source" ? lightTileMaterial() : brandTileMaterial();
+      const tile = new THREE.Mesh(
+        side === "source" ? getTileGeometry() : getBrandTileGeometry(),
+        material,
+      );
+      tile.castShadow = true;
+      face.position.z = FACE_Z;
+      const body = new THREE.Group();
+      body.add(tile, face);
+      const halo = new THREE.Sprite(
         new THREE.SpriteMaterial({
           map: glowMap,
           transparent: true,
@@ -215,96 +234,59 @@ export class ProductsScene {
           opacity: 0,
         }),
       );
-      sprite.renderOrder = -1;
-      this.root.add(sprite);
-      return sprite;
-    };
-
-    // Sources: three columns of databases, white with lit grooves.
-    const unitGeometry = () =>
-      createDatabaseGeometry({
-        radius: UNIT_RADIUS,
-        disk: UNIT_DISK,
-        disks: 1,
-        seam: true,
-        segments: 40,
-      });
-    const count = options.agents.length;
-    const towerCount = Math.ceil(count / UNITS_PER_TOWER);
-    const sourceGeometry = unitGeometry();
-    this.sourceData = new THREE.InstancedBufferAttribute(
-      new Float32Array(count * 4),
-      4,
-    );
-    this.sourceData.setUsage(THREE.DynamicDrawUsage);
-    sourceGeometry.setAttribute("aData", this.sourceData);
-    this.sourceMesh = new THREE.InstancedMesh(
-      sourceGeometry,
-      createDatabaseMaterial({ shadeDepth: 5, bandBase: 0.3 }).material,
-      count,
-    );
-    this.sourceMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    this.sourceMesh.castShadow = true;
-    this.sourceMesh.receiveShadow = true;
-    this.sourceMesh.frustumCulled = false;
-    this.root.add(this.sourceMesh);
-
-    for (let i = 0; i < towerCount; i++) {
-      const hit = new THREE.Mesh(
-        new THREE.CylinderGeometry(
-          UNIT_RADIUS * 1.15,
-          UNIT_RADIUS * 1.15,
-          TOWER_HEIGHT,
-          12,
-        ),
-        new THREE.MeshBasicMaterial({ visible: false }),
-      );
-      this.root.add(hit);
-      this.towers.push({ x: 0, z: 0, hit, halo: halo(), hover: 0 });
-    }
-    // Read top to bottom, left to right, like a page; the light leaves the
-    // outer column first and moves in.
-    options.agents.forEach((_, k) => {
-      const tower = Math.floor(k / UNITS_PER_TOWER);
-      const level = UNITS_PER_TOWER - 1 - (k % UNITS_PER_TOWER);
-      const logo = new THREE.Group();
-      this.root.add(logo);
-      this.units.push({
-        tower,
-        level,
-        logo,
-        body: null,
-        fireAt: 0.02 + tower * 0.085 + (UNITS_PER_TOWER - 1 - level) * 0.025,
+      halo.position.z = -0.3;
+      halo.scale.setScalar(2.5);
+      const hit = new THREE.Mesh(hitGeometry, hitMaterial);
+      const group = new THREE.Group();
+      group.rotation.order = "YXZ";
+      group.add(halo, body, hit);
+      this.root.add(group);
+      this.tiles.push({
+        side,
+        column: index % COLUMNS,
+        row: Math.floor(index / COLUMNS),
+        near: 0,
+        group,
+        body,
+        material,
+        face,
+        hit,
+        halo,
+        fireAt: 0,
+        appearAt: 0,
         energy: 0,
+        hover: 0,
+        flipAt: -1,
       });
+    };
+    options.agents.forEach((_, k) => makeTile("source", k, new THREE.Group()));
+    const glyph = glyphMaterial();
+    READERS.forEach((name, k) => {
+      const mesh = new THREE.Mesh(getGlyphGeometry(name), glyph);
+      makeTile("reader", k, mesh);
     });
 
-    // The core: a wide database with Coere floating over it.
+    // The core: Coere floating over a database.
     const pedestal = createDatabaseMaterial({
       instanced: false,
       shadeDepth: 3,
       bandBase: 0.4,
     });
     this.pedestalUniforms = pedestal.uniforms;
+    const disk = 0.2;
     const pedestalMesh = new THREE.Mesh(
-      createDatabaseGeometry({
-        radius: 1.45,
-        disk: 0.26,
-        segments: 72,
-      }),
+      createDatabaseGeometry({ radius: 1.2, disk, segments: 72 }),
       pedestal.material,
     );
-    pedestalMesh.position.y = 0.26 * 3 + 0.07;
+    pedestalMesh.position.y = disk * 3 + 0.06;
     pedestalMesh.castShadow = true;
     pedestalMesh.receiveShadow = true;
     this.mark = new THREE.Mesh(coereMarkGeometry(), coereMaterial());
     this.mark.castShadow = true;
-    this.mark.scale.setScalar(2.2);
     this.markHit = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.5, 1.5, 3.4, 12),
-      new THREE.MeshBasicMaterial({ visible: false }),
+      new THREE.CylinderGeometry(1.3, 1.3, 3.2, 12),
+      hitMaterial,
     );
-    this.markHit.position.y = 1.6;
     this.coreGlow = new THREE.Sprite(
       new THREE.SpriteMaterial({
         map: glowMap,
@@ -313,7 +295,6 @@ export class ProductsScene {
         opacity: 0.5,
       }),
     );
-    this.coreGlow.scale.setScalar(5.4);
     this.coreLight = new THREE.PointLight("#dbe2ff", 10, 9, 1.6);
     this.core.add(
       pedestalMesh,
@@ -323,69 +304,6 @@ export class ProductsScene {
       this.coreLight,
     );
     this.root.add(this.core);
-
-    // Readers: a database column in brand blue, then a laptop with an app
-    // floating over it, then a phone.
-    const blueGeometry = unitGeometry();
-    this.blueData = new THREE.InstancedBufferAttribute(
-      new Float32Array(UNITS_PER_TOWER * 4),
-      4,
-    );
-    this.blueData.setUsage(THREE.DynamicDrawUsage);
-    blueGeometry.setAttribute("aData", this.blueData);
-    const blue = createDatabaseMaterial({
-      color: BRAND[500],
-      band: "#ffffff",
-      deep: BRAND[600],
-      low: BRAND[500],
-      glow: "#ffffff",
-      shadeDepth: 6,
-      bandBase: 0.5,
-    }).material;
-    blue.roughness = 0.24;
-    blue.envMapIntensity = 1;
-    this.blueMesh = new THREE.InstancedMesh(
-      blueGeometry,
-      blue,
-      UNITS_PER_TOWER,
-    );
-    this.blueMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    this.blueMesh.castShadow = true;
-    this.blueMesh.frustumCulled = false;
-    this.root.add(this.blueMesh);
-
-    const blueColumn: Device = {
-      group: new THREE.Group(),
-      update: () => {},
-    };
-    // [device, scale, turn toward Coere, floats, middle above its base]
-    const readers: [Device, number, number, boolean, number][] = [
-      [blueColumn, 1, 0.12, false, TOWER_HEIGHT / 2],
-      [createLaptop(), 0.8, 0.18, false, 0.7],
-      [createAppTile(), 0.62, 0.16, true, 0],
-      [createPhone(), 0.74, 0.2, false, 0],
-    ];
-    readers.forEach(([device, scale, facing, float, middle], j) => {
-      const hit = new THREE.Mesh(
-        new THREE.SphereGeometry(1.1, 10, 8),
-        new THREE.MeshBasicMaterial({ visible: false }),
-      );
-      this.root.add(device.group, hit);
-      this.readers.push({
-        device,
-        base: new THREE.Vector3(),
-        middle,
-        scale,
-        facing,
-        float,
-        fireAt: CORE_AT + 0.1 + [0, 0.07, 0.11, 0.15][j],
-        energy: 0,
-        hover: 0,
-        hit,
-        halo: halo(),
-        appear: 0,
-      });
-    });
 
     this.ready = this.loadLogos();
 
@@ -410,7 +328,6 @@ export class ProductsScene {
         uColor: { value: new THREE.Color(BRAND[400]) },
         uLit: { value: new THREE.Color(BRAND[600]) },
         uSweep: { value: -100 },
-        uAlong: { value: new THREE.Vector2(1, 0) },
         uStrength: { value: 0 },
       },
       vertexShader: /* glsl */ `
@@ -424,7 +341,6 @@ export class ProductsScene {
         uniform vec3 uColor;
         uniform vec3 uLit;
         uniform float uSweep;
-        uniform vec2 uAlong;
         uniform float uStrength;
         varying vec2 vPos;
         void main() {
@@ -434,10 +350,10 @@ export class ProductsScene {
           float d = length(cell);
           float w = fwidth(d);
           float dotMask = 1.0 - smoothstep(0.05 - w, 0.05 + w, d);
-          float fade = 1.0 - smoothstep(3.5, 11.0, length(p * vec2(0.62, 1.25)));
-          float band = exp(-pow((dot(p, uAlong) - uSweep) / 1.1, 2.0)) * uStrength;
+          float fade = 1.0 - smoothstep(3.0, 10.0, length(p * vec2(0.62, 1.4)));
+          float band = exp(-pow((p.x - uSweep) / 1.1, 2.0)) * uStrength;
           vec3 color = mix(uColor, uLit, band);
-          float alpha = dotMask * fade * (0.28 + band * 0.7);
+          float alpha = dotMask * fade * (0.26 + band * 0.7);
           gl_FragColor = vec4(color, alpha);
           #include <colorspace_fragment>
         }
@@ -452,8 +368,10 @@ export class ProductsScene {
     );
     shadows.rotation.x = -Math.PI / 2;
     shadows.receiveShadow = true;
-    this.root.add(shadows, dots);
-    return material;
+    const group = new THREE.Group();
+    group.add(shadows, dots);
+    this.root.add(group);
+    return { group, material };
   }
 
   private async loadLogos() {
@@ -461,19 +379,23 @@ export class ProductsScene {
       this.options.agents.map((agent) => loadLogo(agent.logo)),
     );
     const bodies = new THREE.Group();
+    const sources = this.tiles.filter((tile) => tile.side === "source");
+    const faces: [THREE.Object3D, THREE.Mesh][] = [];
     results.forEach((result, k) => {
       if (result.status !== "fulfilled") return;
-      const body = new THREE.Mesh(result.value.geometry, result.value.material);
-      body.castShadow = true;
-      this.units[k].body = body;
-      bodies.add(body);
+      const mesh = new THREE.Mesh(result.value.geometry, result.value.material);
+      // Logos fill their 24 unit box differently; this keeps them icon sized.
+      mesh.scale.setScalar(0.56);
+      faces.push([sources[k].face, mesh]);
+      bodies.add(mesh);
     });
     try {
       await this.stage.renderer.compileAsync(bodies, this.camera, this.scene);
     } catch {
       // Compiling on first draw instead is fine.
     }
-    this.units.forEach((unit) => unit.body && unit.logo.add(unit.body));
+    faces.forEach(([face, mesh]) => face.add(mesh));
+    this.loaded = true;
   }
 
   // ---------------------------------------------------------------- layout
@@ -484,66 +406,69 @@ export class ProductsScene {
     this.portrait = aspect < 1.05;
     const tanV = (fov: number) => Math.tan(THREE.MathUtils.degToRad(fov / 2));
 
+    for (const tile of this.tiles) {
+      const source = tile.side === "source";
+      // The column as counted out from Coere on a wide screen.
+      const out = source ? COLUMNS - 1 - tile.column : tile.column;
+      if (this.portrait) {
+        // Sources above, readers below: the flow runs down the screen.
+        tile.near = source ? 2 - tile.row : tile.row;
+        const x = (tile.column - 1) * 1.38;
+        const y = source ? 10.2 - tile.row * 1.35 : 2.7 - tile.row * 1.35;
+        tile.group.position.set(x, y, Math.abs(x) * 0.12);
+        tile.group.rotation.set(0, -x * 0.12, 0);
+        tile.fireAt = source
+          ? 0.02 + (2 - tile.near) * 0.075 + tile.column * 0.015
+          : CORE_AT + 0.07 + tile.near * 0.075 + tile.column * 0.015;
+        tile.appearAt = 0.35 + tile.near * 0.14 + tile.column * 0.05;
+      } else {
+        // Two pages either side of Coere, curving gently toward the viewer
+        // and turned toward the middle.
+        tile.near = out;
+        const s = source ? -1 : 1;
+        const x = s * (3.1 + out * PITCH);
+        const y = 3.5 - tile.row * PITCH;
+        tile.group.position.set(x, y, [0, 0.22, 0.56][out]);
+        tile.group.rotation.set(-0.08, -s * [0.24, 0.32, 0.4][out], 0);
+        tile.fireAt = source
+          ? 0.02 + (2 - out) * 0.075 + tile.row * 0.02
+          : CORE_AT + 0.07 + out * 0.075 + tile.row * 0.02;
+        tile.appearAt = 0.35 + out * 0.14 + tile.row * 0.06;
+      }
+    }
+
     if (this.portrait) {
-      // Sources at the back, readers in front: the flow runs down the screen.
-      this.camera.fov = 34;
-      // Steep enough that the columns at the back clear Coere's top.
-      this.elevation = 0.8;
-      this.targetY = 0.8;
-      this.towers.forEach((tower, i) => {
-        tower.x = (i - 1) * 1.65;
-        tower.z = -5.9;
-      });
-      const spots: [number, number, number][] = [
-        [-2.1, 3.9, 0],
-        [0.15, 4.4, 0],
-        [2.25, 3.55, 2.25],
-        [2.25, 4.1, 0.76],
-      ];
-      this.readers.forEach((r, j) =>
-        r.base.set(spots[j][0], spots[j][2], spots[j][1]),
-      );
-      const halfWidth = 3.3;
-      const halfDepth = 6.7;
+      this.camera.fov = 30;
+      this.elevation = 0.06;
+      this.targetY = 5.1;
+      this.core.position.set(0, 3.55, 0);
+      this.markY = 1.7;
+      this.markScale = 1.95;
+      const halfWidth = 1.38 + 0.5 + 0.4;
+      const halfHeight = 6.0;
       this.distance = Math.max(
         halfWidth / (tanV(this.camera.fov) * aspect),
-        halfDepth / tanV(this.camera.fov),
+        halfHeight / tanV(this.camera.fov),
       );
     } else {
-      // Mirror images either side of Coere, all facing the camera.
       this.camera.fov = 24;
-      this.elevation = 0.2;
-      this.targetY = 1.3;
-      this.towers.forEach((tower, i) => {
-        tower.x = -6.35 + i * 1.5;
-        tower.z = 0;
-      });
-      const spots: [number, number, number][] = [
-        [3.2, 0, 0],
-        [5.25, 0.25, 0],
-        [5.25, -0.1, 2.35],
-        [7.0, 0.15, 0.76],
-      ];
-      this.readers.forEach((r, j) =>
-        r.base.set(spots[j][0], spots[j][2], spots[j][1]),
-      );
-      const halfWidth = 8.2;
-      const halfHeight = 2.8;
+      this.elevation = 0.14;
+      this.targetY = 2.05;
+      this.core.position.set(0, 0, 0);
+      this.markY = 2.25;
+      this.markScale = 2.1;
+      const halfWidth = 7.7;
+      const halfHeight = 2.75;
       this.distance = Math.max(
         halfWidth / (tanV(this.camera.fov) * aspect),
         halfHeight / tanV(this.camera.fov),
       );
     }
-    this.towers.forEach((tower) =>
-      tower.hit.position.set(tower.x, TOWER_HEIGHT / 2, tower.z),
-    );
+    // Seen nearly edge on from the front, the floor would only be a line.
+    this.floor.visible = !this.portrait;
     const fog = this.scene.fog as THREE.Fog;
     fog.near = this.distance + 6;
     fog.far = this.distance + 30;
-    this.floor.uniforms.uAlong.value.set(
-      this.portrait ? 0 : 1,
-      this.portrait ? 1 : 0,
-    );
   }
 
   private degrade() {
@@ -570,7 +495,8 @@ export class ProductsScene {
     const motion = this.reducedMotion ? 0 : 1;
     this.time += dt * motion;
     const t = this.time;
-    if (this.introStart < 0 && dt > 0) this.introStart = this.time;
+    // The intro waits for the logos, so no icon arrives blank.
+    if (this.introStart < 0 && this.loaded) this.introStart = this.time;
     // Without motion everything is simply there.
     const intro = this.reducedMotion
       ? 99
@@ -600,6 +526,7 @@ export class ProductsScene {
       6,
       dt,
     );
+
     // Camera: a slow drift, a little parallax, and a drag that springs home.
     if (!this.drag) this.yawTarget = damp(this.yawTarget, 0, 1.6, dt);
     const parallaxX = this.pointerInside ? this.pointerX : 0;
@@ -618,98 +545,80 @@ export class ProductsScene {
     this.camera.lookAt(target);
     this.camera.updateProjectionMatrix();
 
-    this.updateSources(t, dt, intro, phase, running);
+    this.updateTiles(t, dt, intro, phase, running);
     this.updateCore(t, dt, intro, phase, running);
-    this.updateReaders(t, dt, intro, phase, running);
 
     // The band of light on the floor crosses with the flow.
-    const along = this.portrait ? 4.8 : 7.6;
-    this.floor.uniforms.uSweep.value = lerp(-along, along, phase / 0.62);
-    this.floor.uniforms.uStrength.value =
+    this.floorMaterial.uniforms.uSweep.value = lerp(-7.4, 7.4, phase / 0.62);
+    this.floorMaterial.uniforms.uStrength.value =
       running * (phase < 0.62 ? Math.sin((phase / 0.62) * Math.PI) : 0);
 
     this.stage.renderer.render(this.scene, this.camera);
   }
 
-  /** A side's resting glow: up when it has focus, down when the other does. */
-  private sideLight(mine: number, other: number) {
-    return 1 + mine * 0.6 - other * 0.55;
-  }
-
-  private updateSources(
+  private updateTiles(
     t: number,
     dt: number,
     intro: number,
     phase: number,
     running: number,
   ) {
-    const data = this.sourceData.array as Float32Array;
-    const light = this.sideLight(
-      this.focusAmount.connect,
-      this.focusAmount.developer,
-    );
-    const towerEnergy = this.towers.map(() => 0);
-
-    this.towers.forEach((tower, i) => {
+    const { connect, developer } = this.focusAmount;
+    this.tiles.forEach((tile, k) => {
+      const source = tile.side === "source";
+      const mine = source ? connect : developer;
+      const other = source ? developer : connect;
+      const index = source ? k : k - this.options.agents.length;
       const hovered =
-        this.hovered?.kind === "source" && this.hovered.index === i;
-      tower.hover = damp(tower.hover, hovered ? 1 : 0, 10, dt);
-    });
+        this.hovered?.kind === tile.side && this.hovered.index === index;
+      tile.hover = damp(tile.hover, hovered ? 1 : 0, 10, dt);
+      tile.energy = flash(phase, tile.fireAt) * running;
 
-    this.units.forEach((unit, k) => {
-      const tower = this.towers[unit.tower];
-      // Units drop into place bottom first, a column at a time.
-      const delay = 0.25 + unit.tower * 0.2 + unit.level * 0.12;
-      const appear = this.reducedMotion ? 1 : clamp01((intro - delay) / 0.55);
-      const drop = (1 - easeOutCubic(appear)) * 2.2;
-      unit.energy = flash(phase, unit.fireAt) * running;
-      towerEnergy[unit.tower] = Math.max(towerEnergy[unit.tower], unit.energy);
-
-      const lift = tower.hover * 0.08 * (unit.level + 1);
-      const top =
-        (unit.level + 1) * UNIT_HEIGHT + unit.level * UNIT_GAP + drop + lift;
-      const scale = Math.max(0.0001, easeOutBack(appear));
-      matrix.makeScale(scale, scale, scale).setPosition(tower.x, top, tower.z);
-      this.sourceMesh.setMatrixAt(k, matrix);
-      data[k * 4] = (0.22 + unit.energy * 1.4 + tower.hover * 0.5) * light;
-      data[k * 4 + 1] = 0;
-      data[k * 4 + 2] = this.focusAmount.developer * 0.18;
-      data[k * 4 + 3] = tower.hover * 0.3;
-
-      // The logo sits on the front of its database, turned a touch toward
-      // Coere, and leans forward when the light leaves it.
-      const logo = unit.logo;
-      const face = this.portrait ? 0 : 0.2;
-      logo.position.set(
-        tower.x + Math.sin(face) * (UNIT_RADIUS + 0.06),
-        top - UNIT_HEIGHT / 2,
-        tower.z + Math.cos(face) * (UNIT_RADIUS + 0.06),
-      );
-      logo.scale.setScalar(scale * 0.5 * (1 + unit.energy * 0.08));
-      logo.rotation.set(
-        -unit.energy * 0.12,
-        face - this.yaw * 0.5 + Math.sin(t * 0.8 + k) * 0.06,
+      // Arrive with a pop, nearest Coere first.
+      const appear = this.reducedMotion
+        ? 1
+        : clamp01((intro - tile.appearAt) / 0.7);
+      const scale =
+        Math.max(0.0001, easeOutBack(appear)) *
+        (1 +
+          tile.energy * 0.06 +
+          tile.hover * 0.07 +
+          mine * 0.04 -
+          other * 0.06);
+      const body = tile.body;
+      body.scale.setScalar(scale);
+      body.position.set(
         0,
+        // A slow swell that rolls across each grid.
+        this.reducedMotion
+          ? 0
+          : Math.sin(t * 1.2 - tile.near * 0.9 - tile.row * 0.5) * 0.035 -
+              (1 - easeOutCubic(appear)) * 0.5,
+        // Forward when it fires or has focus, back when the other side does.
+        tile.energy * 0.24 + tile.hover * 0.3 + mine * 0.18 - other * 0.16,
       );
-    });
-    this.sourceMesh.instanceMatrix.needsUpdate = true;
-    this.sourceData.needsUpdate = true;
 
-    this.towers.forEach((tower, i) => {
-      const glow =
-        Math.max(
-          towerEnergy[i] * 0.9,
-          tower.hover * 0.6,
-          this.focusAmount.connect * 0.45,
-        ) * light;
-      tower.halo.position.set(
-        tower.x,
-        TOWER_HEIGHT / 2,
-        tower.z - (this.portrait ? 0.25 : 0.7),
+      // A click sends it once round.
+      let flip = 0;
+      if (tile.flipAt >= 0) {
+        const f = clamp01((t - tile.flipAt) / 1);
+        flip = easeInOutCubic(f) * Math.PI * 2;
+        if (f >= 1) tile.flipAt = -1;
+      }
+      // Neighbours sway together, so each grid moves as one.
+      const sway = this.reducedMotion
+        ? 0
+        : Math.sin(t * 0.6 - tile.near * 0.6 - tile.row * 0.3) * 0.03;
+      body.rotation.set(-tile.energy * 0.12, flip + sway, 0);
+
+      const lit = Math.max(tile.energy, tile.hover * 0.7);
+      tile.material.emissiveIntensity =
+        (source ? 0.5 : 0.55) * lit + mine * 0.2;
+      tile.halo.material.opacity = Math.min(
+        0.85,
+        Math.max(lit, mine * 0.6) * (1 - other * 0.7) * 0.85 * appear,
       );
-      tower.halo.scale.set(3.2, 4.4, 1);
-      tower.halo.material.opacity = Math.min(0.75, glow * 0.7);
-      tower.halo.visible = tower.halo.material.opacity > 0.003;
+      tile.halo.visible = tile.halo.material.opacity > 0.003;
     });
   }
 
@@ -721,7 +630,6 @@ export class ProductsScene {
     running: number,
   ) {
     const appear = this.reducedMotion ? 1 : easeOutCubic(clamp01(intro / 0.9));
-    this.core.position.y = lerp(-1.5, 0, appear);
     this.core.scale.setScalar(lerp(0.7, 1, appear));
 
     // Mostly facing out with a slow sway; a click sends it round.
@@ -733,12 +641,13 @@ export class ProductsScene {
     }
     this.spin += this.spinVelocity * dt;
     const pulse = flash(phase, CORE_AT, 0.16) * running;
-    // Higher on phones, where the steeper camera would sink it into the pedestal.
-    const markY = (this.portrait ? 2.75 : 2.45) + Math.sin(t * 1.1) * 0.07;
+    const markY = this.markY + Math.sin(t * 1.1) * 0.07 - (1 - appear) * 1.2;
     this.mark.position.y = markY;
     this.mark.rotation.set(Math.sin(t * 0.8) * 0.05, this.spin - this.yaw, 0);
-    this.mark.scale.setScalar(2.2 * (1 + pulse * 0.05));
+    this.mark.scale.setScalar(this.markScale * (1 + pulse * 0.05));
+    this.markHit.position.y = markY;
     this.coreGlow.position.y = markY;
+    this.coreGlow.scale.setScalar(this.markScale * 2.35);
     this.coreGlow.material.opacity = 0.42 + pulse * 0.4;
     this.coreLight.position.y = markY;
     this.coreLight.intensity = 10 + pulse * 26;
@@ -752,75 +661,6 @@ export class ProductsScene {
     );
   }
 
-  private updateReaders(
-    t: number,
-    dt: number,
-    intro: number,
-    phase: number,
-    running: number,
-  ) {
-    const light = this.sideLight(
-      this.focusAmount.developer,
-      this.focusAmount.connect,
-    );
-    const blueData = this.blueData.array as Float32Array;
-
-    this.readers.forEach((reader, j) => {
-      const delay = 1 + j * 0.16;
-      reader.appear = this.reducedMotion ? 1 : clamp01((intro - delay) / 0.7);
-      const pop = Math.max(0.0001, easeOutBack(reader.appear));
-      const hovered =
-        this.hovered?.kind === "reader" && this.hovered.index === j;
-      reader.hover = damp(reader.hover, hovered ? 1 : 0, 10, dt);
-      reader.energy = flash(phase, reader.fireAt, 0.16) * running;
-      const lit = Math.min(1, reader.energy + reader.hover * 0.5);
-
-      const group = reader.device.group;
-      const bob = reader.float ? Math.sin(t * 1.1 + j * 2) * 0.08 : 0;
-      group.position.copy(reader.base);
-      group.position.y += bob + reader.hover * 0.12 + reader.energy * 0.06;
-      group.scale.setScalar(pop * reader.scale * (1 + reader.hover * 0.05));
-      const sway = reader.float ? Math.sin(t * 0.6 + j) * 0.12 : 0;
-      group.rotation.y = this.portrait
-        ? sway
-        : -reader.facing + sway - this.yaw * 0.3;
-      reader.device.update(t, lit * light);
-
-      const centerY = group.position.y + reader.middle;
-      reader.hit.position.set(reader.base.x, centerY, reader.base.z);
-      // Just behind; further back would float above it on the steep phone view.
-      const behind = this.portrait ? 0.25 : 0.8;
-      reader.halo.position.set(reader.base.x, centerY, reader.base.z - behind);
-      reader.halo.scale.set(3.4, 3.6, 1);
-      reader.halo.material.opacity = Math.min(
-        0.75,
-        Math.max(lit, this.focusAmount.developer * 0.7) * light * 0.6,
-      );
-      reader.halo.visible = reader.halo.material.opacity > 0.003;
-
-      if (j === 0) {
-        // The blue database column, built like the sources.
-        for (let level = 0; level < UNITS_PER_TOWER; level++) {
-          const at = clamp01((intro - delay - level * 0.12) / 0.55);
-          const top =
-            (level + 1) * UNIT_HEIGHT +
-            level * UNIT_GAP +
-            (1 - easeOutCubic(at)) * 2.2 +
-            reader.hover * 0.08 * (level + 1);
-          const s = Math.max(0.0001, easeOutBack(at));
-          matrix
-            .makeScale(s, s, s)
-            .setPosition(reader.base.x, top, reader.base.z);
-          this.blueMesh.setMatrixAt(level, matrix);
-          blueData[level * 4] = (0.3 + lit * 1.2) * light;
-          blueData[level * 4 + 2] = this.focusAmount.connect * 0.18;
-        }
-      }
-    });
-    this.blueMesh.instanceMatrix.needsUpdate = true;
-    this.blueData.needsUpdate = true;
-  }
-
   // ---------------------------------------------------------------- pointer
 
   private pick(clientX: number, clientY: number): Hover {
@@ -830,18 +670,18 @@ export class ProductsScene {
       -((clientY - rect.top) / rect.height) * 2 + 1,
     );
     this.raycaster.setFromCamera(this.ndc, this.camera);
-    const targets = [
-      this.markHit,
-      ...this.towers.map((s) => s.hit),
-      ...this.readers.map((r) => r.hit),
-    ];
+    const targets = [this.markHit, ...this.tiles.map((tile) => tile.hit)];
     const hit = this.raycaster.intersectObjects(targets, false)[0];
     if (!hit) return null;
-    if (hit.object === this.markHit) return { kind: "core", index: 0 };
-    const s = this.towers.findIndex((x) => x.hit === hit.object);
-    if (s >= 0) return { kind: "source", index: s };
-    const r = this.readers.findIndex((x) => x.hit === hit.object);
-    return r >= 0 ? { kind: "reader", index: r } : null;
+    if (hit.object === this.markHit) return { kind: "core" };
+    const k = this.tiles.findIndex((tile) => tile.hit === hit.object);
+    if (k < 0) return null;
+    const tile = this.tiles[k];
+    const sources = this.options.agents.length;
+    return {
+      kind: tile.side,
+      index: tile.side === "source" ? k : k - sources,
+    };
   }
 
   private setHovered(next: Hover) {
@@ -891,8 +731,8 @@ export class ProductsScene {
       if (drag.moved) {
         this.yawTarget = THREE.MathUtils.clamp(
           this.yawTarget + dx * 0.005,
-          -0.7,
-          0.7,
+          -0.6,
+          0.6,
         );
         this.options.host.style.cursor = "grabbing";
       }
@@ -909,7 +749,17 @@ export class ProductsScene {
     if (!drag || drag.id !== event.pointerId) return;
     if (!drag.moved && event.type === "pointerup") {
       const picked = this.pick(event.clientX, event.clientY);
-      if (picked?.kind === "core") this.spinVelocity += Math.PI * 3;
+      if (picked?.kind === "core") {
+        this.spinVelocity += Math.PI * 3;
+      } else if (picked) {
+        const k =
+          picked.index +
+          (picked.kind === "reader" ? this.options.agents.length : 0);
+        const tile = this.tiles[k];
+        if (tile && tile.flipAt < 0 && !this.reducedMotion) {
+          tile.flipAt = this.time;
+        }
+      }
     }
     this.drag = null;
     this.options.host.style.cursor = this.hovered ? "pointer" : "grab";
@@ -927,7 +777,10 @@ export class ProductsScene {
     host.removeEventListener("pointerup", this.onPointerUp);
     host.removeEventListener("pointercancel", this.onPointerUp);
     host.removeEventListener("pointerleave", this.onPointerLeave);
-    this.units.forEach((u) => u.body && u.logo.remove(u.body));
+    // The logos are cached and shared with the hero: leave them be.
+    this.tiles.forEach((tile) => {
+      if (tile.side === "source") tile.face.clear();
+    });
     disposeTree(this.scene);
     this.scene.environment?.dispose();
     this.stage.dispose();

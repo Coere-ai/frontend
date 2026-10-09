@@ -157,16 +157,16 @@ export function Products() {
           <Reveal className="mx-auto mt-10 max-w-6xl sm:mt-12">
             <div
               ref={stageRef}
-              className="relative h-[32rem] cursor-grab touch-pan-y overflow-hidden rounded-[2rem] border border-ink-900/8 bg-mist select-none md:h-[clamp(22rem,36vw,32rem)]"
+              className="relative h-[38rem] cursor-grab touch-pan-y overflow-hidden rounded-[2rem] border border-ink-900/8 bg-mist select-none md:h-[clamp(22rem,36vw,32rem)]"
             >
               <canvas
                 ref={canvasRef}
                 role="img"
-                aria-label={`A database for each of ${agents
+                aria-label={`Coere in the middle, an icon for each of ${agents
                   .map((agent) => agent.name)
                   .join(
                     ", ",
-                  )} feeding Coere, and a database, a laptop, an app and a phone reading from it`}
+                  )} feeding it, and a laptop, a phone, a watch, a browser, a chat, a terminal, code, an SDK and a database reading from it`}
                 className={`absolute inset-0 h-full w-full transition-opacity duration-1000 ${
                   status === "ready" ? "opacity-100" : "opacity-0"
                 }`}

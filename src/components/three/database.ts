@@ -197,8 +197,6 @@ type DatabaseShape = {
   segments: number;
   /** How many disks are stacked, split by lit grooves. */
   disks?: number;
-  /** Light the rolled bottom edge, so stacked units read as one database. */
-  seam?: boolean;
 };
 
 /** Top of the database sits at y = 0 and it hangs downward. */
@@ -207,7 +205,6 @@ export function createDatabaseGeometry({
   disk,
   segments,
   disks = 3,
-  seam = false,
 }: DatabaseShape) {
   const bevel = R * 0.16;
   const groove = disk * 0.16;
@@ -260,7 +257,6 @@ export function createDatabaseGeometry({
 
   // Close the bottom.
   runs.push({
-    band: seam ? 1 : 0,
     points: [
       [R, top],
       [R - edge, top - edge],

@@ -17,7 +17,6 @@ export function WhatWeDo() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cueRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "failed">(
     "loading",
   );
@@ -52,10 +51,6 @@ export function WhatWeDo() {
           agents,
           getProgress,
           onFail: fail,
-          onFrame: ({ morph }) => {
-            const cue = cueRef.current;
-            if (cue) cue.style.opacity = String(Math.max(0, 1 - morph * 6));
-          },
         });
         engine = scene;
         await scene.ready;
@@ -113,11 +108,6 @@ export function WhatWeDo() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-[30%] bg-linear-to-b from-mist via-mist/70 to-transparent sm:h-[38%]"
         />
-        {/* And at the bottom, so the scroll cue is not read against the cubes. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[18%] bg-linear-to-t from-mist/90 to-transparent"
-        />
 
         <div className="pointer-events-none absolute inset-x-0 top-[7.5rem] px-5 sm:top-[8.25rem]">
           <motion.h1
@@ -129,17 +119,6 @@ export function WhatWeDo() {
             Building the future
             <br className="hidden sm:block" /> infrastructure of AI
           </motion.h1>
-        </div>
-
-        <div
-          ref={cueRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[10px] tracking-[0.3em] text-ink-900/45"
-        >
-          SCROLL
-          <span className="relative h-9 w-px overflow-hidden bg-ink-900/12">
-            <span className="absolute inset-x-0 top-0 h-1/2 animate-[coere-scroll-cue_1.8s_ease-in-out_infinite] bg-brand-600/70" />
-          </span>
         </div>
       </div>
     </section>

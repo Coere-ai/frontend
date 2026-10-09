@@ -54,7 +54,7 @@ Sections, in page order:
 | Component     | Anchor         | What it shows                                                         |
 | ------------- | -------------- | --------------------------------------------------------------------- |
 | `what-we-do`  | `#what-we-do`  | Headline over the 3D wave; scrolling turns it into the 3D orbit       |
-| `products`    | `#products`    | 3D picture of the AIs' databases feeding Coere and the apps reading from it, then Coere Connect (Chrome extension) beside Coere Developer (API, MCP, SDK) |
+| `products`    | `#products`    | 3D picture of the AIs' app icons feeding Coere and the devices, apps and code reading from it, then Coere Connect (Chrome extension) beside Coere Developer (API, MCP, SDK) |
 | `who-we-are`  | `#who-we-are`  | Founders (Michelle and Edison), then the executive team (Sarah)       |
 
 The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly three links, one per
@@ -74,31 +74,36 @@ Products shows just the cards.
 | ------------------- | ----------------------------------------------------------------------------- |
 | `core.ts`           | `Stage` (renderer, frame loop, resize, pause offscreen, adaptive pixel ratio), easing, environment |
 | `logos.ts`          | Extrudes each SVG in `/public` into a beveled solid; the original SVG is rasterized once and every face samples it, so gradients survive. Also the Coere mark |
-| `database.ts`       | The database (three disks, lit grooves), the hero's smooth cube tile, and their shared shader |
+| `database.ts`       | The database under Coere in Products (three disks, lit grooves), the hero's smooth cube tile, and their shared shader |
 | `dust.ts`           | The specks drifting in the hero's air                                          |
 | `hero-scene.ts`     | The wave of cubes, Coere above its crest, the agents, the scroll morph into the orbit |
-| `devices.ts`        | Laptop, phone and app tile on the reading side                                 |
-| `products-scene.ts` | Database columns per AI, Coere, then what reads from it                        |
+| `glyphs.ts`         | The rounded app icon tile, white or brand blue, and the extruded white symbols for the reading side |
+| `products-scene.ts` | An icon per AI, Coere, then an icon for each thing that reads from it          |
 
 **Hero.** A field of smooth cubes, nearly touching so their tops read as one
-surface, rolls in a single long swell with Coere glowing above the crest. The
-section is `260svh` tall with a sticky stage, and scroll progress drives the
-morph: the agents lift off the wave into the ring around Coere while the cubes
-sink away from the center outward. Drag anywhere to turn the scene, drag the
+surface, rolls in a single long swell with Coere glowing above the crest and
+the agents spaced evenly around it, in the orbit's order. The section is
+`260svh` tall with a sticky stage, and scroll progress drives the morph: the
+agents lift off the wave into the ring around Coere while the cubes sink away
+from the center outward. Drag anywhere to turn the scene, drag the
 Coere mark to spin it, click a logo to flip it. The field never actually
 turns: dragging turns the wave and everything on it, the way a shape turns on
 a pin board, so the field only needs to cover what the camera sees. The cube
 lattice sits at an angle to the camera so no row of gaps lines up with a line
 of sight.
 
-**Products.** One centered picture: three columns of databases, each with an
-AI's logo on its front, then Coere, then a blue database column, a laptop with
-an app above it, and a phone. There are no connecting lines; a wave of light
-runs through from left to right instead, each database flaring as it leaves,
-then Coere, then everything that reads from it, with a band of light crossing
-the floor in step. It builds itself in the first time it scrolls into view.
-Hovering a card lights its side of the picture, and hovering a side lights its
-card.
+**Products.** One centered picture, like two pages of app icons either side
+of Coere. On the left, a 3x3 grid of white icons, one per AI with its logo. In
+the middle, Coere floating over a database. On the right, a matching grid of
+brand blue icons for what reads from it: a laptop, a phone and a watch; a
+browser, a chat and a terminal; code, an SDK and a database. There are no
+connecting lines; light runs through instead, the AI icons flaring column by
+column toward Coere, then Coere, then the blue icons column by column away
+from it, with a band of light crossing the floor in step. On phones the grids
+stack above and below Coere and the light runs down the screen. The icons pop
+in from the middle out the first time it scrolls into view. Hover an icon to
+lift it, click one to flip it. Hovering a card brings its side of the picture
+forward, and hovering a side lights its card.
 
 **Performance.** Each scene renders only while on screen and the tab is
 visible. If frames run long the pixel ratio steps down, and then shadows go.

@@ -65,16 +65,6 @@ body {
   }
 }
 
-/* The scroll cue: a short bar sliding down its track. */
-@keyframes coere-scroll-cue {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(200%);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
