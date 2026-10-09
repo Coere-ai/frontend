@@ -14,7 +14,6 @@ import {
   lerp,
   prefersReducedMotion,
 } from "./core";
-import { createDatabaseGeometry, createDatabaseMaterial } from "./database";
 import {
   TILE_DEPTH,
   brandTileMaterial,
@@ -104,11 +103,12 @@ const place = new THREE.Vector3();
 /**
  * Coere Connect and Coere Developer as one centered picture, like two pages
  * of app icons either side of Coere. On the left, a white icon for each AI
- * with its logo. In the middle, Coere on a database. On the right, blue icons
+ * with its logo. In the middle, Coere, floating. On the right, blue icons
  * for what reads from it: a laptop, a phone and a watch, a browser, a chat and
  * a terminal, then code, an SDK and a database. No lines: light runs through
  * the picture, the AI icons flaring column by column toward Coere, Coere as
  * it passes, then the icons on the right column by column away from it.
+ * Dragging anywhere spins Coere; the icons lift on hover and flip on click.
  */
 export class ProductsScene {
   readonly ready: Promise<void>;
@@ -123,14 +123,11 @@ export class ProductsScene {
 
   private readonly tiles: Tile[] = [];
   private readonly core = new THREE.Group();
-  private readonly pedestalUniforms: { uData: { value: THREE.Vector4 } };
   private readonly mark: THREE.Mesh;
   private readonly markHit: THREE.Mesh;
   private readonly coreGlow: THREE.Sprite;
   private readonly coreLight: THREE.PointLight;
-  private readonly floor: THREE.Group;
-  private readonly floorMaterial: THREE.ShaderMaterial;
-  private readonly key: THREE.DirectionalLight;
+  private readonly floor: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
 
   private portrait = false;
   private distance = 18;
@@ -145,17 +142,18 @@ export class ProductsScene {
   private focus: ProductsFocus = null;
   private focusAmount = { connect: 0, developer: 0 };
   private yaw = 0;
-  private yawTarget = 0;
   private pitch = 0;
   private pointerX = 0;
   private pointerY = 0;
   private pointerInside = false;
   private spin = 0;
   private spinVelocity = 0;
+  private coreHover = 0;
   private hovered: Hover = null;
   private drag: null | {
     id: number;
     lastX: number;
+    lastTime: number;
     startX: number;
     moved: boolean;
   } = null;
@@ -170,44 +168,29 @@ export class ProductsScene {
       maxDpr: this.lowPower ? 1.5 : 2,
       onResize: (w, h) => this.resize(w, h),
       onFrame: (dt) => this.frame(dt),
-      onDegrade: () => this.degrade(),
       onContextFail: () => options.onFail?.(),
     });
     const renderer = this.stage.renderer;
+    // Everything floats: nothing here casts a shadow.
+    renderer.shadowMap.enabled = false;
 
     this.scene.background = new THREE.Color(PRODUCTS_BACKGROUND);
     this.scene.fog = new THREE.Fog(PRODUCTS_BACKGROUND, 26, 48);
     this.scene.environment = createEnvironment(renderer);
     this.scene.environmentIntensity = 0.75;
     this.scene.add(new THREE.HemisphereLight("#ffffff", "#b6c3e6", 0.85));
-    this.key = new THREE.DirectionalLight("#ffffff", 2.2);
-    // High and a little in front, so shadows pool under the icons.
-    this.key.position.set(-1.5, 14, 3);
-    this.key.castShadow = true;
-    const shadowSize = this.lowPower ? 1024 : 2048;
-    this.key.shadow.mapSize.set(shadowSize, shadowSize);
-    const sc = this.key.shadow.camera;
-    sc.left = -10;
-    sc.right = 10;
-    sc.top = 8;
-    sc.bottom = -8;
-    sc.near = 1;
-    sc.far = 36;
-    this.key.shadow.radius = 8;
-    this.key.shadow.bias = -0.0004;
-    this.key.shadow.normalBias = 0.02;
-    this.scene.add(this.key, this.key.target);
+    // High and a little in front, so the tops of the icons catch it.
+    const key = new THREE.DirectionalLight("#ffffff", 2.2);
+    key.position.set(-1.5, 14, 3);
     const rim = new THREE.DirectionalLight("#dfe6ff", 0.8);
     rim.position.set(5, 6, -10);
     // From the viewer, so the faces of the icons read bright and clean.
     const fill = new THREE.DirectionalLight("#ffffff", 0.6);
     fill.position.set(0, 3, 12);
-    this.scene.add(rim, fill);
+    this.scene.add(key, rim, fill);
 
     this.scene.add(this.root);
-    const floor = this.buildFloor();
-    this.floor = floor.group;
-    this.floorMaterial = floor.material;
+    this.floor = this.buildFloor();
 
     const glowMap = createGlowTexture(BRAND[500]);
     const hitGeometry = new THREE.BoxGeometry(1.1, 1.1, 0.5);
@@ -222,7 +205,6 @@ export class ProductsScene {
         side === "source" ? getTileGeometry() : getBrandTileGeometry(),
         material,
       );
-      tile.castShadow = true;
       face.position.z = FACE_Z;
       const body = new THREE.Group();
       body.add(tile, face);
@@ -266,26 +248,11 @@ export class ProductsScene {
       makeTile("reader", k, mesh);
     });
 
-    // The core: Coere floating over a database.
-    const pedestal = createDatabaseMaterial({
-      instanced: false,
-      shadeDepth: 3,
-      bandBase: 0.4,
-    });
-    this.pedestalUniforms = pedestal.uniforms;
-    const disk = 0.2;
-    const pedestalMesh = new THREE.Mesh(
-      createDatabaseGeometry({ radius: 1.2, disk, segments: 72 }),
-      pedestal.material,
-    );
-    pedestalMesh.position.y = disk * 3 + 0.06;
-    pedestalMesh.castShadow = true;
-    pedestalMesh.receiveShadow = true;
+    // The core: Coere, floating on its own between the two grids.
     this.mark = new THREE.Mesh(coereMarkGeometry(), coereMaterial());
-    this.mark.castShadow = true;
-    // Sized in resize(), from the floor of the database to the mark's top.
+    // Scaled to the mark in resize().
     this.markHit = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.3, 1.3, 1, 12),
+      new THREE.CylinderGeometry(0.5, 0.5, 1, 12),
       hitMaterial,
     );
     this.coreGlow = new THREE.Sprite(
@@ -297,13 +264,7 @@ export class ProductsScene {
       }),
     );
     this.coreLight = new THREE.PointLight("#dbe2ff", 10, 9, 1.6);
-    this.core.add(
-      pedestalMesh,
-      this.coreGlow,
-      this.mark,
-      this.markHit,
-      this.coreLight,
-    );
+    this.core.add(this.coreGlow, this.mark, this.markHit, this.coreLight);
     this.root.add(this.core);
 
     this.ready = this.loadLogos();
@@ -319,7 +280,7 @@ export class ProductsScene {
 
   /**
    * A floor of faint dots that fades out at the edges, with a band of light
-   * that sweeps across it in step with the flow, plus a plane for shadows.
+   * that sweeps across it in step with the flow.
    */
   private buildFloor() {
     const material = new THREE.ShaderMaterial({
@@ -362,17 +323,8 @@ export class ProductsScene {
     });
     const dots = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), material);
     dots.rotation.x = -Math.PI / 2;
-    dots.position.y = 0.002;
-    const shadows = new THREE.Mesh(
-      new THREE.PlaneGeometry(60, 60),
-      new THREE.ShadowMaterial({ color: "#26338f", opacity: 0.08 }),
-    );
-    shadows.rotation.x = -Math.PI / 2;
-    shadows.receiveShadow = true;
-    const group = new THREE.Group();
-    group.add(shadows, dots);
-    this.root.add(group);
-    return { group, material };
+    this.root.add(dots);
+    return dots;
   }
 
   private async loadLogos() {
@@ -442,9 +394,10 @@ export class ProductsScene {
       this.camera.fov = 30;
       this.elevation = 0.06;
       this.targetY = 5.1;
+      // Midway between the two grids.
       this.core.position.set(0, 3.55, 0);
-      this.markY = 1.7;
-      this.markScale = 1.95;
+      this.markY = 1.55;
+      this.markScale = 2.05;
       const halfWidth = 1.38 + 0.5 + 0.4;
       const halfHeight = 6.0;
       this.distance = Math.max(
@@ -455,9 +408,10 @@ export class ProductsScene {
       this.camera.fov = 24;
       this.elevation = 0.14;
       this.targetY = 2.05;
+      // Level with the middle row.
       this.core.position.set(0, 0, 0);
-      this.markY = 2.25;
-      this.markScale = 2.1;
+      this.markY = 2.2;
+      this.markScale = 2.25;
       const halfWidth = 7.7;
       const halfHeight = 2.75;
       this.distance = Math.max(
@@ -465,28 +419,17 @@ export class ProductsScene {
         halfHeight / tanV(this.camera.fov),
       );
     }
-    const hitTop = this.markY + this.markScale * 0.75;
-    this.markHit.scale.y = hitTop;
-    this.markHit.position.y = hitTop / 2;
+    this.markHit.scale.set(
+      this.markScale,
+      this.markScale * 1.05,
+      this.markScale,
+    );
+    this.markHit.position.y = this.markY;
     // Seen nearly edge on from the front, the floor would only be a line.
     this.floor.visible = !this.portrait;
     const fog = this.scene.fog as THREE.Fog;
     fog.near = this.distance + 6;
     fog.far = this.distance + 30;
-  }
-
-  private degrade() {
-    this.stage.renderer.shadowMap.enabled = false;
-    this.key.castShadow = false;
-    this.scene.traverse((child) => {
-      const mesh = child as THREE.Mesh;
-      if (mesh.isMesh) {
-        const materials = Array.isArray(mesh.material)
-          ? mesh.material
-          : [mesh.material];
-        materials.forEach((m) => (m.needsUpdate = true));
-      }
-    });
   }
 
   setFocus(focus: ProductsFocus) {
@@ -531,12 +474,12 @@ export class ProductsScene {
       dt,
     );
 
-    // Camera: a slow drift, a little parallax, and a drag that springs home.
-    if (!this.drag) this.yawTarget = damp(this.yawTarget, 0, 1.6, dt);
+    // Camera: a slow drift and a little parallax with the mouse. Dragging
+    // spins Coere, never the picture.
     const parallaxX = this.pointerInside ? this.pointerX : 0;
     const parallaxY = this.pointerInside ? this.pointerY : 0;
     const drift = Math.sin(t * 0.25) * 0.05;
-    this.yaw = damp(this.yaw, this.yawTarget + parallaxX * 0.08 + drift, 4, dt);
+    this.yaw = damp(this.yaw, parallaxX * 0.08 + drift, 4, dt);
     this.pitch = damp(this.pitch, -parallaxY * 0.04, 4, dt);
     this.root.rotation.y = this.yaw;
     const elevation = this.elevation + this.pitch;
@@ -553,8 +496,8 @@ export class ProductsScene {
     this.updateCore(t, dt, intro, phase, running);
 
     // The band of light on the floor crosses with the flow.
-    this.floorMaterial.uniforms.uSweep.value = lerp(-7.4, 7.4, phase / 0.62);
-    this.floorMaterial.uniforms.uStrength.value =
+    this.floor.material.uniforms.uSweep.value = lerp(-7.4, 7.4, phase / 0.62);
+    this.floor.material.uniforms.uStrength.value =
       running * (phase < 0.62 ? Math.sin((phase / 0.62) * Math.PI) : 0);
 
     this.stage.renderer.render(this.scene, this.camera);
@@ -636,14 +579,17 @@ export class ProductsScene {
     const appear = this.reducedMotion ? 1 : easeOutCubic(clamp01(intro / 0.9));
     this.core.scale.setScalar(lerp(0.7, 1, appear));
 
-    // Mostly facing out with a slow sway; a click sends it round.
-    this.spinVelocity = damp(this.spinVelocity, 0, 1.4, dt);
-    if (Math.abs(this.spinVelocity) < 0.5) {
-      const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
-      const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.4;
-      this.spin = damp(this.spin, home + sway, 2.5, dt);
+    // Mostly facing out with a slow sway. A drag turns it by hand and lets
+    // it run on when released; a click sends it round.
+    if (!this.drag?.moved) {
+      this.spinVelocity = damp(this.spinVelocity, 0, 1.4, dt);
+      if (Math.abs(this.spinVelocity) < 0.5) {
+        const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
+        const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.4;
+        this.spin = damp(this.spin, home + sway, 2.5, dt);
+      }
+      this.spin += this.spinVelocity * dt;
     }
-    this.spin += this.spinVelocity * dt;
     const pulse = flash(phase, CORE_AT, 0.16) * running;
     const markY = this.markY + Math.sin(t * 1.1) * 0.07 - (1 - appear) * 1.2;
     this.mark.position.y = markY;
@@ -651,17 +597,13 @@ export class ProductsScene {
     this.mark.scale.setScalar(this.markScale * (1 + pulse * 0.05));
     this.coreGlow.position.y = markY;
     this.coreGlow.scale.setScalar(this.markScale * 2.35);
-    this.coreGlow.material.opacity = 0.42 + pulse * 0.4;
+    // Brighter as the light passes through, and under the pointer.
+    const hovered = this.hovered?.kind === "core" || !!this.drag?.moved;
+    this.coreHover = damp(this.coreHover, hovered ? 1 : 0, 8, dt);
+    const lit = Math.max(pulse, this.coreHover * 0.5);
+    this.coreGlow.material.opacity = 0.42 + lit * 0.4;
     this.coreLight.position.y = markY;
-    this.coreLight.intensity = 10 + pulse * 26;
-
-    const hovered = this.hovered?.kind === "core";
-    this.pedestalUniforms.uData.value.set(
-      0.3 + pulse * 1.3 + (hovered ? 0.5 : 0),
-      0,
-      0,
-      0,
-    );
+    this.coreLight.intensity = 10 + lit * 26;
   }
 
   // ---------------------------------------------------------------- pointer
@@ -705,6 +647,7 @@ export class ProductsScene {
     this.drag = {
       id: event.pointerId,
       lastX: event.clientX,
+      lastTime: performance.now(),
       startX: event.clientX,
       moved: false,
     };
@@ -722,7 +665,10 @@ export class ProductsScene {
     const drag = this.drag;
     if (drag && drag.id === event.pointerId) {
       const dx = event.clientX - drag.lastX;
+      const now = performance.now();
+      const dt = Math.max(1, now - drag.lastTime) / 1000;
       drag.lastX = event.clientX;
+      drag.lastTime = now;
       if (!drag.moved && Math.abs(event.clientX - drag.startX) > 4) {
         drag.moved = true;
         try {
@@ -732,11 +678,10 @@ export class ProductsScene {
         }
       }
       if (drag.moved) {
-        this.yawTarget = THREE.MathUtils.clamp(
-          this.yawTarget + dx * 0.005,
-          -0.6,
-          0.6,
-        );
+        // Wherever the drag starts, it spins Coere.
+        const v = dx * 0.014;
+        this.spin += v;
+        this.spinVelocity = damp(this.spinVelocity, v / dt, 18, dt);
         this.options.host.style.cursor = "grabbing";
       }
       return;
@@ -763,6 +708,10 @@ export class ProductsScene {
           tile.flipAt = this.time;
         }
       }
+    }
+    // Let go of a still pointer and Coere simply stops.
+    if (drag.moved && performance.now() - drag.lastTime > 80) {
+      this.spinVelocity = 0;
     }
     this.drag = null;
     this.options.host.style.cursor = this.hovered ? "pointer" : "grab";

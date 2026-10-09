@@ -80,7 +80,7 @@ type Agent = {
   group: THREE.Group;
   body: THREE.Mesh | null;
   hit: THREE.Mesh;
-  /** Spot on the wave, in content space. */
+  /** Spot on the wave. */
   spot: THREE.Vector2;
   ringAngle: number;
   hover: number;
@@ -101,7 +101,6 @@ export class HeroScene {
   private readonly stage: Stage;
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
-  private readonly content = new THREE.Group();
   private readonly lowPower = isLowPowerDevice();
   private readonly reducedMotion = prefersReducedMotion();
   private readonly options: Options;
@@ -158,10 +157,6 @@ export class HeroScene {
   private time = 0;
   private progress = 0;
   private morph = 0;
-  private yaw = 0;
-  private yawVelocity = 0;
-  private pitch = 0;
-  private pitchTarget = 0;
   private spin = 0;
   private spinVelocity = 0;
   private orbitAngle = 0;
@@ -173,12 +168,11 @@ export class HeroScene {
   private readonly pointer = new THREE.Vector2();
   private drag: null | {
     id: number;
-    mode: "scene" | "mark" | "agent";
-    agent: number;
+    /** What the pointer went down on: an agent's index, or -1 or -2. */
+    target: number;
     startX: number;
     startY: number;
     lastX: number;
-    lastY: number;
     lastTime: number;
     moved: boolean;
   } = null;
@@ -230,7 +224,6 @@ export class HeroScene {
     fill.position.set(3, 6, 14);
     this.scene.add(fill);
 
-    this.scene.add(this.content);
     this.buildField(this.lowPower ? 6000 : 14000);
 
     // Coere, glowing, and the light it throws on the crest below.
@@ -252,7 +245,7 @@ export class HeroScene {
     this.glow.renderOrder = 1;
     this.light = new THREE.PointLight("#dbe2ff", 20, 18, 1.5);
     this.rig.add(this.glow, this.mark, this.markHit, this.light);
-    this.content.add(this.rig);
+    this.scene.add(this.rig);
 
     this.dust = createDust(
       this.lowPower ? 140 : 300,
@@ -298,7 +291,7 @@ export class HeroScene {
         // every cube shows a lit top over a shaded side.
         shadeDepth: this.spacing * 1.0,
         deep: "#97a6d4",
-      }).material;
+      });
       this.fieldMaterial.roughness = 0.6;
     }
     // Cubes nearly touching, so their tops read as one surface.
@@ -329,12 +322,7 @@ export class HeroScene {
     this.fieldEdge = new Float32Array(capacity);
   }
 
-  /**
-   * Lays the cubes out in the wedge the camera can see. The field itself
-   * never turns: dragging turns the wave and everything on it instead, the
-   * way a shape turns on a pin board, so the field only has to cover what
-   * the camera sees.
-   */
+  /** Lays the cubes out in the wedge the camera can see. */
   private layoutField() {
     const s = this.spacing;
     const halfFov = THREE.MathUtils.degToRad(this.camera.fov / 2);
@@ -427,7 +415,7 @@ export class HeroScene {
         new THREE.MeshBasicMaterial({ visible: false }),
       );
       group.add(hit);
-      this.content.add(group);
+      this.scene.add(group);
       const spot = WAVE_SPOTS[info.name] ?? [Math.cos(k), Math.sin(k)];
       const ringIndex = Math.max(0, RING_ORDER.indexOf(info.name));
       const ringAngle = Math.PI / 2 - (ringIndex / list.length) * Math.PI * 2;
@@ -547,7 +535,7 @@ export class HeroScene {
 
   // ---------------------------------------------------------------- the wave
 
-  /** Height of the wave at a point in content space. */
+  /** Height of the wave at a point. */
   private height(x: number, z: number, t: number) {
     // One long swell running from near left to far right, its crest passing
     // just behind Coere, a trough in front of it and a gentler swell behind.
@@ -575,18 +563,11 @@ export class HeroScene {
     const fieldFade = smoothstep(0.2, 0.45, morph);
     this.field.visible = true;
 
-    // Content space turns with the drag; the field does not.
-    const cos = Math.cos(-this.yaw);
-    const sin = Math.sin(-this.yaw);
-    const yawCos = Math.cos(this.yaw);
-    const yawSin = Math.sin(this.yaw);
     const pads = this.pads;
     for (let k = 0; k < this.agents.length; k++) {
       const a = this.agents[k];
-      const lx = a.spot.x * this.spread.x;
-      const lz = a.spot.y * this.spread.y;
-      pads[k * 2] = lx * yawCos + lz * yawSin;
-      pads[k * 2 + 1] = -lx * yawSin + lz * yawCos;
+      pads[k * 2] = a.spot.x * this.spread.x;
+      pads[k * 2 + 1] = a.spot.y * this.spread.y;
     }
     const padCount = this.agents.length * 2;
     const padLight = 1 - smoothstep(0, 0.35, morph);
@@ -596,15 +577,13 @@ export class HeroScene {
     for (let i = 0; i < this.fieldCount; i++) {
       const x = this.fieldX[i];
       const z = this.fieldZ[i];
-      const lx = x * cos + z * sin;
-      const lz = -x * sin + z * cos;
-      const d2 = lx * lx + lz * lz;
+      const d2 = x * x + z * z;
       const d = Math.sqrt(d2);
 
       // Sink in a ring that starts under Coere and runs outward.
       const start = Math.min(d / 34, 1) * 0.45;
       const sink = clamp01((morph - start) / 0.5);
-      const h = this.height(lx, lz, t) * amp;
+      const h = this.height(x, z, t) * amp;
       matrix[i * 16 + 13] = h - sink * sink * 11;
 
       // A soft pool of light under each agent.
@@ -617,7 +596,6 @@ export class HeroScene {
       }
 
       const o = i * 4;
-      data[o] = 0;
       // Crests stay white; slopes and the far field fall into blue, as if
       // the only light were Coere's.
       const spot = Math.exp(-d2 / (2 * 12 * 12));
@@ -660,14 +638,6 @@ export class HeroScene {
     const m = this.morph;
     const amp = 1 - 0.45 * m;
 
-    // Drag: yaw with inertia, pitch springs toward where it was left.
-    if (!this.drag) {
-      this.yaw += this.yawVelocity * dt;
-      this.yawVelocity *= Math.exp(-3.2 * dt);
-    }
-    this.pitch = damp(this.pitch, this.pitchTarget, 8, dt);
-    this.content.rotation.y = this.yaw;
-
     this.updateCamera(m);
     this.updateField(t, amp, m);
     this.updateRig(t, dt, m, amp);
@@ -689,8 +659,7 @@ export class HeroScene {
     const target = tmp.copy(A.target).lerp(B.target, e);
     // Entrance: the camera glides in and settles from a little higher up.
     const arriving = 1 - easeOutCubic(clamp01(this.entrance / 2.6));
-    const elevation =
-      lerp(A.elevation, B.elevation, e) + this.pitch + arriving * 0.16;
+    const elevation = lerp(A.elevation, B.elevation, e) + arriving * 0.16;
     const distance = lerp(A.distance, B.distance, e) + arriving * 9;
     this.ringNow = this.ringRadius * Math.min(1, distance / B.distance);
     // Fog starts just past the target, wherever the camera has moved to.
@@ -724,7 +693,8 @@ export class HeroScene {
     this.rig.scale.setScalar(lerp(this.aspect < 0.9 ? 2.45 : 2.6, 3.2, e));
 
     // Spin: free on the wave; in the orbit it settles facing out with a sway.
-    if (!this.drag || this.drag.mode !== "mark") {
+    // While dragged it follows the pointer, and runs on when let go.
+    if (!this.drag?.moved) {
       const cruise = this.reducedMotion ? 0 : lerp(0.42, 0, e);
       this.spinVelocity = damp(this.spinVelocity, cruise, 1.2, dt);
       if (e > 0.5 && Math.abs(this.spinVelocity) < 0.6) {
@@ -732,10 +702,9 @@ export class HeroScene {
         const sway = this.reducedMotion ? 0 : Math.sin(t * 0.55) * 0.32;
         this.spin = damp(this.spin, home + sway, 2.2 * (e - 0.5) * 2, dt);
       }
+      this.spin += this.spinVelocity * dt;
     }
-    this.spin += this.spinVelocity * dt;
-    // Face the camera whatever the scene's yaw, plus the spin.
-    this.mark.rotation.set(Math.sin(t * 0.7) * 0.06, this.spin - this.yaw, 0);
+    this.mark.rotation.set(Math.sin(t * 0.7) * 0.06, this.spin, 0);
     this.glow.material.opacity = lerp(0.55, 0.45, e);
     this.light.intensity = lerp(20, 6, e);
   }
@@ -799,7 +768,7 @@ export class HeroScene {
       const sway = this.reducedMotion
         ? 0
         : Math.sin(t * 0.6 + k * 2.1) * lerp(0.38, 0.22, local);
-      a.group.rotation.set(lerp(-0.18, 0, local), -this.yaw + sway + a.flip, 0);
+      a.group.rotation.set(lerp(-0.18, 0, local), sway + a.flip, 0);
     }
   }
 
@@ -835,16 +804,13 @@ export class HeroScene {
     const target = this.pick(event.clientX, event.clientY);
     this.drag = {
       id: event.pointerId,
-      mode: target === -1 ? "mark" : target >= 0 ? "agent" : "scene",
-      agent: target,
+      target,
       startX: event.clientX,
       startY: event.clientY,
       lastX: event.clientX,
-      lastY: event.clientY,
       lastTime: performance.now(),
       moved: false,
     };
-    this.yawVelocity = 0;
     this.options.host.style.cursor = "grabbing";
   };
 
@@ -859,7 +825,6 @@ export class HeroScene {
     }
     if (event.pointerId !== drag.id) return;
     const dx = event.clientX - drag.lastX;
-    const dy = event.clientY - drag.lastY;
     const now = performance.now();
     const dt = Math.max(1, now - drag.lastTime) / 1000;
     if (
@@ -874,24 +839,12 @@ export class HeroScene {
       }
     }
     if (drag.moved) {
-      if (drag.mode === "mark") {
-        // Spin Coere itself.
-        const v = dx * 0.014;
-        this.spin += v;
-        this.spinVelocity = damp(this.spinVelocity, v / dt, 18, dt);
-      } else {
-        const v = dx * 0.0055;
-        this.yaw += v;
-        this.yawVelocity = damp(this.yawVelocity, v / dt, 18, dt);
-        this.pitchTarget = THREE.MathUtils.clamp(
-          this.pitchTarget + dy * 0.0025,
-          -0.12,
-          0.22,
-        );
-      }
+      // Wherever the drag starts, it spins Coere and nothing else.
+      const v = dx * 0.014;
+      this.spin += v;
+      this.spinVelocity = damp(this.spinVelocity, v / dt, 18, dt);
     }
     drag.lastX = event.clientX;
-    drag.lastY = event.clientY;
     drag.lastTime = now;
   };
 
@@ -899,15 +852,16 @@ export class HeroScene {
     const drag = this.drag;
     if (!drag || event.pointerId !== drag.id) return;
     if (!drag.moved && event.type === "pointerup") {
-      if (drag.mode === "agent" && drag.agent >= 0) {
-        this.agents[drag.agent].flipVelocity = Math.PI * 4.2;
-      } else if (drag.mode === "mark") {
+      // A click on a logo flips it; anywhere else sends Coere round.
+      if (drag.target >= 0) {
+        this.agents[drag.target].flipVelocity = Math.PI * 4.2;
+      } else {
         this.spinVelocity += Math.PI * 3;
       }
     }
-    // Let go of a still pointer and the scene simply stops.
-    if (performance.now() - drag.lastTime > 80) {
-      this.yawVelocity = 0;
+    // Let go of a still pointer and Coere simply stops.
+    if (drag.moved && performance.now() - drag.lastTime > 80) {
+      this.spinVelocity = 0;
     }
     this.drag = null;
     this.options.host.style.cursor = this.hovered >= -1 ? "pointer" : "grab";

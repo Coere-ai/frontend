@@ -2,21 +2,15 @@ import * as THREE from "three";
 import { BRAND } from "./core";
 
 /**
- * The database: three stacked disks split by glowing grooves, the way a
- * database is drawn as an icon. Also the hero's smooth cube tiles.
- *
- * It is a custom lathe so each run of the profile can keep hard edges against
- * the next, and so every vertex can carry what part it is: `aPart.x` marks the
- * grooves, `aPart.y` the glow at the center of the top cap.
+ * The hero's databases: smooth cubes on long shafts, packed into a field, and
+ * the porcelain material they share. Each cube is swept from a 2D profile in
+ * runs, so each run can keep a hard edge against the next.
  */
 
 type Run = {
   points: [number, number][];
   /** Exact 2D (radial, up) normals per point; estimated from the run if absent. */
   normals?: [number, number][];
-  band?: number;
-  /** Cap glow per point, defaults to 0. */
-  glow?: number[];
 };
 
 /** Per point 2D normals, averaged with neighbours inside the run only. */
@@ -34,61 +28,14 @@ function runNormals(run: Run): [number, number][] {
   });
 }
 
-function lathe(runs: Run[], segments: number) {
-  const positions: number[] = [];
-  const normals: number[] = [];
-  const parts: number[] = [];
-  const indices: number[] = [];
-
-  for (const run of runs) {
-    const pts = run.points;
-    const ring0 = positions.length / 3;
-    const n2 = runNormals(run);
-
-    for (let j = 0; j < pts.length; j++) {
-      const [r, y] = pts[j];
-      const [nr, ny] = n2[j];
-      for (let i = 0; i <= segments; i++) {
-        const theta = (i / segments) * Math.PI * 2;
-        const s = Math.sin(theta);
-        const c = Math.cos(theta);
-        positions.push(r * s, y, r * c);
-        normals.push(nr * s, ny, nr * c);
-        parts.push(run.band ?? 0, run.glow?.[j] ?? 0);
-      }
-    }
-    for (let j = 0; j < pts.length - 1; j++) {
-      for (let i = 0; i < segments; i++) {
-        const a = ring0 + j * (segments + 1) + i;
-        const b = a + segments + 1;
-        const c = b + 1;
-        const d = a + 1;
-        indices.push(a, b, c, a, c, d);
-      }
-    }
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(positions, 3),
-  );
-  geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
-  geometry.setAttribute("aPart", new THREE.Float32BufferAttribute(parts, 2));
-  geometry.setIndex(indices);
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
 /**
- * The same profile idea as `lathe`, swept round a square instead of a circle:
- * each of the four faces is flat, so the profile only rounds the top edge.
- * Faces meet exactly at the corners, so the solid stays watertight.
+ * A profile swept round a square: each of the four faces is flat, so the
+ * profile only rounds the top edge. Faces meet exactly at the corners, so the
+ * solid stays watertight.
  */
 function squarePrism(runs: Run[]) {
   const positions: number[] = [];
   const normals: number[] = [];
-  const parts: number[] = [];
   const indices: number[] = [];
   const faces = [
     [1, 0],
@@ -111,7 +58,6 @@ function squarePrism(runs: Run[]) {
         for (const side of [-1, 1]) {
           positions.push(r * nx + side * r * tx, y, r * nz + side * r * tz);
           normals.push(nr * nx, ny, nr * nz);
-          parts.push(run.band ?? 0, run.glow?.[j] ?? 0);
         }
       }
       for (let j = 0; j < pts.length - 1; j++) {
@@ -141,7 +87,6 @@ function squarePrism(runs: Run[]) {
     new THREE.Float32BufferAttribute(positions, 3),
   );
   geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
-  geometry.setAttribute("aPart", new THREE.Float32BufferAttribute(parts, 2));
   geometry.setIndex(indices);
   geometry.computeBoundingSphere();
   return geometry;
@@ -190,124 +135,23 @@ export function createTileGeometry({
   ]);
 }
 
-type DatabaseShape = {
-  radius: number;
-  /** Height of each disk. */
-  disk: number;
-  segments: number;
-  /** How many disks are stacked, split by lit grooves. */
-  disks?: number;
-};
-
-/** Top of the database sits at y = 0 and it hangs downward. */
-export function createDatabaseGeometry({
-  radius: R,
-  disk,
-  segments,
-  disks = 3,
-}: DatabaseShape) {
-  const bevel = R * 0.16;
-  const groove = disk * 0.16;
-  const inset = R * 0.075;
-  const edge = R * 0.05;
-  const runs: Run[] = [];
-
-  // Top cap: flat, with a soft rolled edge.
-  const cap: [number, number][] = [
-    [0, 0],
-    [R * 0.32, 0],
-    [R - bevel, 0],
-  ];
-  for (let k = 1; k <= 4; k++) {
-    const a = (k / 4) * (Math.PI / 2);
-    cap.push([R - bevel + Math.sin(a) * bevel, -bevel + Math.cos(a) * bevel]);
-  }
-  runs.push({ points: cap, glow: [1, 0.22, 0, 0, 0, 0, 0] });
-
-  let top = -bevel;
-  for (let k = 0; k < disks; k++) {
-    const last = k === disks - 1;
-    const bottom = -(k + 1) * disk + (last ? 0 : groove / 2);
-    const start = k === 0 ? top : top - edge;
-    // Disk wall with a slight roll at each end.
-    const wall: [number, number][] = [];
-    if (k > 0) wall.push([R - edge, top]);
-    wall.push([R, start]);
-    wall.push([R, bottom + (last ? 0 : edge)]);
-    if (!last) wall.push([R - edge, bottom]);
-    runs.push({ points: wall });
-
-    if (!last) {
-      // Groove between this disk and the next: the lit band.
-      const lower = bottom - groove;
-      runs.push({
-        band: 1,
-        points: [
-          [R - edge, bottom],
-          [R - inset, bottom - groove * 0.18],
-          [R - inset, lower + groove * 0.18],
-          [R - edge, lower],
-        ],
-      });
-      top = lower;
-    } else {
-      top = bottom;
-    }
-  }
-
-  // Close the bottom.
-  runs.push({
-    points: [
-      [R, top],
-      [R - edge, top - edge],
-    ],
-  });
-  runs.push({
-    points: [
-      [R - edge, top - edge],
-      [R * 0.5, top - edge],
-      [0, top - edge],
-    ],
-  });
-
-  return lathe(runs, segments);
-}
-
-type DatabaseUniforms = {
-  uBand: { value: THREE.Color };
-  uDeep: { value: THREE.Color };
-  uLow: { value: THREE.Color };
-  uGlow: { value: THREE.Color };
-  uShadeDepth: { value: number };
-  uBandBase: { value: number };
-  uData: { value: THREE.Vector4 };
-};
-
 /**
- * White porcelain with lit grooves. Per instance `aData` drives it:
- * x = energy (how bright the grooves and cap glow), y = how far into the blue
- * of the troughs it sits, z = fade into the fog, w = glow from Coere's light.
- *
- * Without instancing, `aData` falls back to the `uData` uniform.
+ * White porcelain for the instanced field. Per instance `aData` drives it:
+ * y = how far into the blue of the troughs it sits, z = fade into the fog,
+ * w = glow from the light under an agent. x is unused.
  */
 export function createDatabaseMaterial({
   color = "#ffffff",
-  band = BRAND[500],
   deep = "#a7b5dc",
   low = "#6a82f4",
   glow = BRAND[300],
   shadeDepth = 3.2,
-  bandBase = 0.18,
-  instanced = true,
 }: {
   color?: string;
-  band?: string;
   deep?: string;
   low?: string;
   glow?: string;
   shadeDepth?: number;
-  bandBase?: number;
-  instanced?: boolean;
 } = {}) {
   const material = new THREE.MeshStandardMaterial({
     color,
@@ -315,14 +159,11 @@ export function createDatabaseMaterial({
     metalness: 0,
     envMapIntensity: 0.6,
   });
-  const uniforms: DatabaseUniforms = {
-    uBand: { value: new THREE.Color(band) },
+  const uniforms = {
     uDeep: { value: new THREE.Color(deep) },
     uLow: { value: new THREE.Color(low) },
     uGlow: { value: new THREE.Color(glow) },
     uShadeDepth: { value: shadeDepth },
-    uBandBase: { value: bandBase },
-    uData: { value: new THREE.Vector4(0.4, 0, 0, 0) },
   };
 
   material.onBeforeCompile = (shader) => {
@@ -331,30 +172,24 @@ export function createDatabaseMaterial({
       .replace(
         "#include <common>",
         `#include <common>
-        attribute vec2 aPart;
-        ${instanced ? "attribute vec4 aData;" : "uniform vec4 uData;"}
-        varying vec2 vPart;
+        attribute vec4 aData;
         varying vec4 vData;
         varying float vLocalY;`,
       )
       .replace(
         "#include <begin_vertex>",
         `#include <begin_vertex>
-        vPart = aPart;
-        vData = ${instanced ? "aData" : "uData"};
+        vData = aData;
         vLocalY = position.y;`,
       );
     shader.fragmentShader = shader.fragmentShader
       .replace(
         "#include <common>",
         `#include <common>
-        uniform vec3 uBand;
         uniform vec3 uDeep;
         uniform vec3 uLow;
         uniform vec3 uGlow;
         uniform float uShadeDepth;
-        uniform float uBandBase;
-        varying vec2 vPart;
         varying vec4 vData;
         varying float vLocalY;`,
       )
@@ -370,15 +205,7 @@ export function createDatabaseMaterial({
         diffuseColor.rgb = mix(diffuseColor.rgb, uDeep * mix(vec3(1.0), uLow, clamp(vData.y, 0.0, 1.0)), depthShade * 0.92);
         // Deep walls see little light at all, so the gaps between neighbours
         // fall dark instead of catching stray light.
-        diffuseColor.rgb *= 1.0 - depthShade * 0.6;
-        diffuseColor.rgb = mix(diffuseColor.rgb, uBand, vPart.x * 0.7);`,
-      )
-      .replace(
-        "#include <emissivemap_fragment>",
-        `#include <emissivemap_fragment>
-        float energy = max(vData.x, 0.0);
-        totalEmissiveRadiance += uBand * vPart.x * (uBandBase + energy * 1.4);
-        totalEmissiveRadiance += uBand * vPart.y * energy * 1.2;`,
+        diffuseColor.rgb *= 1.0 - depthShade * 0.6;`,
       )
       .replace(
         "#include <fog_fragment>",
@@ -389,7 +216,7 @@ export function createDatabaseMaterial({
       );
   };
   // Distinguish the program from plain standard materials in the cache.
-  material.customProgramCacheKey = () => `database-${instanced ? "i" : "s"}`;
+  material.customProgramCacheKey = () => "database";
 
-  return { material, uniforms };
+  return material;
 }

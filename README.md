@@ -74,7 +74,7 @@ Products shows just the cards.
 | ------------------- | ----------------------------------------------------------------------------- |
 | `core.ts`           | `Stage` (renderer, frame loop, resize, pause offscreen, adaptive pixel ratio), easing, environment |
 | `logos.ts`          | Extrudes each SVG in `/public` into a beveled solid; the original SVG is rasterized once and every face samples it, so gradients survive. Also the Coere mark |
-| `database.ts`       | The database under Coere in Products (three disks, lit grooves), the hero's smooth cube tile, and their shared shader |
+| `database.ts`       | The hero's smooth cube on a long shaft, and the porcelain shader the field shares |
 | `dust.ts`           | The specks drifting in the hero's air                                          |
 | `hero-scene.ts`     | The wave of cubes, Coere above its crest, the agents, the scroll morph into the orbit |
 | `glyphs.ts`         | The rounded app icon tile, white or brand blue, and the extruded white symbols for the reading side |
@@ -85,26 +85,26 @@ surface, rolls in a single long swell with Coere glowing above the crest and
 the agents spaced evenly around it, in the orbit's order. The section is
 `260svh` tall with a sticky stage, and scroll progress drives the morph: the
 agents lift off the wave into the ring around Coere while the cubes sink away
-from the center outward. Drag anywhere to turn the scene, drag the
-Coere mark to spin it, click a logo to flip it. The field never actually
-turns: dragging turns the wave and everything on it, the way a shape turns on
-a pin board, so the field only needs to cover what the camera sees. The cube
-lattice sits at an angle to the camera so no row of gaps lines up with a line
-of sight. The camera frames the wave and the orbit below the headline, however
-it wraps, so on short screens nothing rises into it.
+from the center outward. The scene itself never turns: a drag anywhere spins
+the Coere mark and nothing else, a click on a logo flips it, and a click
+anywhere else sends Coere round. The cube lattice sits at an angle to the
+camera so no row of gaps lines up with a line of sight. The camera frames the
+wave and the orbit below the headline, however it wraps, so on short screens
+nothing rises into it.
 
 **Products.** One centered picture, like two pages of app icons either side
 of Coere. On the left, a 3x3 grid of white icons, one per AI with its logo. In
-the middle, Coere floating over a database. On the right, a matching grid of
+the middle, Coere, floating on its own. On the right, a matching grid of
 brand blue icons for what reads from it: a laptop, a phone and a watch; a
 browser, a chat and a terminal; code, an SDK and a database. There are no
 connecting lines; light runs through instead, the AI icons flaring column by
 column toward Coere, then Coere, then the blue icons column by column away
 from it, with a band of light crossing the floor in step. On phones the grids
 stack above and below Coere and the light runs down the screen. The icons pop
-in from the middle out the first time it scrolls into view. Hover an icon to
-lift it, click one to flip it. Hovering a card brings its side of the picture
-forward, and hovering a side lights its card.
+in from the middle out the first time it scrolls into view. Nothing casts a
+shadow; everything floats. Hover an icon to lift it, click one to flip it. A
+drag anywhere spins Coere, and only Coere. Hovering a card brings its side of
+the picture forward, and hovering a side lights its card.
 
 **Performance.** Each scene renders only while on screen and the tab is
 visible. If frames run long the pixel ratio steps down, and then shadows go.

@@ -11,7 +11,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
  * The hero. A field of smooth cubes rolls in one long swell with Coere glowing
  * above the crest and every AI on the surface around it. Scrolling lifts the
  * agents off the wave into the orbit around the mark. It all stays live: drag
- * to turn the scene, drag the mark to spin it, click a logo to flip it.
+ * anywhere to spin the mark, click a logo to flip it.
  */
 export function WhatWeDo() {
   const sectionRef = useRef<HTMLElement>(null);
