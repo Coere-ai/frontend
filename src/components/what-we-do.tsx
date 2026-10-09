@@ -17,6 +17,7 @@ export function WhatWeDo() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const headlineRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "failed">(
     "loading",
   );
@@ -50,6 +51,7 @@ export function WhatWeDo() {
           host: stage,
           agents,
           getProgress,
+          headline: headlineRef.current ?? undefined,
           onFail: fail,
         });
         engine = scene;
@@ -109,12 +111,15 @@ export function WhatWeDo() {
           className="pointer-events-none absolute inset-x-0 top-0 h-[30%] bg-linear-to-b from-mist via-mist/70 to-transparent sm:h-[38%]"
         />
 
-        <div className="pointer-events-none absolute inset-x-0 top-[7.5rem] px-5 sm:top-[8.25rem]">
+        <div
+          ref={headlineRef}
+          className="pointer-events-none absolute inset-x-0 top-[7.5rem] px-5 sm:top-[8.25rem]"
+        >
           <motion.h1
             initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             transition={{ duration: 0.9, ease }}
-            className="mx-auto max-w-4xl text-center text-[2.6rem] leading-[1.02] font-semibold tracking-[-0.045em] text-balance text-brand-600 sm:text-6xl lg:text-[4.6rem]"
+            className="mx-auto max-w-4xl text-center text-[clamp(2rem,10.4vw,2.6rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-balance text-brand-600 sm:text-6xl lg:text-[4.6rem]"
           >
             Building the future
             <br className="hidden sm:block" /> infrastructure of AI

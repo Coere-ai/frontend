@@ -26,6 +26,8 @@ type Options = {
   host: HTMLElement;
   agents: readonly HeroAgent[];
   getProgress: () => number;
+  /** The headline over the scene; the picture is framed to stay below it. */
+  headline?: HTMLElement;
   /** The GPU dropped the scene for good; show the flat page instead. */
   onFail?: () => void;
 };
@@ -50,7 +52,7 @@ const STAGGER = 0.12;
  * wave runs from near left to far right, so the left of the ring sits deeper.
  */
 const WAVE_SPOTS: Record<string, [number, number]> = {
-  Perplexity: [0.4, -0.47],
+  Perplexity: [0.5, -0.6],
   Grok: [0.99, -0.28],
   Copilot: [1.08, 0.06],
   "Meta AI": [0.66, 0.55],
@@ -58,7 +60,7 @@ const WAVE_SPOTS: Record<string, [number, number]> = {
   DeepSeek: [-0.62, 0.84],
   ChatGPT: [-0.99, 0.56],
   Claude: [-1.07, -0.82],
-  Gemini: [-0.48, -1.45],
+  Gemini: [-0.52, -1.55],
 };
 /** Clockwise from the top, as the flat orbit had them. */
 const RING_ORDER = [
@@ -103,6 +105,9 @@ export class HeroScene {
   private readonly lowPower = isLowPowerDevice();
   private readonly reducedMotion = prefersReducedMotion();
   private readonly options: Options;
+  private headlineObserver: ResizeObserver | null = null;
+  /** How far down the screen the headline reaches, as a fraction. */
+  private clear = 0;
 
   // The field of cubes.
   private field!: THREE.InstancedMesh;
@@ -266,6 +271,16 @@ export class HeroScene {
     host.addEventListener("pointercancel", this.onPointerUp);
     host.addEventListener("pointerleave", this.onPointerLeave);
     this.stage.start();
+
+    // The headline rewraps with the width and when its font arrives.
+    if (options.headline) {
+      this.headlineObserver = new ResizeObserver(() => {
+        const { width, height } = this.stage;
+        if (this.headlineClear(height) !== this.clear)
+          this.resize(width, height);
+      });
+      this.headlineObserver.observe(options.headline);
+    }
   }
 
   // ---------------------------------------------------------------- building
@@ -473,7 +488,15 @@ export class HeroScene {
     // Low over the surface, as in a landscape shot.
     this.waveCamera.distance = lerp(44, 40, wide);
     this.waveCamera.elevation = lerp(0.4, 0.3, wide);
-    this.waveCamera.anchor = portrait ? 0.56 : 0.6;
+    const clear = this.headlineClear(height);
+    this.clear = clear;
+    // Lower the picture on short screens, so the agents at the back of the
+    // wave stay under the headline: they sit up to 0.18 of the screen above
+    // the target. Never so low that the agents in front leave the bottom.
+    this.waveCamera.anchor = Math.min(
+      0.72,
+      Math.max(portrait ? 0.56 : 0.6, clear + 0.18),
+    );
     this.waveCamera.target.set(0, 2.6, 0);
 
     // Fit the orbit between the headline and the bottom of the screen. With
@@ -482,9 +505,13 @@ export class HeroScene {
     this.ringRadius = 6.2;
     const extent = this.ringRadius + 1.25;
     const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
-    // Clear air between the headline and the top of the ring.
-    const anchor = portrait ? 0.58 : 0.64;
-    const headroom = portrait ? 0.27 : 0.35;
+    // Clear air between the headline and the top of the ring, and the ring
+    // centered in what is left when the headline runs long.
+    const headroom = Math.max(portrait ? 0.27 : 0.35, clear);
+    const anchor = Math.max(
+      portrait ? 0.58 : 0.64,
+      (headroom + (portrait ? 0.89 : 0.93)) / 2,
+    );
     const fitV = extent / (2 * (anchor - headroom) * tanV);
     const fitH = extent / (tanV * a * 0.92);
     this.orbitCamera.distance = Math.max(fitV, fitH);
@@ -493,6 +520,13 @@ export class HeroScene {
     this.layoutField();
     (this.dust.material as THREE.ShaderMaterial).uniforms.uPixelRatio.value =
       this.stage.pixelRatio;
+  }
+
+  /** The bottom of the headline as a fraction of the screen, plus some air. */
+  private headlineClear(height: number) {
+    const headline = this.options.headline;
+    if (!headline) return 0;
+    return (headline.offsetTop + headline.offsetHeight) / height + 0.02;
   }
 
   private degrade() {
@@ -782,10 +816,18 @@ export class HeroScene {
       this.markHit,
       ...this.agents.map((a) => a.hit),
     ];
-    const hit = this.raycaster.intersectObjects(targets, false)[0];
-    if (!hit) return -2;
-    if (hit.object === this.markHit) return -1;
-    return this.agents.findIndex((a) => a.hit === hit.object);
+    const hits = this.raycaster.intersectObjects(targets, false);
+    if (!hits.length) return -2;
+    // The mark's hit sphere is generous. Where it overlaps an agent's, the
+    // agent wins unless the pointer is on the mark itself.
+    const agent = hits.find((h) => h.object !== this.markHit);
+    if (hits[0].object === this.markHit) {
+      const center = this.markHit.getWorldPosition(tmp);
+      const core = 0.42 * this.rig.scale.x;
+      const onMark = this.raycaster.ray.distanceSqToPoint(center) < core * core;
+      if (onMark || !agent) return -1;
+    }
+    return this.agents.findIndex((a) => a.hit === agent?.object);
   }
 
   private onPointerDown = (event: PointerEvent) => {
@@ -882,6 +924,7 @@ export class HeroScene {
     host.removeEventListener("pointerup", this.onPointerUp);
     host.removeEventListener("pointercancel", this.onPointerUp);
     host.removeEventListener("pointerleave", this.onPointerLeave);
+    this.headlineObserver?.disconnect();
     // Shared logo assets stay cached for the products scene; drop the rest.
     this.agents.forEach((a) => a.body && a.group.remove(a.body));
     disposeTree(this.scene);

@@ -152,7 +152,6 @@ export function getTileGeometry() {
   );
   extruded.translate(0, 0, -TILE_BODY / 2);
   tileGeometry = softEdges(extruded);
-  extruded.dispose();
   return tileGeometry;
 }
 
@@ -342,10 +341,11 @@ export function getGlyphGeometry(name: GlyphName) {
   extruded.computeBoundingBox();
   const center = extruded.boundingBox!.getCenter(new THREE.Vector3());
   extruded.translate(-center.x, -center.y, -center.z);
-  const scale = 0.58 / 24;
-  extruded.scale(scale, scale, scale);
+  // Smooth at the drawing's own scale: the smoothing matches up vertices to
+  // a hundredth of a unit, finer than a scaled-down bevel's steps.
   geometry = softEdges(extruded);
-  extruded.dispose();
+  const scale = 0.58 / 24;
+  geometry.scale(scale, scale, scale);
   glyphCache.set(name, geometry);
   return geometry;
 }

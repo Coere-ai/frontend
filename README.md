@@ -90,7 +90,8 @@ Coere mark to spin it, click a logo to flip it. The field never actually
 turns: dragging turns the wave and everything on it, the way a shape turns on
 a pin board, so the field only needs to cover what the camera sees. The cube
 lattice sits at an angle to the camera so no row of gaps lines up with a line
-of sight.
+of sight. The camera frames the wave and the orbit below the headline, however
+it wraps, so on short screens nothing rises into it.
 
 **Products.** One centered picture, like two pages of app icons either side
 of Coere. On the left, a 3x3 grid of white icons, one per AI with its logo. In

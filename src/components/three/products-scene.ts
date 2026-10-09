@@ -283,8 +283,9 @@ export class ProductsScene {
     pedestalMesh.receiveShadow = true;
     this.mark = new THREE.Mesh(coereMarkGeometry(), coereMaterial());
     this.mark.castShadow = true;
+    // Sized in resize(), from the floor of the database to the mark's top.
     this.markHit = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.3, 1.3, 3.2, 12),
+      new THREE.CylinderGeometry(1.3, 1.3, 1, 12),
       hitMaterial,
     );
     this.coreGlow = new THREE.Sprite(
@@ -464,6 +465,9 @@ export class ProductsScene {
         halfHeight / tanV(this.camera.fov),
       );
     }
+    const hitTop = this.markY + this.markScale * 0.75;
+    this.markHit.scale.y = hitTop;
+    this.markHit.position.y = hitTop / 2;
     // Seen nearly edge on from the front, the floor would only be a line.
     this.floor.visible = !this.portrait;
     const fog = this.scene.fog as THREE.Fog;
@@ -645,7 +649,6 @@ export class ProductsScene {
     this.mark.position.y = markY;
     this.mark.rotation.set(Math.sin(t * 0.8) * 0.05, this.spin - this.yaw, 0);
     this.mark.scale.setScalar(this.markScale * (1 + pulse * 0.05));
-    this.markHit.position.y = markY;
     this.coreGlow.position.y = markY;
     this.coreGlow.scale.setScalar(this.markScale * 2.35);
     this.coreGlow.material.opacity = 0.42 + pulse * 0.4;
