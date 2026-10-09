@@ -697,10 +697,13 @@ export class HeroScene {
     if (!this.drag?.moved) {
       const cruise = this.reducedMotion ? 0 : lerp(0.42, 0, e);
       this.spinVelocity = damp(this.spinVelocity, cruise, 1.2, dt);
-      if (e > 0.5 && Math.abs(this.spinVelocity) < 0.6) {
+      // In the orbit, or with no cruise to carry it round, it comes back
+      // to face out once it slows.
+      const settle = this.reducedMotion ? 2.5 : 2.2 * (e - 0.5) * 2;
+      if (settle > 0 && Math.abs(this.spinVelocity) < 0.6) {
         const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
         const sway = this.reducedMotion ? 0 : Math.sin(t * 0.55) * 0.32;
-        this.spin = damp(this.spin, home + sway, 2.2 * (e - 0.5) * 2, dt);
+        this.spin = damp(this.spin, home + sway, settle, dt);
       }
       this.spin += this.spinVelocity * dt;
     }
