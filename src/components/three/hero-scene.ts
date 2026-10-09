@@ -46,6 +46,9 @@ const ORBIT_Y = 4.4;
  * row direction ever lines up with a sight line on any screen shape.
  */
 const GRID_ANGLE = 0.6;
+/** How much of the morph the agents spread their departures over. Small, so
+ * neighbours leave together and never overtake one another. */
+const STAGGER = 0.12;
 /** Where each agent waits on the wave, as a fraction of the spread. */
 const WAVE_SPOTS: Record<string, [number, number]> = {
   ChatGPT: [-1.0, 0.18],
@@ -104,6 +107,9 @@ export class HeroScene {
 
   // The field of cubes.
   private field!: THREE.InstancedMesh;
+  private fieldMaterial!: THREE.MeshStandardMaterial;
+  /** Most cubes ever laid out; past it the farthest are dropped. */
+  private readonly fieldCap: number;
   private fieldData!: THREE.InstancedBufferAttribute;
   private fieldX = new Float32Array(0);
   private fieldZ = new Float32Array(0);
@@ -175,7 +181,8 @@ export class HeroScene {
 
   constructor(options: Options) {
     this.options = options;
-    this.spacing = this.lowPower ? 0.58 : 0.42;
+    this.spacing = this.lowPower ? 0.62 : 0.5;
+    this.fieldCap = this.lowPower ? 9000 : 30000;
     this.pads = new Float32Array(options.agents.length * 2);
 
     this.stage = new Stage({
@@ -213,12 +220,13 @@ export class HeroScene {
     this.key.shadow.bias = -0.0004;
     this.key.shadow.normalBias = 0.03;
     this.scene.add(this.key, this.key.target);
-    const rim = new THREE.DirectionalLight("#dfe6ff", 1);
-    rim.position.set(7, 5, -12);
-    this.scene.add(rim);
+    // A soft front fill keeps the logos' faces lit with the key behind them.
+    const fill = new THREE.DirectionalLight("#eef1ff", 0.55);
+    fill.position.set(3, 6, 14);
+    this.scene.add(fill);
 
     this.scene.add(this.content);
-    this.buildField();
+    this.buildField(this.lowPower ? 6000 : 14000);
 
     // Coere, glowing, and the light it throws on the crest below.
     this.mark = new THREE.Mesh(coereMarkGeometry(), coereMaterial());
@@ -237,7 +245,7 @@ export class HeroScene {
     );
     this.glow.scale.setScalar(3.4);
     this.glow.renderOrder = 1;
-    this.light = new THREE.PointLight("#dbe2ff", 38, 18, 1.5);
+    this.light = new THREE.PointLight("#dbe2ff", 20, 18, 1.5);
     this.rig.add(this.glow, this.mark, this.markHit, this.light);
     this.content.add(this.rig);
 
@@ -262,36 +270,48 @@ export class HeroScene {
 
   // ---------------------------------------------------------------- building
 
-  private buildField() {
+  /** Builds, or rebuilds bigger, the instanced field for `capacity` cubes. */
+  private buildField(capacity: number) {
+    if (this.field) {
+      this.scene.remove(this.field);
+      this.field.geometry.dispose();
+      this.field.dispose();
+    }
+    if (!this.fieldMaterial) {
+      this.fieldMaterial = createDatabaseMaterial({
+        // Shallow, so the step between neighbours reaches the deep tone and
+        // every cube shows a lit top over a shaded side.
+        shadeDepth: this.spacing * 1.0,
+        deep: "#97a6d4",
+      }).material;
+      this.fieldMaterial.roughness = 0.6;
+    }
     // Cubes nearly touching, so their tops read as one surface.
     const geometry = createTileGeometry({
       half: this.spacing * 0.45,
       shaft: 9,
       roll: this.lowPower ? 2 : 3,
     });
-    const { material } = createDatabaseMaterial({
-      shadeDepth: this.spacing * 2.2,
-      deep: "#9aa9d6",
-    });
-
-    // Enough for the widest screen; the visible count is set per layout.
-    const max = this.lowPower ? 8000 : 17000;
     this.fieldData = new THREE.InstancedBufferAttribute(
-      new Float32Array(max * 4),
+      new Float32Array(capacity * 4),
       4,
     );
     this.fieldData.setUsage(THREE.DynamicDrawUsage);
     geometry.setAttribute("aData", this.fieldData);
-    this.field = new THREE.InstancedMesh(geometry, material, max);
+    this.field = new THREE.InstancedMesh(
+      geometry,
+      this.fieldMaterial,
+      capacity,
+    );
     this.field.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     this.field.receiveShadow = true;
     this.field.frustumCulled = false;
     this.field.count = 0;
     this.scene.add(this.field);
 
-    this.fieldX = new Float32Array(max);
-    this.fieldZ = new Float32Array(max);
-    this.fieldEdge = new Float32Array(max);
+    this.fieldX = new Float32Array(capacity);
+    this.fieldZ = new Float32Array(capacity);
+    this.fieldEdge = new Float32Array(capacity);
   }
 
   /**
@@ -302,7 +322,6 @@ export class HeroScene {
    */
   private layoutField() {
     const s = this.spacing;
-    const max = this.fieldX.length;
     const halfFov = THREE.MathUtils.degToRad(this.camera.fov / 2);
     const tanH = Math.tan(halfFov) * this.aspect;
     const A = this.waveCamera;
@@ -332,10 +351,12 @@ export class HeroScene {
     const v0 = Math.floor(Math.min(...vs) / s);
     const v1 = Math.ceil(Math.max(...vs) / s);
 
-    let n = 0;
-    // Near rows first, so if the budget runs out it is the far ones that go.
-    for (let j = v1; j >= v0 && n < max; j--) {
-      for (let i = u0; i <= u1 && n < max; i++) {
+    // Gather every cube the camera can see.
+    const xs: number[] = [];
+    const zs: number[] = [];
+    const edges: number[] = [];
+    for (let j = v1; j >= v0; j--) {
+      for (let i = u0; i <= u1; i++) {
         const u = i * s;
         const v = j * s;
         const x = ca * u + sa * v;
@@ -343,23 +364,42 @@ export class HeroScene {
         if (z > zNear || z < zFar) continue;
         const half = halfAt(z);
         if (Math.abs(x) > half) continue;
-        this.fieldX[n] = x;
-        this.fieldZ[n] = z;
-        // Fade out toward the sides and the far edge.
+        xs.push(x);
+        zs.push(z);
+        // Fade out toward the sides and into the distance.
         const side = smoothstep(half - 5, half, Math.abs(x));
-        const far = smoothstep(zFar + 12, zFar, z);
-        this.fieldEdge[n] = Math.max(side, far);
-        n++;
+        const far = smoothstep(zFar + 24, zFar + 6, z);
+        edges.push(Math.max(side, far));
       }
+    }
+
+    // Past the cap, drop the farthest cubes, which the fade has mostly
+    // taken anyway; otherwise grow the mesh to fit.
+    let n = xs.length;
+    let order: number[] | null = null;
+    if (n > this.fieldCap) {
+      order = xs
+        .map((_, k) => k)
+        .sort((a, b) => zs[b] - zs[a])
+        .slice(0, this.fieldCap);
+      n = this.fieldCap;
+    }
+    if (n > this.fieldX.length) {
+      this.buildField(Math.min(this.fieldCap, Math.ceil(n * 1.1)));
+    }
+
+    const matrix = new THREE.Matrix4();
+    for (let k = 0; k < n; k++) {
+      const from = order ? order[k] : k;
+      this.fieldX[k] = xs[from];
+      this.fieldZ[k] = zs[from];
+      this.fieldEdge[k] = edges[from];
+      matrix.makeRotationY(GRID_ANGLE);
+      matrix.setPosition(xs[from], 0, zs[from]);
+      this.field.setMatrixAt(k, matrix);
     }
     this.fieldCount = n;
     this.field.count = n;
-    const matrix = new THREE.Matrix4();
-    for (let i = 0; i < n; i++) {
-      matrix.makeRotationY(GRID_ANGLE);
-      matrix.setPosition(this.fieldX[i], 0, this.fieldZ[i]);
-      this.field.setMatrixAt(i, matrix);
-    }
     this.field.instanceMatrix.needsUpdate = true;
   }
 
@@ -388,7 +428,7 @@ export class HeroScene {
         flipVelocity: 0,
         // The bottom of the ring fills first and the top last, once the
         // camera has pulled back, so nothing rises into the headline.
-        stagger: ((Math.sin(ringAngle) + 1) / 2) * 0.22,
+        stagger: ((Math.sin(ringAngle) + 1) / 2) * STAGGER,
       });
     });
 
@@ -426,12 +466,12 @@ export class HeroScene {
 
     // Spread the agents to the screen: wide on desktop, deep on phones.
     const wide = smoothstep(0.55, 1.6, a);
-    this.spread.set(lerp(3.9, 8.6, wide), lerp(7.2, 6.3, wide));
+    this.spread.set(lerp(4.9, 8.6, wide), lerp(7.2, 6.3, wide));
 
     // Low over the surface, as in a landscape shot.
     this.waveCamera.distance = lerp(44, 40, wide);
-    this.waveCamera.elevation = lerp(0.36, 0.25, wide);
-    this.waveCamera.anchor = portrait ? 0.62 : 0.6;
+    this.waveCamera.elevation = lerp(0.4, 0.3, wide);
+    this.waveCamera.anchor = portrait ? 0.56 : 0.6;
     this.waveCamera.target.set(0, 2.6, 0);
 
     // Fit the orbit between the headline and the bottom of the screen. With
@@ -440,8 +480,9 @@ export class HeroScene {
     this.ringRadius = 6.2;
     const extent = this.ringRadius + 1.25;
     const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
-    const anchor = portrait ? 0.58 : 0.6;
-    const headroom = portrait ? 0.27 : 0.31;
+    // Clear air between the headline and the top of the ring.
+    const anchor = portrait ? 0.58 : 0.64;
+    const headroom = portrait ? 0.27 : 0.35;
     const fitV = extent / (2 * (anchor - headroom) * tanV);
     const fitH = extent / (tanV * a * 0.92);
     this.orbitCamera.distance = Math.max(fitV, fitH);
@@ -491,10 +532,11 @@ export class HeroScene {
   }
 
   private updateField(t: number, amp: number, morph: number) {
-    if (morph >= 0.999) {
+    if (morph >= 0.5) {
       this.field.visible = false;
       return;
     }
+    const fieldFade = smoothstep(0.2, 0.45, morph);
     this.field.visible = true;
 
     // Content space turns with the drag; the field does not.
@@ -545,12 +587,22 @@ export class HeroScene {
       const spot = Math.exp(-d2 / (2 * 12 * 12));
       data[o + 1] = Math.min(
         1,
-        smoothstep(2.8, -1.2, h) * 0.9 + (1 - spot) * 0.3,
+        smoothstep(2.8, -1.2, h) * 0.9 + (1 - spot) * 0.15,
       );
-      data[o + 2] = Math.max(this.fieldEdge[i], smoothstep(0.05, 0.55, sink));
+      // Gone before the camera drops low enough to see the field edge-on.
+      data[o + 2] = Math.max(
+        this.fieldEdge[i],
+        fieldFade,
+        smoothstep(0.05, 0.3, sink),
+      );
       data[o + 3] = Math.min(1, pool * 0.55);
     }
+    // Upload only the cubes in use, not the whole capacity.
+    this.field.instanceMatrix.clearUpdateRanges();
+    this.field.instanceMatrix.addUpdateRange(0, this.fieldCount * 16);
     this.field.instanceMatrix.needsUpdate = true;
+    this.fieldData.clearUpdateRanges();
+    this.fieldData.addUpdateRange(0, this.fieldCount * 4);
     this.fieldData.needsUpdate = true;
   }
 
@@ -588,6 +640,8 @@ export class HeroScene {
 
     const dustMaterial = this.dust.material as THREE.ShaderMaterial;
     dustMaterial.uniforms.uTime.value = elapsed * motion;
+    // At orbit distance the specks shrink to stray pixels, so let them go.
+    dustMaterial.uniforms.uOpacity.value = 1 - smoothstep(0.3, 0.7, m);
 
     this.stage.renderer.render(this.scene, this.camera);
     this.options.onFrame?.({ morph: m });
@@ -622,7 +676,9 @@ export class HeroScene {
 
     // Keep the shadow box around the action.
     this.key.target.position.copy(target);
-    this.key.position.set(target.x - 6, target.y + 20, target.z + 7);
+    // From above and behind the crest, as in the reference: tops catch it,
+    // the sides facing the camera fall into shade.
+    this.key.position.set(target.x - 6, target.y + 18, target.z - 8);
   }
 
   private updateRig(t: number, dt: number, m: number, amp: number) {
@@ -630,7 +686,7 @@ export class HeroScene {
     const bob = Math.sin(t * 0.9) * 0.12;
     const waveY = this.height(0, 0, t) * amp + 2 + bob;
     this.rig.position.set(0, lerp(waveY, ORBIT_Y + bob * 0.5, e), 0);
-    this.rig.scale.setScalar(lerp(2.6, 3.2, e));
+    this.rig.scale.setScalar(lerp(this.aspect < 0.9 ? 2.15 : 2.6, 3.2, e));
 
     // Spin: free on the wave; in the orbit it settles facing out with a sway.
     if (!this.drag || this.drag.mode !== "mark") {
@@ -646,13 +702,13 @@ export class HeroScene {
     // Face the camera whatever the scene's yaw, plus the spin.
     this.mark.rotation.set(Math.sin(t * 0.7) * 0.06, this.spin - this.yaw, 0);
     this.glow.material.opacity = lerp(0.55, 0.45, e);
-    this.light.intensity = lerp(38, 6, e);
+    this.light.intensity = lerp(20, 6, e);
   }
 
   private updateAgents(t: number, dt: number, m: number, amp: number) {
     for (let k = 0; k < this.agents.length; k++) {
       const a = this.agents[k];
-      const local = easeInOutCubic(clamp01((m - a.stagger) / (1 - 0.22)));
+      const local = easeInOutCubic(clamp01((m - a.stagger) / (1 - STAGGER)));
 
       // On the wave.
       const lx = a.spot.x * this.spread.x;

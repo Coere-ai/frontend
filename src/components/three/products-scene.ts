@@ -38,11 +38,15 @@ type Options = {
 
 export const PRODUCTS_BACKGROUND = "#f2f5fc";
 
-/** One database unit: three disks, about as tall as it is wide. */
+/**
+ * One disk of a database column. A column of three reads as one database,
+ * each disk carrying a logo, with a lit seam between them and nothing
+ * crossing the logos.
+ */
 const UNIT_RADIUS = 0.6;
-const UNIT_DISK = 0.24;
-const UNIT_HEIGHT = UNIT_DISK * 3 + UNIT_RADIUS * 0.05;
-const UNIT_GAP = 0.1;
+const UNIT_DISK = 0.66;
+const UNIT_HEIGHT = UNIT_DISK + UNIT_RADIUS * 0.05;
+const UNIT_GAP = 0.05;
 const UNITS_PER_TOWER = 3;
 const TOWER_HEIGHT =
   UNITS_PER_TOWER * UNIT_HEIGHT + (UNITS_PER_TOWER - 1) * UNIT_GAP;
@@ -129,7 +133,6 @@ export class ProductsScene {
   private readonly markHit: THREE.Mesh;
   private readonly coreGlow: THREE.Sprite;
   private readonly coreLight: THREE.PointLight;
-  private readonly ripple: THREE.Mesh;
   private readonly floor: THREE.ShaderMaterial;
   private readonly key: THREE.DirectionalLight;
 
@@ -179,7 +182,8 @@ export class ProductsScene {
     this.scene.environmentIntensity = 0.7;
     this.scene.add(new THREE.HemisphereLight("#ffffff", "#b6c3e6", 0.8));
     this.key = new THREE.DirectionalLight("#ffffff", 2.3);
-    this.key.position.set(-4, 12, 9);
+    // Nearly overhead, so shadows pool under things instead of smearing.
+    this.key.position.set(-1.5, 14, 5);
     this.key.castShadow = true;
     const shadowSize = this.lowPower ? 1024 : 2048;
     this.key.shadow.mapSize.set(shadowSize, shadowSize);
@@ -221,7 +225,8 @@ export class ProductsScene {
       createDatabaseGeometry({
         radius: UNIT_RADIUS,
         disk: UNIT_DISK,
-        shaft: 0,
+        disks: 1,
+        seam: true,
         segments: 40,
       });
     const count = options.agents.length;
@@ -285,7 +290,6 @@ export class ProductsScene {
       createDatabaseGeometry({
         radius: 1.45,
         disk: 0.26,
-        shaft: 0,
         segments: 72,
       }),
       pedestal.material,
@@ -311,24 +315,12 @@ export class ProductsScene {
     );
     this.coreGlow.scale.setScalar(5.4);
     this.coreLight = new THREE.PointLight("#dbe2ff", 10, 9, 1.6);
-    this.ripple = new THREE.Mesh(
-      new THREE.RingGeometry(0.94, 1, 96),
-      new THREE.MeshBasicMaterial({
-        color: BRAND[500],
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-      }),
-    );
-    this.ripple.rotation.x = -Math.PI / 2;
-    this.ripple.position.y = 0.012;
     this.core.add(
       pedestalMesh,
       this.coreGlow,
       this.mark,
       this.markHit,
       this.coreLight,
-      this.ripple,
     );
     this.root.add(this.core);
 
@@ -369,9 +361,9 @@ export class ProductsScene {
     // [device, scale, turn toward Coere, floats, middle above its base]
     const readers: [Device, number, number, boolean, number][] = [
       [blueColumn, 1, 0.12, false, TOWER_HEIGHT / 2],
-      [createLaptop(), 0.62, 0.18, false, 0.55],
+      [createLaptop(), 0.8, 0.18, false, 0.7],
       [createAppTile(), 0.62, 0.16, true, 0],
-      [createPhone(), 0.85, 0.2, false, 0],
+      [createPhone(), 0.74, 0.2, false, 0],
     ];
     readers.forEach(([device, scale, facing, float, middle], j) => {
       const hit = new THREE.Mesh(
@@ -456,7 +448,7 @@ export class ProductsScene {
     dots.position.y = 0.002;
     const shadows = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60),
-      new THREE.ShadowMaterial({ color: "#26338f", opacity: 0.12 }),
+      new THREE.ShadowMaterial({ color: "#26338f", opacity: 0.08 }),
     );
     shadows.rotation.x = -Math.PI / 2;
     shadows.receiveShadow = true;
@@ -505,8 +497,8 @@ export class ProductsScene {
       const spots: [number, number, number][] = [
         [-2.1, 3.9, 0],
         [0.15, 4.4, 0],
-        [0.15, 3.3, 1.75],
-        [2.25, 4.1, 0.87],
+        [2.25, 3.55, 2.25],
+        [2.25, 4.1, 0.76],
       ];
       this.readers.forEach((r, j) =>
         r.base.set(spots[j][0], spots[j][2], spots[j][1]),
@@ -527,10 +519,10 @@ export class ProductsScene {
         tower.z = 0;
       });
       const spots: [number, number, number][] = [
-        [3.35, 0, 0],
-        [5.1, 0.25, 0],
-        [5.1, -0.1, 2.35],
-        [6.85, 0.15, 0.87],
+        [3.2, 0, 0],
+        [5.25, 0.25, 0],
+        [5.25, -0.1, 2.35],
+        [7.0, 0.15, 0.76],
       ];
       this.readers.forEach((r, j) =>
         r.base.set(spots[j][0], spots[j][2], spots[j][1]),
@@ -710,7 +702,11 @@ export class ProductsScene {
           tower.hover * 0.6,
           this.focusAmount.connect * 0.45,
         ) * light;
-      tower.halo.position.set(tower.x, TOWER_HEIGHT / 2, tower.z - 0.7);
+      tower.halo.position.set(
+        tower.x,
+        TOWER_HEIGHT / 2,
+        tower.z - (this.portrait ? 0.25 : 0.7),
+      );
       tower.halo.scale.set(3.2, 4.4, 1);
       tower.halo.material.opacity = Math.min(0.75, glow * 0.7);
       tower.halo.visible = tower.halo.material.opacity > 0.003;
@@ -737,7 +733,8 @@ export class ProductsScene {
     }
     this.spin += this.spinVelocity * dt;
     const pulse = flash(phase, CORE_AT, 0.16) * running;
-    const markY = 2.45 + Math.sin(t * 1.1) * 0.07;
+    // Higher on phones, where the steeper camera would sink it into the pedestal.
+    const markY = (this.portrait ? 2.75 : 2.45) + Math.sin(t * 1.1) * 0.07;
     this.mark.position.y = markY;
     this.mark.rotation.set(Math.sin(t * 0.8) * 0.05, this.spin - this.yaw, 0);
     this.mark.scale.setScalar(2.2 * (1 + pulse * 0.05));
@@ -753,15 +750,6 @@ export class ProductsScene {
       0,
       0,
     );
-
-    // A ring of light spreads across the floor as the flow passes through.
-    let age = phase - CORE_AT;
-    if (age < 0) age += 1;
-    const ring = age < 0.3 ? age / 0.3 : 1;
-    const material = this.ripple.material as THREE.MeshBasicMaterial;
-    material.opacity = running * (1 - easeOutCubic(ring)) * 0.35;
-    this.ripple.visible = material.opacity > 0.003;
-    this.ripple.scale.setScalar(1.6 + easeOutCubic(ring) * 2.6);
   }
 
   private updateReaders(
@@ -800,7 +788,9 @@ export class ProductsScene {
 
       const centerY = group.position.y + reader.middle;
       reader.hit.position.set(reader.base.x, centerY, reader.base.z);
-      reader.halo.position.set(reader.base.x, centerY, reader.base.z - 0.8);
+      // Just behind; further back would float above it on the steep phone view.
+      const behind = this.portrait ? 0.25 : 0.8;
+      reader.halo.position.set(reader.base.x, centerY, reader.base.z - behind);
       reader.halo.scale.set(3.4, 3.6, 1);
       reader.halo.material.opacity = Math.min(
         0.75,
@@ -882,6 +872,10 @@ export class ProductsScene {
     this.pointerInside = event.pointerType === "mouse";
     this.pointerX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.pointerY = ((event.clientY - rect.top) / rect.height) * 2 - 1;
+    // A mouse released outside the stage never sends pointerup here.
+    if (this.drag && event.pointerType === "mouse" && event.buttons === 0) {
+      this.drag = null;
+    }
     const drag = this.drag;
     if (drag && drag.id === event.pointerId) {
       const dx = event.clientX - drag.lastX;

@@ -3,7 +3,7 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { BRAND } from "./core";
 
 /**
- * The things that read from Coere: a laptop, a phone, an app and a database.
+ * The things that read from Coere: a laptop, a phone and an app.
  * Screens are drawn once to canvases: abstract interfaces, bars standing in
  * for text, so nothing on them competes with the page's own words.
  */

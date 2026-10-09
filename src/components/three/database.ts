@@ -12,10 +12,27 @@ import { BRAND } from "./core";
 
 type Run = {
   points: [number, number][];
+  /** Exact 2D (radial, up) normals per point; estimated from the run if absent. */
+  normals?: [number, number][];
   band?: number;
   /** Cap glow per point, defaults to 0. */
   glow?: number[];
 };
+
+/** Per point 2D normals, averaged with neighbours inside the run only. */
+function runNormals(run: Run): [number, number][] {
+  if (run.normals) return run.normals;
+  const pts = run.points;
+  return pts.map((_, j) => {
+    const prev = pts[Math.max(0, j - 1)];
+    const next = pts[Math.min(pts.length - 1, j + 1)];
+    const dr = next[0] - prev[0];
+    const dy = next[1] - prev[1];
+    const len = Math.hypot(dr, dy) || 1;
+    // Rotating the tangent a quarter turn points it outward.
+    return [-dy / len, dr / len];
+  });
+}
 
 function lathe(runs: Run[], segments: number) {
   const positions: number[] = [];
@@ -26,16 +43,7 @@ function lathe(runs: Run[], segments: number) {
   for (const run of runs) {
     const pts = run.points;
     const ring0 = positions.length / 3;
-    // Per point 2D normals, averaged with neighbours inside this run only.
-    const n2: [number, number][] = pts.map((_, j) => {
-      const prev = pts[Math.max(0, j - 1)];
-      const next = pts[Math.min(pts.length - 1, j + 1)];
-      const dr = next[0] - prev[0];
-      const dy = next[1] - prev[1];
-      const len = Math.hypot(dr, dy) || 1;
-      // Rotating the tangent a quarter turn points it outward.
-      return [-dy / len, dr / len];
-    });
+    const n2 = runNormals(run);
 
     for (let j = 0; j < pts.length; j++) {
       const [r, y] = pts[j];
@@ -91,14 +99,7 @@ function squarePrism(runs: Run[]) {
 
   for (const run of runs) {
     const pts = run.points;
-    const n2 = pts.map((_, j) => {
-      const prev = pts[Math.max(0, j - 1)];
-      const next = pts[Math.min(pts.length - 1, j + 1)];
-      const dr = next[0] - prev[0];
-      const dy = next[1] - prev[1];
-      const len = Math.hypot(dr, dy) || 1;
-      return [-dy / len, dr / len];
-    });
+    const n2 = runNormals(run);
     for (const [nx, nz] of faces) {
       // Along the face, perpendicular to its outward normal.
       const tx = -nz;
@@ -165,15 +166,21 @@ export function createTileGeometry({
     [0, 0],
     [half - bevel, 0],
   ];
+  // Exact normals, so the roll meets the flat top and the wall without a crease.
+  const normals: [number, number][] = [
+    [0, 1],
+    [0, 1],
+  ];
   for (let k = 1; k <= roll; k++) {
     const a = (k / roll) * (Math.PI / 2);
     cap.push([
       half - bevel + Math.sin(a) * bevel,
       -bevel + Math.cos(a) * bevel,
     ]);
+    normals.push([Math.sin(a), Math.cos(a)]);
   }
   return squarePrism([
-    { points: cap },
+    { points: cap, normals },
     {
       points: [
         [half, -bevel],
@@ -185,30 +192,27 @@ export function createTileGeometry({
 
 type DatabaseShape = {
   radius: number;
-  /** Height of each of the three disks. */
+  /** Height of each disk. */
   disk: number;
-  /** How far the shaft runs below the last disk. 0 for a free-standing database. */
-  shaft: number;
   segments: number;
-  /** Fewer rings for columns far enough away that the roll is sub-pixel. */
-  low?: boolean;
-  /** Cap and wall only, for columns so far off the grooves would not show. */
-  plain?: boolean;
+  /** How many disks are stacked, split by lit grooves. */
+  disks?: number;
+  /** Light the rolled bottom edge, so stacked units read as one database. */
+  seam?: boolean;
 };
 
 /** Top of the database sits at y = 0 and it hangs downward. */
 export function createDatabaseGeometry({
   radius: R,
   disk,
-  shaft,
   segments,
-  low = false,
-  plain = false,
+  disks = 3,
+  seam = false,
 }: DatabaseShape) {
   const bevel = R * 0.16;
   const groove = disk * 0.16;
   const inset = R * 0.075;
-  const edge = low ? 0 : R * 0.05;
+  const edge = R * 0.05;
   const runs: Run[] = [];
 
   // Top cap: flat, with a soft rolled edge.
@@ -217,35 +221,26 @@ export function createDatabaseGeometry({
     [R * 0.32, 0],
     [R - bevel, 0],
   ];
-  const roll = low ? 1 : 4;
-  for (let k = 1; k <= roll; k++) {
-    const a = (k / roll) * (Math.PI / 2);
+  for (let k = 1; k <= 4; k++) {
+    const a = (k / 4) * (Math.PI / 2);
     cap.push([R - bevel + Math.sin(a) * bevel, -bevel + Math.cos(a) * bevel]);
   }
   runs.push({ points: cap, glow: [1, 0.22, 0, 0, 0, 0, 0] });
-  if (plain) {
-    runs.push({
-      points: [
-        [R, -bevel],
-        [R, -shaft],
-      ],
-    });
-    return lathe(runs, segments);
-  }
 
   let top = -bevel;
-  for (let k = 0; k < 3; k++) {
-    const bottom = -(k + 1) * disk + (k < 2 ? groove / 2 : 0);
+  for (let k = 0; k < disks; k++) {
+    const last = k === disks - 1;
+    const bottom = -(k + 1) * disk + (last ? 0 : groove / 2);
     const start = k === 0 ? top : top - edge;
     // Disk wall with a slight roll at each end.
     const wall: [number, number][] = [];
-    if (k > 0 && edge) wall.push([R - edge, top]);
+    if (k > 0) wall.push([R - edge, top]);
     wall.push([R, start]);
-    wall.push([R, bottom + (k < 2 ? edge : 0)]);
-    if (k < 2 && edge) wall.push([R - edge, bottom]);
+    wall.push([R, bottom + (last ? 0 : edge)]);
+    if (!last) wall.push([R - edge, bottom]);
     runs.push({ points: wall });
 
-    if (k < 2) {
+    if (!last) {
       // Groove between this disk and the next: the lit band.
       const lower = bottom - groove;
       runs.push({
@@ -263,39 +258,26 @@ export function createDatabaseGeometry({
     }
   }
 
-  if (shaft > 0) {
-    // A thin lit seam where the database meets its shaft, then the shaft.
-    runs.push({
-      band: 0.55,
-      points: [
-        [R, top],
-        [R - inset * 0.7, top - groove * 0.4],
-        [R - inset * 0.7, top - groove * 0.9],
-        [R, top - groove * 1.3],
-      ],
-    });
-    runs.push({
-      points: [
-        [R, top - groove * 1.3],
-        [R, -shaft],
-      ],
-    });
-  } else {
-    // Free-standing: close the bottom.
-    runs.push({
-      points: [
-        [R, top],
-        [R - edge, top - edge],
-        [R * 0.5, top - edge],
-        [0, top - edge],
-      ],
-    });
-  }
+  // Close the bottom.
+  runs.push({
+    band: seam ? 1 : 0,
+    points: [
+      [R, top],
+      [R - edge, top - edge],
+    ],
+  });
+  runs.push({
+    points: [
+      [R - edge, top - edge],
+      [R * 0.5, top - edge],
+      [0, top - edge],
+    ],
+  });
 
   return lathe(runs, segments);
 }
 
-export type DatabaseUniforms = {
+type DatabaseUniforms = {
   uBand: { value: THREE.Color };
   uDeep: { value: THREE.Color };
   uLow: { value: THREE.Color };

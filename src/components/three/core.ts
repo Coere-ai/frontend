@@ -38,18 +38,6 @@ export const damp = (
   dt: number,
 ) => lerp(current, target, 1 - Math.exp(-lambda * dt));
 
-/** Wraps an angle into (-PI, PI]. */
-export const wrapAngle = (a: number) => {
-  const t = (a + Math.PI) % (Math.PI * 2);
-  return (t < 0 ? t + Math.PI * 2 : t) - Math.PI;
-};
-
-/** Cheap deterministic hash in [0, 1). */
-export const hash = (n: number) => {
-  const s = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
-  return s - Math.floor(s);
-};
-
 /** True when the device looks like a phone, a tablet or a low-power laptop. */
 export function isLowPowerDevice() {
   if (typeof window === "undefined") return false;
