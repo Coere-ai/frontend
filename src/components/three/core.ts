@@ -50,26 +50,6 @@ export const hash = (n: number) => {
   return s - Math.floor(s);
 };
 
-export function cubicBezier(
-  p0: THREE.Vector3,
-  p1: THREE.Vector3,
-  p2: THREE.Vector3,
-  p3: THREE.Vector3,
-  t: number,
-  out: THREE.Vector3,
-) {
-  const s = 1 - t;
-  const a = s * s * s;
-  const b = 3 * s * s * t;
-  const c = 3 * s * t * t;
-  const d = t * t * t;
-  return out.set(
-    a * p0.x + b * p1.x + c * p2.x + d * p3.x,
-    a * p0.y + b * p1.y + c * p2.y + d * p3.y,
-    a * p0.z + b * p1.z + c * p2.z + d * p3.z,
-  );
-}
-
 /** True when the device looks like a phone, a tablet or a low-power laptop. */
 export function isLowPowerDevice() {
   if (typeof window === "undefined") return false;

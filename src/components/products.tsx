@@ -157,7 +157,7 @@ export function Products() {
           <Reveal className="mx-auto mt-10 max-w-6xl sm:mt-12">
             <div
               ref={stageRef}
-              className="relative h-[34rem] cursor-grab touch-pan-y overflow-hidden rounded-[2rem] border border-ink-900/8 bg-mist select-none md:h-[clamp(24rem,42vw,36rem)]"
+              className="relative h-[32rem] cursor-grab touch-pan-y overflow-hidden rounded-[2rem] border border-ink-900/8 bg-mist select-none md:h-[clamp(22rem,36vw,32rem)]"
             >
               <canvas
                 ref={canvasRef}
@@ -166,20 +166,11 @@ export function Products() {
                   .map((agent) => agent.name)
                   .join(
                     ", ",
-                  )} streaming into Coere, and a laptop, a phone, an app and a database reading from it`}
+                  )} feeding Coere, and a database, a laptop, an app and a phone reading from it`}
                 className={`absolute inset-0 h-full w-full transition-opacity duration-1000 ${
                   status === "ready" ? "opacity-100" : "opacity-0"
                 }`}
               />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-5"
-              >
-                <span className="absolute top-0 left-0 h-3.5 w-3.5 border-t border-l border-brand-600/30" />
-                <span className="absolute top-0 right-0 h-3.5 w-3.5 border-t border-r border-brand-600/30" />
-                <span className="absolute bottom-0 left-0 h-3.5 w-3.5 border-b border-l border-brand-600/30" />
-                <span className="absolute right-0 bottom-0 h-3.5 w-3.5 border-r border-b border-brand-600/30" />
-              </div>
             </div>
           </Reveal>
         ) : null}

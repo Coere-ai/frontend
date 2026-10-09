@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { BRAND } from "./core";
-import { createDatabaseGeometry, createDatabaseMaterial } from "./database";
 
 /**
  * The things that read from Coere: a laptop, a phone, an app and a database.
@@ -11,8 +10,6 @@ import { createDatabaseGeometry, createDatabaseMaterial } from "./database";
 
 export type Device = {
   group: THREE.Group;
-  /** Where streams land, in the device group's space. */
-  socket: THREE.Vector3;
   /** Called every frame with time and how lit the device should be (0..1). */
   update: (time: number, energy: number) => void;
 };
@@ -302,15 +299,10 @@ export function createLaptop(): Device {
   hinge.add(lid, glass, screen);
 
   group.add(base, deck, hinge);
-  // Stream lands on the middle of the screen.
-  const socket = new THREE.Vector3();
-  hinge.updateMatrix();
-  socket.set(0, 0, depth / 2).applyMatrix4(hinge.matrix);
 
   const screenMat = screen.material as THREE.MeshBasicMaterial;
   return {
     group,
-    socket,
     update: (_t, energy) => {
       screenMat.color.setScalar(0.93 + energy * 0.07);
     },
@@ -359,7 +351,6 @@ export function createPhone(): Device {
   const screenMat = screen.material as THREE.MeshBasicMaterial;
   return {
     group,
-    socket: new THREE.Vector3(0, 0.1, 0.06),
     update: (_t, energy) => {
       screenMat.color.setScalar(0.93 + energy * 0.07);
     },
@@ -459,44 +450,9 @@ export function createAppTile(): Device {
   const tileMaterial = tile.material as THREE.MeshPhysicalMaterial;
   return {
     group,
-    socket: new THREE.Vector3(0, 0, 0.15),
     update: (_t, energy) => {
       tileMaterial.emissive.set(BRAND[500]);
       tileMaterial.emissiveIntensity = energy * 0.35;
-    },
-  };
-}
-
-/** A database on the reading side: brand blue body, white bands. */
-export function createBlueDatabase(): Device {
-  const group = new THREE.Group();
-  const geometry = createDatabaseGeometry({
-    radius: 0.66,
-    disk: 0.44,
-    shaft: 0,
-    segments: 40,
-  });
-  const { material, uniforms } = createDatabaseMaterial({
-    instanced: false,
-    color: BRAND[500],
-    band: "#ffffff",
-    deep: BRAND[600],
-    low: BRAND[500],
-    glow: "#ffffff",
-    shadeDepth: 6,
-    bandBase: 0.5,
-  });
-  material.roughness = 0.24;
-  material.envMapIntensity = 1;
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.y = 3 * 0.44 + 0.05;
-  mesh.castShadow = true;
-  group.add(mesh);
-  return {
-    group,
-    socket: new THREE.Vector3(0, 3 * 0.44 + 0.05, 0),
-    update: (_t, energy) => {
-      uniforms.uData.value.set(0.25 + energy, 0, 0, 0);
     },
   };
 }

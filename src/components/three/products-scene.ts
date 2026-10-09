@@ -12,17 +12,14 @@ import {
   isLowPowerDevice,
   lerp,
   prefersReducedMotion,
-  smoothstep,
 } from "./core";
 import { createDatabaseGeometry, createDatabaseMaterial } from "./database";
 import {
   createAppTile,
-  createBlueDatabase,
   createLaptop,
   createPhone,
   type Device,
 } from "./devices";
-import { FlowLine } from "./flow-line";
 import { coereMaterial, coereMarkGeometry, loadLogo } from "./logos";
 
 export type ProductsAgent = { name: string; logo: string };
@@ -41,84 +38,105 @@ type Options = {
 
 export const PRODUCTS_BACKGROUND = "#f2f5fc";
 
-const DB_RADIUS = 0.42;
-const DB_DISK = 0.34;
-const DB_TOP = DB_DISK * 3 + 0.04;
+/** One database unit: three disks, about as tall as it is wide. */
+const UNIT_RADIUS = 0.6;
+const UNIT_DISK = 0.24;
+const UNIT_HEIGHT = UNIT_DISK * 3 + UNIT_RADIUS * 0.05;
+const UNIT_GAP = 0.1;
+const UNITS_PER_TOWER = 3;
+const TOWER_HEIGHT =
+  UNITS_PER_TOWER * UNIT_HEIGHT + (UNITS_PER_TOWER - 1) * UNIT_GAP;
 
-type Source = {
-  name: string;
+/** Light runs through the picture once per cycle: in, through Coere, out. */
+const CYCLE = 5.4;
+/** When, as a fraction of the cycle, Coere lights. */
+const CORE_AT = 0.36;
+
+/** A quick flash that fades: 1 at `at`, gone a little after. */
+const flash = (phase: number, at: number, width = 0.12) => {
+  let u = phase - at;
+  if (u < 0) u += 1;
+  return u < width ? Math.pow(1 - u / width, 2) : 0;
+};
+
+type Unit = {
+  tower: number;
+  /** 0 at the bottom. */
+  level: number;
   logo: THREE.Group;
   body: THREE.Mesh | null;
+  fireAt: number;
+  energy: number;
+};
+
+type Tower = {
+  x: number;
+  z: number;
   hit: THREE.Mesh;
-  line: FlowLine;
-  /** Place in the bank: index along its row, row 0 in front. */
-  cell: [number, number];
-  position: THREE.Vector3;
+  halo: THREE.Sprite;
   hover: number;
-  pulse: number;
-  appear: number;
 };
 
 type Reader = {
   device: Device;
-  line: FlowLine;
-  hit: THREE.Mesh;
-  position: THREE.Vector3;
   base: THREE.Vector3;
-  float: number;
+  /** Height of its middle above `base`, for its halo and hit area. */
+  middle: number;
+  scale: number;
   facing: number;
+  float: boolean;
+  fireAt: number;
+  energy: number;
   hover: number;
-  pulse: number;
+  hit: THREE.Mesh;
+  halo: THREE.Sprite;
   appear: number;
-  ripple: THREE.Mesh;
-  rippleAge: number;
 };
 
-const tmp = new THREE.Vector3();
-const tmp2 = new THREE.Vector3();
-const matrix = new THREE.Matrix4();
-const quaternion = new THREE.Quaternion();
 const place = new THREE.Vector3();
-const size = new THREE.Vector3();
+const matrix = new THREE.Matrix4();
 
 /**
- * Coere Connect and Coere Developer as one picture. On the left, a database
- * for every AI, each with its logo, streaming memory into Coere. On the right,
- * a laptop, a phone, an app and a database reading it back out.
+ * Coere Connect and Coere Developer as one centered picture. On the left,
+ * three columns of databases, one for each AI with its logo on the front. In
+ * the middle, Coere. On the right, the things that read from it: a database,
+ * a laptop with an app above it, and a phone. No lines: a wave of light runs
+ * through the picture from left to right, the databases flaring as it
+ * leaves them, Coere as it passes, then everything that reads from it.
  */
 export class ProductsScene {
   readonly ready: Promise<void>;
 
   private readonly stage: Stage;
   private readonly scene = new THREE.Scene();
-  private readonly camera = new THREE.PerspectiveCamera(30, 1, 0.1, 120);
+  private readonly camera = new THREE.PerspectiveCamera(24, 1, 0.1, 120);
   private readonly root = new THREE.Group();
   private readonly lowPower = isLowPowerDevice();
   private readonly reducedMotion = prefersReducedMotion();
   private readonly options: Options;
 
-  private readonly sources: Source[] = [];
+  private readonly units: Unit[] = [];
+  private readonly towers: Tower[] = [];
+  private readonly sourceMesh: THREE.InstancedMesh;
+  private readonly sourceData: THREE.InstancedBufferAttribute;
+  private readonly blueMesh: THREE.InstancedMesh;
+  private readonly blueData: THREE.InstancedBufferAttribute;
   private readonly readers: Reader[] = [];
-  private readonly databases: THREE.InstancedMesh;
-  private readonly databaseData: THREE.InstancedBufferAttribute;
-  private readonly packets: THREE.InstancedMesh;
 
   private readonly core = new THREE.Group();
-  private readonly pedestal: THREE.Mesh;
   private readonly pedestalUniforms: { uData: { value: THREE.Vector4 } };
   private readonly mark: THREE.Mesh;
   private readonly markHit: THREE.Mesh;
-  private readonly coreRipple: THREE.Mesh;
-  private coreRippleAge = 1;
-  private readonly orbitBead: THREE.Group;
+  private readonly coreGlow: THREE.Sprite;
+  private readonly coreLight: THREE.PointLight;
+  private readonly ripple: THREE.Mesh;
+  private readonly floor: THREE.ShaderMaterial;
   private readonly key: THREE.DirectionalLight;
 
-  private along = new THREE.Vector3(1, 0, 0);
-  private side = new THREE.Vector3(0, 0, 1);
   private portrait = false;
-  private distance = 22;
-  private elevation = 0.32;
-  private anchor = 0.5;
+  private distance = 18;
+  private elevation = 0.2;
+  private targetY = 1.3;
 
   private time = 0;
   private introStart = -1;
@@ -156,209 +174,226 @@ export class ProductsScene {
     const renderer = this.stage.renderer;
 
     this.scene.background = new THREE.Color(PRODUCTS_BACKGROUND);
-    this.scene.fog = new THREE.Fog(PRODUCTS_BACKGROUND, 28, 52);
+    this.scene.fog = new THREE.Fog(PRODUCTS_BACKGROUND, 26, 48);
     this.scene.environment = createEnvironment(renderer);
-    this.scene.environmentIntensity = 0.65;
+    this.scene.environmentIntensity = 0.7;
     this.scene.add(new THREE.HemisphereLight("#ffffff", "#b6c3e6", 0.8));
-    this.key = new THREE.DirectionalLight("#ffffff", 2.4);
-    this.key.position.set(-5, 14, 9);
+    this.key = new THREE.DirectionalLight("#ffffff", 2.3);
+    this.key.position.set(-4, 12, 9);
     this.key.castShadow = true;
     const shadowSize = this.lowPower ? 1024 : 2048;
     this.key.shadow.mapSize.set(shadowSize, shadowSize);
     const sc = this.key.shadow.camera;
-    sc.left = -13;
-    sc.right = 13;
-    sc.top = 10;
-    sc.bottom = -10;
+    sc.left = -11;
+    sc.right = 11;
+    sc.top = 8;
+    sc.bottom = -8;
     sc.near = 1;
-    sc.far = 40;
-    this.key.shadow.radius = 6;
+    sc.far = 36;
+    this.key.shadow.radius = 7;
     this.key.shadow.bias = -0.0004;
     this.key.shadow.normalBias = 0.02;
     this.scene.add(this.key, this.key.target);
     const rim = new THREE.DirectionalLight("#dfe6ff", 0.9);
-    rim.position.set(6, 6, -10);
+    rim.position.set(5, 6, -10);
     this.scene.add(rim);
 
     this.scene.add(this.root);
-    this.root.add(this.buildFloor());
+    this.floor = this.buildFloor();
 
-    // Sources: a database per AI. One instanced mesh for all nine.
+    const glowMap = createGlowTexture(BRAND[500]);
+    const halo = () => {
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: glowMap,
+          transparent: true,
+          depthWrite: false,
+          opacity: 0,
+        }),
+      );
+      sprite.renderOrder = -1;
+      this.root.add(sprite);
+      return sprite;
+    };
+
+    // Sources: three columns of databases, white with lit grooves.
+    const unitGeometry = () =>
+      createDatabaseGeometry({
+        radius: UNIT_RADIUS,
+        disk: UNIT_DISK,
+        shaft: 0,
+        segments: 40,
+      });
     const count = options.agents.length;
-    const dbGeometry = createDatabaseGeometry({
-      radius: DB_RADIUS,
-      disk: DB_DISK,
-      shaft: 0,
-      segments: 32,
-    });
-    this.databaseData = new THREE.InstancedBufferAttribute(
+    const towerCount = Math.ceil(count / UNITS_PER_TOWER);
+    const sourceGeometry = unitGeometry();
+    this.sourceData = new THREE.InstancedBufferAttribute(
       new Float32Array(count * 4),
       4,
     );
-    this.databaseData.setUsage(THREE.DynamicDrawUsage);
-    dbGeometry.setAttribute("aData", this.databaseData);
-    const { material: dbMaterial } = createDatabaseMaterial({
-      shadeDepth: 5,
-      bandBase: 0.3,
-    });
-    this.databases = new THREE.InstancedMesh(dbGeometry, dbMaterial, count);
-    this.databases.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    this.databases.castShadow = true;
-    this.databases.receiveShadow = true;
-    this.databases.frustumCulled = false;
-    this.root.add(this.databases);
+    this.sourceData.setUsage(THREE.DynamicDrawUsage);
+    sourceGeometry.setAttribute("aData", this.sourceData);
+    this.sourceMesh = new THREE.InstancedMesh(
+      sourceGeometry,
+      createDatabaseMaterial({ shadeDepth: 5, bandBase: 0.3 }).material,
+      count,
+    );
+    this.sourceMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.sourceMesh.castShadow = true;
+    this.sourceMesh.receiveShadow = true;
+    this.sourceMesh.frustumCulled = false;
+    this.root.add(this.sourceMesh);
 
-    const frontRow = Math.ceil(count / 2);
-    options.agents.forEach((agent, k) => {
-      const logo = new THREE.Group();
+    for (let i = 0; i < towerCount; i++) {
       const hit = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.62, 0.62, 2.4, 10),
+        new THREE.CylinderGeometry(
+          UNIT_RADIUS * 1.15,
+          UNIT_RADIUS * 1.15,
+          TOWER_HEIGHT,
+          12,
+        ),
         new THREE.MeshBasicMaterial({ visible: false }),
       );
-      const line = new FlowLine({ seed: k * 0.41, width: 0.034 });
-      this.root.add(logo, hit, line.mesh);
-      this.sources.push({
-        name: agent.name,
+      this.root.add(hit);
+      this.towers.push({ x: 0, z: 0, hit, halo: halo(), hover: 0 });
+    }
+    // Read top to bottom, left to right, like a page; the light leaves the
+    // outer column first and moves in.
+    options.agents.forEach((_, k) => {
+      const tower = Math.floor(k / UNITS_PER_TOWER);
+      const level = UNITS_PER_TOWER - 1 - (k % UNITS_PER_TOWER);
+      const logo = new THREE.Group();
+      this.root.add(logo);
+      this.units.push({
+        tower,
+        level,
         logo,
         body: null,
-        hit,
-        line,
-        cell: k < frontRow ? [k, 0] : [k - frontRow, 1],
-        position: new THREE.Vector3(),
-        hover: 0,
-        pulse: 0,
-        appear: 0,
+        fireAt: 0.02 + tower * 0.085 + (UNITS_PER_TOWER - 1 - level) * 0.025,
+        energy: 0,
       });
     });
 
     // The core: a wide database with Coere floating over it.
-    const pedestalGeometry = createDatabaseGeometry({
-      radius: 1.35,
-      disk: 0.3,
-      shaft: 0,
-      segments: 64,
-    });
     const pedestal = createDatabaseMaterial({
       instanced: false,
       shadeDepth: 3,
-      bandBase: 0.45,
+      bandBase: 0.4,
     });
     this.pedestalUniforms = pedestal.uniforms;
-    this.pedestal = new THREE.Mesh(pedestalGeometry, pedestal.material);
-    this.pedestal.position.y = 0.94;
-    this.pedestal.castShadow = true;
-    this.pedestal.receiveShadow = true;
+    const pedestalMesh = new THREE.Mesh(
+      createDatabaseGeometry({
+        radius: 1.45,
+        disk: 0.26,
+        shaft: 0,
+        segments: 72,
+      }),
+      pedestal.material,
+    );
+    pedestalMesh.position.y = 0.26 * 3 + 0.07;
+    pedestalMesh.castShadow = true;
+    pedestalMesh.receiveShadow = true;
     this.mark = new THREE.Mesh(coereMarkGeometry(), coereMaterial());
     this.mark.castShadow = true;
-    this.mark.scale.setScalar(1.9);
-    this.mark.position.y = 2.45;
+    this.mark.scale.setScalar(2.2);
     this.markHit = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.4, 1.4, 3.4, 12),
+      new THREE.CylinderGeometry(1.5, 1.5, 3.4, 12),
       new THREE.MeshBasicMaterial({ visible: false }),
     );
     this.markHit.position.y = 1.6;
-    const glow = new THREE.Sprite(
+    this.coreGlow = new THREE.Sprite(
       new THREE.SpriteMaterial({
-        map: createGlowTexture(BRAND[500]),
+        map: glowMap,
         transparent: true,
         depthWrite: false,
-        opacity: 0.55,
+        opacity: 0.5,
       }),
     );
-    glow.scale.setScalar(5);
-    glow.position.y = 2.45;
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(1.75, 0.008, 10, 200),
-      new THREE.MeshPhysicalMaterial({
-        color: "#ffffff",
-        roughness: 0.15,
-        metalness: 0.2,
-        clearcoat: 1,
-        emissive: BRAND[200],
-        emissiveIntensity: 0.3,
-      }),
-    );
-    const orbit = new THREE.Group();
-    orbit.position.y = 2.45;
-    orbit.rotation.set(Math.PI / 2 - 0.42, 0, 0.18);
-    orbit.add(ring);
-    this.orbitBead = new THREE.Group();
-    const bead = new THREE.Mesh(
-      new THREE.SphereGeometry(0.06, 16, 12),
-      new THREE.MeshStandardMaterial({
+    this.coreGlow.scale.setScalar(5.4);
+    this.coreLight = new THREE.PointLight("#dbe2ff", 10, 9, 1.6);
+    this.ripple = new THREE.Mesh(
+      new THREE.RingGeometry(0.94, 1, 96),
+      new THREE.MeshBasicMaterial({
         color: BRAND[500],
-        emissive: BRAND[500],
-        emissiveIntensity: 1,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
       }),
     );
-    bead.position.x = 1.75;
-    this.orbitBead.add(bead);
-    orbit.add(this.orbitBead);
-    const light = new THREE.PointLight(BRAND[500], 14, 9, 1.6);
-    light.position.y = 2.45;
-    this.coreRipple = this.makeRipple();
-    this.coreRipple.position.y = 2.45;
+    this.ripple.rotation.x = -Math.PI / 2;
+    this.ripple.position.y = 0.012;
     this.core.add(
-      this.pedestal,
-      glow,
+      pedestalMesh,
+      this.coreGlow,
       this.mark,
       this.markHit,
-      orbit,
-      light,
-      this.coreRipple,
+      this.coreLight,
+      this.ripple,
     );
     this.root.add(this.core);
 
-    // Readers.
-    const devices: [Device, number, number][] = [
-      [createLaptop(), 0, 0.15],
-      [createPhone(), 1.05, 0.25],
-      [createAppTile(), 1.75, 0.2],
-      [createBlueDatabase(), 0, 0.1],
+    // Readers: a database column in brand blue, then a laptop with an app
+    // floating over it, then a phone.
+    const blueGeometry = unitGeometry();
+    this.blueData = new THREE.InstancedBufferAttribute(
+      new Float32Array(UNITS_PER_TOWER * 4),
+      4,
+    );
+    this.blueData.setUsage(THREE.DynamicDrawUsage);
+    blueGeometry.setAttribute("aData", this.blueData);
+    const blue = createDatabaseMaterial({
+      color: BRAND[500],
+      band: "#ffffff",
+      deep: BRAND[600],
+      low: BRAND[500],
+      glow: "#ffffff",
+      shadeDepth: 6,
+      bandBase: 0.5,
+    }).material;
+    blue.roughness = 0.24;
+    blue.envMapIntensity = 1;
+    this.blueMesh = new THREE.InstancedMesh(
+      blueGeometry,
+      blue,
+      UNITS_PER_TOWER,
+    );
+    this.blueMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    this.blueMesh.castShadow = true;
+    this.blueMesh.frustumCulled = false;
+    this.root.add(this.blueMesh);
+
+    const blueColumn: Device = {
+      group: new THREE.Group(),
+      update: () => {},
+    };
+    // [device, scale, turn toward Coere, floats, middle above its base]
+    const readers: [Device, number, number, boolean, number][] = [
+      [blueColumn, 1, 0.12, false, TOWER_HEIGHT / 2],
+      [createLaptop(), 0.62, 0.18, false, 0.55],
+      [createAppTile(), 0.62, 0.16, true, 0],
+      [createPhone(), 0.85, 0.2, false, 0],
     ];
-    devices.forEach(([device, float, facing], j) => {
+    readers.forEach(([device, scale, facing, float, middle], j) => {
       const hit = new THREE.Mesh(
-        new THREE.SphereGeometry(1.25, 10, 8),
+        new THREE.SphereGeometry(1.1, 10, 8),
         new THREE.MeshBasicMaterial({ visible: false }),
       );
-      const line = new FlowLine({
-        seed: 0.3 + j * 0.53,
-        width: 0.05,
-        inColor: BRAND[600],
-        baseColor: BRAND[500],
-      });
-      const ripple = this.makeRipple();
-      this.root.add(device.group, hit, line.mesh, ripple);
+      this.root.add(device.group, hit);
       this.readers.push({
         device,
-        line,
-        hit,
-        position: new THREE.Vector3(),
         base: new THREE.Vector3(),
-        float,
+        middle,
+        scale,
         facing,
+        float,
+        fireAt: CORE_AT + 0.1 + [0, 0.07, 0.11, 0.15][j],
+        energy: 0,
         hover: 0,
-        pulse: 0,
+        hit,
+        halo: halo(),
         appear: 0,
-        ripple,
-        rippleAge: 1,
       });
     });
-
-    // Packets: two per source stream, two per reader stream.
-    this.packets = new THREE.InstancedMesh(
-      new THREE.SphereGeometry(1, 12, 10),
-      new THREE.MeshStandardMaterial({
-        color: BRAND[500],
-        emissive: BRAND[500],
-        emissiveIntensity: 0.9,
-        roughness: 0.25,
-      }),
-      (this.sources.length + this.readers.length) * 2,
-    );
-    this.packets.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    this.packets.frustumCulled = false;
-    this.root.add(this.packets);
 
     this.ready = this.loadLogos();
 
@@ -371,62 +406,62 @@ export class ProductsScene {
     this.stage.start();
   }
 
-  private makeRipple() {
-    const ripple = new THREE.Mesh(
-      new THREE.RingGeometry(0.92, 1, 64),
-      new THREE.MeshBasicMaterial({
-        color: BRAND[500],
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      }),
-    );
-    ripple.renderOrder = 3;
-    return ripple;
-  }
-
-  /** A dotted floor that fades out radially, plus a plane to catch shadows. */
+  /**
+   * A floor of faint dots that fades out at the edges, with a band of light
+   * that sweeps across it in step with the flow, plus a plane for shadows.
+   */
   private buildFloor() {
-    const floor = new THREE.Group();
-    const dots = new THREE.Mesh(
-      new THREE.PlaneGeometry(60, 60),
-      new THREE.ShaderMaterial({
-        transparent: true,
-        depthWrite: false,
-        uniforms: { uColor: { value: new THREE.Color(BRAND[400]) } },
-        vertexShader: /* glsl */ `
-          varying vec2 vPos;
-          void main() {
-            vPos = position.xy;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `,
-        fragmentShader: /* glsl */ `
-          uniform vec3 uColor;
-          varying vec2 vPos;
-          void main() {
-            vec2 cell = fract(vPos / 0.6) - 0.5;
-            float d = length(cell);
-            float w = fwidth(d);
-            float dot = 1.0 - smoothstep(0.06 - w, 0.06 + w, d);
-            float fade = 1.0 - smoothstep(4.0, 13.0, length(vPos * vec2(0.75, 1.2)));
-            gl_FragColor = vec4(uColor, dot * fade * 0.55);
-            #include <colorspace_fragment>
-          }
-        `,
-      }),
-    );
+    const material = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      uniforms: {
+        uColor: { value: new THREE.Color(BRAND[400]) },
+        uLit: { value: new THREE.Color(BRAND[600]) },
+        uSweep: { value: -100 },
+        uAlong: { value: new THREE.Vector2(1, 0) },
+        uStrength: { value: 0 },
+      },
+      vertexShader: /* glsl */ `
+        varying vec2 vPos;
+        void main() {
+          vPos = position.xy;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform vec3 uColor;
+        uniform vec3 uLit;
+        uniform float uSweep;
+        uniform vec2 uAlong;
+        uniform float uStrength;
+        varying vec2 vPos;
+        void main() {
+          // The plane lies flat, so its y runs toward the camera: flip it.
+          vec2 p = vec2(vPos.x, -vPos.y);
+          vec2 cell = fract(p / 0.5) - 0.5;
+          float d = length(cell);
+          float w = fwidth(d);
+          float dotMask = 1.0 - smoothstep(0.05 - w, 0.05 + w, d);
+          float fade = 1.0 - smoothstep(3.5, 11.0, length(p * vec2(0.62, 1.25)));
+          float band = exp(-pow((dot(p, uAlong) - uSweep) / 1.1, 2.0)) * uStrength;
+          vec3 color = mix(uColor, uLit, band);
+          float alpha = dotMask * fade * (0.28 + band * 0.7);
+          gl_FragColor = vec4(color, alpha);
+          #include <colorspace_fragment>
+        }
+      `,
+    });
+    const dots = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), material);
     dots.rotation.x = -Math.PI / 2;
-    dots.position.y = 0.001;
+    dots.position.y = 0.002;
     const shadows = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60),
       new THREE.ShadowMaterial({ color: "#26338f", opacity: 0.12 }),
     );
     shadows.rotation.x = -Math.PI / 2;
     shadows.receiveShadow = true;
-    floor.add(shadows, dots);
-    return floor;
+    this.root.add(shadows, dots);
+    return material;
   }
 
   private async loadLogos() {
@@ -438,7 +473,7 @@ export class ProductsScene {
       if (result.status !== "fulfilled") return;
       const body = new THREE.Mesh(result.value.geometry, result.value.material);
       body.castShadow = true;
-      this.sources[k].body = body;
+      this.units[k].body = body;
       bodies.add(body);
     });
     try {
@@ -446,9 +481,7 @@ export class ProductsScene {
     } catch {
       // Compiling on first draw instead is fine.
     }
-    this.sources.forEach(
-      (source) => source.body && source.logo.add(source.body),
-    );
+    this.units.forEach((unit) => unit.body && unit.logo.add(unit.body));
   }
 
   // ---------------------------------------------------------------- layout
@@ -457,76 +490,68 @@ export class ProductsScene {
     const aspect = width / height;
     this.camera.aspect = aspect;
     this.portrait = aspect < 1.05;
-    if (this.portrait) {
-      // Sources at the back, readers at the front: the flow runs down the screen.
-      this.along.set(0, 0, 1);
-      this.side.set(1, 0, 0);
-      this.camera.fov = 36;
-      this.elevation = 0.86;
-    } else {
-      this.along.set(1, 0, 0);
-      this.side.set(0, 0, 1);
-      this.camera.fov = 26;
-      this.elevation = 0.6;
-    }
+    const tanV = (fov: number) => Math.tan(THREE.MathUtils.degToRad(fov / 2));
 
-    // Sources in two staggered rows, so every logo has clear air above it;
-    // readers in a loose cluster.
-    this.sources.forEach((source) => {
-      const [i, row] = source.cell;
-      let a: number;
-      let b: number;
-      if (this.portrait) {
-        a = row ? -5.5 : -4.0;
-        b = (i - (row ? 1.5 : 2)) * 1.42;
-      } else {
-        a = -3.7 - i * 1.3 - row * 0.65;
-        b = (row ? -1.35 : 1.25) - i * 0.12;
-      }
-      source.position
-        .copy(this.along)
-        .multiplyScalar(a)
-        .addScaledVector(this.side, b);
-    });
-    const readerSpots: [number, number, number][] = this.portrait
-      ? [
-          [4.5, 0, 0],
-          [3.9, 2.35, 0.55],
-          [2.7, -2.5, 1.7],
-          [4.1, -2.35, 0],
-        ]
-      : [
-          [4.7, 1.0, 0],
-          [6.75, 2.0, 0.55],
-          [5.9, -1.75, 1.75],
-          [7.9, -0.25, 0],
-        ];
-    this.readers.forEach((reader, j) => {
-      const [a, b, y] = readerSpots[j];
-      reader.base
-        .copy(this.along)
-        .multiplyScalar(a)
-        .addScaledVector(this.side, b);
-      reader.base.y = y;
-    });
-
-    // Fit the whole picture.
-    const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
     if (this.portrait) {
-      const halfWidth = 3.45;
-      const halfDepth = 6.1;
-      this.distance = Math.max(halfWidth / (tanV * aspect), halfDepth / tanV);
-      this.anchor = 0.5;
+      // Sources at the back, readers in front: the flow runs down the screen.
+      this.camera.fov = 34;
+      // Steep enough that the columns at the back clear Coere's top.
+      this.elevation = 0.8;
+      this.targetY = 0.8;
+      this.towers.forEach((tower, i) => {
+        tower.x = (i - 1) * 1.65;
+        tower.z = -5.9;
+      });
+      const spots: [number, number, number][] = [
+        [-2.1, 3.9, 0],
+        [0.15, 4.4, 0],
+        [0.15, 3.3, 1.75],
+        [2.25, 4.1, 0.87],
+      ];
+      this.readers.forEach((r, j) =>
+        r.base.set(spots[j][0], spots[j][2], spots[j][1]),
+      );
+      const halfWidth = 3.3;
+      const halfDepth = 6.7;
+      this.distance = Math.max(
+        halfWidth / (tanV(this.camera.fov) * aspect),
+        halfDepth / tanV(this.camera.fov),
+      );
     } else {
-      const halfWidth = 9.4;
-      const halfHeight = 3.4;
-      this.distance =
-        Math.max(halfWidth / (tanV * aspect), halfHeight / tanV) * 1.02;
-      this.anchor = 0.52;
+      // Mirror images either side of Coere, all facing the camera.
+      this.camera.fov = 24;
+      this.elevation = 0.2;
+      this.targetY = 1.3;
+      this.towers.forEach((tower, i) => {
+        tower.x = -6.35 + i * 1.5;
+        tower.z = 0;
+      });
+      const spots: [number, number, number][] = [
+        [3.35, 0, 0],
+        [5.1, 0.25, 0],
+        [5.1, -0.1, 2.35],
+        [6.85, 0.15, 0.87],
+      ];
+      this.readers.forEach((r, j) =>
+        r.base.set(spots[j][0], spots[j][2], spots[j][1]),
+      );
+      const halfWidth = 8.2;
+      const halfHeight = 2.8;
+      this.distance = Math.max(
+        halfWidth / (tanV(this.camera.fov) * aspect),
+        halfHeight / tanV(this.camera.fov),
+      );
     }
+    this.towers.forEach((tower) =>
+      tower.hit.position.set(tower.x, TOWER_HEIGHT / 2, tower.z),
+    );
     const fog = this.scene.fog as THREE.Fog;
     fog.near = this.distance + 6;
     fog.far = this.distance + 30;
+    this.floor.uniforms.uAlong.value.set(
+      this.portrait ? 0 : 1,
+      this.portrait ? 1 : 0,
+    );
   }
 
   private degrade() {
@@ -560,6 +585,9 @@ export class ProductsScene {
       : this.introStart < 0
         ? 0
         : this.time - this.introStart;
+    // The flow starts once everything has arrived.
+    const running = this.reducedMotion ? 0 : clamp01((intro - 2.2) / 0.6);
+    const phase = (Math.max(0, intro - 2.2) / CYCLE) % 1;
 
     const hoverSide =
       this.hovered?.kind === "source"
@@ -580,250 +608,232 @@ export class ProductsScene {
       6,
       dt,
     );
-
-    // Camera: drag yaw that springs home, plus a little parallax.
+    // Camera: a slow drift, a little parallax, and a drag that springs home.
     if (!this.drag) this.yawTarget = damp(this.yawTarget, 0, 1.6, dt);
     const parallaxX = this.pointerInside ? this.pointerX : 0;
     const parallaxY = this.pointerInside ? this.pointerY : 0;
-    this.yaw = damp(this.yaw, this.yawTarget + parallaxX * 0.1, 5, dt);
-    this.pitch = damp(this.pitch, -parallaxY * 0.05, 5, dt);
+    const drift = Math.sin(t * 0.25) * 0.05;
+    this.yaw = damp(this.yaw, this.yawTarget + parallaxX * 0.08 + drift, 4, dt);
+    this.pitch = damp(this.pitch, -parallaxY * 0.04, 4, dt);
     this.root.rotation.y = this.yaw;
-    // The bank of sources runs a little longer than the readers; even it out.
-    this.root.position.x = this.portrait ? 0 : 0.45;
     const elevation = this.elevation + this.pitch;
-    const target = tmp.set(0, this.portrait ? 0.6 : 1.1, 0);
+    const target = place.set(0, this.targetY, 0);
     this.camera.position.set(
-      0,
+      target.x,
       target.y + Math.sin(elevation) * this.distance,
-      Math.cos(elevation) * this.distance,
+      target.z + Math.cos(elevation) * this.distance,
     );
     this.camera.lookAt(target);
-    const w = this.stage.width;
-    const h = this.stage.height;
-    this.camera.setViewOffset(w, h, 0, (0.5 - this.anchor) * h, w, h);
     this.camera.updateProjectionMatrix();
 
-    this.updateCore(t, dt, intro);
-    this.updateSources(t, dt, intro);
-    this.updateReaders(t, dt, intro);
+    this.updateSources(t, dt, intro, phase, running);
+    this.updateCore(t, dt, intro, phase, running);
+    this.updateReaders(t, dt, intro, phase, running);
+
+    // The band of light on the floor crosses with the flow.
+    const along = this.portrait ? 4.8 : 7.6;
+    this.floor.uniforms.uSweep.value = lerp(-along, along, phase / 0.62);
+    this.floor.uniforms.uStrength.value =
+      running * (phase < 0.62 ? Math.sin((phase / 0.62) * Math.PI) : 0);
 
     this.stage.renderer.render(this.scene, this.camera);
   }
 
-  private updateCore(t: number, dt: number, intro: number) {
-    const appear = easeOutCubic(clamp01(intro / 0.9));
-    this.core.position.y = lerp(-2.5, 0, appear);
-    this.core.scale.setScalar(lerp(0.6, 1, appear));
+  /** A side's resting glow: up when it has focus, down when the other does. */
+  private sideLight(mine: number, other: number) {
+    return 1 + mine * 0.6 - other * 0.55;
+  }
+
+  private updateSources(
+    t: number,
+    dt: number,
+    intro: number,
+    phase: number,
+    running: number,
+  ) {
+    const data = this.sourceData.array as Float32Array;
+    const light = this.sideLight(
+      this.focusAmount.connect,
+      this.focusAmount.developer,
+    );
+    const towerEnergy = this.towers.map(() => 0);
+
+    this.towers.forEach((tower, i) => {
+      const hovered =
+        this.hovered?.kind === "source" && this.hovered.index === i;
+      tower.hover = damp(tower.hover, hovered ? 1 : 0, 10, dt);
+    });
+
+    this.units.forEach((unit, k) => {
+      const tower = this.towers[unit.tower];
+      // Units drop into place bottom first, a column at a time.
+      const delay = 0.25 + unit.tower * 0.2 + unit.level * 0.12;
+      const appear = this.reducedMotion ? 1 : clamp01((intro - delay) / 0.55);
+      const drop = (1 - easeOutCubic(appear)) * 2.2;
+      unit.energy = flash(phase, unit.fireAt) * running;
+      towerEnergy[unit.tower] = Math.max(towerEnergy[unit.tower], unit.energy);
+
+      const lift = tower.hover * 0.08 * (unit.level + 1);
+      const top =
+        (unit.level + 1) * UNIT_HEIGHT + unit.level * UNIT_GAP + drop + lift;
+      const scale = Math.max(0.0001, easeOutBack(appear));
+      matrix.makeScale(scale, scale, scale).setPosition(tower.x, top, tower.z);
+      this.sourceMesh.setMatrixAt(k, matrix);
+      data[k * 4] = (0.22 + unit.energy * 1.4 + tower.hover * 0.5) * light;
+      data[k * 4 + 1] = 0;
+      data[k * 4 + 2] = this.focusAmount.developer * 0.18;
+      data[k * 4 + 3] = tower.hover * 0.3;
+
+      // The logo sits on the front of its database, turned a touch toward
+      // Coere, and leans forward when the light leaves it.
+      const logo = unit.logo;
+      const face = this.portrait ? 0 : 0.2;
+      logo.position.set(
+        tower.x + Math.sin(face) * (UNIT_RADIUS + 0.06),
+        top - UNIT_HEIGHT / 2,
+        tower.z + Math.cos(face) * (UNIT_RADIUS + 0.06),
+      );
+      logo.scale.setScalar(scale * 0.5 * (1 + unit.energy * 0.08));
+      logo.rotation.set(
+        -unit.energy * 0.12,
+        face - this.yaw * 0.5 + Math.sin(t * 0.8 + k) * 0.06,
+        0,
+      );
+    });
+    this.sourceMesh.instanceMatrix.needsUpdate = true;
+    this.sourceData.needsUpdate = true;
+
+    this.towers.forEach((tower, i) => {
+      const glow =
+        Math.max(
+          towerEnergy[i] * 0.9,
+          tower.hover * 0.6,
+          this.focusAmount.connect * 0.45,
+        ) * light;
+      tower.halo.position.set(tower.x, TOWER_HEIGHT / 2, tower.z - 0.7);
+      tower.halo.scale.set(3.2, 4.4, 1);
+      tower.halo.material.opacity = Math.min(0.75, glow * 0.7);
+      tower.halo.visible = tower.halo.material.opacity > 0.003;
+    });
+  }
+
+  private updateCore(
+    t: number,
+    dt: number,
+    intro: number,
+    phase: number,
+    running: number,
+  ) {
+    const appear = this.reducedMotion ? 1 : easeOutCubic(clamp01(intro / 0.9));
+    this.core.position.y = lerp(-1.5, 0, appear);
+    this.core.scale.setScalar(lerp(0.7, 1, appear));
 
     // Mostly facing out with a slow sway; a click sends it round.
     this.spinVelocity = damp(this.spinVelocity, 0, 1.4, dt);
     if (Math.abs(this.spinVelocity) < 0.5) {
       const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
-      const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.45;
+      const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.4;
       this.spin = damp(this.spin, home + sway, 2.5, dt);
     }
     this.spin += this.spinVelocity * dt;
+    const pulse = flash(phase, CORE_AT, 0.16) * running;
+    const markY = 2.45 + Math.sin(t * 1.1) * 0.07;
+    this.mark.position.y = markY;
     this.mark.rotation.set(Math.sin(t * 0.8) * 0.05, this.spin - this.yaw, 0);
-    this.mark.position.y = 2.45 + Math.sin(t * 1.1) * 0.08;
-    this.orbitBead.rotation.z = t * 0.9;
+    this.mark.scale.setScalar(2.2 * (1 + pulse * 0.05));
+    this.coreGlow.position.y = markY;
+    this.coreGlow.material.opacity = 0.42 + pulse * 0.4;
+    this.coreLight.position.y = markY;
+    this.coreLight.intensity = 10 + pulse * 26;
 
     const hovered = this.hovered?.kind === "core";
-    const lit = Math.max(
-      this.coreRippleAge < 1 ? 1 - this.coreRippleAge : 0,
-      hovered ? 0.6 : 0,
+    this.pedestalUniforms.uData.value.set(
+      0.3 + pulse * 1.3 + (hovered ? 0.5 : 0),
+      0,
+      0,
+      0,
     );
-    this.pedestalUniforms.uData.value.set(0.35 + lit * 0.8, 0, 0, 0);
-    this.coreRippleAge = Math.min(1, this.coreRippleAge + dt * 1.4);
-    this.setRipple(this.coreRipple, this.coreRippleAge, 1.25, 0.28);
+
+    // A ring of light spreads across the floor as the flow passes through.
+    let age = phase - CORE_AT;
+    if (age < 0) age += 1;
+    const ring = age < 0.3 ? age / 0.3 : 1;
+    const material = this.ripple.material as THREE.MeshBasicMaterial;
+    material.opacity = running * (1 - easeOutCubic(ring)) * 0.35;
+    this.ripple.visible = material.opacity > 0.003;
+    this.ripple.scale.setScalar(1.6 + easeOutCubic(ring) * 2.6);
   }
 
-  private setRipple(
-    ripple: THREE.Mesh,
-    age: number,
-    size: number,
-    opacity: number,
+  private updateReaders(
+    t: number,
+    dt: number,
+    intro: number,
+    phase: number,
+    running: number,
   ) {
-    const material = ripple.material as THREE.MeshBasicMaterial;
-    material.opacity = age >= 1 ? 0 : (1 - easeOutCubic(age)) * opacity;
-    ripple.visible = material.opacity > 0.002;
-    ripple.scale.setScalar(size * (0.4 + easeOutCubic(age) * 0.9));
-    ripple.quaternion.copy(this.camera.quaternion);
-    // Undo the root's turn so the ring faces the camera squarely.
-    ripple.quaternion.premultiply(
-      quaternion.setFromAxisAngle(tmp2.set(0, 1, 0), -this.yaw),
+    const light = this.sideLight(
+      this.focusAmount.developer,
+      this.focusAmount.connect,
     );
-  }
-
-  private updateSources(t: number, dt: number, intro: number) {
-    const coreCenter = tmp2.set(
-      0,
-      this.core.position.y + this.mark.position.y,
-      0,
-    );
-    const data = this.databaseData.array as Float32Array;
-    const focusOn = this.focusAmount.connect;
-    const focusOff = this.focusAmount.developer;
-    let arrived = false;
-
-    this.sources.forEach((source, k) => {
-      const [i, row] = source.cell;
-      const delay = 0.35 + (i + row * 0.5) * 0.09;
-      source.appear = this.reducedMotion ? 1 : clamp01((intro - delay) / 0.7);
-      const pop = easeOutBack(source.appear);
-      const hovered =
-        this.hovered?.kind === "source" && this.hovered.index === k;
-      source.hover = damp(source.hover, hovered ? 1 : 0, 10, dt);
-
-      const lift = source.hover * 0.12;
-      const p = source.position;
-      const scale = Math.max(0.0001, pop);
-      matrix.compose(
-        place.set(
-          p.x,
-          lerp(-1.2, 0, easeOutCubic(source.appear)) + DB_TOP + lift,
-          p.z,
-        ),
-        quaternion.identity(),
-        size.setScalar(scale),
-      );
-      this.databases.setMatrixAt(k, matrix);
-      source.pulse = Math.max(0, source.pulse - dt * 2);
-      data[k * 4] =
-        0.25 + source.pulse * 1.2 + source.hover * 0.6 + focusOn * 0.4;
-      data[k * 4 + 1] = 0;
-      data[k * 4 + 2] = focusOff * 0.25;
-      data[k * 4 + 3] = source.hover * 0.4;
-
-      // Logo floats over its database, turned a little toward the camera.
-      const bob = Math.sin(t * 1.3 + k * 1.1) * 0.06;
-      source.logo.position.set(
-        p.x,
-        DB_TOP * scale + 0.62 + bob + lift * 2,
-        p.z,
-      );
-      source.logo.scale.setScalar(0.78 * scale * (1 + source.hover * 0.15));
-      source.logo.rotation.set(
-        -0.12,
-        -this.yaw + Math.sin(t * 0.7 + k) * 0.28,
-        0,
-      );
-      source.hit.position.set(p.x, 1.1, p.z);
-
-      // Stream from the top of the database into Coere.
-      const line = source.line;
-      line.p0.set(p.x, DB_TOP * scale + 0.08, p.z);
-      line.p3.copy(coreCenter);
-      const away = tmp.copy(p).setY(0).normalize();
-      line.p1.copy(line.p0);
-      line.p1.y += 1.5;
-      line.p2.copy(coreCenter).addScaledVector(away, 2.4);
-      line.p2.y += 0.9;
-      line.time = t;
-      line.opacity =
-        smoothstep(0.9, 1.6, intro - i * 0.08) * (1 - focusOff * 0.65);
-      line.highlight = Math.max(source.hover, focusOn * 0.6);
-
-      const inward = (t * 0.3 + k * 0.173) % 1;
-      const outward = (t * 0.22 + k * 0.311 + 0.5) % 1;
-      if (inward < 0.02) source.pulse = 1;
-      if (inward > 0.975) arrived = true;
-      this.placePacket(
-        k * 2,
-        line,
-        inward,
-        0.075 * line.mesh.material.uniforms.uOpacity.value,
-      );
-      this.placePacket(
-        k * 2 + 1,
-        line,
-        1 - outward,
-        0.05 * line.mesh.material.uniforms.uOpacity.value,
-      );
-    });
-    this.databases.instanceMatrix.needsUpdate = true;
-    this.databaseData.needsUpdate = true;
-    if (arrived && !this.reducedMotion && intro > 1.6) this.coreRippleAge = 0;
-  }
-
-  private updateReaders(t: number, dt: number, intro: number) {
-    const coreCenter = tmp2.set(
-      0,
-      this.core.position.y + this.mark.position.y,
-      0,
-    );
-    const offset = this.sources.length * 2;
-    const focusOn = this.focusAmount.developer;
-    const focusOff = this.focusAmount.connect;
+    const blueData = this.blueData.array as Float32Array;
 
     this.readers.forEach((reader, j) => {
-      const delay = 1.3 + j * 0.16;
-      reader.appear = this.reducedMotion ? 1 : clamp01((intro - delay) / 0.75);
+      const delay = 1 + j * 0.16;
+      reader.appear = this.reducedMotion ? 1 : clamp01((intro - delay) / 0.7);
       const pop = Math.max(0.0001, easeOutBack(reader.appear));
       const hovered =
         this.hovered?.kind === "reader" && this.hovered.index === j;
       reader.hover = damp(reader.hover, hovered ? 1 : 0, 10, dt);
-      reader.pulse = Math.max(0, reader.pulse - dt * 1.6);
+      reader.energy = flash(phase, reader.fireAt, 0.16) * running;
+      const lit = Math.min(1, reader.energy + reader.hover * 0.5);
 
       const group = reader.device.group;
-      const bob = reader.float > 0 ? Math.sin(t * 1.1 + j * 2) * 0.08 : 0;
+      const bob = reader.float ? Math.sin(t * 1.1 + j * 2) * 0.08 : 0;
       group.position.copy(reader.base);
-      group.position.y += bob + reader.hover * 0.15;
-      group.scale.setScalar(pop * (1 + reader.hover * 0.06));
-      // Turn toward the camera and a touch toward the core.
-      const toward = Math.atan2(-reader.base.x, 12) * reader.facing * 2;
-      const sway = reader.float > 0 ? Math.sin(t * 0.6 + j) * 0.12 : 0;
-      group.rotation.y = -this.yaw * 0.6 + toward + sway;
-      reader.device.update(
-        t,
-        Math.min(1, reader.pulse + reader.hover * 0.5 + focusOn * 0.3),
+      group.position.y += bob + reader.hover * 0.12 + reader.energy * 0.06;
+      group.scale.setScalar(pop * reader.scale * (1 + reader.hover * 0.05));
+      const sway = reader.float ? Math.sin(t * 0.6 + j) * 0.12 : 0;
+      group.rotation.y = this.portrait
+        ? sway
+        : -reader.facing + sway - this.yaw * 0.3;
+      reader.device.update(t, lit * light);
+
+      const centerY = group.position.y + reader.middle;
+      reader.hit.position.set(reader.base.x, centerY, reader.base.z);
+      reader.halo.position.set(reader.base.x, centerY, reader.base.z - 0.8);
+      reader.halo.scale.set(3.4, 3.6, 1);
+      reader.halo.material.opacity = Math.min(
+        0.75,
+        Math.max(lit, this.focusAmount.developer * 0.7) * light * 0.6,
       );
+      reader.halo.visible = reader.halo.material.opacity > 0.003;
 
-      group.updateMatrix();
-      const socket = reader.position
-        .copy(reader.device.socket)
-        .applyMatrix4(group.matrix);
-      reader.hit.position.copy(socket);
-
-      const line = reader.line;
-      line.p0.copy(coreCenter);
-      line.p3.copy(socket);
-      const away = tmp.copy(reader.base).setY(0).normalize();
-      line.p1.copy(coreCenter).addScaledVector(away, 2.4);
-      line.p1.y += 1;
-      line.p2.copy(socket).addScaledVector(away, -1.6);
-      line.p2.y += 1.2;
-      line.time = t;
-      line.opacity =
-        smoothstep(1.8, 2.6, intro - j * 0.12) * (1 - focusOff * 0.65);
-      line.highlight = Math.max(reader.hover, focusOn * 0.6);
-
-      const outward = (t * 0.32 + j * 0.27) % 1;
-      const back = (t * 0.24 + j * 0.41 + 0.5) % 1;
-      if (outward > 0.975 && intro > 2.6 && !this.reducedMotion) {
-        reader.pulse = 1;
-        reader.rippleAge = 0;
+      if (j === 0) {
+        // The blue database column, built like the sources.
+        for (let level = 0; level < UNITS_PER_TOWER; level++) {
+          const at = clamp01((intro - delay - level * 0.12) / 0.55);
+          const top =
+            (level + 1) * UNIT_HEIGHT +
+            level * UNIT_GAP +
+            (1 - easeOutCubic(at)) * 2.2 +
+            reader.hover * 0.08 * (level + 1);
+          const s = Math.max(0.0001, easeOutBack(at));
+          matrix
+            .makeScale(s, s, s)
+            .setPosition(reader.base.x, top, reader.base.z);
+          this.blueMesh.setMatrixAt(level, matrix);
+          blueData[level * 4] = (0.3 + lit * 1.2) * light;
+          blueData[level * 4 + 2] = this.focusAmount.connect * 0.18;
+        }
       }
-      const opacity = line.mesh.material.uniforms.uOpacity.value;
-      this.placePacket(offset + j * 2, line, outward, 0.075 * opacity);
-      this.placePacket(offset + j * 2 + 1, line, 1 - back, 0.05 * opacity);
-
-      reader.rippleAge = Math.min(1, reader.rippleAge + dt * 1.5);
-      reader.ripple.position.copy(socket);
-      this.setRipple(reader.ripple, reader.rippleAge, 0.9, 0.5);
     });
-    this.packets.instanceMatrix.needsUpdate = true;
-  }
-
-  private placePacket(index: number, line: FlowLine, at: number, size: number) {
-    line.pointAt(at, tmp);
-    const s = size * (0.25 + 0.75 * Math.sin(at * Math.PI)) + 0.0001;
-    matrix.makeScale(s, s, s).setPosition(tmp);
-    this.packets.setMatrixAt(index, matrix);
+    this.blueMesh.instanceMatrix.needsUpdate = true;
+    this.blueData.needsUpdate = true;
   }
 
   // ---------------------------------------------------------------- pointer
 
-  private pick(clientX: number, clientY: number) {
+  private pick(clientX: number, clientY: number): Hover {
     const rect = this.options.host.getBoundingClientRect();
     this.ndc.set(
       ((clientX - rect.left) / rect.width) * 2 - 1,
@@ -832,33 +842,29 @@ export class ProductsScene {
     this.raycaster.setFromCamera(this.ndc, this.camera);
     const targets = [
       this.markHit,
-      ...this.sources.map((s) => s.hit),
+      ...this.towers.map((s) => s.hit),
       ...this.readers.map((r) => r.hit),
     ];
     const hit = this.raycaster.intersectObjects(targets, false)[0];
     if (!hit) return null;
-    if (hit.object === this.markHit) return { kind: "core" as const, index: 0 };
-    const s = this.sources.findIndex((x) => x.hit === hit.object);
-    if (s >= 0) return { kind: "source" as const, index: s };
+    if (hit.object === this.markHit) return { kind: "core", index: 0 };
+    const s = this.towers.findIndex((x) => x.hit === hit.object);
+    if (s >= 0) return { kind: "source", index: s };
     const r = this.readers.findIndex((x) => x.hit === hit.object);
-    return r >= 0 ? { kind: "reader" as const, index: r } : null;
+    return r >= 0 ? { kind: "reader", index: r } : null;
   }
 
   private setHovered(next: Hover) {
-    const prevSide =
-      this.hovered?.kind === "source"
+    const sideOf = (h: Hover) =>
+      h?.kind === "source"
         ? "connect"
-        : this.hovered?.kind === "reader"
+        : h?.kind === "reader"
           ? "developer"
           : null;
+    const before = sideOf(this.hovered);
     this.hovered = next;
-    const side =
-      next?.kind === "source"
-        ? "connect"
-        : next?.kind === "reader"
-          ? "developer"
-          : null;
-    if (side !== prevSide) this.options.onHoverSide?.(side);
+    const after = sideOf(next);
+    if (after !== before) this.options.onHoverSide?.(after);
   }
 
   private onPointerDown = (event: PointerEvent) => {
@@ -891,8 +897,8 @@ export class ProductsScene {
       if (drag.moved) {
         this.yawTarget = THREE.MathUtils.clamp(
           this.yawTarget + dx * 0.005,
-          -0.75,
-          0.75,
+          -0.7,
+          0.7,
         );
         this.options.host.style.cursor = "grabbing";
       }
@@ -910,11 +916,6 @@ export class ProductsScene {
     if (!drag.moved && event.type === "pointerup") {
       const picked = this.pick(event.clientX, event.clientY);
       if (picked?.kind === "core") this.spinVelocity += Math.PI * 3;
-      if (picked?.kind === "source") this.sources[picked.index].pulse = 1;
-      if (picked?.kind === "reader") {
-        this.readers[picked.index].pulse = 1;
-        this.readers[picked.index].rippleAge = 0;
-      }
     }
     this.drag = null;
     this.options.host.style.cursor = this.hovered ? "pointer" : "grab";
@@ -932,11 +933,7 @@ export class ProductsScene {
     host.removeEventListener("pointerup", this.onPointerUp);
     host.removeEventListener("pointercancel", this.onPointerUp);
     host.removeEventListener("pointerleave", this.onPointerLeave);
-    this.sources.forEach((s) => {
-      s.line.dispose();
-      if (s.body) s.logo.remove(s.body);
-    });
-    this.readers.forEach((r) => r.line.dispose());
+    this.units.forEach((u) => u.body && u.logo.remove(u.body));
     disposeTree(this.scene);
     this.scene.environment?.dispose();
     this.stage.dispose();

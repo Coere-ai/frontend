@@ -54,7 +54,7 @@ Sections, in page order:
 | Component     | Anchor         | What it shows                                                         |
 | ------------- | -------------- | --------------------------------------------------------------------- |
 | `what-we-do`  | `#what-we-do`  | Headline over the 3D wave; scrolling turns it into the 3D orbit       |
-| `products`    | `#products`    | 3D picture of memory flowing in and out of Coere, then Coere Connect (Chrome extension) beside Coere Developer (API, MCP, SDK) |
+| `products`    | `#products`    | 3D picture of the AIs' databases feeding Coere and the apps reading from it, then Coere Connect (Chrome extension) beside Coere Developer (API, MCP, SDK) |
 | `who-we-are`  | `#who-we-are`  | Founders (Michelle and Edison), then the executive team (Sarah)       |
 
 The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly three links, one per
@@ -74,26 +74,36 @@ Products shows just the cards.
 | ------------------- | ----------------------------------------------------------------------------- |
 | `core.ts`           | `Stage` (renderer, frame loop, resize, pause offscreen, adaptive pixel ratio), easing, environment |
 | `logos.ts`          | Extrudes each SVG in `/public` into a beveled solid; the original SVG is rasterized once and every face samples it, so gradients survive. Also the Coere mark |
-| `database.ts`       | The database column (three disks, lit grooves) and its shader            |
-| `flow-line.ts`      | GPU bezier ribbons with pulses running both ways, and the drifting dust       |
-| `hero-scene.ts`     | The wave, Coere at its peak, the agents, the scroll morph into the orbit      |
-| `devices.ts`        | Laptop, phone, app tile and the blue database on the reading side            |
-| `products-scene.ts` | Databases per AI into Coere, out to the devices                               |
+| `database.ts`       | The database (three disks, lit grooves), the hero's smooth cube tile, and their shared shader |
+| `dust.ts`           | The specks drifting in the hero's air                                          |
+| `hero-scene.ts`     | The wave of cubes, Coere above its crest, the agents, the scroll morph into the orbit |
+| `devices.ts`        | Laptop, phone and app tile on the reading side                                 |
+| `products-scene.ts` | Database columns per AI, Coere, then what reads from it                        |
 
-**Hero.** The section is `260svh` tall with a sticky stage, and scroll progress
-drives the morph: the agents lift off the wave into the orbit while the columns
+**Hero.** A field of smooth cubes, nearly touching so their tops read as one
+surface, rolls in a single long swell with Coere glowing above the crest. The
+section is `260svh` tall with a sticky stage, and scroll progress drives the
+morph: the agents lift off the wave into the ring around Coere while the cubes
 sink away from the center outward. Drag anywhere to turn the scene, drag the
-Coere mark to spin it, click a logo to flip it. The field never actually turns:
-dragging rotates the wave function and everything on it, and since the columns
-are round nobody can tell, so the field only needs to cover what the camera
-sees. It is drawn in three levels of detail by distance.
+Coere mark to spin it, click a logo to flip it. The field never actually
+turns: dragging turns the wave and everything on it, the way a shape turns on
+a pin board, so the field only needs to cover what the camera sees. The cube
+lattice sits at an angle to the camera so no row of gaps lines up with a line
+of sight.
 
-**Products.** Builds itself in the first time it scrolls into view. Hovering a
-card highlights its side of the picture, and hovering a side lights its card.
+**Products.** One centered picture: three columns of databases, each with an
+AI's logo on its front, then Coere, then a blue database column, a laptop with
+an app above it, and a phone. There are no connecting lines; a wave of light
+runs through from left to right instead, each database flaring as it leaves,
+then Coere, then everything that reads from it, with a band of light crossing
+the floor in step. It builds itself in the first time it scrolls into view.
+Hovering a card lights its side of the picture, and hovering a side lights its
+card.
 
 **Performance.** Each scene renders only while on screen and the tab is
 visible. If frames run long the pixel ratio steps down, and then shadows go.
-Phones and low-power machines start with a sparser field. With
+Phones and low-power machines start with a sparser field. A software WebGL
+renderer, or a GPU that drops the context for good, gets the flat page. With
 `prefers-reduced-motion`, ambient motion stops; scrolling and dragging still
 work.
 
