@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { DemoPlayer } from "@/components/demo/demo-player";
 
-/** Unlisted: nothing links here and crawlers are told to skip it. */
+/** Unlisted: nothing links here, and its noindex keeps it out of search. */
 export const metadata: Metadata = {
   title: "Demo",
   robots: { index: false, follow: false, nocache: true },

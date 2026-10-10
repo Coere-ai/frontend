@@ -1,8 +1,9 @@
 # Coere — marketing site
 
-Landing page for **Coere**, unified memory for AI. Coere is a Chrome extension
-that carries your context across every AI you use, so a new chat in any agent
-picks up where the last one left off.
+Landing page for **Coere** (Coere AI), unified memory for AI. Coere Connect is
+a Chrome extension that carries your memory across every AI you use, so a new
+chat in any of them picks up where the last one left off; Coere Developer lets
+apps read that memory through an API, MCP and SDK.
 
 Built with Next.js (App Router) + TypeScript + Tailwind CSS v4 + Motion, with
 the hero and the Products picture rendered in 3D by three.js.
@@ -54,7 +55,6 @@ src/app/globals.css       brand tokens (blue scale, navy scale, mist), keyframes
 src/lib/site.ts           copy, links, agents, founders
 src/components/three/     the 3D scenes (see below)
 public/*.svg              AI provider logos, also extruded into 3D at runtime
-public/chrome_webstore.png  install button icon
 public/founders/          founder photos
 public/coere-logo.png     the mark, used as the logo in structured data
 public/llms.txt           a plain summary of Coere for AI search crawlers
@@ -125,7 +125,8 @@ work.
 ## The demo film
 
 `/demo` is an unlisted page holding a 60 second product film built entirely in
-HTML. Nothing links to it, it is `noindex`, and `robots.txt` disallows it.
+HTML. Nothing links to it and it is `noindex`. `robots.txt` deliberately lets
+crawlers fetch it, since a crawler blocked from the page never sees its noindex.
 
 - Space bar plays and pauses, `r` restarts, arrow keys jump five seconds, and
   the scrubber can be clicked or dragged.
