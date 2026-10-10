@@ -38,6 +38,85 @@ export const damp = (
   dt: number,
 ) => lerp(current, target, 1 - Math.exp(-lambda * dt));
 
+const TURN = Math.PI * 2;
+
+/**
+ * The Coere mark's spin. Clicked or flung, it coasts, then slows to a stop
+ * exactly facing out, always finishing the way it was going: it never winds
+ * back. At rest it eases to face out, plus any sway the caller passes.
+ */
+export class Spin {
+  angle = 0;
+  velocity = 0;
+  private stopAt: number | null = null;
+  private stopDir = 0;
+  private decel = 0;
+
+  /** A push, as from a click. */
+  kick(velocity: number) {
+    this.velocity += velocity;
+    this.stopAt = null;
+  }
+
+  /** Turned by hand: follows the pointer and keeps its speed for the fling. */
+  turn(delta: number, dt: number) {
+    this.angle += delta;
+    this.velocity = damp(this.velocity, delta / dt, 18, dt);
+    this.stopAt = null;
+  }
+
+  /** Let go without a fling. */
+  stop() {
+    this.velocity = 0;
+    this.stopAt = null;
+  }
+
+  update(dt: number, sway = 0) {
+    const speed = Math.abs(this.velocity);
+    if (this.stopAt === null && speed > 3) {
+      // Fast: coast on plain friction.
+      this.velocity *= Math.exp(-1.2 * dt);
+      this.angle += this.velocity * dt;
+    } else if (this.stopAt !== null || speed > 0.05) {
+      if (this.stopAt === null) {
+        // Slow enough to aim: stop on the next whole turn ahead, or the one
+        // after if that is too close to reach without a jolt.
+        const dir = Math.sign(this.velocity);
+        const turns = this.angle / TURN;
+        let at = (dir > 0 ? Math.ceil(turns) : Math.floor(turns)) * TURN;
+        if (Math.abs(at - this.angle) < 0.6) at += dir * TURN;
+        const distance = Math.abs(at - this.angle);
+        if (distance > speed * 2.5) {
+          // Too gentle to get there in good time: let it settle, and it
+          // eases back to face out once at rest.
+          this.velocity *= Math.exp(-2.5 * dt);
+          this.angle += this.velocity * dt;
+          return;
+        }
+        this.stopAt = at;
+        this.stopDir = dir;
+        this.decel = (speed * speed) / (2 * distance);
+      }
+      this.velocity -= this.stopDir * this.decel * dt;
+      const next = this.angle + this.velocity * dt;
+      if (
+        this.velocity * this.stopDir <= 0 ||
+        (this.stopAt - next) * this.stopDir <= 0
+      ) {
+        this.angle = this.stopAt;
+        this.stop();
+      } else {
+        this.angle = next;
+      }
+    } else {
+      // At rest: face out.
+      this.velocity = 0;
+      const home = Math.round(this.angle / TURN) * TURN;
+      this.angle = damp(this.angle, home + sway, 2.5, dt);
+    }
+  }
+}
+
 /** True when the device looks like a phone, a tablet or a low-power laptop. */
 export function isLowPowerDevice() {
   if (typeof window === "undefined") return false;

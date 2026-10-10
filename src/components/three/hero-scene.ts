@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import {
   BRAND,
+  Spin,
   Stage,
   clamp01,
   createEnvironment,
@@ -51,7 +52,7 @@ const WAVE_SPOTS: Record<string, [number, number]> = {
   Kimi: [0, 0.83],
   DeepSeek: [-0.62, 0.84],
   ChatGPT: [-0.99, 0.56],
-  Claude: [-1.07, -0.82],
+  Claude: [-1.07, -0.92],
   Gemini: [-0.52, -1.55],
 };
 
@@ -85,6 +86,36 @@ function createSkyTexture(top: string, bottom: string) {
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
+}
+
+/**
+ * A copy of a logo's material that dissolves into white at the very foot of
+ * the screen, as the field does there, so on the shortest screens a logo at
+ * the front of the wave melts away instead of being cut by the section's
+ * edge. A copy, because the logos are shared with Products.
+ */
+function fadeAtFoot(
+  material: THREE.MeshPhysicalMaterial,
+  viewHeight: { value: number },
+) {
+  const faded = material.clone();
+  faded.onBeforeCompile = (shader) => {
+    shader.uniforms.uViewHeight = viewHeight;
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+        uniform float uViewHeight;`,
+      )
+      .replace(
+        "#include <fog_fragment>",
+        `#include <fog_fragment>
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0),
+          1.0 - smoothstep(0.0, 0.07, gl_FragCoord.y / uViewHeight));`,
+      );
+  };
+  faded.customProgramCacheKey = () => "logo-foot";
+  return faded;
 }
 
 export class HeroScene {
@@ -139,8 +170,7 @@ export class HeroScene {
 
   // Motion state.
   private time = 0;
-  private spin = 0;
-  private spinVelocity = 0;
+  private readonly spin = new Spin();
   /** Seconds since the logos arrived, for the entrance. */
   private entrance = -1;
 
@@ -418,7 +448,10 @@ export class HeroScene {
     const bodies = new THREE.Group();
     assets.forEach((result, k) => {
       if (result.status !== "fulfilled") return;
-      const body = new THREE.Mesh(result.value.geometry, result.value.material);
+      const body = new THREE.Mesh(
+        result.value.geometry,
+        fadeAtFoot(result.value.material, this.fieldViewHeight),
+      );
       body.castShadow = true;
       this.agents[k].body = body;
       bodies.add(body);
@@ -457,8 +490,9 @@ export class HeroScene {
     this.clear = clear;
     // Lower the picture on short screens, so the agents at the back of the
     // wave stay under the headline: riding the swells, they reach up to 0.21
-    // of the screen above the target. Never so low that the agents in front
-    // leave the bottom.
+    // of the screen above the target. Capped, so the agents in front stay on
+    // screen; on the very shortest, they dissolve into the foot with the
+    // field rather than meet the edge.
     this.waveCamera.anchor = Math.min(
       0.72,
       Math.max(portrait ? 0.56 : 0.6, clear + 0.21),
@@ -495,29 +529,45 @@ export class HeroScene {
 
   // ---------------------------------------------------------------- the wave
 
-  /** Height of the wave at a point. */
-  private height(x: number, z: number, t: number) {
+  /**
+   * Height of the wave at a point. `motion` scales everything that moves:
+   * 1 for the surface itself, 0 for where it rests on average.
+   */
+  private height(x: number, z: number, t: number, motion = 1) {
     // One long swell running from near left to far right, its crest passing
     // just behind Coere, a trough in front of it and a gentler swell behind.
     const across = 0.42 * x + 0.91 * z;
     const along = 0.91 * x - 0.42 * z;
     // The crest meanders a little, and the meander runs along it.
-    const c = across + 1.2 + 0.35 * Math.sin(along * 0.16 - t * 0.42);
+    const c = across + 1.2 + motion * 0.3 * Math.sin(along * 0.16 - t * 0.42);
     const crest =
       3.4 *
       Math.exp(-(c * c) / (2 * 3.4 * 3.4)) *
-      (0.78 + 0.22 * Math.sin(along * 0.14 - t * 0.5));
-    const b = across + 13 + 1.4 * Math.sin(along * 0.1 + t * 0.3);
+      (0.78 + motion * 0.22 * Math.sin(along * 0.14 - t * 0.5));
+    const b = across + 13 + motion * 1.4 * Math.sin(along * 0.1 + t * 0.3);
     const back = 1.6 * Math.exp(-(b * b) / (2 * 5 * 5));
     const f = across - 9;
     const front = -0.9 * Math.exp(-(f * f) / (2 * 5 * 5));
     // Long, low swells rolling in from the back toward the viewer: full in
     // the far field, gentle by the time they pass under Coere.
     const far = 0.35 + 0.65 * smoothstep(1, -12, across);
-    const roll = 0.42 * far * Math.sin(across * 0.38 - t * 0.8 + along * 0.06);
+    const roll =
+      motion * 0.36 * far * Math.sin(across * 0.38 - t * 0.8 + along * 0.06);
     const swell =
-      0.3 * Math.sin(x * 0.1 + t * 0.25) * Math.cos(z * 0.09 - t * 0.2);
+      motion *
+      0.3 *
+      Math.sin(x * 0.1 + t * 0.25) *
+      Math.cos(z * 0.09 - t * 0.2);
     return crest + back + front + roll + swell - 0.6;
+  }
+
+  /**
+   * Where things floating on the wave ride: with the swells, but only part
+   * of the way, so neighbours never drift into one another.
+   */
+  private ride(x: number, z: number, t: number) {
+    const rest = this.height(x, z, t, 0);
+    return rest + (this.height(x, z, t) - rest) * 0.6;
   }
 
   private updateField(t: number) {
@@ -621,21 +671,15 @@ export class HeroScene {
 
   private updateRig(t: number, dt: number) {
     const bob = Math.sin(t * 0.9) * 0.12;
-    this.rig.position.set(0, this.height(0, 0, t) + 2 + bob, 0);
+    this.rig.position.set(0, this.ride(0, 0, t) + 2 + bob, 0);
     this.rig.scale.setScalar(this.aspect < 0.9 ? 2.45 : 2.6);
 
     // Facing out, with a slow sway; it only spins when it is spun. While
-    // dragged it follows the pointer, runs on when let go, then comes back.
+    // dragged it follows the pointer.
     if (!this.drag?.moved) {
-      this.spinVelocity = damp(this.spinVelocity, 0, 1.2, dt);
-      if (Math.abs(this.spinVelocity) < 0.6) {
-        const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
-        const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.2;
-        this.spin = damp(this.spin, home + sway, 2.5, dt);
-      }
-      this.spin += this.spinVelocity * dt;
+      this.spin.update(dt, this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.2);
     }
-    this.mark.rotation.set(Math.sin(t * 0.7) * 0.06, this.spin, 0);
+    this.mark.rotation.set(Math.sin(t * 0.7) * 0.06, this.spin.angle, 0);
   }
 
   private updateAgents(t: number, dt: number) {
@@ -649,7 +693,7 @@ export class HeroScene {
       // Far ones a touch larger, so perspective does not shrink them away.
       const size = (1.4 - a.spot.y * 0.2) * this.waveScale;
       const bob = Math.sin(t * 1.1 + k * 1.7) * 0.13;
-      a.group.position.set(x, this.height(x, z, t) + 0.6 + size * 0.5 + bob, z);
+      a.group.position.set(x, this.ride(x, z, t) + 0.72 + size * 0.5 + bob, z);
 
       // Hover lifts and grows; a click flips it once round.
       a.hover = damp(a.hover, this.hovered === k ? 1 : 0, 10, dt);
@@ -748,9 +792,7 @@ export class HeroScene {
     }
     if (drag.moved) {
       // Wherever the drag starts, it spins Coere and nothing else.
-      const v = dx * 0.014;
-      this.spin += v;
-      this.spinVelocity = damp(this.spinVelocity, v / dt, 18, dt);
+      this.spin.turn(dx * 0.014, dt);
     }
     drag.lastX = event.clientX;
     drag.lastTime = now;
@@ -764,12 +806,13 @@ export class HeroScene {
       if (drag.target >= 0) {
         this.agents[drag.target].flipVelocity = Math.PI * 4.2;
       } else {
-        this.spinVelocity += Math.PI * 3;
+        this.spin.kick(Math.PI * 3);
       }
     }
-    // Let go of a still pointer and Coere simply stops.
+    // Let go of a still pointer and there is no fling: Coere eases back to
+    // face out.
     if (drag.moved && performance.now() - drag.lastTime > 80) {
-      this.spinVelocity = 0;
+      this.spin.stop();
     }
     this.drag = null;
     this.options.host.style.cursor = this.hovered >= -1 ? "pointer" : "grab";
@@ -788,7 +831,12 @@ export class HeroScene {
     host.removeEventListener("pointerleave", this.onPointerLeave);
     this.headlineObserver?.disconnect();
     // Shared logo assets stay cached for the products scene; drop the rest.
-    this.agents.forEach((a) => a.body && a.group.remove(a.body));
+    // Their copies of the materials are this scene's own.
+    this.agents.forEach((a) => {
+      if (!a.body) return;
+      a.group.remove(a.body);
+      (a.body.material as THREE.Material).dispose();
+    });
     disposeTree(this.scene);
     this.scene.environment?.dispose();
     (this.scene.background as THREE.Texture | null)?.dispose();

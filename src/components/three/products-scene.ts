@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import {
   BRAND,
+  Spin,
   Stage,
   clamp01,
   createEnvironment,
@@ -146,8 +147,7 @@ export class ProductsScene {
   private pointerX = 0;
   private pointerY = 0;
   private pointerInside = false;
-  private spin = 0;
-  private spinVelocity = 0;
+  private readonly spin = new Spin();
   private coreHover = 0;
   private hovered: Hover = null;
   private drag: null | {
@@ -582,18 +582,16 @@ export class ProductsScene {
     // Mostly facing out with a slow sway. A drag turns it by hand and lets
     // it run on when released; a click sends it round.
     if (!this.drag?.moved) {
-      this.spinVelocity = damp(this.spinVelocity, 0, 1.4, dt);
-      if (Math.abs(this.spinVelocity) < 0.5) {
-        const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
-        const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.2;
-        this.spin = damp(this.spin, home + sway, 2.5, dt);
-      }
-      this.spin += this.spinVelocity * dt;
+      this.spin.update(dt, this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.2);
     }
     const pulse = flash(phase, CORE_AT, 0.16) * running;
     const markY = this.markY + Math.sin(t * 1.1) * 0.07 - (1 - appear) * 1.2;
     this.mark.position.y = markY;
-    this.mark.rotation.set(Math.sin(t * 0.8) * 0.05, this.spin - this.yaw, 0);
+    this.mark.rotation.set(
+      Math.sin(t * 0.8) * 0.05,
+      this.spin.angle - this.yaw,
+      0,
+    );
     this.mark.scale.setScalar(this.markScale * (1 + pulse * 0.05));
     this.coreGlow.position.y = markY;
     this.coreGlow.scale.setScalar(this.markScale * 2.35);
@@ -679,9 +677,7 @@ export class ProductsScene {
       }
       if (drag.moved) {
         // Wherever the drag starts, it spins Coere.
-        const v = dx * 0.014;
-        this.spin += v;
-        this.spinVelocity = damp(this.spinVelocity, v / dt, 18, dt);
+        this.spin.turn(dx * 0.014, dt);
         this.options.host.style.cursor = "grabbing";
       }
       return;
@@ -698,7 +694,7 @@ export class ProductsScene {
     if (!drag.moved && event.type === "pointerup") {
       const picked = this.pick(event.clientX, event.clientY);
       if (picked?.kind === "core") {
-        this.spinVelocity += Math.PI * 3;
+        this.spin.kick(Math.PI * 3);
       } else if (picked) {
         const k =
           picked.index +
@@ -709,9 +705,10 @@ export class ProductsScene {
         }
       }
     }
-    // Let go of a still pointer and Coere simply stops.
+    // Let go of a still pointer and there is no fling: Coere eases back to
+    // face out.
     if (drag.moved && performance.now() - drag.lastTime > 80) {
-      this.spinVelocity = 0;
+      this.spin.stop();
     }
     this.drag = null;
     this.options.host.style.cursor = this.hovered ? "pointer" : "grab";
