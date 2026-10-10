@@ -100,10 +100,11 @@ export function WhatWeDo() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-[30%] bg-linear-to-b from-mist via-mist/70 to-transparent sm:h-[38%]"
         />
-        {/* And at the bottom, so the wave melts into the page below. */}
+        {/* A thin fade at the foot, so the wave meets the page below softly.
+            Kept short: the logos at the front of the wave sit just above it. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[16%] bg-linear-to-b from-transparent to-white"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-b from-transparent to-white"
         />
 
         <div

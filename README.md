@@ -108,7 +108,7 @@ the picture forward, and hovering a side lights its card.
 visible. If frames run long the pixel ratio steps down, and then shadows go.
 Phones and low-power machines start with a sparser field. A software WebGL
 renderer, or a GPU that drops the context for good, gets the flat page. With
-`prefers-reduced-motion`, ambient motion stops; scrolling and dragging still
+`prefers-reduced-motion`, ambient motion stops; dragging and clicking still
 work.
 
 ## The demo film
