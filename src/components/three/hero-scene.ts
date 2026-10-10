@@ -7,7 +7,6 @@ import {
   createGlowTexture,
   damp,
   disposeTree,
-  easeInOutCubic,
   easeOutBack,
   easeOutCubic,
   isLowPowerDevice,
@@ -25,7 +24,6 @@ type Options = {
   canvas: HTMLCanvasElement;
   host: HTMLElement;
   agents: readonly HeroAgent[];
-  getProgress: () => number;
   /** The headline over the scene; the picture is framed to stay below it. */
   headline?: HTMLElement;
   /** The GPU dropped the scene for good; show the flat page instead. */
@@ -34,22 +32,16 @@ type Options = {
 
 export const HERO_BACKGROUND = "#f2f5fc";
 
-/** Height of the orbit formation. */
-const ORBIT_Y = 4.4;
 /**
  * How far the cube lattice is turned from the camera's line of sight. Past
  * the half-width of the view, and short of 90 degrees minus it, so neither
  * row direction ever lines up with a sight line on any screen shape.
  */
 const GRID_ANGLE = 0.6;
-/** How much of the morph the agents spread their departures over. Small, so
- * neighbours leave together and never overtake one another. */
-const STAGGER = 0.12;
 /**
- * Where each agent waits on the wave, as a fraction of the spread: an even
- * ring on screen around Coere, in the orbit's order, so nothing bunches up and
- * none of them leaves for its place in the orbit across another's path. The
- * wave runs from near left to far right, so the left of the ring sits deeper.
+ * Where each agent floats on the wave, as a fraction of the spread: an even
+ * ring on screen around Coere, so nothing bunches up. The wave runs from near
+ * left to far right, so the left of the ring sits deeper.
  */
 const WAVE_SPOTS: Record<string, [number, number]> = {
   Perplexity: [0.5, -0.6],
@@ -62,18 +54,6 @@ const WAVE_SPOTS: Record<string, [number, number]> = {
   Claude: [-1.07, -0.82],
   Gemini: [-0.52, -1.55],
 };
-/** Clockwise from the top, as the flat orbit had them. */
-const RING_ORDER = [
-  "Perplexity",
-  "Grok",
-  "Copilot",
-  "Meta AI",
-  "Kimi",
-  "DeepSeek",
-  "ChatGPT",
-  "Claude",
-  "Gemini",
-];
 
 type Agent = {
   name: string;
@@ -82,18 +62,12 @@ type Agent = {
   hit: THREE.Mesh;
   /** Spot on the wave. */
   spot: THREE.Vector2;
-  ringAngle: number;
   hover: number;
   flip: number;
   flipVelocity: number;
-  stagger: number;
 };
 
 const tmp = new THREE.Vector3();
-const from = new THREE.Vector3();
-const to = new THREE.Vector3();
-const lift = new THREE.Vector3();
-const settle = new THREE.Vector3();
 
 export class HeroScene {
   readonly ready: Promise<void>;
@@ -142,24 +116,11 @@ export class HeroScene {
     distance: 29,
     anchor: 0.6,
   };
-  private orbitCamera = {
-    target: new THREE.Vector3(0, ORBIT_Y, 0),
-    elevation: 0.06,
-    distance: 40,
-    anchor: 0.6,
-  };
-  private ringRadius = 6.2;
-  /** The ring as drawn this frame: it grows with the camera's pull-back, so
-   * it holds one size on screen and never rises into the headline. */
-  private ringNow = 6.2;
 
   // Motion state.
   private time = 0;
-  private progress = 0;
-  private morph = 0;
   private spin = 0;
   private spinVelocity = 0;
-  private orbitAngle = 0;
   /** Seconds since the logos arrived, for the entrance. */
   private entrance = -1;
 
@@ -417,21 +378,15 @@ export class HeroScene {
       group.add(hit);
       this.scene.add(group);
       const spot = WAVE_SPOTS[info.name] ?? [Math.cos(k), Math.sin(k)];
-      const ringIndex = Math.max(0, RING_ORDER.indexOf(info.name));
-      const ringAngle = Math.PI / 2 - (ringIndex / list.length) * Math.PI * 2;
       this.agents.push({
         name: info.name,
         group,
         body: null,
         hit,
         spot: new THREE.Vector2(spot[0], spot[1]),
-        ringAngle,
         hover: 0,
         flip: 0,
         flipVelocity: 0,
-        // The bottom of the ring fills first and the top last, once the
-        // camera has pulled back, so nothing rises into the headline.
-        stagger: ((Math.sin(ringAngle) + 1) / 2) * STAGGER,
       });
     });
 
@@ -487,24 +442,6 @@ export class HeroScene {
     );
     this.waveCamera.target.set(0, 2.6, 0);
 
-    // Fit the orbit between the headline and the bottom of the screen. With
-    // the target drawn at `anchor` down the screen, the world height visible
-    // above it is 2 * (anchor - headroom) * distance * tan(fov / 2).
-    this.ringRadius = 6.2;
-    const extent = this.ringRadius + 1.25;
-    const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
-    // Clear air between the headline and the top of the ring, and the ring
-    // centered in what is left when the headline runs long.
-    const headroom = Math.max(portrait ? 0.27 : 0.35, clear);
-    const anchor = Math.max(
-      portrait ? 0.58 : 0.64,
-      (headroom + (portrait ? 0.89 : 0.93)) / 2,
-    );
-    const fitV = extent / (2 * (anchor - headroom) * tanV);
-    const fitH = extent / (tanV * a * 0.92);
-    this.orbitCamera.distance = Math.max(fitV, fitH);
-    this.orbitCamera.anchor = anchor;
-
     this.layoutField();
     (this.dust.material as THREE.ShaderMaterial).uniforms.uPixelRatio.value =
       this.stage.pixelRatio;
@@ -555,14 +492,7 @@ export class HeroScene {
     return crest + back + front + swell - 0.6;
   }
 
-  private updateField(t: number, amp: number, morph: number) {
-    if (morph >= 0.5) {
-      this.field.visible = false;
-      return;
-    }
-    const fieldFade = smoothstep(0.2, 0.45, morph);
-    this.field.visible = true;
-
+  private updateField(t: number) {
     const pads = this.pads;
     for (let k = 0; k < this.agents.length; k++) {
       const a = this.agents[k];
@@ -570,7 +500,6 @@ export class HeroScene {
       pads[k * 2 + 1] = a.spot.y * this.spread.y;
     }
     const padCount = this.agents.length * 2;
-    const padLight = 1 - smoothstep(0, 0.35, morph);
     const matrix = this.field.instanceMatrix.array as Float32Array;
     const data = this.fieldData.array as Float32Array;
 
@@ -578,13 +507,8 @@ export class HeroScene {
       const x = this.fieldX[i];
       const z = this.fieldZ[i];
       const d2 = x * x + z * z;
-      const d = Math.sqrt(d2);
-
-      // Sink in a ring that starts under Coere and runs outward.
-      const start = Math.min(d / 34, 1) * 0.45;
-      const sink = clamp01((morph - start) / 0.5);
-      const h = this.height(x, z, t) * amp;
-      matrix[i * 16 + 13] = h - sink * sink * 11;
+      const h = this.height(x, z, t);
+      matrix[i * 16 + 13] = h;
 
       // A soft pool of light under each agent.
       let pool = 0;
@@ -592,7 +516,7 @@ export class HeroScene {
         const dx = x - pads[p];
         const dz = z - pads[p + 1];
         const q = dx * dx + dz * dz;
-        if (q < 2.2) pool += (1 - q / 2.2) * padLight;
+        if (q < 2.2) pool += 1 - q / 2.2;
       }
 
       const o = i * 4;
@@ -603,12 +527,7 @@ export class HeroScene {
         1,
         smoothstep(2.8, -1.2, h) * 0.9 + (1 - spot) * 0.15,
       );
-      // Gone before the camera drops low enough to see the field edge-on.
-      data[o + 2] = Math.max(
-        this.fieldEdge[i],
-        fieldFade,
-        smoothstep(0.05, 0.3, sink),
-      );
+      data[o + 2] = this.fieldEdge[i];
       data[o + 3] = Math.min(1, pool * 0.55);
     }
     // Upload only the cubes in use, not the whole capacity.
@@ -628,40 +547,24 @@ export class HeroScene {
     const t = this.time;
     if (this.entrance >= 0) this.entrance += dt;
 
-    // Scroll drives the morph, smoothed so wheel steps glide.
-    const target = clamp01(this.options.getProgress());
-    this.progress =
-      this.reducedMotion || dt === 0
-        ? target
-        : damp(this.progress, target, 6, dt);
-    this.morph = smoothstep(0.04, 0.8, this.progress);
-    const m = this.morph;
-    const amp = 1 - 0.45 * m;
-
-    this.updateCamera(m);
-    this.updateField(t, amp, m);
-    this.updateRig(t, dt, m, amp);
-    this.updateAgents(t, dt, m, amp);
-    this.orbitAngle -= dt * 0.1 * motion * smoothstep(0.6, 1, m);
+    this.updateCamera();
+    this.updateField(t);
+    this.updateRig(t, dt);
+    this.updateAgents(t, dt);
 
     const dustMaterial = this.dust.material as THREE.ShaderMaterial;
     dustMaterial.uniforms.uTime.value = elapsed * motion;
-    // At orbit distance the specks shrink to stray pixels, so let them go.
-    dustMaterial.uniforms.uOpacity.value = 1 - smoothstep(0.3, 0.7, m);
 
     this.stage.renderer.render(this.scene, this.camera);
   }
 
-  private updateCamera(m: number) {
-    const e = easeInOutCubic(m);
+  private updateCamera() {
     const A = this.waveCamera;
-    const B = this.orbitCamera;
-    const target = tmp.copy(A.target).lerp(B.target, e);
+    const target = A.target;
     // Entrance: the camera glides in and settles from a little higher up.
     const arriving = 1 - easeOutCubic(clamp01(this.entrance / 2.6));
-    const elevation = lerp(A.elevation, B.elevation, e) + arriving * 0.16;
-    const distance = lerp(A.distance, B.distance, e) + arriving * 9;
-    this.ringNow = this.ringRadius * Math.min(1, distance / B.distance);
+    const elevation = A.elevation + arriving * 0.16;
+    const distance = A.distance + arriving * 9;
     // Fog starts just past the target, wherever the camera has moved to.
     const fog = this.scene.fog as THREE.Fog;
     fog.near = distance + 3;
@@ -672,10 +575,9 @@ export class HeroScene {
       target.z + Math.cos(elevation) * distance,
     );
     this.camera.lookAt(target);
-    const anchor = lerp(A.anchor, B.anchor, e);
     const w = this.stage.width;
     const h = this.stage.height;
-    this.camera.setViewOffset(w, h, 0, (0.5 - anchor) * h, w, h);
+    this.camera.setViewOffset(w, h, 0, (0.5 - A.anchor) * h, w, h);
     this.camera.updateProjectionMatrix();
 
     // Keep the shadow box around the action.
@@ -685,63 +587,36 @@ export class HeroScene {
     this.key.position.set(target.x - 6, target.y + 18, target.z - 8);
   }
 
-  private updateRig(t: number, dt: number, m: number, amp: number) {
-    const e = easeInOutCubic(m);
+  private updateRig(t: number, dt: number) {
     const bob = Math.sin(t * 0.9) * 0.12;
-    const waveY = this.height(0, 0, t) * amp + 2 + bob;
-    this.rig.position.set(0, lerp(waveY, ORBIT_Y + bob * 0.5, e), 0);
-    this.rig.scale.setScalar(lerp(this.aspect < 0.9 ? 2.45 : 2.6, 3.2, e));
+    this.rig.position.set(0, this.height(0, 0, t) + 2 + bob, 0);
+    this.rig.scale.setScalar(this.aspect < 0.9 ? 2.45 : 2.6);
 
-    // Spin: free on the wave; in the orbit it settles facing out with a sway.
-    // While dragged it follows the pointer, and runs on when let go.
+    // Spin: a slow cruise. While dragged it follows the pointer, and runs on
+    // when let go.
     if (!this.drag?.moved) {
-      const cruise = this.reducedMotion ? 0 : lerp(0.42, 0, e);
+      const cruise = this.reducedMotion ? 0 : 0.42;
       this.spinVelocity = damp(this.spinVelocity, cruise, 1.2, dt);
-      // In the orbit, or with no cruise to carry it round, it comes back
-      // to face out once it slows.
-      const settle = this.reducedMotion ? 2.5 : 2.2 * (e - 0.5) * 2;
-      if (settle > 0 && Math.abs(this.spinVelocity) < 0.6) {
+      // With no cruise to carry it round, it comes back to face out once it
+      // slows.
+      if (this.reducedMotion && Math.abs(this.spinVelocity) < 0.6) {
         const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
-        const sway = this.reducedMotion ? 0 : Math.sin(t * 0.55) * 0.32;
-        this.spin = damp(this.spin, home + sway, settle, dt);
+        this.spin = damp(this.spin, home, 2.5, dt);
       }
       this.spin += this.spinVelocity * dt;
     }
     this.mark.rotation.set(Math.sin(t * 0.7) * 0.06, this.spin, 0);
-    this.glow.material.opacity = lerp(0.55, 0.45, e);
-    this.light.intensity = lerp(20, 6, e);
   }
 
-  private updateAgents(t: number, dt: number, m: number, amp: number) {
+  private updateAgents(t: number, dt: number) {
     for (let k = 0; k < this.agents.length; k++) {
       const a = this.agents[k];
-      const local = easeInOutCubic(clamp01((m - a.stagger) / (1 - STAGGER)));
 
-      // On the wave.
-      const lx = a.spot.x * this.spread.x;
-      const lz = a.spot.y * this.spread.y;
+      // Floating just over the wave, riding it.
+      const x = a.spot.x * this.spread.x;
+      const z = a.spot.y * this.spread.y;
       const bob = Math.sin(t * 1.1 + k * 1.7) * 0.13;
-      from.set(lx, this.height(lx, lz, t) * amp + 1.1 + bob, lz);
-      // In the orbit.
-      const angle = a.ringAngle + this.orbitAngle;
-      to.set(
-        Math.cos(angle) * this.ringNow,
-        ORBIT_Y + Math.sin(angle) * this.ringNow,
-        0,
-      );
-      // Lift off the wave first, then glide into place.
-      lift.copy(from).setY(from.y + 1.2);
-      settle.copy(to).setZ(to.z + 0.8);
-      const s = 1 - local;
-      const w0 = s * s * s;
-      const w1 = 3 * s * s * local;
-      const w2 = 3 * s * local * local;
-      const w3 = local * local * local;
-      a.group.position.set(
-        w0 * from.x + w1 * lift.x + w2 * settle.x + w3 * to.x,
-        w0 * from.y + w1 * lift.y + w2 * settle.y + w3 * to.y,
-        w0 * from.z + w1 * lift.z + w2 * settle.z + w3 * to.z,
-      );
+      a.group.position.set(x, this.height(x, z, t) + 1.1 + bob, z);
 
       // Hover lifts and grows; a click flips it once round.
       a.hover = damp(a.hover, this.hovered === k ? 1 : 0, 10, dt);
@@ -759,7 +634,8 @@ export class HeroScene {
       }
       // Far ones a touch larger, so perspective does not shrink them away.
       const scale =
-        lerp((1.4 - a.spot.y * 0.2) * this.waveScale, 1.42, local) *
+        (1.4 - a.spot.y * 0.2) *
+        this.waveScale *
         (1 + a.hover * 0.14) *
         // Entrance: each logo rises out of the wave in turn.
         Math.max(
@@ -768,10 +644,8 @@ export class HeroScene {
         );
       a.group.scale.setScalar(scale);
       a.group.position.y += a.hover * 0.18;
-      const sway = this.reducedMotion
-        ? 0
-        : Math.sin(t * 0.6 + k * 2.1) * lerp(0.38, 0.22, local);
-      a.group.rotation.set(lerp(-0.18, 0, local), sway + a.flip, 0);
+      const sway = this.reducedMotion ? 0 : Math.sin(t * 0.6 + k * 2.1) * 0.38;
+      a.group.rotation.set(-0.18, sway + a.flip, 0);
     }
   }
 

@@ -42,7 +42,7 @@ export function SiteNav() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-ink-900/65 transition-colors hover:text-ink-900"
+              className="text-sm text-ink-900 transition-colors hover:text-brand-600"
             >
               {link.label}
             </a>
@@ -55,7 +55,7 @@ export function SiteNav() {
           onClick={() => setMenuOpen((open) => !open)}
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
-          className="grid h-10 w-10 place-items-center justify-self-end rounded-xl border border-ink-900/10 text-ink-900/70 md:hidden"
+          className="grid h-10 w-10 place-items-center justify-self-end rounded-xl border border-ink-900/10 text-ink-900 md:hidden"
         >
           <span className="sr-only">Toggle menu</span>
           <svg viewBox="0 0 20 20" className="h-4 w-4" aria-hidden="true">
@@ -86,7 +86,7 @@ export function SiteNav() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block rounded-lg px-2 py-2.5 text-sm text-ink-900/70"
+                  className="block rounded-lg px-2 py-2.5 text-sm text-ink-900"
                 >
                   {link.label}
                 </a>

@@ -53,7 +53,7 @@ Sections, in page order:
 
 | Component     | Anchor         | What it shows                                                         |
 | ------------- | -------------- | --------------------------------------------------------------------- |
-| `what-we-do`  | `#what-we-do`  | Headline over the 3D wave; scrolling turns it into the 3D orbit       |
+| `what-we-do`  | `#what-we-do`  | Headline over the 3D wave, one screen tall                            |
 | `products`    | `#products`    | 3D picture of the AIs' app icons feeding Coere and the devices, apps and code reading from it, then Coere Connect (Chrome extension) beside Coere Developer (API, MCP, SDK) |
 | `who-we-are`  | `#who-we-are`  | Founders (Michelle and Edison), then the executive team (Sarah)       |
 
@@ -76,21 +76,19 @@ Products shows just the cards.
 | `logos.ts`          | Extrudes each SVG in `/public` into a beveled solid; the original SVG is rasterized once and every face samples it, so gradients survive. Also the Coere mark |
 | `database.ts`       | The hero's smooth cube on a long shaft, and the porcelain shader the field shares |
 | `dust.ts`           | The specks drifting in the hero's air                                          |
-| `hero-scene.ts`     | The wave of cubes, Coere above its crest, the agents, the scroll morph into the orbit |
+| `hero-scene.ts`     | The wave of cubes, Coere above its crest, and the agents floating around it   |
 | `glyphs.ts`         | The rounded app icon tile, white or brand blue, and the extruded white symbols for the reading side |
 | `products-scene.ts` | An icon per AI, Coere, then an icon for each thing that reads from it          |
 
 **Hero.** A field of smooth cubes, nearly touching so their tops read as one
 surface, rolls in a single long swell with Coere glowing above the crest and
-the agents spaced evenly around it, in the orbit's order. The section is
-`260svh` tall with a sticky stage, and scroll progress drives the morph: the
-agents lift off the wave into the ring around Coere while the cubes sink away
-from the center outward. The scene itself never turns: a drag anywhere spins
-the Coere mark and nothing else, a click on a logo flips it, and a click
-anywhere else sends Coere round. The cube lattice sits at an angle to the
-camera so no row of gaps lines up with a line of sight. The camera frames the
-wave and the orbit below the headline, however it wraps, so on short screens
-nothing rises into it.
+the agents spaced evenly around it. The section is one screen tall and
+scrolls away like any other, the wave fading into the page at its foot. The
+scene itself never turns: a drag anywhere spins the Coere mark and nothing
+else, a click on a logo flips it, and a click anywhere else sends Coere
+round. The cube lattice sits at an angle to the camera so no row of gaps
+lines up with a line of sight. The camera frames the wave below the headline,
+however it wraps, so on short screens nothing rises into it.
 
 **Products.** One centered picture, like two pages of app icons either side
 of Coere. On the left, a 3x3 grid of white icons, one per AI with its logo. In

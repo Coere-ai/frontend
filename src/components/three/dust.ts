@@ -30,7 +30,6 @@ export function createDust(
       uTime: { value: 0 },
       uColor: { value: new THREE.Color(color) },
       uPixelRatio: { value: 1 },
-      uOpacity: { value: 1 },
       uHeight: { value: extent.y },
     },
     vertexShader: /* glsl */ `
@@ -53,12 +52,11 @@ export function createDust(
     `,
     fragmentShader: /* glsl */ `
       uniform vec3 uColor;
-      uniform float uOpacity;
       varying float vAlpha;
       void main() {
         float d = length(gl_PointCoord - 0.5);
         float a = smoothstep(0.5, 0.0, d);
-        gl_FragColor = vec4(uColor, a * vAlpha * 0.55 * uOpacity);
+        gl_FragColor = vec4(uColor, a * vAlpha * 0.55);
         #include <colorspace_fragment>
       }
     `,

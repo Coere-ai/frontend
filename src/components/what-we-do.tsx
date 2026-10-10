@@ -9,12 +9,11 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 /**
  * The hero. A field of smooth cubes rolls in one long swell with Coere glowing
- * above the crest and every AI on the surface around it. Scrolling lifts the
- * agents off the wave into the orbit around the mark. It all stays live: drag
- * anywhere to spin the mark, click a logo to flip it.
+ * above the crest and every AI on the surface around it. It is one screen
+ * tall and scrolls away like any section. It stays live: drag anywhere to spin
+ * the mark, click a logo to flip it.
  */
 export function WhatWeDo() {
-  const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
@@ -23,10 +22,9 @@ export function WhatWeDo() {
   );
 
   useEffect(() => {
-    const section = sectionRef.current;
     const stage = stageRef.current;
     const canvas = canvasRef.current;
-    if (!section || !stage || !canvas) return;
+    if (!stage || !canvas) return;
 
     let engine: { dispose(): void } | null = null;
     let cancelled = false;
@@ -37,12 +35,6 @@ export function WhatWeDo() {
       if (!cancelled) setStatus("failed");
     };
 
-    const getProgress = () => {
-      const rect = section.getBoundingClientRect();
-      const travel = rect.height - window.innerHeight;
-      return travel > 0 ? -rect.top / travel : 0;
-    };
-
     import("./three/hero-scene")
       .then(async ({ HeroScene }) => {
         if (cancelled) return;
@@ -50,7 +42,6 @@ export function WhatWeDo() {
           canvas,
           host: stage,
           agents,
-          getProgress,
           headline: headlineRef.current ?? undefined,
           onFail: fail,
         });
@@ -86,13 +77,12 @@ export function WhatWeDo() {
   return (
     <section
       id="what-we-do"
-      ref={sectionRef}
       // Pulled up under the nav so the scene runs edge to edge.
-      className="relative -mt-16 h-[260svh] bg-mist"
+      className="relative -mt-16 h-svh bg-mist"
     >
       <div
         ref={stageRef}
-        className="sticky top-0 h-svh w-full cursor-grab touch-pan-y overflow-hidden select-none"
+        className="relative h-full w-full cursor-grab touch-pan-y overflow-hidden select-none"
       >
         <canvas
           ref={canvasRef}
@@ -109,6 +99,11 @@ export function WhatWeDo() {
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-[30%] bg-linear-to-b from-mist via-mist/70 to-transparent sm:h-[38%]"
+        />
+        {/* And at the bottom, so the wave melts into the page below. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[16%] bg-linear-to-b from-transparent to-white"
         />
 
         <div
