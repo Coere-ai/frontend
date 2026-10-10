@@ -63,20 +63,6 @@ const PITCH = 1.3;
 /** Where a symbol sits: just proud of the tile's face. */
 const FACE_Z = TILE_DEPTH / 2 + 0.03;
 
-/** Light runs through the picture once per cycle: in, through Coere, out. */
-const CYCLE = 5.4;
-/** When, as a fraction of the cycle, Coere lights. */
-const CORE_AT = 0.32;
-
-/** A quick rise to 1 at `at`, then a fade over `width` of the cycle. */
-const flash = (phase: number, at: number, width = 0.13) => {
-  let u = phase - at;
-  if (u < -0.5) u += 1;
-  if (u < -0.02 || u > width) return 0;
-  if (u < 0) return 1 - (u / -0.02) ** 2;
-  return (1 - u / width) ** 2;
-};
-
 type Tile = {
   side: Side;
   /** Its column in the grid as seen, 0 on the left, and its row from the top. */
@@ -92,9 +78,7 @@ type Tile = {
   face: THREE.Object3D;
   hit: THREE.Mesh;
   halo: THREE.Sprite;
-  fireAt: number;
   appearAt: number;
-  energy: number;
   hover: number;
   flipAt: number;
 };
@@ -106,9 +90,8 @@ const place = new THREE.Vector3();
  * of app icons either side of Coere. On the left, a white icon for each AI
  * with its logo. In the middle, Coere, floating. On the right, blue icons
  * for what reads from it: a laptop, a phone and a watch, a browser, a chat and
- * a terminal, then code, an SDK and a database. No lines: light runs through
- * the picture, the AI icons flaring column by column toward Coere, Coere as
- * it passes, then the icons on the right column by column away from it.
+ * a terminal, then code, an SDK and a database. No lines and no pulsing:
+ * the picture holds still, the camera too, until someone reaches for it.
  * Dragging anywhere spins Coere; the icons lift on hover and flip on click.
  */
 export class ProductsScene {
@@ -142,11 +125,6 @@ export class ProductsScene {
   private introStart = -1;
   private focus: ProductsFocus = null;
   private focusAmount = { connect: 0, developer: 0 };
-  private yaw = 0;
-  private pitch = 0;
-  private pointerX = 0;
-  private pointerY = 0;
-  private pointerInside = false;
   private readonly spin = new Spin();
   private coreHover = 0;
   private hovered: Hover = null;
@@ -234,9 +212,7 @@ export class ProductsScene {
         face,
         hit,
         halo,
-        fireAt: 0,
         appearAt: 0,
-        energy: 0,
         hover: 0,
         flipAt: -1,
       });
@@ -278,19 +254,13 @@ export class ProductsScene {
     this.stage.start();
   }
 
-  /**
-   * A floor of faint dots that fades out at the edges, with a band of light
-   * that sweeps across it in step with the flow.
-   */
+  /** A floor of faint dots that fades out at the edges. */
   private buildFloor() {
     const material = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       uniforms: {
         uColor: { value: new THREE.Color(BRAND[400]) },
-        uLit: { value: new THREE.Color(BRAND[600]) },
-        uSweep: { value: -100 },
-        uStrength: { value: 0 },
       },
       vertexShader: /* glsl */ `
         varying vec2 vPos;
@@ -301,9 +271,6 @@ export class ProductsScene {
       `,
       fragmentShader: /* glsl */ `
         uniform vec3 uColor;
-        uniform vec3 uLit;
-        uniform float uSweep;
-        uniform float uStrength;
         varying vec2 vPos;
         void main() {
           // The plane lies flat, so its y runs toward the camera: flip it.
@@ -313,10 +280,7 @@ export class ProductsScene {
           float w = fwidth(d);
           float dotMask = 1.0 - smoothstep(0.05 - w, 0.05 + w, d);
           float fade = 1.0 - smoothstep(3.0, 10.0, length(p * vec2(0.62, 1.4)));
-          float band = exp(-pow((p.x - uSweep) / 1.1, 2.0)) * uStrength;
-          vec3 color = mix(uColor, uLit, band);
-          float alpha = dotMask * fade * (0.26 + band * 0.7);
-          gl_FragColor = vec4(color, alpha);
+          gl_FragColor = vec4(uColor, dotMask * fade * 0.26);
           #include <colorspace_fragment>
         }
       `,
@@ -364,15 +328,12 @@ export class ProductsScene {
       // The column as counted out from Coere on a wide screen.
       const out = source ? COLUMNS - 1 - tile.column : tile.column;
       if (this.portrait) {
-        // Sources above, readers below: the flow runs down the screen.
+        // Sources above, readers below.
         tile.near = source ? 2 - tile.row : tile.row;
         const x = (tile.column - 1) * 1.38;
         const y = source ? 10.2 - tile.row * 1.35 : 2.7 - tile.row * 1.35;
         tile.group.position.set(x, y, Math.abs(x) * 0.12);
         tile.group.rotation.set(0, -x * 0.12, 0);
-        tile.fireAt = source
-          ? 0.02 + (2 - tile.near) * 0.075 + tile.column * 0.015
-          : CORE_AT + 0.07 + tile.near * 0.075 + tile.column * 0.015;
         tile.appearAt = 0.35 + tile.near * 0.14 + tile.column * 0.05;
       } else {
         // Two pages either side of Coere, curving gently toward the viewer
@@ -383,9 +344,6 @@ export class ProductsScene {
         const y = 3.5 - tile.row * PITCH;
         tile.group.position.set(x, y, [0, 0.22, 0.56][out]);
         tile.group.rotation.set(-0.08, -s * [0.24, 0.32, 0.4][out], 0);
-        tile.fireAt = source
-          ? 0.02 + (2 - out) * 0.075 + tile.row * 0.02
-          : CORE_AT + 0.07 + out * 0.075 + tile.row * 0.02;
         tile.appearAt = 0.35 + out * 0.14 + tile.row * 0.06;
       }
     }
@@ -450,10 +408,6 @@ export class ProductsScene {
       : this.introStart < 0
         ? 0
         : this.time - this.introStart;
-    // The flow starts once everything has arrived.
-    const running = this.reducedMotion ? 0 : clamp01((intro - 2.2) / 0.6);
-    const phase = (Math.max(0, intro - 2.2) / CYCLE) % 1;
-
     const hoverSide =
       this.hovered?.kind === "source"
         ? "connect"
@@ -474,15 +428,9 @@ export class ProductsScene {
       dt,
     );
 
-    // Camera: a slow drift and a little parallax with the mouse. Dragging
-    // spins Coere, never the picture.
-    const parallaxX = this.pointerInside ? this.pointerX : 0;
-    const parallaxY = this.pointerInside ? this.pointerY : 0;
-    const drift = Math.sin(t * 0.25) * 0.05;
-    this.yaw = damp(this.yaw, parallaxX * 0.08 + drift, 4, dt);
-    this.pitch = damp(this.pitch, -parallaxY * 0.04, 4, dt);
-    this.root.rotation.y = this.yaw;
-    const elevation = this.elevation + this.pitch;
+    // The camera holds still: the mouse never moves it, and dragging spins
+    // Coere, never the picture.
+    const elevation = this.elevation;
     const target = place.set(0, this.targetY, 0);
     this.camera.position.set(
       target.x,
@@ -492,24 +440,13 @@ export class ProductsScene {
     this.camera.lookAt(target);
     this.camera.updateProjectionMatrix();
 
-    this.updateTiles(t, dt, intro, phase, running);
-    this.updateCore(t, dt, intro, phase, running);
-
-    // The band of light on the floor crosses with the flow.
-    this.floor.material.uniforms.uSweep.value = lerp(-7.4, 7.4, phase / 0.62);
-    this.floor.material.uniforms.uStrength.value =
-      running * (phase < 0.62 ? Math.sin((phase / 0.62) * Math.PI) : 0);
+    this.updateTiles(t, dt, intro);
+    this.updateCore(t, dt, intro);
 
     this.stage.renderer.render(this.scene, this.camera);
   }
 
-  private updateTiles(
-    t: number,
-    dt: number,
-    intro: number,
-    phase: number,
-    running: number,
-  ) {
+  private updateTiles(t: number, dt: number, intro: number) {
     const { connect, developer } = this.focusAmount;
     this.tiles.forEach((tile, k) => {
       const source = tile.side === "source";
@@ -519,7 +456,6 @@ export class ProductsScene {
       const hovered =
         this.hovered?.kind === tile.side && this.hovered.index === index;
       tile.hover = damp(tile.hover, hovered ? 1 : 0, 10, dt);
-      tile.energy = flash(phase, tile.fireAt) * running;
 
       // Arrive with a pop, nearest Coere first.
       const appear = this.reducedMotion
@@ -527,11 +463,7 @@ export class ProductsScene {
         : clamp01((intro - tile.appearAt) / 0.7);
       const scale =
         Math.max(0.0001, easeOutBack(appear)) *
-        (1 +
-          tile.energy * 0.06 +
-          tile.hover * 0.07 +
-          mine * 0.04 -
-          other * 0.06);
+        (1 + tile.hover * 0.07 + mine * 0.04 - other * 0.06);
       const body = tile.body;
       body.scale.setScalar(scale);
       body.position.set(
@@ -541,8 +473,9 @@ export class ProductsScene {
           ? 0
           : Math.sin(t * 1.2 - tile.near * 0.9 - tile.row * 0.5) * 0.035 -
               (1 - easeOutCubic(appear)) * 0.5,
-        // Forward when it fires or has focus, back when the other side does.
-        tile.energy * 0.24 + tile.hover * 0.3 + mine * 0.18 - other * 0.16,
+        // Forward under the pointer or with focus, back when the other side
+        // has it.
+        tile.hover * 0.3 + mine * 0.18 - other * 0.16,
       );
 
       // A click sends it once round.
@@ -556,9 +489,9 @@ export class ProductsScene {
       const sway = this.reducedMotion
         ? 0
         : Math.sin(t * 0.6 - tile.near * 0.6 - tile.row * 0.3) * 0.03;
-      body.rotation.set(-tile.energy * 0.12, flip + sway, 0);
+      body.rotation.set(0, flip + sway, 0);
 
-      const lit = Math.max(tile.energy, tile.hover * 0.7);
+      const lit = tile.hover * 0.7;
       tile.material.emissiveIntensity =
         (source ? 0.5 : 0.55) * lit + mine * 0.2;
       tile.halo.material.opacity = Math.min(
@@ -569,13 +502,7 @@ export class ProductsScene {
     });
   }
 
-  private updateCore(
-    t: number,
-    dt: number,
-    intro: number,
-    phase: number,
-    running: number,
-  ) {
+  private updateCore(t: number, dt: number, intro: number) {
     const appear = this.reducedMotion ? 1 : easeOutCubic(clamp01(intro / 0.9));
     this.core.scale.setScalar(lerp(0.7, 1, appear));
 
@@ -584,21 +511,16 @@ export class ProductsScene {
     if (!this.drag?.moved) {
       this.spin.update(dt, this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.2);
     }
-    const pulse = flash(phase, CORE_AT, 0.16) * running;
     const markY = this.markY + Math.sin(t * 1.1) * 0.07 - (1 - appear) * 1.2;
     this.mark.position.y = markY;
-    this.mark.rotation.set(
-      Math.sin(t * 0.8) * 0.05,
-      this.spin.angle - this.yaw,
-      0,
-    );
-    this.mark.scale.setScalar(this.markScale * (1 + pulse * 0.05));
+    this.mark.rotation.set(Math.sin(t * 0.8) * 0.05, this.spin.angle, 0);
+    this.mark.scale.setScalar(this.markScale);
     this.coreGlow.position.y = markY;
     this.coreGlow.scale.setScalar(this.markScale * 2.35);
-    // Brighter as the light passes through, and under the pointer.
+    // Brighter under the pointer.
     const hovered = this.hovered?.kind === "core" || !!this.drag?.moved;
     this.coreHover = damp(this.coreHover, hovered ? 1 : 0, 8, dt);
-    const lit = Math.max(pulse, this.coreHover * 0.5);
+    const lit = this.coreHover * 0.5;
     this.coreGlow.material.opacity = 0.42 + lit * 0.4;
     this.coreLight.position.y = markY;
     this.coreLight.intensity = 10 + lit * 26;
@@ -652,10 +574,6 @@ export class ProductsScene {
   };
 
   private onPointerMove = (event: PointerEvent) => {
-    const rect = this.options.host.getBoundingClientRect();
-    this.pointerInside = event.pointerType === "mouse";
-    this.pointerX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    this.pointerY = ((event.clientY - rect.top) / rect.height) * 2 - 1;
     // A mouse released outside the stage never sends pointerup here.
     if (this.drag && event.pointerType === "mouse" && event.buttons === 0) {
       this.drag = null;
@@ -715,7 +633,6 @@ export class ProductsScene {
   };
 
   private onPointerLeave = () => {
-    this.pointerInside = false;
     if (!this.drag) this.setHovered(null);
   };
 
