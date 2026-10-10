@@ -585,7 +585,7 @@ export class ProductsScene {
       this.spinVelocity = damp(this.spinVelocity, 0, 1.4, dt);
       if (Math.abs(this.spinVelocity) < 0.5) {
         const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
-        const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.4;
+        const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.2;
         this.spin = damp(this.spin, home + sway, 2.5, dt);
       }
       this.spin += this.spinVelocity * dt;

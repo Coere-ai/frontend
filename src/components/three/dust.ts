@@ -31,6 +31,8 @@ export function createDust(
       uColor: { value: new THREE.Color(color) },
       uPixelRatio: { value: 1 },
       uHeight: { value: extent.y },
+      // Drawing buffer height in pixels, for the fade at the foot.
+      uViewHeight: { value: 1 },
     },
     vertexShader: /* glsl */ `
       uniform float uTime;
@@ -52,10 +54,13 @@ export function createDust(
     `,
     fragmentShader: /* glsl */ `
       uniform vec3 uColor;
+      uniform float uViewHeight;
       varying float vAlpha;
       void main() {
         float d = length(gl_PointCoord - 0.5);
         float a = smoothstep(0.5, 0.0, d);
+        // Gone toward the bottom of the screen, with the field.
+        a *= smoothstep(0.0, 0.32, gl_FragCoord.y / uViewHeight);
         gl_FragColor = vec4(uColor, a * vAlpha * 0.55);
         #include <colorspace_fragment>
       }

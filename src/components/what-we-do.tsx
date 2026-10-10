@@ -77,8 +77,9 @@ export function WhatWeDo() {
   return (
     <section
       id="what-we-do"
-      // Pulled up under the nav so the scene runs edge to edge.
-      className="relative -mt-16 h-svh bg-mist"
+      // Pulled up under the nav so the scene runs edge to edge. The scene
+      // pales to white at its foot, as this does before it arrives.
+      className="relative -mt-16 h-svh bg-linear-to-b from-mist from-55% to-white"
     >
       <div
         ref={stageRef}
@@ -99,12 +100,6 @@ export function WhatWeDo() {
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-[30%] bg-linear-to-b from-mist via-mist/70 to-transparent sm:h-[38%]"
-        />
-        {/* A thin fade at the foot, so the wave meets the page below softly.
-            Kept short: the logos at the front of the wave sit just above it. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-b from-transparent to-white"
         />
 
         <div

@@ -69,6 +69,24 @@ type Agent = {
 
 const tmp = new THREE.Vector3();
 
+/** A vertical gradient for the background: `top` down to past halfway, then
+ * easing to `bottom` at the foot of the screen. */
+function createSkyTexture(top: string, bottom: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 2;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d")!;
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, top);
+  gradient.addColorStop(0.55, top);
+  gradient.addColorStop(1, bottom);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 export class HeroScene {
   readonly ready: Promise<void>;
 
@@ -85,6 +103,8 @@ export class HeroScene {
   // The field of cubes.
   private field!: THREE.InstancedMesh;
   private fieldMaterial!: THREE.MeshStandardMaterial;
+  /** The field's drawing-buffer height, for its fade at the foot. */
+  private fieldViewHeight!: { value: number };
   /** Most cubes ever laid out; past it the farthest are dropped. */
   private readonly fieldCap: number;
   private fieldData!: THREE.InstancedBufferAttribute;
@@ -156,8 +176,8 @@ export class HeroScene {
     });
     const renderer = this.stage.renderer;
 
-    // Light, airy studio.
-    this.scene.background = new THREE.Color(HERO_BACKGROUND);
+    // Light, airy studio, paling to the white of the page at the foot.
+    this.scene.background = createSkyTexture(HERO_BACKGROUND, "#ffffff");
     this.scene.fog = new THREE.Fog(HERO_BACKGROUND, 43, 88);
     this.scene.environment = createEnvironment(renderer);
     this.scene.environmentIntensity = 0.5;
@@ -247,13 +267,15 @@ export class HeroScene {
       this.field.dispose();
     }
     if (!this.fieldMaterial) {
-      this.fieldMaterial = createDatabaseMaterial({
+      const { material, viewHeight } = createDatabaseMaterial({
         // Shallow, so the step between neighbours reaches the deep tone and
         // every cube shows a lit top over a shaded side.
         shadeDepth: this.spacing * 1.0,
         deep: "#97a6d4",
       });
-      this.fieldMaterial.roughness = 0.6;
+      material.roughness = 0.6;
+      this.fieldMaterial = material;
+      this.fieldViewHeight = viewHeight;
     }
     // Cubes nearly touching, so their tops read as one surface.
     const geometry = createTileGeometry({
@@ -434,11 +456,12 @@ export class HeroScene {
     const clear = this.headlineClear(height);
     this.clear = clear;
     // Lower the picture on short screens, so the agents at the back of the
-    // wave stay under the headline: they sit up to 0.18 of the screen above
-    // the target. Never so low that the agents in front leave the bottom.
+    // wave stay under the headline: riding the swells, they reach up to 0.21
+    // of the screen above the target. Never so low that the agents in front
+    // leave the bottom.
     this.waveCamera.anchor = Math.min(
       0.72,
-      Math.max(portrait ? 0.56 : 0.6, clear + 0.18),
+      Math.max(portrait ? 0.56 : 0.6, clear + 0.21),
     );
     this.waveCamera.target.set(0, 2.6, 0);
 
@@ -478,18 +501,23 @@ export class HeroScene {
     // just behind Coere, a trough in front of it and a gentler swell behind.
     const across = 0.42 * x + 0.91 * z;
     const along = 0.91 * x - 0.42 * z;
-    const c = across + 1.2;
+    // The crest meanders a little, and the meander runs along it.
+    const c = across + 1.2 + 0.35 * Math.sin(along * 0.16 - t * 0.42);
     const crest =
       3.4 *
       Math.exp(-(c * c) / (2 * 3.4 * 3.4)) *
-      (0.8 + 0.2 * Math.sin(along * 0.14 - t * 0.32));
-    const b = across + 13;
+      (0.78 + 0.22 * Math.sin(along * 0.14 - t * 0.5));
+    const b = across + 13 + 1.4 * Math.sin(along * 0.1 + t * 0.3);
     const back = 1.6 * Math.exp(-(b * b) / (2 * 5 * 5));
     const f = across - 9;
     const front = -0.9 * Math.exp(-(f * f) / (2 * 5 * 5));
+    // Long, low swells rolling in from the back toward the viewer: full in
+    // the far field, gentle by the time they pass under Coere.
+    const far = 0.35 + 0.65 * smoothstep(1, -12, across);
+    const roll = 0.42 * far * Math.sin(across * 0.38 - t * 0.8 + along * 0.06);
     const swell =
       0.3 * Math.sin(x * 0.1 + t * 0.25) * Math.cos(z * 0.09 - t * 0.2);
-    return crest + back + front + swell - 0.6;
+    return crest + back + front + roll + swell - 0.6;
   }
 
   private updateField(t: number) {
@@ -554,6 +582,10 @@ export class HeroScene {
 
     const dustMaterial = this.dust.material as THREE.ShaderMaterial;
     dustMaterial.uniforms.uTime.value = elapsed * motion;
+    // The pixel ratio can drop mid-session, so track the real buffer height.
+    const viewHeight = this.stage.renderer.domElement.height;
+    this.fieldViewHeight.value = viewHeight;
+    dustMaterial.uniforms.uViewHeight.value = viewHeight;
 
     this.stage.renderer.render(this.scene, this.camera);
   }
@@ -592,16 +624,14 @@ export class HeroScene {
     this.rig.position.set(0, this.height(0, 0, t) + 2 + bob, 0);
     this.rig.scale.setScalar(this.aspect < 0.9 ? 2.45 : 2.6);
 
-    // Spin: a slow cruise. While dragged it follows the pointer, and runs on
-    // when let go.
+    // Facing out, with a slow sway; it only spins when it is spun. While
+    // dragged it follows the pointer, runs on when let go, then comes back.
     if (!this.drag?.moved) {
-      const cruise = this.reducedMotion ? 0 : 0.42;
-      this.spinVelocity = damp(this.spinVelocity, cruise, 1.2, dt);
-      // With no cruise to carry it round, it comes back to face out once it
-      // slows.
-      if (this.reducedMotion && Math.abs(this.spinVelocity) < 0.6) {
+      this.spinVelocity = damp(this.spinVelocity, 0, 1.2, dt);
+      if (Math.abs(this.spinVelocity) < 0.6) {
         const home = Math.round(this.spin / (Math.PI * 2)) * Math.PI * 2;
-        this.spin = damp(this.spin, home, 2.5, dt);
+        const sway = this.reducedMotion ? 0 : Math.sin(t * 0.5) * 0.2;
+        this.spin = damp(this.spin, home + sway, 2.5, dt);
       }
       this.spin += this.spinVelocity * dt;
     }
@@ -612,11 +642,14 @@ export class HeroScene {
     for (let k = 0; k < this.agents.length; k++) {
       const a = this.agents[k];
 
-      // Floating just over the wave, riding it.
+      // Floating just over the wave, riding it, with the bigger logos held
+      // higher so the swells passing under them never touch them.
       const x = a.spot.x * this.spread.x;
       const z = a.spot.y * this.spread.y;
+      // Far ones a touch larger, so perspective does not shrink them away.
+      const size = (1.4 - a.spot.y * 0.2) * this.waveScale;
       const bob = Math.sin(t * 1.1 + k * 1.7) * 0.13;
-      a.group.position.set(x, this.height(x, z, t) + 1.1 + bob, z);
+      a.group.position.set(x, this.height(x, z, t) + 0.6 + size * 0.5 + bob, z);
 
       // Hover lifts and grows; a click flips it once round.
       a.hover = damp(a.hover, this.hovered === k ? 1 : 0, 10, dt);
@@ -632,10 +665,8 @@ export class HeroScene {
           }
         }
       }
-      // Far ones a touch larger, so perspective does not shrink them away.
       const scale =
-        (1.4 - a.spot.y * 0.2) *
-        this.waveScale *
+        size *
         (1 + a.hover * 0.14) *
         // Entrance: each logo rises out of the wave in turn.
         Math.max(
@@ -760,6 +791,7 @@ export class HeroScene {
     this.agents.forEach((a) => a.body && a.group.remove(a.body));
     disposeTree(this.scene);
     this.scene.environment?.dispose();
+    (this.scene.background as THREE.Texture | null)?.dispose();
     this.stage.dispose();
   }
 }

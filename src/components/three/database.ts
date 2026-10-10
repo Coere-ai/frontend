@@ -139,6 +139,10 @@ export function createTileGeometry({
  * White porcelain for the instanced field. Per instance `aData` drives it:
  * y = how far into the blue of the troughs it sits, z = fade into the fog,
  * w = glow from the light under an agent. x is unused.
+ *
+ * Toward the bottom of the screen the field pales and dissolves into white,
+ * so it runs on into the page below with no edge. `viewHeight` is the height
+ * of the drawing buffer in pixels; keep it current.
  */
 export function createDatabaseMaterial({
   color = "#ffffff",
@@ -164,6 +168,7 @@ export function createDatabaseMaterial({
     uLow: { value: new THREE.Color(low) },
     uGlow: { value: new THREE.Color(glow) },
     uShadeDepth: { value: shadeDepth },
+    uViewHeight: { value: 1 },
   };
 
   material.onBeforeCompile = (shader) => {
@@ -190,19 +195,23 @@ export function createDatabaseMaterial({
         uniform vec3 uLow;
         uniform vec3 uGlow;
         uniform float uShadeDepth;
+        uniform float uViewHeight;
         varying vec4 vData;
         varying float vLocalY;`,
       )
       .replace(
         "#include <color_fragment>",
         `#include <color_fragment>
-        // Troughs run blue, crests stay white.
-        diffuseColor.rgb = mix(diffuseColor.rgb, uLow, clamp(vData.y, 0.0, 1.0));
+        // 1 at the bottom of the screen, easing to 0 a third of the way up.
+        float footFade = 1.0 - smoothstep(0.0, 0.32, gl_FragCoord.y / uViewHeight);
+        // Troughs run blue, crests stay white; the blue gives way near the foot.
+        float lowTint = clamp(vData.y, 0.0, 1.0) * (1.0 - footFade * 0.85);
+        diffuseColor.rgb = mix(diffuseColor.rgb, uLow, lowTint);
         diffuseColor.rgb = mix(diffuseColor.rgb, uGlow, clamp(vData.w, 0.0, 1.0) * 0.6);
         // Walls darken the deeper they go, standing in for the light their
         // neighbours would block.
         float depthShade = smoothstep(0.0, 1.0, clamp(-vLocalY / uShadeDepth, 0.0, 1.0));
-        diffuseColor.rgb = mix(diffuseColor.rgb, uDeep * mix(vec3(1.0), uLow, clamp(vData.y, 0.0, 1.0)), depthShade * 0.92);
+        diffuseColor.rgb = mix(diffuseColor.rgb, uDeep * mix(vec3(1.0), uLow, lowTint), depthShade * 0.92);
         // Deep walls see little light at all, so the gaps between neighbours
         // fall dark instead of catching stray light.
         diffuseColor.rgb *= 1.0 - depthShade * 0.6;`,
@@ -212,11 +221,13 @@ export function createDatabaseMaterial({
         `#include <fog_fragment>
         #ifdef USE_FOG
         gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, clamp(vData.z, 0.0, 1.0));
-        #endif`,
+        #endif
+        // Eased, so the fade starts too softly to see where it begins.
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), footFade * footFade);`,
       );
   };
   // Distinguish the program from plain standard materials in the cache.
   material.customProgramCacheKey = () => "database";
 
-  return material;
+  return { material, viewHeight: uniforms.uViewHeight };
 }

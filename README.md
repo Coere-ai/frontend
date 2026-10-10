@@ -82,11 +82,13 @@ Products shows just the cards.
 
 **Hero.** A field of smooth cubes, nearly touching so their tops read as one
 surface, rolls in a single long swell with Coere glowing above the crest and
-the agents spaced evenly around it. The section is one screen tall and
-scrolls away like any other, the wave fading into the page at its foot. The
-scene itself never turns: a drag anywhere spins the Coere mark and nothing
-else, a click on a logo flips it, and a click anywhere else sends Coere
-round. The cube lattice sits at an angle to the camera so no row of gaps
+the agents spaced evenly around it, riding it. The crest meanders and low
+swells roll in from the back, so the whole field keeps flowing. The section
+is one screen tall and scrolls away like any other: toward its foot the
+cubes pale and dissolve into the white of the page, so there is no edge.
+Coere faces out with a slow sway and only spins when spun. The scene itself
+never turns: a drag anywhere spins the Coere mark and nothing else, a click
+on a logo flips it, and a click anywhere else sends Coere round. The cube lattice sits at an angle to the camera so no row of gaps
 lines up with a line of sight. The camera frames the wave below the headline,
 however it wraps, so on short screens nothing rises into it.
 
