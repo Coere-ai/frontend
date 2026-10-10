@@ -1,0 +1,21 @@
+# Coere
+
+> Coere (Coere AI) is the memory layer for AI. Coere is not Cohere: the name comes from the Latin cohaerere, "to connect". Website: https://www.coere.ai/
+
+Coere carries a person's memory across every AI they use, so a new chat in any of them picks up where the last one left off.
+
+## Products
+
+- Coere Connect: a Chrome extension that carries your memory across every AI you use, including ChatGPT, Claude, Gemini, Perplexity, Grok, Copilot, Meta AI, Kimi and DeepSeek. Install it once, and a new chat in any of them picks up where the last one left off.
+- Coere Developer: developers can read the memory layer through the API, MCP or SDK, making every user known on day one.
+
+## Team
+
+- Michelle Dong, Co-founder and CEO (UC Berkeley, Business and Computer Science)
+- Edison Law, Co-founder and CTO (UC Berkeley, EECS and Bioengineering)
+- Sarah Shelke, COO and CMO (UC Berkeley, Economics and Neuroscience)
+
+## Contact
+
+- Email: coereagent@gmail.com
+- Website: https://www.coere.ai/

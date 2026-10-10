@@ -4,11 +4,23 @@
 export const siteConfig = {
   name: "Coere",
   legalName: "Coere AI",
-  tagline: "Building the memory layer of the future",
+  tagline: "Unified memory for AI",
   domain: "coere.ai",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://coere.ai",
-  description: "Building the memory layer of the future.",
+  /**
+   * The canonical origin, with no trailing slash. The apex coere.ai redirects
+   * here, so canonical links, the sitemap and structured data all use www.
+   */
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.coere.ai",
+  /** For search results and link previews; not shown on the page. */
+  title: "Coere AI | The memory layer for every AI you use",
+  description:
+    "Coere AI is the memory layer for AI. Coere Connect carries your memory across ChatGPT, Claude, Gemini and more; Coere Developer brings it to apps through an API, MCP and SDK.",
   email: "coereagent@gmail.com",
+  /** Profiles that speak for Coere, for search engines (schema.org sameAs). */
+  profiles: [
+    "https://www.linkedin.com/company/coere",
+    "https://github.com/Coere-ai",
+  ],
 } as const;
 
 export const navLinks = [

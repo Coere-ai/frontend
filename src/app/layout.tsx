@@ -13,42 +13,46 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
+  // Only the unlisted demo uses it; don't make the home page wait for it.
+  preload: false,
 });
 
+/**
+ * Site-wide metadata. The share images come from the opengraph-image and
+ * twitter-image files beside this one, and the icons from favicon.ico, icon.svg,
+ * icon1.png and apple-icon.png. The home page sets its own canonical link.
+ */
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: siteConfig.name,
-    template: `%s, ${siteConfig.name}`,
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
-  keywords: ["Coere", "Coere AI", "memory layer"],
   authors: founders.map((f) => ({ name: f.name })),
   creator: siteConfig.legalName,
+  publisher: siteConfig.legalName,
   openGraph: {
     type: "website",
-    url: siteConfig.url,
+    locale: "en_US",
+    url: "/",
     siteName: siteConfig.name,
-    title: siteConfig.name,
+    title: siteConfig.title,
     description: siteConfig.description,
-    images: [
-      {
-        url: "/banner.png",
-        width: 2508,
-        height: 627,
-        alt: `${siteConfig.name}, ${siteConfig.tagline}`,
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: siteConfig.name,
+    title: siteConfig.title,
     description: siteConfig.description,
-    images: ["/banner.png"],
   },
-  alternates: { canonical: "/" },
-  robots: { index: true, follow: true },
+  // Search Console and Bing Webmaster Tools tokens, when set in the deploy.
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+    other: process.env.BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION }
+      : undefined,
+  },
 };
 
 export const viewport: Viewport = {

@@ -65,6 +65,15 @@ body {
   }
 }
 
+/* The hero headline's entrance: up out of a soft blur. */
+@keyframes coere-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

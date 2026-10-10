@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
 import { Orbit } from "@/components/orbit";
 import { agents } from "@/lib/site";
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 /**
  * The hero. A field of smooth cubes rolls in one long swell with Coere glowing
@@ -106,15 +103,12 @@ export function WhatWeDo() {
           ref={headlineRef}
           className="pointer-events-none absolute inset-x-0 top-[7.5rem] px-5 sm:top-[8.25rem]"
         >
-          <motion.h1
-            initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 0.9, ease }}
-            className="mx-auto max-w-4xl text-center text-[clamp(2rem,10.4vw,2.6rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-balance text-brand-600 sm:text-6xl lg:text-[4.6rem]"
-          >
+          {/* The entrance is plain CSS, so it plays as soon as the page paints
+              rather than waiting for scripts to load. */}
+          <h1 className="mx-auto max-w-4xl animate-[coere-rise_0.9s_cubic-bezier(0.22,1,0.36,1)_both] text-center text-[clamp(2rem,10.4vw,2.6rem)] leading-[1.02] font-semibold tracking-[-0.045em] text-balance text-brand-600 sm:text-6xl lg:text-[4.6rem]">
             Building the future
             <br className="hidden sm:block" /> infrastructure of AI
-          </motion.h1>
+          </h1>
         </div>
       </div>
     </section>

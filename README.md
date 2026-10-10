@@ -22,31 +22,42 @@ npm run lint     # eslint
 
 ## Configuration
 
-Copy `.env.example` to `.env.local` and set the canonical site URL — it feeds
-canonical tags, Open Graph metadata, `robots.txt`, and `sitemap.xml`.
+The canonical site URL defaults to `https://www.coere.ai`, the host the apex
+`coere.ai` redirects to. It feeds the canonical link, Open Graph metadata,
+structured data, `robots.txt` and `sitemap.xml`, so it must be the host that
+actually serves the page. Override it only for another deployment:
 
 ```
-NEXT_PUBLIC_SITE_URL=https://coere.ai
+NEXT_PUBLIC_SITE_URL=https://www.coere.ai
 ```
 
-Site copy, links, the agent list, the example capsule, the illustrative token
-and time costs, and founder details live in [`src/lib/site.ts`](src/lib/site.ts).
-One thing to update at launch: `chromeStoreUrl` is empty, so every install
-button falls back to an early-access mailto. Set it to the Chrome Web Store
-listing and the buttons point at the store instead.
+Optional search-engine verification tokens, emitted as meta tags when set:
+
+```
+GOOGLE_SITE_VERIFICATION=...   # Google Search Console, HTML tag method
+BING_SITE_VERIFICATION=...     # Bing Webmaster Tools, msvalidate.01
+```
+
+Site copy, the search title and description, the profiles listed for search
+engines, the agent list and founder details live in
+[`src/lib/site.ts`](src/lib/site.ts).
 
 ## Structure
 
 ```
-src/app/layout.tsx        fonts, metadata, OG/Twitter cards
-src/app/page.tsx          section composition, JSON-LD structured data
+src/app/layout.tsx        fonts, site-wide metadata
+src/app/page.tsx          section composition, canonical link, JSON-LD
+src/app/*-image.png       the 1200x630 share image (Open Graph and X)
+src/app/favicon.ico, icon.svg, icon1.png, apple-icon.png   icons
+src/app/robots.ts, sitemap.ts, manifest.ts                 crawler and app files
 src/app/globals.css       brand tokens (blue scale, navy scale, mist), keyframes
-src/lib/site.ts           copy, links, agents, costs, founders
+src/lib/site.ts           copy, links, agents, founders
 src/components/three/     the 3D scenes (see below)
 public/*.svg              AI provider logos, also extruded into 3D at runtime
 public/chrome_webstore.png  install button icon
 public/founders/          founder photos
-public/banner.png         social share image
+public/coere-logo.png     the mark, used as the logo in structured data
+public/llms.txt           a plain summary of Coere for AI search crawlers
 ```
 
 Sections, in page order:
@@ -157,14 +168,31 @@ the team section is static. All motion respects
 `prefers-reduced-motion`, and a `noscript` style reveals the scroll animations
 when JavaScript is off.
 
-Spend figures in `costs` are sourced (CloudZero State of AI Costs 2025, PNC
-card data reported May 2026, Anthropic's published Claude Code per-developer
-range); the Coere savings are estimates derived from the token and time numbers
-in `src/lib/site.ts`. See the comment at the top of
-[`src/components/costs.tsx`](src/components/costs.tsx).
-
 ## Deploying
 
 The site is fully static. `npm run build` prerenders every route, so any host
-that runs a Next.js build works (Vercel needs no configuration). Set
-`NEXT_PUBLIC_SITE_URL` in the host environment before building.
+that runs a Next.js build works (Vercel needs no configuration). If
+`NEXT_PUBLIC_SITE_URL` is set in the host environment, it must be
+`https://www.coere.ai`.
+
+## Search
+
+What the site tells search engines, so "Coere" and "Coere AI" find it:
+
+- The title is "Coere AI | The memory layer for every AI you use", and the
+  description names Coere Connect, Coere Developer and the AIs they work with.
+- One canonical host, `https://www.coere.ai`, in the canonical link, Open
+  Graph URL, structured data, sitemap and robots file.
+- JSON-LD on the home page: a `WebSite` named "Coere" (also "Coere AI" and
+  "coere.ai"), which is what Google uses for the site name in results, and an
+  `Organization` with the same names, the logo, the founders and the profiles
+  in `siteConfig.profiles`. Add every official profile there (X, Crunchbase,
+  the Chrome Web Store listing) as it goes live.
+- The Coere mark as favicon (ico, svg and png) and apple-touch icon, a web
+  manifest, and a 1200x630 share image.
+- `public/llms.txt`, which says plainly that Coere is not Cohere.
+
+Search engines often correct "Coere" to "Cohere", so the rest happens off the
+site: verify the domain in Google Search Console and Bing Webmaster Tools,
+submit `https://www.coere.ai/sitemap.xml`, and get profiles and mentions that
+spell "Coere" exactly and link to `https://www.coere.ai/`.

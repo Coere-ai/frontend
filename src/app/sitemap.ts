@@ -4,9 +4,10 @@ import { siteConfig } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: siteConfig.url,
-      changeFrequency: "weekly",
-      priority: 1,
+      // The canonical home page, exactly as its canonical link names it.
+      url: `${siteConfig.url}/`,
+      // Each deploy is when the page last changed.
+      lastModified: new Date(),
     },
   ];
 }

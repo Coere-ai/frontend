@@ -20,7 +20,7 @@ function Portrait({ member }: { member: TeamMember }) {
       {member.photo ? (
         <Image
           src={member.photo}
-          alt={member.name}
+          alt={`${member.name}, ${member.role} of Coere`}
           fill
           // Larger than the box so a zoomed crop stays sharp.
           sizes="256px"
