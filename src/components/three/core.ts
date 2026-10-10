@@ -51,11 +51,14 @@ export class Spin {
   private stopAt: number | null = null;
   private stopDir = 0;
   private decel = 0;
+  /** How much of the sway applies: 0 after a spin, easing back to 1. */
+  private settled = 1;
 
   /** A push, as from a click. */
   kick(velocity: number) {
     this.velocity += velocity;
     this.stopAt = null;
+    this.settled = 0;
   }
 
   /** Turned by hand: follows the pointer and keeps its speed for the fling. */
@@ -63,12 +66,14 @@ export class Spin {
     this.angle += delta;
     this.velocity = damp(this.velocity, delta / dt, 18, dt);
     this.stopAt = null;
+    this.settled = 0;
   }
 
   /** Let go without a fling. */
   stop() {
     this.velocity = 0;
     this.stopAt = null;
+    this.settled = 0;
   }
 
   update(dt: number, sway = 0) {
@@ -97,8 +102,10 @@ export class Spin {
         this.stopDir = dir;
         this.decel = (speed * speed) / (2 * distance);
       }
+      // Under steady braking, so it lands on the turn as it comes to rest.
+      const before = this.velocity;
       this.velocity -= this.stopDir * this.decel * dt;
-      const next = this.angle + this.velocity * dt;
+      const next = this.angle + ((before + this.velocity) / 2) * dt;
       if (
         this.velocity * this.stopDir <= 0 ||
         (this.stopAt - next) * this.stopDir <= 0
@@ -109,10 +116,12 @@ export class Spin {
         this.angle = next;
       }
     } else {
-      // At rest: face out.
+      // At rest: face out, the sway fading back in after a spin so it never
+      // tugs the mark back the moment it lands.
       this.velocity = 0;
+      this.settled = damp(this.settled, 1, 0.6, dt);
       const home = Math.round(this.angle / TURN) * TURN;
-      this.angle = damp(this.angle, home + sway, 2.5, dt);
+      this.angle = damp(this.angle, home + sway * this.settled, 2.5, dt);
     }
   }
 }
