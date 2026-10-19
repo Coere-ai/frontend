@@ -1,4 +1,3 @@
-import { Products } from "@/components/products";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { WhatWeDo } from "@/components/what-we-do";
@@ -83,7 +82,6 @@ export default function Home() {
       <SiteNav />
       <main className="flex-1">
         <WhatWeDo />
-        <Products />
         <WhoWeAre />
       </main>
       <SiteFooter />

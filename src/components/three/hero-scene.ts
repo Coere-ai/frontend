@@ -92,7 +92,7 @@ function createSkyTexture(top: string, bottom: string) {
  * A copy of a logo's material that dissolves into white at the very foot of
  * the screen, as the field does there, so on the shortest screens a logo at
  * the front of the wave melts away instead of being cut by the section's
- * edge. A copy, because the logos are shared with Products.
+ * edge. A copy, because the loaded logo assets are cached and shared.
  */
 function fadeAtFoot(
   material: THREE.MeshPhysicalMaterial,
@@ -830,8 +830,8 @@ export class HeroScene {
     host.removeEventListener("pointercancel", this.onPointerUp);
     host.removeEventListener("pointerleave", this.onPointerLeave);
     this.headlineObserver?.disconnect();
-    // Shared logo assets stay cached for the products scene; drop the rest.
-    // Their copies of the materials are this scene's own.
+    // The loaded logo geometry and textures stay cached for a remount; their
+    // copies of the materials are this scene's own.
     this.agents.forEach((a) => {
       if (!a.body) return;
       a.group.remove(a.body);

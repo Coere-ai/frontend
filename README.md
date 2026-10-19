@@ -6,7 +6,7 @@ chat in any of them picks up where the last one left off; Coere Developer lets
 apps read that memory through an API, MCP and SDK.
 
 Built with Next.js (App Router) + TypeScript + Tailwind CSS v4 + Motion, with
-the hero and the Products picture rendered in 3D by three.js.
+the hero rendered in 3D by three.js.
 
 ## Getting started
 
@@ -62,34 +62,30 @@ public/llms.txt           a plain summary of Coere for AI search crawlers
 
 Sections, in page order:
 
-| Component     | Anchor         | What it shows                                                         |
-| ------------- | -------------- | --------------------------------------------------------------------- |
-| `what-we-do`  | `#what-we-do`  | Headline over the 3D wave, one screen tall                            |
-| `products`    | `#products`    | 3D picture of the AIs' app icons feeding Coere and the devices, apps and code reading from it, then Coere Connect (Chrome extension) beside Coere Developer (API, MCP, SDK) |
-| `who-we-are`  | `#who-we-are`  | Founders (Michelle and Edison), then the executive team (Sarah)       |
+| Component    | Anchor        | What it shows                                                   |
+| ------------ | ------------- | --------------------------------------------------------------- |
+| `what-we-do` | `#what-we-do` | Headline over the 3D wave, one screen tall                      |
+| `who-we-are` | `#who-we-are` | Founders (Michelle and Edison), then the executive team (Sarah) |
 
-The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly three links, one per
-anchor above. Product copy and team details (school, majors and short highlight
-bullets, rendered by `team-profile`) live there too; a member without a `photo`
-gets an initials avatar.
+The nav in [`src/lib/site.ts`](src/lib/site.ts) has exactly two links, one per
+anchor above. Team details (school, majors and short highlight bullets,
+rendered by `team-profile`) live there too; a member without a `photo` gets an
+initials avatar.
 
 ## The 3D scenes
 
-Both scenes are plain three.js, built imperatively in
+The hero is plain three.js, built imperatively in
 [`src/components/three/`](src/components/three) and loaded with a dynamic
-`import()` from the section that hosts them, so three.js never weighs on the
-first paint. If WebGL is missing, the hero falls back to the flat `orbit` and
-Products shows just the cards.
+`import()` from the section that hosts it, so three.js never weighs on the
+first paint. If WebGL is missing, the hero falls back to the flat `orbit`.
 
-| File                | What it holds                                                                 |
-| ------------------- | ----------------------------------------------------------------------------- |
-| `core.ts`           | `Stage` (renderer, frame loop, resize, pause offscreen, adaptive pixel ratio), easing, environment |
-| `logos.ts`          | Extrudes each SVG in `/public` into a beveled solid; the original SVG is rasterized once and every face samples it, so gradients survive. Also the Coere mark |
-| `database.ts`       | The hero's smooth cube on a long shaft, and the porcelain shader the field shares |
-| `dust.ts`           | The specks drifting in the hero's air                                          |
-| `hero-scene.ts`     | The wave of cubes, Coere above its crest, and the agents floating around it   |
-| `glyphs.ts`         | The rounded app icon tile, white or brand blue, and the extruded white symbols for the reading side |
-| `products-scene.ts` | An icon per AI, Coere, then an icon for each thing that reads from it          |
+| File            | What it holds                                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `core.ts`       | `Stage` (renderer, frame loop, resize, pause offscreen, adaptive pixel ratio), easing, environment                                                            |
+| `logos.ts`      | Extrudes each SVG in `/public` into a beveled solid; the original SVG is rasterized once and every face samples it, so gradients survive. Also the Coere mark |
+| `database.ts`   | The hero's smooth cube on a long shaft, and the porcelain shader the field shares                                                                             |
+| `dust.ts`       | The specks drifting in the hero's air                                                                                                                         |
+| `hero-scene.ts` | The wave of cubes, Coere above its crest, and the agents floating around it                                                                                   |
 
 **Hero.** A field of smooth cubes, nearly touching so their tops read as one
 surface, rolls in a single long swell with Coere glowing above the crest and
@@ -99,23 +95,12 @@ is one screen tall and scrolls away like any other: toward its foot the
 cubes pale and dissolve into the white of the page, so there is no edge.
 Coere faces out with a slow sway and only spins when spun. The scene itself
 never turns: a drag anywhere spins the Coere mark and nothing else, a click
-on a logo flips it, and a click anywhere else sends Coere round. The cube lattice sits at an angle to the camera so no row of gaps
-lines up with a line of sight. The camera frames the wave below the headline,
+on a logo flips it, and a click anywhere else sends Coere round. The cube
+lattice sits at an angle to the camera so no row of gaps lines up with a line
+of sight. The camera frames the wave below the headline,
 however it wraps, so on short screens nothing rises into it.
 
-**Products.** One centered picture, like two pages of app icons either side
-of Coere. On the left, a 3x3 grid of white icons, one per AI with its logo. In
-the middle, Coere, floating on its own. On the right, a matching grid of
-brand blue icons for what reads from it: a laptop, a phone and a watch; a
-browser, a chat and a terminal; code, an SDK and a database. There are no
-connecting lines and nothing pulses: the picture and its camera hold still,
-the mouse never moves them. On phones the grids stack above and below Coere.
-The icons pop in from the middle out the first time it scrolls into view.
-Nothing casts a shadow; everything floats. Hover an icon to lift it, click
-one to flip it. A drag anywhere spins Coere, and only Coere. Hovering a card
-brings its side of the picture forward, and hovering a side lights its card.
-
-**Performance.** Each scene renders only while on screen and the tab is
+**Performance.** The scene renders only while on screen and the tab is
 visible. If frames run long the pixel ratio steps down, and then shadows go.
 Phones and low-power machines start with a sparser field. A software WebGL
 renderer, or a GPU that drops the context for good, gets the flat page. With
@@ -164,8 +149,8 @@ Everything shown on screen lives in
 `orbit` sends each logo around a CSS motion path with `offset-rotate: 0deg`, so
 the logos travel the ring while staying face up and no two animations can drift
 out of sync.
-The hero and Products are client components because they host the 3D scenes;
-the team section is static. All motion respects
+The hero is a client component because it hosts the 3D scene; the team
+section is static. All motion respects
 `prefers-reduced-motion`, and a `noscript` style reveals the scroll animations
 when JavaScript is off.
 

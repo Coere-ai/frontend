@@ -25,7 +25,6 @@ export const siteConfig = {
 
 export const navLinks = [
   { href: "#what-we-do", label: "What we do" },
-  { href: "#products", label: "Products" },
   { href: "#who-we-are", label: "Who we are" },
 ] as const;
 
@@ -40,34 +39,6 @@ export const agents = [
   { name: "Meta AI", logo: "/meta-color.svg" },
   { name: "Kimi", logo: "/kimi.svg" },
   { name: "DeepSeek", logo: "/deepseek-color.svg" },
-] as const;
-
-export type Product = {
-  name: string;
-  /** What it is, in a few words: the extension, or the developer surface. */
-  kind: string;
-  /** Which symbol the card shows: the Chrome wheel, or code brackets. */
-  icon: "chrome" | "code";
-  /** What the product does, in one breath. */
-  description: string;
-};
-
-/** Two ways into the same memory layer: the extension for people, the API for apps. */
-export const products: readonly Product[] = [
-  {
-    name: "Coere Connect",
-    kind: "Chrome extension",
-    icon: "chrome",
-    description:
-      "An app that carries your memory across every AI you use. Install it once, and a new chat in any of them picks up where the last one left off.",
-  },
-  {
-    name: "Coere Developer",
-    kind: "API, MCP and SDK",
-    icon: "code",
-    description:
-      "Developers can read the memory layer through the API, MCP or SDK, making every user known on day one.",
-  },
 ] as const;
 
 export type TeamMember = {
