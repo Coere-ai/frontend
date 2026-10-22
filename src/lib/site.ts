@@ -27,7 +27,7 @@ export const navLinks = [
   { href: "#who-we-are", label: "Who we are" },
 ] as const;
 
-/** Agents that ride the orbit. Logos live in /public. */
+/** The AI logos in the hero. They live in /public. */
 export const agents = [
   { name: "ChatGPT", logo: "/openai.svg" },
   { name: "Claude", logo: "/claude-color.svg" },

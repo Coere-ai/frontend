@@ -2,7 +2,6 @@
 
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   /* Brand blue, anchored on the logo's #5267f7 */
   --color-brand-50: #eef1ff;

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { BRAND } from "./core";
 
 /**
- * The hero's databases: smooth cubes on long shafts, packed into a field, and
+ * The hero's cubes: smooth cubes on long shafts, packed into a field, and
  * the porcelain material they share. Each cube is swept from a 2D profile in
  * runs, so each run can keep a hard edge against the next.
  */
@@ -144,7 +144,7 @@ export function createTileGeometry({
  * so it runs on into the page below with no edge. `viewHeight` is the height
  * of the drawing buffer in pixels; keep it current.
  */
-export function createDatabaseMaterial({
+export function createCubeMaterial({
   color = "#ffffff",
   deep = "#a7b5dc",
   low = "#6a82f4",
@@ -227,7 +227,7 @@ export function createDatabaseMaterial({
       );
   };
   // Distinguish the program from plain standard materials in the cache.
-  material.customProgramCacheKey = () => "database";
+  material.customProgramCacheKey = () => "cubes";
 
   return { material, viewHeight: uniforms.uViewHeight };
 }

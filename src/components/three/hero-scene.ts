@@ -15,7 +15,7 @@ import {
   prefersReducedMotion,
   smoothstep,
 } from "./core";
-import { createDatabaseMaterial, createTileGeometry } from "./database";
+import { createCubeMaterial, createTileGeometry } from "./cubes";
 import { createDust } from "./dust";
 import { coereMaterial, coereMarkGeometry, loadLogo } from "./logos";
 
@@ -297,7 +297,7 @@ export class HeroScene {
       this.field.dispose();
     }
     if (!this.fieldMaterial) {
-      const { material, viewHeight } = createDatabaseMaterial({
+      const { material, viewHeight } = createCubeMaterial({
         // Shallow, so the step between neighbours reaches the deep tone and
         // every cube shows a lit top over a shaded side.
         shadeDepth: this.spacing * 1.0,
