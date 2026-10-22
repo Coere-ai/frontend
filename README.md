@@ -1,9 +1,6 @@
 # Coere — marketing site
 
-Landing page for **Coere** (Coere AI), unified memory for AI. Coere Connect is
-a Chrome extension that carries your memory across every AI you use, so a new
-chat in any of them picks up where the last one left off; Coere Developer lets
-apps read that memory through an API, MCP and SDK.
+Landing page for **Coere** (Coere AI), the memory layer for AI.
 
 Built with Next.js (App Router) + TypeScript + Tailwind CSS v4 + Motion, with
 the hero rendered in 3D by three.js.
@@ -109,9 +106,10 @@ work.
 
 ## The demo film
 
-`/demo` is an unlisted page holding a 60 second product film built entirely in
-HTML. Nothing links to it and it is `noindex`. `robots.txt` deliberately lets
-crawlers fetch it, since a crawler blocked from the page never sees its noindex.
+`/demo` is an unlisted page holding a 60 second film built entirely in HTML.
+It is not public for now: the production site answers 404 for it (the check is
+in `src/app/demo/page.tsx`), while local runs and preview deploys still play
+it.
 
 - Space bar plays and pauses, `r` restarts, arrow keys jump five seconds, and
   the scrubber can be clicked or dragged.
@@ -165,15 +163,17 @@ that runs a Next.js build works (Vercel needs no configuration). If
 
 What the site tells search engines, so "Coere" and "Coere AI" find it:
 
-- The title is "Coere AI | The memory layer for every AI you use", and the
-  description names Coere Connect, Coere Developer and the AIs they work with.
+- The title is "Coere AI | The memory layer for AI", and the description says
+  no more than that. The site is in stealth, so keep it that way: copy, titles,
+  descriptions, share images and structured data should not say what Coere does
+  beyond being a memory layer for AI.
 - One canonical host, `https://www.coere.ai`, in the canonical link, Open
   Graph URL, structured data, sitemap and robots file.
 - JSON-LD on the home page: a `WebSite` named "Coere" (also "Coere AI" and
   "coere.ai"), which is what Google uses for the site name in results, and an
   `Organization` with the same names, the logo, the founders and the profiles
-  in `siteConfig.profiles`. Add every official profile there (X, Crunchbase,
-  the Chrome Web Store listing) as it goes live.
+  in `siteConfig.profiles`. Add every official profile there (X, Crunchbase)
+  as it goes live.
 - The Coere mark as favicon (ico, svg and png) and apple-touch icon, a web
   manifest, and a 1200x630 share image.
 - `public/llms.txt`, which says plainly that Coere is not Cohere.

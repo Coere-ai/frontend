@@ -1,1 +1,1 @@
-Coere: unified memory for AI
+Coere: the memory layer for AI

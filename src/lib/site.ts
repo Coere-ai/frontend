@@ -4,7 +4,7 @@
 export const siteConfig = {
   name: "Coere",
   legalName: "Coere AI",
-  tagline: "Unified memory for AI",
+  tagline: "The memory layer for AI",
   domain: "coere.ai",
   /**
    * The canonical origin, with no trailing slash. The apex coere.ai redirects
@@ -12,9 +12,8 @@ export const siteConfig = {
    */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.coere.ai",
   /** For search results and link previews; not shown on the page. */
-  title: "Coere AI | The memory layer for every AI you use",
-  description:
-    "Coere AI is the memory layer for AI. Coere Connect carries your memory across ChatGPT, Claude, Gemini and more; Coere Developer brings it to apps through an API, MCP and SDK.",
+  title: "Coere AI | The memory layer for AI",
+  description: "Coere AI is the memory layer for AI.",
   email: "coereagent@gmail.com",
   /** Profiles that speak for Coere, for search engines (schema.org sameAs). */
   profiles: [
