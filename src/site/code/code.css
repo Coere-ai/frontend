@@ -1,0 +1,9 @@
+/* Token colors for code on the site's dark code panels. */
+.tok-comment { color: #6f7aa3; font-style: italic; }
+.tok-string { color: #9fe3b5; }
+.tok-keyword { color: #a5b4fc; }
+.tok-literal { color: #fbbf77; }
+.tok-number { color: #fbbf77; }
+.tok-function { color: #7dd3fc; }
+.tok-property { color: #f0abfc; }
+.tok-flag { color: #a5b4fc; }
