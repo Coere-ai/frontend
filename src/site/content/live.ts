@@ -8,4 +8,7 @@ import type { FilmKey } from "./films";
  */
 export type LivePart = { from?: string; to?: string };
 
-export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePart }>> = {};
+export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePart }>> = {
+  memory: { slug: "memory", showcase: { from: "grow" } },
+  coriRewrite: { slug: "cori-rewrite", showcase: { from: "select", to: "docs" } },
+};
