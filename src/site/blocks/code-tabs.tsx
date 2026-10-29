@@ -10,7 +10,7 @@ export type CodeSample = { label: string; language: string; code: string };
  * A dark code window with a tab per language, colored by token kind. Copy
  * takes the code exactly as written.
  */
-export function CodeTabs({ samples, title }: { samples: CodeSample[]; title?: string }) {
+export function CodeTabs({ samples }: { samples: CodeSample[] }) {
   const [picked, setPicked] = useState(0);
   const [copied, setCopied] = useState(false);
   const sample = samples[picked];
@@ -28,7 +28,6 @@ export function CodeTabs({ samples, title }: { samples: CodeSample[]; title?: st
   return (
     <div className="overflow-hidden rounded-2xl bg-[#0b1020] text-white shadow-[0_40px_100px_-40px_rgba(0,0,0,0.6)] ring-1 ring-white/10">
       <div className="flex items-center gap-1 border-b border-white/10 px-3">
-        {title ? <span className="mr-3 px-2 text-[13px] text-white/50">{title}</span> : null}
         {samples.map((s, index) => (
           <button
             key={s.label}
