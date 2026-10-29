@@ -8,6 +8,7 @@
  *   <slug>.html                 the full player, with controls and captions
  *   <slug>.html?preview&start=3 a silent loop past the title card, which
  *                               plays only while it is on screen
+ *   ...&end=38                  loops only the part between start and end
  */
 
 const STYLE = `@font-face{font-family:"Coere Geist";src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-display:swap}
@@ -26,12 +27,14 @@ const SCRIPT = `(function () {
   if (params.has('preview')) {
     document.documentElement.className = 'preview';
     var start = Number(params.get('start')) || 0;
+    var end = Number(params.get('end')) || 0;
     var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     video.poster = video.dataset.still;
     video.muted = true;
     Array.prototype.forEach.call(document.querySelectorAll('track'), function (t) { t.remove(); });
     video.addEventListener('loadedmetadata', function () { video.currentTime = start; });
     video.addEventListener('ended', function () { video.currentTime = start; video.play().catch(function () {}); });
+    if (end > start) video.addEventListener('timeupdate', function () { if (video.currentTime >= end) video.currentTime = start; });
     new IntersectionObserver(function (entries) {
       if (!entries[0].isIntersecting) { video.pause(); return; }
       video.preload = 'auto';
