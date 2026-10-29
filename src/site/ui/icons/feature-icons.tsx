@@ -54,6 +54,12 @@ const paths = {
     </>
   ),
   cap: <path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5ZM6.5 11.5v4c3 2.5 8 2.5 11 0v-4M21.5 9.5v5" />,
+  calendar: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15" rx="2" />
+      <path d="M3.5 9.5h17M8 3v4M16 3v4M8 13.5h2M14 13.5h2M8 16.5h2" />
+    </>
+  ),
 } satisfies Record<string, ReactNode>;
 
 export type FeatureIconName = keyof typeof paths;
