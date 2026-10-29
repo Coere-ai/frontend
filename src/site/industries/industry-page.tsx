@@ -3,7 +3,7 @@ import { PhotoHero } from "@/site/blocks/photo-hero";
 import { films } from "@/site/content/films";
 import { industries, type Industry } from "@/site/content/industries";
 import type { IndustryPage as Content } from "@/site/content/industry-stories";
-import { contactHref } from "@/site/content/navigation";
+import { contactHref, contactLabel } from "@/site/content/navigation";
 import { productBySlug } from "@/site/content/products";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { ProductSection } from "@/site/products/product-section";
@@ -38,7 +38,7 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
         title={`Coere for ${industry.name.toLowerCase()}`}
         line={content.line}
         checks={content.stories.map((story) => story.title)}
-        primary={{ href: contactHref, label: "Talk to Us" }}
+        primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "See how" }}
         app={<FilmFrame film={films[lead.film]} />}
       />

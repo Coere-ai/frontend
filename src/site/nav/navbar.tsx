@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, type FocusEvent } from "react";
-import { contactHref, navTabs } from "@/site/content/navigation";
+import { contactHref, contactLabel, navTabs } from "@/site/content/navigation";
 import { Brand } from "@/site/ui/brand";
 import { ButtonLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
@@ -14,7 +14,7 @@ import { useMenu } from "./use-menu";
 
 /**
  * The white navbar: the brand on the left, the tabs centered on the page, and
- * Talk to Us on the right. Three equal grid tracks keep the tabs truly
+ * the contact button on the right. Three equal grid tracks keep the tabs truly
  * centered whatever the brand and button widths are.
  */
 export function Navbar() {
@@ -59,7 +59,7 @@ export function Navbar() {
           <div className="col-start-3 flex items-center gap-2 justify-self-end" onMouseEnter={() => menu.hide(0)}>
             {/* Wrapped, because the button's own display class would beat "hidden". */}
             <span className="hidden lg:block">
-              <ButtonLink href={contactHref}>Talk to Us</ButtonLink>
+              <ButtonLink href={contactHref}>{contactLabel}</ButtonLink>
             </span>
             <button
               type="button"

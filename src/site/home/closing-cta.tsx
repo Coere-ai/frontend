@@ -1,4 +1,4 @@
-import { contactHref } from "@/site/content/navigation";
+import { contactHref, contactLabel } from "@/site/content/navigation";
 import { ButtonLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 
@@ -16,7 +16,7 @@ export function ClosingCta({
         <h2 className="mx-auto max-w-4xl text-5xl font-medium tracking-[-0.05em] text-neutral-950 text-balance md:text-7xl">{title}</h2>
         <p className="mx-auto mt-6 max-w-xl text-lg text-neutral-500">{text}</p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <ButtonLink href={contactHref}>Talk to Us</ButtonLink>
+          <ButtonLink href={contactHref}>{contactLabel}</ButtonLink>
           <ButtonLink href="/#demo" variant="secondary">
             Watch the demo
           </ButtonLink>

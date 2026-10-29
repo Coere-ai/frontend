@@ -10,5 +10,6 @@ export const navTabs: { id: NavTabId; label: string; href: string }[] = [
   { id: "careers", label: "Careers", href: "/careers" },
 ];
 
-/** Where Talk to Us goes. */
-export const contactHref = "mailto:coereagent@gmail.com";
+/** The contact button reads Coming Soon for now, and emails the team. */
+export const contactHref = "mailto:edisonlaw@berkeley.edu";
+export const contactLabel = "Coming Soon";

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { industries } from "@/site/content/industries";
-import { contactHref, navTabs, type NavTabId } from "@/site/content/navigation";
+import { contactHref, contactLabel, navTabs, type NavTabId } from "@/site/content/navigation";
 import { posts } from "@/site/content/posts";
 import { products } from "@/site/content/products";
 import { ButtonLink } from "@/site/ui/button";
@@ -83,7 +83,7 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
               </div>
             ))}
             <ButtonLink href={contactHref} className="mt-8 w-full">
-              Talk to Us
+              {contactLabel}
             </ButtonLink>
           </nav>
         </motion.div>
