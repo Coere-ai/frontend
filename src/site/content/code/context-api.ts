@@ -30,3 +30,33 @@ for item in ctx.items:
     print(" / ".join(item.path), item.why)`,
   },
 ];
+
+/** Connecting an agent over MCP, as the dashboard's token dialog writes it. */
+export const mcpSamples: CodeSample[] = [
+  {
+    label: "Claude Code",
+    language: "bash",
+    code: `claude mcp add --transport http coere http://127.0.0.1:7337/mcp --header "Authorization: Bearer coere_app_..."`,
+  },
+  {
+    label: "MCP config",
+    language: "json",
+    code: `{
+  "mcpServers": {
+    "coere": {
+      "command": "node",
+      "args": ["/path/to/coere-v2/apps/server/dist/coere-server.mjs", "mcp"],
+      "env": { "COERE_URL": "http://127.0.0.1:7337", "COERE_TOKEN": "coere_app_..." }
+    }
+  }
+}`,
+  },
+  {
+    label: "curl",
+    language: "bash",
+    code: `curl -s -X POST http://127.0.0.1:7337/v1/context/draft \\
+  -H "Authorization: Bearer $COERE_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"draft": "dinner with my climbing friends friday", "chat": "chat-1"}'`,
+  },
+];
