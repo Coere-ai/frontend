@@ -1,0 +1,8 @@
+{
+  "title": "Coere Forge: build it into your app",
+  "version": 3,
+  "bundles": {
+    "code.js": { "from": "code.ts", "version": 3, "title": "prep-coach" },
+    "anywhere.js": { "from": "anywhere.tsx", "version": 3, "title": "Any AI" }
+  }
+}

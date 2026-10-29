@@ -1,0 +1,891 @@
+{
+ "add": {
+  "name": "prep-coach",
+  "scopes": [
+   "memory:read",
+   "memory:evidence"
+  ],
+  "sections": [
+   "work",
+   "projects",
+   "plans"
+  ],
+  "expiresInDays": null
+ },
+ "made": {
+  "row": {
+   "id": "tok_01M64DEKY9ANFMZR4DDV9WNV0H",
+   "name": "prep-coach",
+   "scopes": [
+    "memory:read",
+    "memory:evidence"
+   ],
+   "sections": [
+    "work",
+    "projects",
+    "plans"
+   ],
+   "hint": "RNK2",
+   "createdAt": "2026-10-29T18:06:14Z",
+   "lastUsedAt": null,
+   "expiresAt": null
+  },
+  "token": "coere_app_RNK2DDAMPNRCIUTTHTYZYSMEBJR7QJVGGR4BQZVS66XYXOLPYNKA"
+ },
+ "phases": {
+  "paired": {
+   "status": {
+    "state": "ok",
+    "url": "http://127.0.0.1:39055",
+    "lastOkAt": "2026-10-29T18:06:14.223Z",
+    "nextTryAt": null,
+    "pending": 0,
+    "shareSensitive": false,
+    "apps": 0,
+    "suggestions": 0,
+    "connects": 0,
+    "demoOnServer": false
+   },
+   "tokens": [],
+   "log": [],
+   "connects": [],
+   "requests": [
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "contextLog.list",
+     "status": 200,
+     "ms": 4,
+     "items": 0
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.list",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 1,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 5,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.push",
+     "status": 200,
+     "ms": 435,
+     "items": 309
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 12,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": null,
+     "app": null,
+     "op": "pair.finish",
+     "status": 200,
+     "ms": 6,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": null,
+     "app": null,
+     "op": "pair.hello",
+     "status": 200,
+     "ms": 12,
+     "items": null
+    }
+   ]
+  },
+  "made": {
+   "status": {
+    "state": "ok",
+    "url": "http://127.0.0.1:39055",
+    "lastOkAt": "2026-10-29T18:06:14.552Z",
+    "nextTryAt": null,
+    "pending": 0,
+    "shareSensitive": false,
+    "apps": 1,
+    "suggestions": 0,
+    "connects": 0,
+    "demoOnServer": false
+   },
+   "tokens": [
+    {
+     "id": "tok_01M64DEKY9ANFMZR4DDV9WNV0H",
+     "name": "prep-coach",
+     "scopes": [
+      "memory:read",
+      "memory:evidence"
+     ],
+     "sections": [
+      "work",
+      "projects",
+      "plans"
+     ],
+     "hint": "RNK2",
+     "createdAt": "2026-10-29T18:06:14Z",
+     "lastUsedAt": null,
+     "expiresAt": null
+    }
+   ],
+   "log": [],
+   "connects": [],
+   "requests": [
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "contextLog.list",
+     "status": 200,
+     "ms": 1,
+     "items": 0
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.list",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 14,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 5,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.create",
+     "status": 201,
+     "ms": 4,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "requests.list",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "contextLog.list",
+     "status": 200,
+     "ms": 4,
+     "items": 0
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.list",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 1,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 5,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.push",
+     "status": 200,
+     "ms": 435,
+     "items": 309
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 12,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": null,
+     "app": null,
+     "op": "pair.finish",
+     "status": 200,
+     "ms": 6,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": null,
+     "app": null,
+     "op": "pair.hello",
+     "status": 200,
+     "ms": 12,
+     "items": null
+    }
+   ]
+  },
+  "used": {
+   "status": {
+    "state": "ok",
+    "url": "http://127.0.0.1:39055",
+    "lastOkAt": "2026-10-29T18:06:15.104Z",
+    "nextTryAt": null,
+    "pending": 0,
+    "shareSensitive": false,
+    "apps": 1,
+    "suggestions": 0,
+    "connects": 0,
+    "demoOnServer": false
+   },
+   "tokens": [
+    {
+     "id": "tok_01M64DEKY9ANFMZR4DDV9WNV0H",
+     "name": "prep-coach",
+     "scopes": [
+      "memory:read",
+      "memory:evidence"
+     ],
+     "sections": [
+      "work",
+      "projects",
+      "plans"
+     ],
+     "hint": "RNK2",
+     "createdAt": "2026-10-29T18:06:14Z",
+     "lastUsedAt": "2026-10-29T18:06:14Z",
+     "expiresAt": null
+    }
+   ],
+   "log": [
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "token": "tok_01M64DEKY9ANFMZR4DDV9WNV0H",
+     "target": null,
+     "chat": "cb1478d7a00bacd4bec5fe796cfdec223dea5540daa70f59f149e4331982f8cf",
+     "first": true,
+     "client": null,
+     "items": [
+      {
+       "id": "core",
+       "records": [
+        "core:fact_01a1850c-137c-7000-a11d-4277bfb3b61a",
+        "core:fact_01a1850b-90b4-7000-837c-1f25a1dc2843",
+        "core:ent_01a1850c-d29e-7000-b74c-124dcc076c14",
+        "core:ent_01a1850c-1a0c-7000-b05b-d04ea37c7f02"
+       ]
+      },
+      {
+       "id": "ent_01a1850b-606c-7000-90f8-5f27c81ec81d",
+       "records": [
+        "fact_01a1850d-7c12-7001-af7e-b672325cc166",
+        "fact_01a1850b-606c-7002-8250-7ca799e371ff",
+        "fact_01a1850b-606c-7001-80bc-231db9180e30",
+        "fact_01a1850d-7c30-7001-bbb4-dad7a461c1fa",
+        "fact_01a1850d-7c30-7000-9adb-8340bd940682",
+        "fact_01a1850d-7c12-7000-8527-d0370ed77915"
+       ]
+      }
+     ],
+     "tokens": 233,
+     "recorded": true
+    }
+   ],
+   "connects": [],
+   "requests": [
+    {
+     "at": "2026-10-29T18:06:16Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "contextLog.list",
+     "status": 200,
+     "ms": 48,
+     "items": 1
+    },
+    {
+     "at": "2026-10-29T18:06:15Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.list",
+     "status": 200,
+     "ms": 63,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:15Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inboxAck",
+     "status": 204,
+     "ms": 19,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:15Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 65,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "tok_01M64DEKY9ANFMZR4DDV9WNV0H",
+     "app": "prep-coach",
+     "op": "context.draft",
+     "status": 200,
+     "ms": 183,
+     "items": 2
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "requests.list",
+     "status": 200,
+     "ms": 1,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "contextLog.list",
+     "status": 200,
+     "ms": 1,
+     "items": 0
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.list",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 14,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 5,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.create",
+     "status": 201,
+     "ms": 4,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "requests.list",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "contextLog.list",
+     "status": 200,
+     "ms": 4,
+     "items": 0
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "tokens.list",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 1,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:14Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 5,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.push",
+     "status": 200,
+     "ms": 435,
+     "items": 309
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": "dev_01M64DEK1G36RAAGYCP28K4SD6",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 12,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": null,
+     "app": null,
+     "op": "pair.finish",
+     "status": 200,
+     "ms": 6,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:06:13Z",
+     "actor": null,
+     "app": null,
+     "op": "pair.hello",
+     "status": 200,
+     "ms": 12,
+     "items": null
+    }
+   ]
+  }
+ },
+ "draft": "Help me prepare for this interview",
+ "context": {
+  "memoryVersion": "366ecb2ceabaa018.213",
+  "chat": "f3f6ee4c-91de-4fa7-b373-caaa19e64ca6",
+  "first": true,
+  "client": null,
+  "items": [
+   {
+    "id": "core",
+    "kind": "core",
+    "path": [
+     "About me"
+    ],
+    "reason": "standing",
+    "via": null,
+    "why": "Goes with the first message of every chat",
+    "changedOnly": false,
+    "tokens": 43,
+    "version": "8de36bce0492e3db",
+    "lines": [
+     {
+      "record": "core:fact_01a1850c-137c-7000-a11d-4277bfb3b61a",
+      "text": "You work at Kestrel Analytics as a lead research assistant.",
+      "platform": null,
+      "at": null,
+      "date": null,
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "claude:72eb3365-b2f4-533e-9e13-33ebc3fe8c98",
+        "platform": "claude",
+        "title": "Tesselcrest log retention",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "core:fact_01a1850b-90b4-7000-837c-1f25a1dc2843",
+      "text": "Your employer is Kestrel Analytics.",
+      "platform": null,
+      "at": null,
+      "date": null,
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "chatgpt:8e63c6ef-fd1b-b2ee-002b-6ae509b1472b",
+        "platform": "chatgpt",
+        "title": "MATH 54 this term",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "core:ent_01a1850c-d29e-7000-b74c-124dcc076c14",
+      "text": "Working on Tidepool.",
+      "platform": null,
+      "at": null,
+      "date": null,
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "gemini:473956e708ec6941",
+        "platform": "gemini",
+        "title": "Tidepool notes",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "core:ent_01a1850c-1a0c-7000-b05b-d04ea37c7f02",
+      "text": "Working on Sparrowhawk.",
+      "platform": null,
+      "at": null,
+      "date": null,
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "claude:819d1557-6d54-c5f9-2d63-52fa52335bb8",
+        "platform": "claude",
+        "title": "Sparrowhawk deploy error",
+        "url": null
+       }
+      ]
+     }
+    ],
+    "sources": [],
+    "fromChats": 4
+   },
+   {
+    "id": "ent_01a1850b-606c-7000-90f8-5f27c81ec81d",
+    "kind": "node",
+    "path": [
+     "Projects",
+     "Startups and businesses",
+     "PearX interview"
+    ],
+    "reason": "keyword",
+    "via": null,
+    "why": "Shares words with the draft",
+    "changedOnly": false,
+    "tokens": 165,
+    "version": "b59fcb215b795038",
+    "lines": [
+     {
+      "record": "fact_01a1850d-7c12-7001-af7e-b672325cc166",
+      "text": "The PearX interview is on November 4 at 2 pm over video.",
+      "platform": "claude",
+      "at": "2026-10-09T12:57:00Z",
+      "date": "Oct 9, 2026",
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
+        "platform": "claude",
+        "title": "Big news about PearX",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "fact_01a1850b-606c-7002-8250-7ca799e371ff",
+      "text": "I want my PearX interview answer on why now to mention the records move.",
+      "platform": "chatgpt",
+      "at": "2026-10-19T11:10:00Z",
+      "date": "Oct 19, 2026",
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "chatgpt:5e91a20c-5fe4-2cd8-cee0-1fc3efb0180d",
+        "platform": "chatgpt",
+        "title": "PearX interview prep",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "fact_01a1850b-606c-7001-80bc-231db9180e30",
+      "text": "My PearX interview answer on traction should lead with the 1,200 weekly users.",
+      "platform": "chatgpt",
+      "at": "2026-10-19T11:08:00Z",
+      "date": "Oct 19, 2026",
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "chatgpt:5e91a20c-5fe4-2cd8-cee0-1fc3efb0180d",
+        "platform": "chatgpt",
+        "title": "PearX interview prep",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "fact_01a1850d-7c30-7001-bbb4-dad7a461c1fa",
+      "text": "They told me the PearX interview will cover traction, the team and why now.",
+      "platform": "claude",
+      "at": "2026-10-09T12:59:00Z",
+      "date": "Oct 9, 2026",
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
+        "platform": "claude",
+        "title": "Big news about PearX",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "fact_01a1850d-7c30-7000-9adb-8340bd940682",
+      "text": "The PearX interview is the partner round with two partners.",
+      "platform": "claude",
+      "at": "2026-10-09T12:57:00Z",
+      "date": "Oct 9, 2026",
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
+        "platform": "claude",
+        "title": "Big news about PearX",
+        "url": null
+       }
+      ]
+     },
+     {
+      "record": "fact_01a1850d-7c12-7000-8527-d0370ed77915",
+      "text": "My PearX interview is for Tidepool, my startup.",
+      "platform": "claude",
+      "at": "2026-10-09T12:55:00Z",
+      "date": "Oct 9, 2026",
+      "chats": 1,
+      "chatRefs": [
+       {
+        "id": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
+        "platform": "claude",
+        "title": "Big news about PearX",
+        "url": null
+       }
+      ]
+     }
+    ],
+    "sources": [
+     "chatgpt",
+     "claude"
+    ],
+    "fromChats": 2
+   }
+  ],
+  "also": [],
+  "topic": [
+   "About me",
+   "PearX interview"
+  ],
+  "fromChats": 6,
+  "sources": [
+   "chatgpt",
+   "claude"
+  ],
+  "tokens": 233,
+  "chars": 836,
+  "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\n[End of context from Coere]\n\n",
+  "receipt": null,
+  "recorded": true,
+  "vectors": "loading"
+ },
+ "reads": {
+  "status": {
+   "state": "ready",
+   "models": {
+    "extract": "claude-sonnet-5-5",
+    "consolidate": "claude-sonnet-5-5",
+    "short": "claude-haiku-5-5"
+   },
+   "until": null,
+   "stopClass": null,
+   "set": {
+    "id": "set_01M62GNYZYE00TZJQVZ2RPFQ10",
+    "origin": "library",
+    "mode": "direct",
+    "state": "ended",
+    "byPlatform": {},
+    "linking": {
+     "queued": 0,
+     "done": 111
+    },
+    "factsFound": 0,
+    "spentMicros": 1205717,
+    "etaSec": null
+   },
+   "held": null,
+   "counts": {
+    "memories": 81,
+    "dueSoon": 0,
+    "review": 5,
+    "sourceChats": 48,
+    "sourceChatsBy": {
+     "chatgpt": 10,
+     "claude": 21,
+     "gemini": 17
+    },
+    "held": 0,
+    "chatsRead": 57,
+    "chatsInLibrary": 57,
+    "failedJobs": 0,
+    "refusedJobs": 0
+   },
+   "spend": {
+    "monthMicros": 1265525,
+    "capMicros": 200000000
+   },
+   "poolSlots": {
+    "used": 0,
+    "capacity": 0
+   },
+   "lastVerify": null
+  },
+  "settings": {
+   "readFrom": [
+    {
+     "platform": "chatgpt",
+     "on": true,
+     "chats": 11,
+     "projectsOff": []
+    },
+    {
+     "platform": "claude",
+     "on": true,
+     "chats": 25,
+     "projectsOff": []
+    },
+    {
+     "platform": "gemini",
+     "on": true,
+     "chats": 21,
+     "projectsOff": []
+    }
+   ],
+   "recall": true,
+   "backfillMode": "direct",
+   "capUsd": 200,
+   "timeZone": "America/Los_Angeles",
+   "copyToFolder": false,
+   "showTrivia": false,
+   "extractScope": {
+    "v": 1,
+    "all": true
+   }
+  },
+  "estimate": {
+   "chats": 57,
+   "seconds": 334,
+   "measured": false,
+   "progress": null
+  }
+ }
+}
