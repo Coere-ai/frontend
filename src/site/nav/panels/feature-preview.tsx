@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { Feature } from "@/site/content/features";
 import { films } from "@/site/content/films";
 import { FilmFrame } from "@/site/ui/film-frame";
+import { PanelMore } from "./panel-parts";
 
 /**
  * The film beside the features list. Each feature gets its own film page,
@@ -30,6 +31,9 @@ export function FeaturePreview({ feature }: { feature: Feature }) {
       </div>
       <p className="mt-4 text-[15px] font-medium text-neutral-950">{feature.title}</p>
       <p className="mt-1 text-[13px] leading-snug text-neutral-500">{feature.description}</p>
+      <div className="mt-3">
+        <PanelMore href={feature.href}>See it</PanelMore>
+      </div>
     </div>
   );
 }
