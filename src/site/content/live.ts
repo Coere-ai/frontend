@@ -29,4 +29,4 @@ export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePa
  * whose chapters are the page's four demos in order. The others still play
  * their saved screens.
  */
-export const liveIndustries = new Set<string>(["commerce", "legal", "technology"]);
+export const liveIndustries = new Set<string>(["commerce", "legal", "technology", "finance"]);
