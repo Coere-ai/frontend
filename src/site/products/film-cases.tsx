@@ -8,12 +8,12 @@ import { FeatureIcon } from "@/site/ui/icons/feature-icons";
 
 /** Content cases as use case tabs, each with its film looping silently. */
 export function asUseCases(cases: FilmCase[]): UseCase[] {
-  return cases.map((c) => ({ ...c, visual: <FilmFrame film={films[c.film]} preview /> }));
+  return cases.map((c) => ({ ...c, visual: <FilmFrame film={films[c.film]} preview part={c.part} /> }));
 }
 
 /** Content cases as accordion items, each with its film looping silently. */
 export function asShowcase(cases: FilmCase[]): ShowcaseItem[] {
-  return cases.map((c) => ({ key: c.key, title: c.title, summary: c.text, checks: c.checks, visual: <FilmFrame film={films[c.film]} preview /> }));
+  return cases.map((c) => ({ key: c.key, title: c.title, summary: c.text, checks: c.checks, visual: <FilmFrame film={films[c.film]} preview part={c.part} /> }));
 }
 
 /** Content grid items with their drawn icons. */

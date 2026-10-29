@@ -20,6 +20,7 @@ export const solutionsCases: FilmCase[] = [
     text: "Extract all saves every chat from the AIs your team uses, and the graph grows into Company and Clients as Coere reads them.",
     checks: ["Each client's contacts, promises and decisions", "A client the chats found waits in Review", "Ask Cori what the team promised a client"],
     film: "teams",
+    part: { from: "graph", to: "chat" },
   },
   {
     key: "right-client",
@@ -27,7 +28,8 @@ export const solutionsCases: FilmCase[] = [
     title: "The right client in every chat",
     text: "Start a reply about a client and the blue line names the client the draft is about. What goes is on the line before you send.",
     checks: ["One client goes with each send", "Only what changed goes with a follow up", "Long context can go as a file (beta)"],
-    film: "smartContext",
+    film: "teams",
+    part: { from: "chat", to: "share" },
   },
   {
     key: "research",

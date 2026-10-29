@@ -16,6 +16,7 @@ export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePa
   voiceMode: { slug: "voice-mode", showcase: { from: "hold", to: "cancel" } },
   actionsGmail: { slug: "actions-gmail", showcase: { from: "ask", to: "send" } },
   actionsAnywhere: { slug: "actions-anywhere", showcase: { from: "answers", to: "form" } },
+  teams: { slug: "teams", showcase: { from: "graph", to: "new-client" } },
   v3: { slug: "v3", showcase: { from: "asks", to: "planner" } },
   workers: { slug: "workers", showcase: { from: "handoff", to: "stop-all" } },
   benchmarksEvals: { slug: "benchmarks-evals", showcase: { from: "estimate", to: "export" } },
@@ -28,4 +29,4 @@ export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePa
  * whose chapters are the page's four demos in order. The others still play
  * their saved screens.
  */
-export const liveIndustries = new Set<string>(["commerce"]);
+export const liveIndustries = new Set<string>(["commerce", "legal", "technology"]);
