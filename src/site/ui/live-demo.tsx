@@ -18,9 +18,9 @@ export const posterOf = (film: string, chapter?: string | null) => `/preview/liv
  * shows in its place, so it never shows a blank frame.
  *
  * `from` and `to` name chapters, to loop one part of a film, and `at` starts
- * that many seconds into `from`. A demo inside the site's own player takes
- * clicks; any other ignores the pointer, so inside a link or a menu it
- * behaves like a picture.
+ * that many seconds into `from`. It ignores the pointer and the keyboard
+ * everywhere, so it plays like a video: nobody can click into it and knock
+ * the film off its script.
  */
 export function LiveDemo({
   film,
@@ -29,7 +29,6 @@ export function LiveDemo({
   at,
   label,
   className,
-  interactive = false,
   onState,
   frameRef,
 }: {
@@ -39,7 +38,6 @@ export function LiveDemo({
   at?: number;
   label: string;
   className?: string;
-  interactive?: boolean;
   onState?: (state: DemoState) => void;
   frameRef?: RefObject<HTMLIFrameElement | null>;
 }) {
@@ -81,16 +79,16 @@ export function LiveDemo({
   }, [frame, onState, src]);
 
   return (
-    <div ref={box} role={interactive ? undefined : "img"} aria-label={interactive ? undefined : label} className={`relative aspect-[1440/900] w-full overflow-hidden bg-neutral-100 ${className ?? ""}`}>
+    <div ref={box} role="img" aria-label={label} className={`relative aspect-[1440/900] w-full overflow-hidden bg-neutral-100 ${className ?? ""}`}>
       {near ? (
         <iframe
           key={src}
           ref={frame}
           src={src}
           title={label}
-          tabIndex={interactive ? undefined : -1}
-          aria-hidden={interactive ? undefined : true}
-          className={`absolute inset-0 h-full w-full border-0 bg-white ${interactive ? "" : "pointer-events-none"}`}
+          tabIndex={-1}
+          aria-hidden={true}
+          className="pointer-events-none absolute inset-0 h-full w-full border-0 bg-white"
         />
       ) : null}
       {/* The still sits over the page until the part plays. */}

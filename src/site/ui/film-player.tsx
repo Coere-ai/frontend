@@ -60,7 +60,7 @@ export function FilmPlayer({ film, className }: { film: Film; className?: string
 
   return (
     <div className={className}>
-      <LiveDemo film={film.slug} from={start.from} at={start.at} label={film.title} interactive frameRef={frame} onState={onState} className="rounded-2xl shadow-[0_50px_120px_-30px_rgba(0,0,0,0.75)] ring-1 ring-white/10" />
+      <LiveDemo film={film.slug} from={start.from} at={start.at} label={film.title} frameRef={frame} onState={onState} className="rounded-2xl shadow-[0_50px_120px_-30px_rgba(0,0,0,0.75)] ring-1 ring-white/10" />
       <div className="mt-5 flex items-center gap-4 text-white">
         <button type="button" onClick={toggle} aria-label={paused ? "Play" : "Pause"} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-neutral-950">
           {paused ? <PlayIcon size={18} /> : <PauseIcon size={18} />}
