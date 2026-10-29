@@ -1,0 +1,196 @@
+{
+ "chapters": [
+  {
+   "start": 0,
+   "end": 3.067,
+   "text": "Install"
+  },
+  {
+   "start": 3.067,
+   "end": 24.9,
+   "text": "The company card"
+  },
+  {
+   "start": 24.9,
+   "end": 29.533,
+   "text": "Extract all"
+  },
+  {
+   "start": 29.533,
+   "end": 48.633,
+   "text": "The build"
+  },
+  {
+   "start": 48.633,
+   "end": 67.388,
+   "text": "Company and Clients"
+  },
+  {
+   "start": 67.388,
+   "end": 89.204,
+   "text": "A client"
+  },
+  {
+   "start": 89.204,
+   "end": 98.5,
+   "text": "A new client"
+  },
+  {
+   "start": 98.5,
+   "end": 112.667,
+   "text": "Ask Cori"
+  },
+  {
+   "start": 112.667,
+   "end": 132.867,
+   "text": "The client in a chat"
+  },
+  {
+   "start": 132.867,
+   "end": 143.867,
+   "text": "Share a client"
+  },
+  {
+   "start": 143.867,
+   "end": 164.4,
+   "text": "Delete a client"
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.002,
+   "end": 3.067,
+   "text": "Coere for Teams builds one memory of the company, its people and its clients."
+  },
+  {
+   "start": 3.067,
+   "end": 5.694,
+   "text": "The first run asks for the company once, with its clients."
+  },
+  {
+   "start": 5.694,
+   "end": 11.102,
+   "text": "Maya pastes the first clients, each with its website."
+  },
+  {
+   "start": 11.102,
+   "end": 24.9,
+   "text": "Then the AIs she uses at work, and Save."
+  },
+  {
+   "start": 24.9,
+   "end": 29.533,
+   "text": "Extract all saves every chat from each AI."
+  },
+  {
+   "start": 29.533,
+   "end": 35.367,
+   "text": "Cori asks what to build the company's memory from."
+  },
+  {
+   "start": 35.367,
+   "end": 44.0,
+   "text": "The graph grows into Company and Clients as Coere reads the chats."
+  },
+  {
+   "start": 44.0,
+   "end": 48.633,
+   "text": "The memory is ready."
+  },
+  {
+   "start": 48.633,
+   "end": 52.041,
+   "text": "All shows Company and Clients around Maya, beside her own sections."
+  },
+  {
+   "start": 52.041,
+   "end": 58.661,
+   "text": "Company holds the agency: its people, its way of working and its tools."
+  },
+  {
+   "start": 58.661,
+   "end": 67.388,
+   "text": "Clients has a folder for each client, with its contacts and promises."
+  },
+  {
+   "start": 67.388,
+   "end": 77.528,
+   "text": "Opened, Kestrel Outdoor draws its slots, and its sheet lists what sits in each."
+  },
+  {
+   "start": 77.528,
+   "end": 89.204,
+   "text": "A contact at Kestrel Outdoor starts with how to reach her, her role and her client."
+  },
+  {
+   "start": 89.204,
+   "end": 98.5,
+   "text": "A client the chats found waits in Review until Maya keeps it."
+  },
+  {
+   "start": 98.5,
+   "end": 107.141,
+   "text": "Maya asks Cori what the team promised Kestrel Outdoor."
+  },
+  {
+   "start": 107.141,
+   "end": 112.667,
+   "text": "Cori answers from memory, with each promise, its date and the AI it came from."
+  },
+  {
+   "start": 112.667,
+   "end": 118.335,
+   "text": "The first time she opens an AI, Cori shows how to call him: Right Option."
+  },
+  {
+   "start": 118.335,
+   "end": 121.339,
+   "text": "A tap brings out his chat, and the card is gone for good."
+  },
+  {
+   "start": 121.339,
+   "end": 127.073,
+   "text": "On ChatGPT, Maya starts a reply to Kestrel Outdoor."
+  },
+  {
+   "start": 127.073,
+   "end": 132.867,
+   "text": "The blue line names the client the draft is about. One client goes with each send."
+  },
+  {
+   "start": 132.867,
+   "end": 135.479,
+   "text": "The Enterprise card holds the company, its people and its clients."
+  },
+  {
+   "start": 135.479,
+   "end": 139.63,
+   "text": "To hand Kestrel Outdoor to a teammate, Maya exports that one client."
+  },
+  {
+   "start": 139.63,
+   "end": 143.867,
+   "text": "The line says what the file holds before she saves it."
+  },
+  {
+   "start": 143.867,
+   "end": 151.48,
+   "text": "When the work with Halvorsen Freight ends, Maya deletes everything about it."
+  },
+  {
+   "start": 151.48,
+   "end": 157.615,
+   "text": "The graph lights all of it, and the sheet says what goes."
+  },
+  {
+   "start": 157.615,
+   "end": 161.233,
+   "text": "Then Coere checks that nothing about it is left."
+  },
+  {
+   "start": 161.233,
+   "end": 164.4,
+   "text": "Coere for Teams: one memory of the company and its clients."
+  }
+ ]
+}
