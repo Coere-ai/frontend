@@ -17,10 +17,10 @@ const items: Record<NavTabId, Item[]> = {
   products: products.map((p) => ({ href: `/products/${p.slug}`, label: p.name })),
   industries: [{ href: "/industries", label: "All industries" }, ...industries.slice(0, 6).map((i) => ({ href: `/industries/${i.slug}`, label: i.name }))],
   resources: [
+    { href: "/resources", label: "Developer docs" },
+    { href: "/resources/sdks", label: "SDKs" },
+    { href: "/resources/mcp", label: "MCP" },
     { href: "/#demo", label: "Product demo" },
-    { href: "/resources#films", label: "Feature films" },
-    { href: "/resources#privacy", label: "Privacy" },
-    { href: "/resources#faq", label: "Questions" },
   ],
   blog: [{ href: "/blog", label: "All posts" }, ...posts.slice(0, 3).map((p) => ({ href: `/blog/${p.slug}`, label: p.title }))],
   about: [

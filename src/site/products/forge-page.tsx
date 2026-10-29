@@ -32,7 +32,7 @@ export function ForgePage() {
           <div>
             <h2 className="text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">Give your agent a memory over MCP</h2>
             <p className="mt-5 text-lg leading-relaxed text-neutral-600">The same memory and the same token, as MCP tools. Connect over HTTP at /mcp, or run coere-server mcp over stdio.</p>
-            <ArrowLink href="/resources#mcp" className="mt-7 text-neutral-950">See every MCP tool</ArrowLink>
+            <ArrowLink href="/resources/mcp" className="mt-7 text-neutral-950">See every MCP tool</ArrowLink>
           </div>
           <CodeTabs samples={mcpSamples} title="Connect" />
         </Container>
