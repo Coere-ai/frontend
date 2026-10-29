@@ -128,8 +128,8 @@ const page = (title) => `<!doctype html><html lang="en"><head><meta charset="utf
 const EXT_PAGES = { console: "Coere dashboard", onboarding: "Welcome to Coere", popup: "Coere" };
 const extPage = (title, script) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title></head><body><div id="app"></div><script src="${script}"></script></body></html>\n`;
 
-copyLib();
 if (!process.env.DEMO_SKIP_LIB) {
+  copyLib();
   for (const [version, edition] of [[2, "consumer"], [3, "consumer"], [2, "solution"]]) {
     const tag = `v${version}${edition === "solution" ? "-solution" : ""}`;
     await bundle(join(here, "stage/tab/site.ts"), join(LIB, `site-${tag}.js`), version, edition);
