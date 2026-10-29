@@ -1,5 +1,6 @@
 import type { Role, Team } from "@/site/content/roles";
 import { SearchIcon } from "@/site/ui/icons/interface-icons";
+import { SelectMenu } from "@/site/ui/select-menu";
 import { ANY_LOCATION, toggle, type RoleFilters } from "./filter-roles";
 
 /** A plain checkbox with a black tick, for one filter value. */
@@ -59,18 +60,7 @@ export function JobFilters({
         </fieldset>
       </div>
 
-      <label className="block">
-        <span className="text-[13px] font-medium text-neutral-500">Location</span>
-        <select
-          value={filters.location}
-          onChange={(event) => onChange({ ...filters, location: event.target.value })}
-          className="mt-2 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-[15px] text-neutral-950 outline-none focus:border-neutral-950"
-        >
-          {[ANY_LOCATION, ...locations].map((location) => (
-            <option key={location}>{location}</option>
-          ))}
-        </select>
-      </label>
+      <SelectMenu label="Location" value={filters.location} options={[ANY_LOCATION, ...locations]} onChange={(location) => onChange({ ...filters, location })} />
     </div>
   );
 }
