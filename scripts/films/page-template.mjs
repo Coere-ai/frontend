@@ -4,6 +4,10 @@
  * browser's own video element, drawn at the film's real resolution, with
  * the same caption style and the same fallback for tracks that fail.
  *
+ * The films are silent and made to be understood by sight, so captions
+ * start off (the CC button still turns them on) and the player shows no
+ * volume control.
+ *
  * Two ways to open it:
  *   <slug>.html                 the full player, with controls and captions
  *   <slug>.html?preview&start=3 a silent loop past the title card, which
@@ -15,6 +19,7 @@ const STYLE = `@font-face{font-family:"Coere Geist";src:url("fonts/Geist-Variabl
 html,body{margin:0;height:100%;overflow:hidden;background:#000}
 video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
 html.preview video{object-fit:cover}
+video::-webkit-media-controls-mute-button,video::-webkit-media-controls-volume-slider,video::-webkit-media-controls-volume-control-container{display:none!important}
 video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-size:max(12px,2.1vw);background:rgba(8,14,36,.82);color:#fff}`;
 
 // Runs in the page. A preview loops from `start` and pauses off screen; the
@@ -43,6 +48,7 @@ const SCRIPT = `(function () {
     return;
   }
   video.controls = true;
+  video.muted = true;
   Array.prototype.forEach.call(document.querySelectorAll('track'), function (el) {
     var done = false;
     function fallback() {
@@ -52,7 +58,7 @@ const SCRIPT = `(function () {
       el.remove();
       var track = video.addTextTrack(kind, el.label, el.srclang);
       cues.forEach(function (c) { track.addCue(new VTTCue(c.start, c.end, c.text)); });
-      track.mode = kind === 'captions' ? 'showing' : 'hidden';
+      track.mode = 'hidden';
     }
     if (el.readyState === 3) fallback();
     el.addEventListener('error', fallback);
@@ -79,7 +85,7 @@ ${STYLE}
 <body>
 <video playsinline preload="metadata" poster="${slug}-poster.jpg" data-still="${slug}-still.jpg" aria-label="${escape(title)}">
 <source src="${slug}.mp4" type="video/mp4">
-<track kind="captions" src="${slug}-captions.vtt" srclang="en" label="English" default>
+<track kind="captions" src="${slug}-captions.vtt" srclang="en" label="English">
 <track kind="chapters" src="${slug}-chapters.vtt" srclang="en" label="Chapters">
 </video>
 <script type="application/json" id="cues">${cues}</script>

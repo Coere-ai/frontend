@@ -10,13 +10,14 @@
 html,body{margin:0;height:100%;overflow:hidden;background:#000}
 video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
 html.preview video{object-fit:cover}
+video::-webkit-media-controls-mute-button,video::-webkit-media-controls-volume-slider,video::-webkit-media-controls-volume-control-container{display:none!important}
 video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-size:max(12px,2.1vw);background:rgba(8,14,36,.82);color:#fff}
 </style>
 </head>
 <body>
 <video playsinline preload="metadata" poster="actions-gmail-poster.jpg" data-still="actions-gmail-still.jpg" aria-label="Coere Actions: Gmail">
 <source src="actions-gmail.mp4" type="video/mp4">
-<track kind="captions" src="actions-gmail-captions.vtt" srclang="en" label="English" default>
+<track kind="captions" src="actions-gmail-captions.vtt" srclang="en" label="English">
 <track kind="chapters" src="actions-gmail-chapters.vtt" srclang="en" label="Chapters">
 </video>
 <script type="application/json" id="cues">{"captions":[{"start":0.003073462893553223,"end":2.733333,"text":"Cori can write email for Maya, in her style, from her memory."},{"start":2.733333,"end":5.059163303458122,"text":"In Settings, Maya turns on Coere Browser Use."},{"start":5.059163303458122,"end":8.7,"text":"Autonomous and Bolt are the defaults. Human Review asks before each click."},{"start":8.7,"end":13.706471120486448,"text":"On the Cori page she asks for an email in her own words."},{"start":13.706471120486448,"end":16.329432425043166,"text":"Cori shows his plan and starts."},{"start":16.329432425043166,"end":21.666666999999997,"text":"Two people in her mail are called Sam, so Cori asks which one."},{"start":21.666666999999997,"end":25.49084210187024,"text":"Cori works in a tab of his own, in the Coere tab group, with a glow around the page."},{"start":25.49084210187024,"end":29.31840461395233,"text":"He reads her past emails with Sam, then writes in her style. The bar shows each step and Stop."},{"start":29.31840461395233,"end":33.4,"text":"The email is in her voice, signed the way she signs."},{"start":33.4,"end":37.12201125457277,"text":"The draft waits in Gmail, unsent. Open draft or Delete draft are one press away."},{"start":37.12201125457277,"end":44.366667,"text":"When her line says send, Cori sends."},{"start":44.366667,"end":51.133334,"text":"Sent to Priya. Undo send takes it back while Gmail still can."},{"start":51.133334,"end":53.366667,"text":"Cori asks before he sends to someone you did not name."}],"chapters":[{"start":0,"end":8.7,"text":"Turn on Browser Use"},{"start":8.7,"end":12.692005214248178,"text":"Ask Cori"},{"start":12.692005214248178,"end":21.666666999999997,"text":"The plan"},{"start":21.666666999999997,"end":25.49084210187024,"text":"Cori is working"},{"start":25.49084210187024,"end":33.4,"text":"Your style"},{"start":33.4,"end":37.12201125457277,"text":"Draft saved"},{"start":37.12201125457277,"end":53.366667,"text":"Send and undo"}]}</script>
@@ -44,6 +45,7 @@ video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-siz
     return;
   }
   video.controls = true;
+  video.muted = true;
   Array.prototype.forEach.call(document.querySelectorAll('track'), function (el) {
     var done = false;
     function fallback() {
@@ -53,7 +55,7 @@ video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-siz
       el.remove();
       var track = video.addTextTrack(kind, el.label, el.srclang);
       cues.forEach(function (c) { track.addCue(new VTTCue(c.start, c.end, c.text)); });
-      track.mode = kind === 'captions' ? 'showing' : 'hidden';
+      track.mode = 'hidden';
     }
     if (el.readyState === 3) fallback();
     el.addEventListener('error', fallback);

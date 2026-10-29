@@ -10,13 +10,14 @@
 html,body{margin:0;height:100%;overflow:hidden;background:#000}
 video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
 html.preview video{object-fit:cover}
+video::-webkit-media-controls-mute-button,video::-webkit-media-controls-volume-slider,video::-webkit-media-controls-volume-control-container{display:none!important}
 video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-size:max(12px,2.1vw);background:rgba(8,14,36,.82);color:#fff}
 </style>
 </head>
 <body>
 <video playsinline preload="metadata" poster="voice-mode-poster.jpg" data-still="voice-mode-still.jpg" aria-label="Coere Voice mode">
 <source src="voice-mode.mp4" type="video/mp4">
-<track kind="captions" src="voice-mode-captions.vtt" srclang="en" label="English" default>
+<track kind="captions" src="voice-mode-captions.vtt" srclang="en" label="English">
 <track kind="chapters" src="voice-mode-chapters.vtt" srclang="en" label="Chapters">
 </video>
 <script type="application/json" id="cues">{"captions":[{"start":0.002028062964273081,"end":2.866667,"text":"With Voice mode on in Settings, Maya can talk to Cori instead of typing."},{"start":2.866667,"end":4.6496901268954876,"text":"On ChatGPT, she holds Right Option and asks Cori a question."},{"start":4.6496901268954876,"end":9.75209342440752,"text":"Cori listens. The bars follow her voice, and her words show as she says them."},{"start":9.75209342440752,"end":11.582466647371287,"text":"She lets go, and her words go to Cori as her line."},{"start":11.582466647371287,"end":17.878068909606828,"text":"Cori answers in the chat and says his reply out loud. Stop, or any key, quiets him."},{"start":17.878068909606828,"end":24.533334,"text":"Pressed by mistake? Escape while she holds it cancels, and nothing is sent."},{"start":24.533334,"end":26.800001,"text":"The speech models run in her browser. Her voice never leaves the computer."}],"chapters":[{"start":0,"end":9.75209342440752,"text":"Hold Right Option"},{"start":9.75209342440752,"end":17.878068909606828,"text":"Let go"},{"start":17.878068909606828,"end":26.800001,"text":"Cancel"}]}</script>
@@ -44,6 +45,7 @@ video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-siz
     return;
   }
   video.controls = true;
+  video.muted = true;
   Array.prototype.forEach.call(document.querySelectorAll('track'), function (el) {
     var done = false;
     function fallback() {
@@ -53,7 +55,7 @@ video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-siz
       el.remove();
       var track = video.addTextTrack(kind, el.label, el.srclang);
       cues.forEach(function (c) { track.addCue(new VTTCue(c.start, c.end, c.text)); });
-      track.mode = kind === 'captions' ? 'showing' : 'hidden';
+      track.mode = 'hidden';
     }
     if (el.readyState === 3) fallback();
     el.addEventListener('error', fallback);
