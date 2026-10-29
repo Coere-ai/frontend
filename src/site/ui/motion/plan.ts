@@ -14,7 +14,10 @@ export type Plan = {
   cut: boolean;
 };
 
-const LONG = 70;
+/** New text this long streams in; shorter text, like a sent message, slides in whole. */
+const LONG = 140;
+/** On a new page, the answer that writes itself can be a little shorter. */
+const LONG_ON_CUT = 70;
 
 /** Plans a screen against the one before it, or on its own when it is the first. */
 export function planShot(doc: Document, prev: Document | null): Plan {
@@ -45,7 +48,7 @@ export function planShot(doc: Document, prev: Document | null): Plan {
   }
   // On a new page, the last long text on it is the answer being written.
   if (cut) {
-    const long = leaves.filter((l) => l.text.length > LONG && !typed.has(l.el));
+    const long = leaves.filter((l) => l.text.length > LONG_ON_CUT && !typed.has(l.el));
     const last = long.at(-1);
     if (last) stream.push(...long.filter((l) => l.el.parentElement === last.el.parentElement).map((l) => l.el));
   }
