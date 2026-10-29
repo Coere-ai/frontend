@@ -1,7 +1,7 @@
 import { CheckList } from "@/site/blocks/check-list";
 import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
-import { ForgeDemo } from "@/site/products/forge-demo";
+import { ForgeWalkthrough } from "@/site/products/forge-walkthrough";
 import { Container } from "@/site/ui/container";
 
 /**
@@ -29,7 +29,7 @@ export function ForgeSection() {
                 <a href="/resources" className="inline-flex h-12 items-center rounded-full px-5 text-[16px] font-medium text-white ring-1 ring-white/40">Read the docs</a>
               </div>
             </div>
-            <ForgeDemo />
+            <ForgeWalkthrough />
           </div>
         </Stage>
       </Container>
