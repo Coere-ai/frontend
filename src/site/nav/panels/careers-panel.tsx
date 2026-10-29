@@ -20,7 +20,7 @@ export function CareersPanel() {
             return (
               <li key={team}>
                 <PanelLink
-                  href={`/careers#${team.toLowerCase()}`}
+                  href={`/careers?team=${encodeURIComponent(team)}`}
                   title={team}
                   summary={`${open} open ${open === 1 ? "role" : "roles"}`}
                 />
