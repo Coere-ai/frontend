@@ -1,31 +1,32 @@
 import { AccordionShowcase } from "@/site/blocks/accordion-showcase";
 import { PhotoHero } from "@/site/blocks/photo-hero";
-import { films } from "@/site/content/films";
 import { industries, type Industry } from "@/site/content/industries";
+import { industryScenes } from "@/site/content/industry-scenes";
 import type { IndustryPage as Content } from "@/site/content/industry-stories";
 import { contactHref, contactLabel } from "@/site/content/navigation";
 import { productBySlug } from "@/site/content/products";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { ProductSection } from "@/site/products/product-section";
-import { FilmFrame } from "@/site/ui/film-frame";
+import { ScreenScene } from "@/site/ui/screen-scene";
 import { MoreIndustries } from "./more-industries";
 
 /**
  * One industry: its photo with the app set on it, then each Coere product
- * told through an example from that field, then a few other fields.
+ * told through an example from that field, played on the app with the
+ * field's own people and work, then a few other fields.
  */
 export function IndustryPage({ industry, content }: { industry: Industry; content: Content }) {
-  const lead = content.stories[0];
+  const scenes = industryScenes(industry.slug);
   const items = content.stories.map((story) => {
     const product = productBySlug(story.product);
     return {
-      key: `${story.product}-${story.film}`,
+      key: story.demo,
       title: story.title,
       summary: story.text,
       checks: story.checks,
       href: `/products/${story.product}`,
       linkLabel: `With ${product?.name ?? "Coere"}`,
-      visual: <FilmFrame film={films[story.film]} preview />,
+      visual: <ScreenScene shots={scenes[story.demo]} label={`${story.title}, shown on the app`} />,
     };
   });
 
@@ -40,7 +41,7 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
         checks={content.stories.map((story) => story.title)}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "See how" }}
-        app={<FilmFrame film={films[lead.film]} />}
+        app={<ScreenScene shots={scenes.context} label={`Coere for ${industry.name.toLowerCase()}, shown on the app`} />}
       />
       <ProductSection id="how" title={`What ${industry.name.toLowerCase()} teams do with Coere`} line="Each Coere product, through an example from the field.">
         <AccordionShowcase items={items} background={{ src: industry.photo.src, by: industry.photo.by }} />
