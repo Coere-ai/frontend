@@ -76,3 +76,10 @@ export const SearchIcon = (p: IconProps) => (
     <path d="m16 16 4 4" />
   </Icon>
 );
+
+export const CheckCircleIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="m8.5 12.2 2.3 2.3 4.7-4.8" />
+  </Icon>
+);
