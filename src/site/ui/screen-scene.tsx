@@ -88,9 +88,10 @@ export function ScreenScene({ shots, label, className }: { shots: SceneShot[]; l
     if (plan.point) lastPoint.current = plan.point;
     const hold = Math.max(shot.hold ?? HOLD, motion + AFTER);
     if (!still) camera.animate([{ transform: cameraFor(shot.view) }, { transform: cameraFor(shot.view, 1.035) }], { duration: hold, delay: 1200, easing: "linear", fill: "forwards" });
-    if (shots.length < 2 || still) return;
+    if (still) return;
+    // A scene of one screen plays it again from the start: it mounts fresh and fades back in.
     timer.current = setTimeout(() => {
-      setPrevious(i);
+      setPrevious(shots.length < 2 ? null : i);
       setIndex((i + 1) % shots.length);
       setRun((r) => r + 1);
     }, hold);
