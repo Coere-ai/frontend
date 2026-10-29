@@ -182,7 +182,7 @@ export class Stage {
   private async pressAt(tab: Tab, p: Point, button: number, count: number): Promise<void> {
     for (let n = 1; n <= count; n++) {
       this.el.pointer.classList.add("down");
-      const pressed = down(tab.doc, p, button);
+      const pressed = down(tab.doc, p, button, n);
       await this.wait(60);
       up(tab.doc, p, pressed, button, n);
       this.el.pointer.classList.remove("down");

@@ -62,12 +62,12 @@ function focusFor(el: Element): void {
   if (target) target.focus({ preventScroll: true });
 }
 
-export function down(doc: Document, p: Point, button = 0): Element | null {
+export function down(doc: Document, p: Point, button = 0, count = 1): Element | null {
   const win = doc.defaultView!;
   const el = hitAt(doc, p);
   if (!el) return null;
   el.dispatchEvent(pointer(win, "pointerdown", p, { button, buttons: 1 }));
-  const go = el.dispatchEvent(mouse(win, "mousedown", p, { button, buttons: 1 }));
+  const go = el.dispatchEvent(mouse(win, "mousedown", p, { button, buttons: 1, detail: count }));
   if (go) focusFor(el);
   return el;
 }

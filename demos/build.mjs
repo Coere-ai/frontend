@@ -32,14 +32,23 @@ const v2require = createRequire(join(V2, "apps/extension/package.json"));
 const { build } = await import(v2require.resolve("esbuild"));
 const tsx = join(V2, "node_modules/.bin/tsx");
 
-/** Vite's `?raw` and `?inline` imports, as text. */
+/** A stylesheet with its `@import`s put in place, as Vite inlines them for `?inline`; a style element ignores them otherwise. */
+function inlineCss(path, seen = new Set()) {
+  if (seen.has(path)) return "";
+  seen.add(path);
+  return readFileSync(path, "utf8").replace(/@import\s+(?:url\()?['"]([^'"]+)['"]\)?\s*;/g, (all, rel) => (/^(https?:)?\/\//.test(rel) ? all : inlineCss(resolve(dirname(path), rel), seen)));
+}
+
+/** Vite's `?raw`, `?inline` and `?url` imports: text, a stylesheet with its imports inlined, or the file's address. */
 const asText = {
   name: "as-text",
   setup(b) {
-    b.onResolve({ filter: /\?(raw|inline|url)$/ }, (a) => ({ path: resolve(a.resolveDir, a.path.replace(/\?(raw|inline|url)$/, "")), namespace: "as-text", pluginData: a.path.endsWith("?url") }));
-    b.onLoad({ filter: /.*/, namespace: "as-text" }, (a) =>
-      a.pluginData ? { contents: `export default ${JSON.stringify(WEB_LIB + "ext/" + a.path.split("/").pop())}`, loader: "js" } : { contents: readFileSync(a.path, "utf8"), loader: "text" },
-    );
+    b.onResolve({ filter: /\?(raw|inline|url)$/ }, (a) => ({ path: resolve(a.resolveDir, a.path.replace(/\?(raw|inline|url)$/, "")), namespace: "as-text", pluginData: a.path.match(/\?(raw|inline|url)$/)[1] }));
+    b.onLoad({ filter: /.*/, namespace: "as-text" }, (a) => {
+      if (a.pluginData === "url") return { contents: `export default ${JSON.stringify(WEB_LIB + "ext/" + a.path.split("/").pop())}`, loader: "js" };
+      const css = a.pluginData === "inline" && a.path.endsWith(".css");
+      return { contents: css ? inlineCss(a.path) : readFileSync(a.path, "utf8"), loader: "text" };
+    });
   },
 };
 
@@ -146,7 +155,11 @@ for (const film of readdirSync(join(here, "films"))) {
   const dir = join(here, "films", film);
   const config = existsSync(join(dir, "config.json")) ? JSON.parse(readFileSync(join(dir, "config.json"), "utf8")) : {};
   mkdirSync(join(OUT, film), { recursive: true });
-  for (const [name, entry] of Object.entries(config.bundles ?? {})) await bundle(join(dir, entry.from), join(OUT, film, name), entry.version ?? 2, entry.edition);
+  // A film's own page bundle (`name.js`) gets a page beside it (`name.html`) for a tab to open.
+  for (const [name, entry] of Object.entries(config.bundles ?? {})) {
+    await bundle(join(dir, entry.from), join(OUT, film, name), entry.version ?? 2, entry.edition);
+    if (name.endsWith(".js")) writeFileSync(join(OUT, film, name.replace(/\.js$/, ".html")), extPage(entry.title ?? config.title ?? film, name));
+  }
   await bundle(join(dir, "film.ts"), join(OUT, film, "film.js"), config.version ?? 2, config.edition);
   const sites = existsSync(join(dir, "sites.mjs")) ? (await import(join(dir, "sites.mjs"))).default : [];
   writeSites(film, sites);
