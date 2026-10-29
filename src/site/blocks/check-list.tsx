@@ -3,11 +3,12 @@ import { CheckCircleIcon } from "@/site/ui/icons/interface-icons";
 /**
  * A short list of what something does, each line behind a ticked circle.
  * A line can lead with a bold name, written as "Name: what it does".
+ * `row` lays the lines side by side, wrapping, for a centered heading.
  */
-export function CheckList({ items, tone = "dark", className }: { items: string[]; tone?: "dark" | "light"; className?: string }) {
+export function CheckList({ items, tone = "dark", row = false, className }: { items: string[]; tone?: "dark" | "light"; row?: boolean; className?: string }) {
   const text = tone === "light" ? "text-white/90" : "text-neutral-700";
   return (
-    <ul className={`space-y-2.5 ${className ?? ""}`}>
+    <ul className={`${row ? "flex flex-wrap justify-center gap-x-7 gap-y-2.5" : "space-y-2.5"} ${className ?? ""}`}>
       {items.map((item) => {
         const [name, ...rest] = item.split(": ");
         return (

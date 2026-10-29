@@ -41,6 +41,7 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
         checks={content.stories.map((story) => story.title)}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "See how" }}
+        appFit="centered"
         app={<ScreenScene shots={scenes.context} label={`Coere for ${industry.name.toLowerCase()}, shown on the app`} />}
       />
       <ProductSection id="how" title={`What ${industry.name.toLowerCase()} teams do with Coere`} line="Each Coere product, through an example from the field.">
