@@ -16,7 +16,7 @@ import { ProductSection } from "./product-section";
 export function ConnectPage() {
   return (
     <>
-      <ProductHero copy={connectHero} background={backgrounds.tangle} app={<FilmFrame film={films.v2} />} secondary={{ href: "#use-cases", label: "See what it does" }} />
+      <ProductHero copy={connectHero} background={backgrounds.tangle} app={<FilmFrame film={films.v2} preview />} secondary={{ href: "#use-cases", label: "See what it does" }} />
       <ProductSection id="use-cases" title="Put your memory to work" line="Bring every chat in, build one memory from them, and let Cori act on it." tint>
         <UseCaseTabs cases={asUseCases(connectCases)} />
       </ProductSection>
