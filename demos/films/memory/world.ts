@@ -12,12 +12,13 @@ import baked from './data/memory.json'
  * real v2.2 build over them with the film's stand in models and writes the
  * answers down): before the build, the build itself with its events and
  * the overview as it grew, and after it the Memory page's reads. The build
- * plays back on the clock when Build my memory is pressed, a little slower
- * than Node ran it, as the film slowed its models to watch it grow.
+ * plays back on the clock when Build my memory is pressed, faster than
+ * Node ran it, so the film watches all of it grow in some seconds.
  */
 
 type Answer = { method: string; args?: unknown; answer: unknown }
-type Entry = { t: number; event?: { name: string; [k: string]: unknown }; overview?: unknown; status?: unknown }
+/** `whole: false` marks an overview onboarding's canvas cannot frame whole (bake.mts). */
+type Entry = { t: number; event?: { name: string; [k: string]: unknown }; overview?: unknown; status?: unknown; whole?: false }
 type Baked = {
   now: number
   before: { status: unknown; settings: unknown; estimate: { chats: number }; overview: unknown; platforms: Record<string, number> }
@@ -40,9 +41,19 @@ const AFTER = table(data.answers)
 const LIBRARY = table(data.engine)
 const after = (method: string, args?: unknown) => AFTER.get(keyOf(method, args))
 
-/** The build's first overview comes some two seconds in, after the chats are sorted; the replay starts near it and runs a little slower. */
-const LEAD_MS = 1800
-const PACE = 1.75
+/**
+ * Over Maya's 324 chats the build first sorts them, some seconds before its
+ * first overview, then grows memory for half a minute. The replay gives the
+ * sorting a moment, then grows the graph so that the biggest one
+ * onboarding's canvas frames whole comes some six seconds after Build my
+ * memory, near the end of the film's look at it; the build goes on at that
+ * pace, and the graph stays as it was framed.
+ */
+const FIRST = data.timeline.find((e) => e.overview)?.t ?? 0
+const WHOLE = data.timeline.findLast((e) => e.overview && e.whole !== false)?.t ?? FIRST
+const SORT_MS = 1500
+const SHOWN_MS = 6200
+const replayAt = (t: number) => (t < FIRST ? (t / Math.max(1, FIRST)) * SORT_MS : SORT_MS + ((t - FIRST) / Math.max(1, WHOLE - FIRST)) * (SHOWN_MS - SORT_MS))
 
 export const AIS = ['chatgpt', 'claude', 'gemini'] as const
 
@@ -78,7 +89,8 @@ export class MemoryWorld {
     w.engine('memory.buildEstimate', () =>
       this.phase === 'before' ? data.before.estimate : { ...data.before.estimate, progress: this.phase === 'building' ? this.progress : null },
     )
-    w.engine('memory.overview', (m) => (this.phase === 'built' ? this.answer('memory.overview', m.args) : this.overview))
+    // Onboarding keeps the graph it watched grow, framed whole, while the film cuts to the dashboard, which reads the built memory.
+    w.engine('memory.overview', (m, tab) => (this.phase === 'built' && tab !== 'onboarding' ? this.answer('memory.overview', m.args) : this.overview))
     w.engine('memory.control', (m) => {
       const action = (m.args as { action?: string } | null)?.action
       if (action === 'build' && this.phase === 'before') this.play()
@@ -113,13 +125,13 @@ export class MemoryWorld {
   private play(): void {
     this.phase = 'building'
     for (const entry of data.timeline) {
-      const at = Math.max(0, entry.t - LEAD_MS) * PACE
+      const at = replayAt(entry.t)
       this.timers.push(window.setTimeout(() => this.apply(entry), at))
     }
   }
 
   private apply(entry: Entry): void {
-    if (entry.overview) this.overview = entry.overview
+    if (entry.overview && entry.whole !== false) this.overview = entry.overview
     if (entry.status) this.status = entry.status
     if (!entry.event) return
     const { name } = entry.event
@@ -129,14 +141,13 @@ export class MemoryWorld {
     this.world.tell({ ch: 'coere', type: 'engine.event', event: entry.event })
   }
 
-  /** The build ends at once, as it has by the time she opens the dashboard, so a page opened now reads the built memory. */
+  /** The build ends at once, as it has by the time she opens the dashboard, so the dashboard opened now reads the built memory. */
   finish(): void {
     for (const t of this.timers) clearTimeout(t)
     this.timers = []
     if (this.phase === 'built') return
     this.phase = 'built'
     this.status = after('memory.status')
-    this.overview = after('memory.overview', {})
   }
 
   /** Puts the finished Extract all away, as Clear on the dock does, so the dashboard opens without it. */

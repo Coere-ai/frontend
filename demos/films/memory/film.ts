@@ -17,13 +17,14 @@ import { MemoryWorld } from './world'
  * Maya's chats (world.ts).
  */
 
+/** `seconds` is each chapter's length in a full run, measured, for the site's play bar. */
 const CHAPTERS = [
-  { id: 'build', title: 'Build your memory' },
-  { id: 'grow', title: 'The graph grows' },
-  { id: 'memory', title: 'Your memory' },
-  { id: 'layers', title: 'Memories and chats' },
-  { id: 'up-close', title: 'Up close' },
-  { id: 'search', title: 'Search' },
+  { id: 'build', title: 'Build your memory', seconds: 9 },
+  { id: 'grow', title: 'The graph grows', seconds: 10 },
+  { id: 'memory', title: 'Your memory', seconds: 7 },
+  { id: 'layers', title: 'Memories and chats', seconds: 13 },
+  { id: 'up-close', title: 'Up close', seconds: 7 },
+  { id: 'search', title: 'Search', seconds: 10 },
 ]
 
 const LIB = '/preview/live/lib/'
@@ -45,7 +46,7 @@ async function film(s: Stage): Promise<void> {
   const memory = current!
 
   // Coere Memory: the build. Extract all ended off camera, and Done leads to the build step, behind the title card.
-  s.chapter('build')
+  await chapter(s, 'build')
   s.say('Coere builds a memory from Maya’s chats, with her own keys.')
   const card = s.card('Coere Memory', 'What your chats taught Coere, as one graph around you.', 2600)
   const onboarding = await s.open('onboarding', `${LIB}onboarding-v2.html`)
@@ -61,7 +62,7 @@ async function film(s: Stage): Promise<void> {
   await s.click(onboarding, role('button', 'Build my memory'), { after: 200 })
   await s.rest()
 
-  s.chapter('grow')
+  await chapter(s, 'grow')
   s.say('Coere reads her chats and the graph grows, section by section.')
   await s.waitFor(onboarding, '.ob-grow-canvas')
   await s.wait(7000)
@@ -74,13 +75,13 @@ async function film(s: Stage): Promise<void> {
   await s.waitFor(page, 'canvas.cx-mp-canvas')
   await settledDrawn(s, page)
   await s.film(page)
-  s.chapter('memory')
+  await chapter(s, 'memory')
   s.say('The Memory page draws everything as one graph, with Maya in the middle and a section for each part of her life.')
   await s.wait(3600)
   s.say('Each memory sits beside the chats it came from, the small dots around it.')
   await s.wait(3000)
 
-  s.chapter('layers')
+  await chapter(s, 'layers')
   s.say('All shows both. Memories shows only what Coere learned.')
   await s.click(page, layer('Memories'), { after: 400 })
   await s.rest()
@@ -93,7 +94,7 @@ async function film(s: Stage): Promise<void> {
   await s.rest()
   await s.wait(800)
 
-  s.chapter('up-close')
+  await chapter(s, 'up-close')
   s.say('A click opens a section, with its folders, memories and chats.')
   await settledDrawn(s, page)
   await s.clickAt(page, sectionSpot(page, 'School'), { after: 0 })
@@ -103,7 +104,7 @@ async function film(s: Stage): Promise<void> {
   await s.press(page, 'Escape')
   await s.wait(900)
 
-  s.chapter('search')
+  await chapter(s, 'search')
   s.say('Search lists the top four matches and lights them on the graph.')
   await s.click(page, searchBox, { after: 150 })
   await s.type(page, 'MATH 54', 80)
@@ -117,6 +118,18 @@ async function film(s: Stage): Promise<void> {
   // For whoever works on the film: calls the baked memory or the World did not answer.
   if (memory.missed.length) console.log('MISSED', JSON.stringify([...new Set(memory.missed)]))
   if (s.world.unanswered.length) console.log('UNANSWERED', JSON.stringify([...new Set(s.world.unanswered.map((u) => `${u.tab} ${u.type}`))]))
+}
+
+/**
+ * Starts a chapter. A chapter played alone (`from`) is revealed a frame
+ * after it starts, and until then the stage is still skipping, when a wait
+ * passes in one frame: the chapter's first beat would be lost (the grow
+ * chapter's whole build). Two frames let the reveal land first; a chapter
+ * the run is skipping past loses only those.
+ */
+async function chapter(s: Stage, id: string): Promise<void> {
+  s.chapter(id)
+  for (let i = 0; i < 2 && s.fast; i++) await new Promise((r) => requestAnimationFrame(r))
 }
 
 /** Waits until `done` holds, as the film's expect does. */
