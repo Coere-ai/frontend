@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatPostDate, type Post } from "@/site/content/posts";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
-import { hoverUnderline } from "@/site/ui/hover-underline";
+import { Underlined } from "@/site/ui/underlined";
 
 /** The newest post, wide, with its image beside the words. */
 export function FeaturedPost({ post }: { post: Post }) {
@@ -15,7 +15,7 @@ export function FeaturedPost({ post }: { post: Post }) {
         <p className="text-[13px] text-neutral-500">
           Latest, {formatPostDate(post.date)}
         </p>
-        <h2 className={`mt-3 text-3xl font-medium tracking-[-0.035em] text-neutral-950 text-balance md:text-4xl ${hoverUnderline}`}>{post.title}</h2>
+        <h2 className="mt-3 text-3xl font-medium tracking-[-0.035em] text-neutral-950 text-balance md:text-4xl"><Underlined big>{post.title}</Underlined></h2>
         <p className="mt-4 text-[16px] leading-relaxed text-neutral-500">{post.excerpt}</p>
         <span className="mt-7 inline-flex items-center gap-1.5 text-[15px] font-medium text-neutral-950">
           Read the post

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { features, type Feature } from "@/site/content/features";
 import { products } from "@/site/content/products";
-import { hoverUnderline } from "@/site/ui/hover-underline";
+import { Underlined } from "@/site/ui/underlined";
 import { FeaturePreview } from "./feature-preview";
 import { PanelLabel } from "./panel-parts";
 
@@ -24,8 +24,8 @@ export function ProductsPanel() {
       {products.map((product) => (
         <Link key={product.slug} href={`/products/${product.slug}`} className="group row-span-4 grid grid-rows-subgrid">
           <p className="text-[13px] font-medium text-neutral-500">{product.kind}</p>
-          <h3 className={`mt-1.5 text-[22px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[26px] ${hoverUnderline}`}>
-            {product.name}
+          <h3 className="mt-1.5 text-[22px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[26px]">
+            <Underlined big>{product.name}</Underlined>
           </h3>
           <p className="mt-2 text-[14px] leading-snug text-neutral-500">{product.description}</p>
           <div className="mt-5 self-start overflow-hidden rounded-2xl">
@@ -50,11 +50,11 @@ export function ProductsPanel() {
                 type="button"
                 aria-pressed={picked?.slug === feature.slug}
                 onClick={() => setPicked(feature)}
-                className={`block py-1.5 text-left text-[15px] decoration-neutral-950 decoration-1 underline-offset-[5px] focus-visible:underline focus-visible:outline-none ${
-                  picked?.slug === feature.slug ? "text-neutral-950 underline" : "text-neutral-600 hover:text-neutral-950"
+                className={`group block py-1.5 text-left text-[15px] focus-visible:outline-none ${
+                  picked?.slug === feature.slug ? "text-neutral-950" : "text-neutral-600 hover:text-neutral-950"
                 }`}
               >
-                {feature.name}
+                <Underlined on={picked?.slug === feature.slug}>{feature.name}</Underlined>
               </button>
             </li>
           ))}

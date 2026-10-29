@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { hoverUnderline } from "@/site/ui/hover-underline";
+import { Underlined } from "@/site/ui/underlined";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 
 /** The small grey label that names a column in a menu. */
@@ -31,7 +31,7 @@ export function PanelLink({
         </span>
       ) : null}
       <span>
-        <span className={`block text-[15px] font-medium text-neutral-950 ${hoverUnderline}`}>{title}</span>
+        <span className="block text-[15px] font-medium text-neutral-950"><Underlined>{title}</Underlined></span>
         {summary ? <span className="mt-0.5 block text-[13px] leading-snug text-neutral-500">{summary}</span> : null}
       </span>
     </Link>

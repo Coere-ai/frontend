@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { industries } from "@/site/content/industries";
-import { hoverUnderline } from "@/site/ui/hover-underline";
+import { Underlined } from "@/site/ui/underlined";
 import { IndustryIcon } from "@/site/ui/icons/industry-icons";
 import { Reveal } from "@/site/ui/reveal";
 import { SizedPhoto } from "@/site/ui/sized-photo";
@@ -26,7 +26,7 @@ export function IndustryGrid() {
             </div>
             <div className="mt-6 flex items-center gap-3 text-neutral-950">
               <IndustryIcon name={industry.icon} size={28} />
-              <h3 className={`text-2xl font-medium tracking-[-0.03em] ${hoverUnderline}`}>{industry.name}</h3>
+              <h3 className="text-2xl font-medium tracking-[-0.03em]"><Underlined big>{industry.name}</Underlined></h3>
             </div>
             <p className="mt-3 text-[15px] leading-relaxed text-neutral-500">{industry.summary}</p>
             <ul className="mt-4 flex flex-wrap gap-2">

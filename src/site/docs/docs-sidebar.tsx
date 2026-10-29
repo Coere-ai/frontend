@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { docPages } from "@/site/content/docs";
+import { Underlined } from "@/site/ui/underlined";
 
 /** The list of docs pages. The page being read is underlined in black. */
 export function DocsSidebar() {
@@ -19,9 +20,9 @@ export function DocsSidebar() {
               <Link
                 href={href}
                 aria-current={current ? "page" : undefined}
-                className={`block py-1.5 text-[15px] decoration-1 underline-offset-[5px] ${current ? "text-neutral-950 underline" : "text-neutral-600 hover:text-neutral-950"}`}
+                className={`group block py-1.5 text-[15px] ${current ? "text-neutral-950" : "text-neutral-600 hover:text-neutral-950"}`}
               >
-                {page.title}
+                <Underlined on={current}>{page.title}</Underlined>
               </Link>
             </li>
           );

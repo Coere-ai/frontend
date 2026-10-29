@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Highlighted } from "@/site/code/highlighted";
+import { Underlined } from "@/site/ui/underlined";
 
 export type CodeSample = { label: string; language: string; code: string };
 
@@ -34,9 +35,9 @@ export function CodeTabs({ samples, title }: { samples: CodeSample[]; title?: st
             type="button"
             onClick={() => setPicked(index)}
             aria-pressed={index === picked}
-            className={`h-11 px-3 text-[13px] decoration-1 underline-offset-[14px] ${index === picked ? "text-white underline" : "text-white/55 hover:text-white"}`}
+            className={`group h-11 px-3 text-[13px] ${index === picked ? "text-white" : "text-white/55 hover:text-white"}`}
           >
-            {s.label}
+            <Underlined light on={index === picked}>{s.label}</Underlined>
           </button>
         ))}
         <button type="button" onClick={copy} className="ml-auto h-11 px-3 text-[13px] text-white/55 hover:text-white">

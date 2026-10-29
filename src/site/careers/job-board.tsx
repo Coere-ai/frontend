@@ -6,6 +6,7 @@ import { roles, teams, type Role, type Team } from "@/site/content/roles";
 import { ANY_LOCATION, filterRoles, type RoleFilters } from "./filter-roles";
 import { JobDetail } from "./job-detail";
 import { JobFilters } from "./job-filters";
+import { Underlined } from "@/site/ui/underlined";
 
 const types = [...new Set(roles.map((role) => role.type))];
 const locations = [...new Set(roles.map((role) => role.location))];
@@ -36,10 +37,10 @@ export function JobBoard({ team }: { team?: Team }) {
             const active = role.slug === shown?.slug;
             return (
               <li key={role.slug}>
-                <button type="button" onClick={() => setPicked(role.slug)} aria-pressed={active} className="hidden w-full py-4 text-left lg:block">
+                <button type="button" onClick={() => setPicked(role.slug)} aria-pressed={active} className="group hidden w-full py-4 text-left lg:block">
                   <RoleRow role={role} active={active} />
                 </button>
-                <Link href={`/careers/${role.slug}`} className="block py-4 lg:hidden">
+                <Link href={`/careers/${role.slug}`} className="group block py-4 lg:hidden">
                   <RoleRow role={role} active={false} />
                 </Link>
               </li>
@@ -57,8 +58,8 @@ export function JobBoard({ team }: { team?: Team }) {
 function RoleRow({ role, active }: { role: Role; active: boolean }) {
   return (
     <>
-      <span className={`block text-[16px] font-medium text-neutral-950 decoration-1 underline-offset-[5px] ${active ? "underline" : "hover:underline"}`}>
-        {role.title}
+      <span className="block text-[16px] font-medium text-neutral-950">
+        <Underlined on={active}>{role.title}</Underlined>
       </span>
       <span className="mt-1 block text-[13px] text-neutral-500">
         {/* "Internships, Internship" would say the same thing twice. */}

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { contactHref } from "@/site/content/navigation";
 import { PanelLabel, PanelLink } from "./panel-parts";
-import { hoverUnderline } from "@/site/ui/hover-underline";
+import { Underlined } from "@/site/ui/underlined";
 
 /** About menu: the company links, and a card that opens the story. */
 export function AboutPanel() {
@@ -23,7 +23,7 @@ export function AboutPanel() {
         </div>
         <div>
           <p className="text-[13px] font-medium text-neutral-500">Our story</p>
-          <p className={`mt-1 text-xl font-medium tracking-[-0.02em] text-neutral-950 ${hoverUnderline}`}>AI split you into pieces. We put you back together.</p>
+          <p className="mt-1 text-xl font-medium tracking-[-0.02em] text-neutral-950"><Underlined big>AI split you into pieces. We put you back together.</Underlined></p>
         </div>
       </Link>
     </div>

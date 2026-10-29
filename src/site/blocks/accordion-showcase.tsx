@@ -6,6 +6,7 @@ import type { Background } from "@/site/content/backgrounds";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { CheckList } from "./check-list";
 import { Stage } from "./stage";
+import { Underlined } from "@/site/ui/underlined";
 
 export type ShowcaseItem = {
   key: string;
@@ -54,9 +55,9 @@ export function AccordionShowcase({ items, background, flip = false }: { items: 
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(item.key)}
-                className="w-full py-5 text-left text-2xl font-medium tracking-[-0.025em] text-neutral-950"
+                className="group w-full py-5 text-left text-2xl font-medium tracking-[-0.025em] text-neutral-950"
               >
-                {item.title}
+                <Underlined big>{item.title}</Underlined>
               </button>
               <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
                 <div className="overflow-hidden" inert={!isOpen}>

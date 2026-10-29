@@ -6,6 +6,7 @@ import { DocsSidebar } from "./docs-sidebar";
 import { renderDoc } from "./render";
 import "@/site/code/code.css";
 import "./docs.css";
+import { Underlined } from "@/site/ui/underlined";
 
 const hrefOf = (slug: string) => (slug === "overview" ? "/resources" : `/resources/${slug}`);
 
@@ -32,7 +33,9 @@ export function DocView({ page }: { page: DocPage }) {
           <Link href={hrefOf(next.slug)} className="group mt-16 flex items-center justify-between rounded-2xl border border-neutral-200 p-6">
             <span>
               <span className="block text-[13px] text-neutral-500">Next</span>
-              <span className="mt-1 block text-lg font-medium text-neutral-950 decoration-1 underline-offset-[5px] group-hover:underline">{next.title}</span>
+              <span className="mt-1 block text-lg font-medium text-neutral-950">
+                <Underlined big>{next.title}</Underlined>
+              </span>
             </span>
             <ArrowRightIcon size={20} className="text-neutral-950" />
           </Link>

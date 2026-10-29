@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Industry } from "@/site/content/industries";
 import { Container } from "@/site/ui/container";
-import { hoverUnderline } from "@/site/ui/hover-underline";
+import { Underlined } from "@/site/ui/underlined";
 import { SizedPhoto } from "@/site/ui/sized-photo";
 
 /** Three other industries as photo cards, so a reader can move across fields. */
@@ -19,7 +19,7 @@ export function MoreIndustries({ current, all }: { current: string; all: Industr
                 <div className="relative aspect-[16/10] overflow-hidden rounded-3xl bg-neutral-200">
                   <SizedPhoto src={industry.photo.src} alt={industry.photo.alt} fill sizes="(min-width: 768px) 30vw, 100vw" className="object-cover" />
                 </div>
-                <p className={`mt-4 text-xl font-medium tracking-[-0.02em] text-neutral-950 ${hoverUnderline}`}>{industry.name}</p>
+                <p className="mt-4 text-xl font-medium tracking-[-0.02em] text-neutral-950"><Underlined big>{industry.name}</Underlined></p>
               </Link>
             </li>
           ))}
