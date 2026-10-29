@@ -86,3 +86,31 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/*
+ * Hover underlines grow from the middle out, like the navbar tabs. The line
+ * is a background under inline text, so a title that wraps gets a line
+ * under each of its lines. Big text gets a heavier line.
+ */
+.u-line {
+  background-image: linear-gradient(var(--u-color, var(--color-neutral-950)), var(--u-color, var(--color-neutral-950)));
+  background-repeat: no-repeat;
+  background-position: 50% 100%;
+  background-size: 0% var(--u-weight, 1px);
+  padding-bottom: 0.1em;
+  transition: background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.u-line-big {
+  --u-weight: 2px;
+}
+.u-line-light {
+  --u-color: #fff;
+}
+.group:hover .u-line,
+.group:focus-visible .u-line,
+.u-line.u-hover:hover,
+.u-line.u-on {
+  background-size: 100% var(--u-weight, 1px);
+}
