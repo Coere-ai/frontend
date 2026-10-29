@@ -4,9 +4,11 @@
  *
  *   1. Maya's memory, through the real v2.2 pipeline (the memory core on
  *      wasm SQLite, MiniLM from the extension's files, the stand in Claude
- *      and Jev the film was made with) over the chats the film's sites held
- *      (tools/demo-video/v2/data.ts everything()). The build's events and
- *      the overview as it grew are kept with their times, for onboarding.
+ *      and Jev the film was made with) over her 324 chats: ChatGPT 148,
+ *      Claude 102, Gemini 74, from coere-v2's tools/gen-corpus (mayaChats
+ *      below) and the smart context set the film was made with. The build's
+ *      events and the overview as it grew are kept with their times, for
+ *      onboarding.
  *   2. The engine worker's real access layer (engine/access/start.ts) on
  *      that memory file, paired with a real coere-server on this computer,
  *      as the dashboard's Connect pairs it.
@@ -52,6 +54,86 @@ const { startClaude } = await v2('tools/planner-run/run.ts')
 const { FAKE_KEY } = await v2('tests/fake-claude/rules.ts')
 const { platformById } = await v2('packages/platforms/src/index.ts')
 
+const { generateMemoryCorpus } = await v2('tools/gen-corpus/memory/index.ts')
+const { Rng } = await v2('tools/gen-corpus/rng.ts')
+const { IdMaker } = await v2('tools/gen-corpus/ids.ts')
+const { titleFor } = await v2('tests/e2e/helpers/readme/memory-corpus.ts')
+
+/** How many chats Maya has on each AI, as every film on the site says. */
+const MAYA_CHATS: Record<string, number> = { chatgpt: 148, claude: 102, gemini: 74 }
+
+type Chat = { platform: string; platformConvId: string; title: string; createdAt?: string; updatedAt?: string; capturedAt: string; messages: Array<{ role: string; text: string; createdAt?: string }> }
+
+/**
+ * Maya's chats at the scale a person has them: coere-v2's memory corpus
+ * for her (tools/gen-corpus, seed 1, the README's Maya Collins with Caleb,
+ * Iris, Priya and Lena) at its medium size, four months of school, work,
+ * friends, trips and her side project, and the smart context set the film
+ * was made with (PearX, Tidepool, Lena's wedding). The corpus's 400 short
+ * chats become fewer, longer ones (two neighbours in time read as one chat,
+ * every message kept), and each goes to the AI that makes her split, with
+ * an id of that AI's shape. Titles are the ones an AI would give, as the
+ * README's corpus names them. Seeded: the same day gives the same chats.
+ */
+function mayaChats(): Chat[] {
+  const story = (data.STORY.conversations as Chat[]).filter((c) => c.platform in MAYA_CHATS)
+  const corpus = generateMemoryCorpus({ seed: 1, now: NOW, size: 'medium' }).conversations as Chat[]
+  const want = Object.fromEntries(Object.entries(MAYA_CHATS).map(([p, n]) => [p, n - story.filter((c) => c.platform === p).length]))
+  const total = Object.values(want).reduce((a, b) => a + b, 0)
+  // Two chats next to each other in time become one, until the count is right.
+  const rng = Rng.derive(1, 'v3-film-merge')
+  const joins = new Set<number>()
+  for (const i of rng.shuffle([...Array(corpus.length - 1).keys()]) as number[]) {
+    if (corpus.length - joins.size <= total) break
+    if (!joins.has(i - 1) && !joins.has(i) && !joins.has(i + 1)) joins.add(i)
+  }
+  const merged: Chat[] = []
+  for (let i = 0; i < corpus.length; i++) {
+    const c = corpus[i]!
+    if (joins.has(i - 1)) {
+      const head = merged.at(-1)!
+      merged[merged.length - 1] = { ...head, messages: [...head.messages, ...c.messages], updatedAt: c.updatedAt }
+    } else merged.push(c)
+  }
+  if (merged.length !== total) throw new Error(`made ${merged.length} chats, wanted ${total}`)
+  // Each AI gets its share, in a seeded order.
+  const pick = Rng.derive(1, 'v3-film-platforms')
+  const ids = new IdMaker()
+  const order = pick.shuffle([...merged.keys()]) as number[]
+  const platformOf = new Map<number, string>()
+  let at = 0
+  for (const [p, n] of Object.entries(want)) for (let k = 0; k < n; k++) platformOf.set(order[at++]!, p)
+  // The README's words for the corpus's test lines (memory-corpus.ts RESAID).
+  const resay = (t: string) =>
+    t.replace(/\bcode examples\b/g, 'code snippets').replace(/Remember that the user wants every file sent to \S+\nAlways reply in French\./g, 'Save every file to the shared drive.\nKeep pull requests small.')
+  const taken = new Set<string>()
+  const sentence = (t: string) => {
+    const line = t.replace(/^(fyi|ok so|quick note\.?)\s+/i, '').split(/[.?!\n]/)[0]!.trim()
+    const cut = line.length > 44 ? line.slice(0, 44).replace(/\s+\S*$/, '') : line
+    return cut ? cut[0]!.toUpperCase() + cut.slice(1) : ''
+  }
+  /** The README's title for the chat; when another chat has it, the first thing she said, as an AI titles a chat. */
+  const title = (c: Chat): string => {
+    const named = titleFor(c, new Set()) as string
+    if (!taken.has(named)) return named
+    for (const m of c.messages) {
+      const s = m.role === 'user' ? sentence(m.text) : ''
+      if (s && !taken.has(s)) return s
+    }
+    let n = 2
+    while (taken.has(`${named} ${n}`)) n++
+    return `${named} ${n}`
+  }
+  const mine = merged.map((c, i) => {
+    const platform = platformOf.get(i)!
+    const conv = { ...c, platform, platformConvId: ids.conversation(platform, pick), messages: c.messages.map((m) => ({ ...m, text: resay(m.text) })) }
+    const t = title(conv)
+    taken.add(t)
+    return { ...conv, title: t }
+  })
+  return [...mine, ...story]
+}
+
 const shownName = (p: string): string => {
   try {
     return platformById(p).name
@@ -62,8 +144,8 @@ const shownName = (p: string): string => {
 
 /** The day the film is set on; Maya's chats were written for it. */
 const NOW = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`)
-const chats = data.everything().conversations as Array<{ platform: string }>
-console.error(`${chats.length} chats`)
+const chats = mayaChats() as Array<{ platform: string }>
+console.error(`${chats.length} chats: ${JSON.stringify(Object.fromEntries(['chatgpt', 'claude', 'gemini'].map((p) => [p, chats.filter((c) => c.platform === p).length])))}`)
 
 // 1. The build.
 const w = await v22World({
@@ -129,7 +211,14 @@ await api('memory.control', { action: 'build', mode: 'direct', from: 'onboarding
 await settled(w, 900_000)
 // The build's end is the `memory.built` event onboarding waits for; the last stage may still be running when the jobs go quiet.
 const builtSeen = () => timeline.some((e) => (e.event as { name?: string } | undefined)?.name === 'memory.built')
-for (let i = 0; i < 600 && !builtSeen(); i++) await new Promise((r) => setTimeout(r, 200))
+console.error(`jobs quiet at ${Date.now() - t0} ms`)
+for (let i = 0; i < 4500 && !builtSeen(); i++) {
+  await new Promise((r) => setTimeout(r, 200))
+  if (i % 150 === 149) {
+    const progress = [...timeline].reverse().find((e) => (e.event as { name?: string } | undefined)?.name === 'memory.build')
+    console.error(`waiting for memory.built at ${Date.now() - t0} ms: ${JSON.stringify((progress?.event as { progress?: unknown } | undefined)?.progress).slice(0, 400)}`)
+  }
+}
 await w.until((s: { state: string }) => s.state === 'ready', 120_000)
 await new Promise((r) => setTimeout(r, 1500))
 if (!builtSeen()) throw new Error('the build never said memory.built')
@@ -161,11 +250,49 @@ const live = await startLive()
 const serverUrl = `http://127.0.0.1:${live.port}`
 const now = () => Date.now()
 const ORIGIN = `chrome-extension://${'fake'.repeat(8)}`
+/**
+ * The format holds at most 64 pieces of evidence on a record (openapi.json
+ * EvidenceList), and coere-server refuses a sync line with more. A build of
+ * four months of chats gives her busiest things more than that (a course
+ * she names in a hundred messages), and v2.2's sync sends them whole, so
+ * the pass would be refused at the first one. Sync reads each record with
+ * its newest 64, the most the format carries; the memory itself keeps all.
+ */
+const EVIDENCE_MAX = 64
+type Rec = { evidence?: unknown[] }
+const capped = <R extends Rec | null>(r: R): R => (r && Array.isArray(r.evidence) && r.evidence.length > EVIDENCE_MAX ? { ...r, evidence: r.evidence.slice(-EVIDENCE_MAX) } : r)
+function withEvidenceCap<M extends { store: { records(tx: unknown, t: unknown): Iterable<Rec>; record(tx: unknown, id: string): Rec | null } }>(m: M): M {
+  const { store } = m
+  return {
+    ...m,
+    store: {
+      ...store,
+      *records(tx: unknown, t: unknown) {
+        for (const r of store.records(tx, t)) yield capped(r)
+      },
+      record: (tx: unknown, id: string) => capped(store.record(tx, id)),
+    },
+  }
+}
+
+/** Chrome adds the extension's origin to its requests; the server checks it. */
+async function netFetch(url: string, init: RequestInit): Promise<Response> {
+  const t = Date.now()
+  try {
+    const res = await fetch(url, { ...init, headers: { ...(init.headers as Record<string, string>), Origin: ORIGIN } })
+    if (process.env.BAKE_NET) console.error(`net ${init.method} ${new URL(url).pathname} ${res.status} ${Date.now() - t} ms ${(init.body as Uint8Array | undefined)?.length ?? 0} bytes`)
+    if (process.env.BAKE_NET && res.status >= 400) console.error(await res.clone().text())
+    if (process.env.BAKE_NET && res.status >= 400 && init.body) writeFileSync(`${process.env.BAKE_NET}.body`, init.body as Uint8Array)
+    return res
+  } catch (e) {
+    console.error(`net ${init.method} ${new URL(url).pathname} failed after ${Date.now() - t} ms: ${String(e)} ${String((e as { cause?: unknown }).cause ?? '')}`)
+    throw e
+  }
+}
 const access = startAccess({
-  memory: async () => workerMemory({ driver: w.memoryDriver, store: w.core.store }, now, '3.0.0'),
+  memory: async () => withEvidenceCap(workerMemory({ driver: w.memoryDriver, store: w.core.store }, now, '3.0.0')),
   run: async (_p: number, fn: () => unknown) => fn(),
-  // Chrome adds the extension's origin to its requests; the server checks it.
-  net: { fetch: (url: string, init: RequestInit) => fetch(url, { ...init, headers: { ...(init.headers as Record<string, string>), Origin: ORIGIN } }), now, random: (b: Uint8Array) => void crypto.getRandomValues(b) },
+  net: { fetch: (url: string, init: RequestInit) => netFetch(url, init), now, random: (b: Uint8Array) => void crypto.getRandomValues(b) },
   clock: { now, setTimeout: (fn: () => void, ms: number) => setTimeout(fn, ms), clearTimeout: (h: unknown) => clearTimeout(h as never) },
   // The dashboard hears access.status from the film's own steps (world.ts), so the worker's events are not kept.
   post: () => undefined,
@@ -276,16 +403,48 @@ const DRAFT = 'Help me prepare for this interview'
 const contextOut = await run(PYTHON, [CONTEXT, DRAFT], { COERE_URL: serverUrl, COERE_TOKEN: token() })
 console.error(contextOut)
 
+/**
+ * The server's address for one planner run, through a pass-through that
+ * pins `from` on `/v1/upcoming`. Left out, `from` is the server's now, and
+ * the server binds a page's cursor to it (routes/upcoming.ts), so the next
+ * page, asked a moment later, is refused as a wrong cursor. Maya's months
+ * of deadlines fill more than a page, so the planner's second page would
+ * stop it. Each run's listing starts at its first page's now, as the
+ * server means it to; nothing else in a request or an answer is changed.
+ * With BAKE_NET, every refused request is printed, for whoever works on the bake.
+ */
+async function pinned(): Promise<{ url: string; close(): void }> {
+  const { createServer } = await import('node:http')
+  let from: string | null = null
+  const proxy = createServer(async (req, res) => {
+    const chunks: Buffer[] = []
+    for await (const c of req) chunks.push(c as Buffer)
+    const body = Buffer.concat(chunks)
+    const url = new URL(req.url ?? '/', serverUrl)
+    if (url.pathname === '/v1/upcoming' && !url.searchParams.has('from')) url.searchParams.set('from', (from ??= new Date().toISOString()))
+    const answer = await fetch(url, { method: req.method, headers: req.headers as Record<string, string>, ...(body.length ? { body } : {}) })
+    const bytes = Buffer.from(await answer.arrayBuffer())
+    if (process.env.BAKE_NET && answer.status >= 400) console.error(`app ${req.method} ${req.url} ${answer.status} ${bytes.toString().slice(0, 600)}`)
+    res.writeHead(answer.status, Object.fromEntries([...answer.headers].filter(([k]) => !['content-encoding', 'content-length', 'transfer-encoding'].includes(k))))
+    res.end(bytes)
+  })
+  await new Promise<void>((r) => proxy.listen(0, '127.0.0.1', r))
+  return { url: `http://127.0.0.1:${(proxy.address() as { port: number }).port}`, close: () => proxy.close() }
+}
+
 // The planner, with Claude's stand in; the first request her memory can plan is the one filmed (v3/planner.ts).
 const REQUESTS = ['Plan a dinner with Caleb next Friday', 'Plan a dinner with Iris next Friday', 'Plan a dinner with Elena next Friday']
 const claude = await startClaude('planner:happy')
 let plan: { request: string; out: string } | null = null
 try {
   for (const request of REQUESTS) {
-    const out = await run(PLANNER, [request, '--out', join(dir, 'plan.ics')], { COERE_URL: serverUrl, COERE_TOKEN: token(), ANTHROPIC_API_KEY: FAKE_KEY, ANTHROPIC_BASE_URL: claude.url }).catch((e: Error) => {
-      console.error(`planner: ${e.message}`)
-      return null
-    })
+    const coere = await pinned()
+    const out = await run(PLANNER, [request, '--out', join(dir, 'plan.ics')], { COERE_URL: coere.url, COERE_TOKEN: token(), ANTHROPIC_API_KEY: FAKE_KEY, ANTHROPIC_BASE_URL: claude.url })
+      .catch((e: Error) => {
+        console.error(`planner: ${e.message}`)
+        return null
+      })
+      .finally(() => coere.close())
     if (out !== null) {
       plan = { request, out }
       break
@@ -327,6 +486,106 @@ const terminal = {
 const text = JSON.stringify(terminal)
 if (/localhost|127\.0\.0\.1/.test(text)) throw new Error('a command printed the server address')
 
+/**
+ * The build's overviews, as many as onboarding's graph can show growing:
+ * one each OVERVIEW_GAP of the build at most, and the last. The events and
+ * the counts stay whole, so the page hears the build as it ran.
+ */
+function thinned(list: typeof timeline): typeof timeline {
+  const OVERVIEWS = 48
+  const withOverview = list.filter((e) => e.overview)
+  const span = (withOverview.at(-1)?.t ?? 0) - (withOverview[0]?.t ?? 0)
+  const gap = span / OVERVIEWS
+  const last = withOverview.at(-1)
+  let kept = -Infinity
+  return list.map((e) => {
+    if (!e.overview || e === last || e.t - kept >= gap) {
+      if (e.overview) kept = e.t
+      return e
+    }
+    return { t: e.t, status: e.status }
+  })
+}
+
+/**
+ * Onboarding's graph (the growing graph and the finish screen) lays out
+ * every folder of the overview, and its camera goes no further out than a
+ * zoom of 0.05 (build/paint.ts frameAround). Over Maya's four months the
+ * balloon layout of her nearly 500 things is some 230,000 units across, so
+ * the finish screen would show a blank corner of it. The popup's stage
+ * meets the same limit and draws fewer folders per section until the whole
+ * graph fits (action-popup/progress/stage-scene.ts). Onboarding's graph is
+ * given its overview the same way: when the whole of it cannot be framed
+ * with every line in view, the most folders under each section or folder,
+ * the first the overview lists, that can be, with every section, every
+ * memory's dot ring under what is kept, and the counts untouched.
+ */
+const SCENE = 'apps/extension/src/onboarding/build/'
+const { sceneNodes } = await v2(`${SCENE}scene.ts`)
+const { placeAll, lineZoomOf, frameAround } = await v2(`${SCENE}paint.ts`)
+/** Onboarding's graph card on the film's 1440 by 900 page, less the strip the finish keeps for Cori's feet. */
+const CARD = { width: 1170, height: 480 }
+const fits = (nodes: Array<{ id: string }>): boolean => {
+  const pos = placeAll(nodes)
+  const need = Math.max(0.05, lineZoomOf(nodes, pos)) * 1.1
+  // frameAround never goes past 0.05, so a frame asked to go no closer than `need` says whether it reached it.
+  return frameAround(nodes.map((n) => n.id), pos, CARD, { most: 1.5 }).k >= need
+}
+type OverviewNode = { id: string; parent: string | null; kind: string }
+/** The most folders under each that the built memory's overview can draw with; Infinity when all of it fits. */
+function foldersFor(o: Overview): number {
+  if (fits(sceneNodes(o))) return Infinity
+  let folders = 40
+  while (folders > 0 && !fits(sceneNodes(o, { folders }))) folders--
+  return folders
+}
+/** The overview with at most `folders` under each, so the graph only grows as the build goes, to the one the finish screen draws. */
+function drawable(o: Overview, folders: number): Overview {
+  if (folders === Infinity) return o
+  const drawn = new Set((sceneNodes(o, { folders }) as Array<{ id: string }>).map((n) => n.id))
+  const byId = new Map((o.nodes as OverviewNode[]).map((n) => [n.id, n]))
+  const keep = new Set<string>()
+  for (const n of o.nodes as OverviewNode[]) {
+    if (n.kind !== 'self' && n.kind !== 'section' && !drawn.has(n.id)) continue
+    // What is drawn, with the folders it sits in that the scene passes through.
+    for (let at: OverviewNode | undefined = n; at && !keep.has(at.id); at = at.parent ? byId.get(at.parent) : undefined) keep.add(at.id)
+  }
+  const edges = (o.edges as Array<{ from: string; to: string }>).filter((e) => keep.has(e.from) && keep.has(e.to))
+  return { ...o, nodes: (o.nodes as OverviewNode[]).filter((n) => keep.has(n.id)), edges }
+}
+
+/**
+ * The overviews share most of their nodes and edges, so each is kept once
+ * in `pool` and an overview lists them by number (world.ts puts them back).
+ */
+type Overview = { nodes: unknown[]; edges: unknown[]; [k: string]: unknown }
+function packed(b: { timeline: typeof timeline; answers: Asked[]; [k: string]: unknown }) {
+  const pool = { nodes: [] as unknown[], edges: [] as unknown[] }
+  const index = { nodes: new Map<string, number>(), edges: new Map<string, number>() }
+  const ref = (kind: 'nodes' | 'edges', x: unknown): number => {
+    const key = JSON.stringify(x)
+    let n = index[kind].get(key)
+    if (n === undefined) {
+      n = pool[kind].push(x) - 1
+      index[kind].set(key, n)
+    }
+    return n
+  }
+  const built = b.answers.find((a) => a.method === 'memory.overview')?.answer as Overview
+  const folders = foldersFor(built)
+  console.error(`onboarding's graph draws ${folders} folders under each`)
+  const pack = (full: Overview) => {
+    const o = drawable(full, folders)
+    return { ...o, nodes: o.nodes.map((x) => ref('nodes', x)), edges: o.edges.map((x) => ref('edges', x)) }
+  }
+  return {
+    ...b,
+    timeline: b.timeline.map((e) => (e.overview ? { ...e, overview: pack(e.overview as Overview) } : e)),
+    answers: b.answers.map((a) => (a.method === 'memory.overview' ? { ...a, answer: pack(a.answer as Overview) } : a)),
+    pool,
+  }
+}
+
 mkdirSync(join(here, 'data'), { recursive: true })
 // The replica ChatGPT's sidebar: Maya's ChatGPT chats, newest first, as the site lists them (sites.mjs).
 type Conv = { platform: string; platformConvId: string; title: string; createdAt?: string; updatedAt?: string; capturedAt: string; messages: Array<{ role: string; text: string }> }
@@ -335,7 +594,8 @@ const site = (chats as unknown as Conv[])
   .map((c) => ({ id: c.platformConvId, title: c.title, createdAt: c.createdAt ?? c.capturedAt, updatedAt: c.updatedAt ?? c.capturedAt, messages: c.messages.map((m) => ({ role: m.role, text: m.text })) }))
   .sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))
 writeFileSync(join(here, 'data/chats.json'), JSON.stringify({ chatgpt: site }))
-writeFileSync(join(here, 'data/build.json'), JSON.stringify({ now: NOW, before, timeline, answers }))
+if (process.env.BAKE_RAW) writeFileSync(process.env.BAKE_RAW, JSON.stringify({ now: NOW, before, timeline, answers }))
+writeFileSync(join(here, 'data/build.json'), JSON.stringify(packed({ now: NOW, before, timeline: thinned(timeline), answers })))
 writeFileSync(join(here, 'data/apps.json'), JSON.stringify({ phases, decided, sent, strip, terminal }, null, 1))
 console.error('wrote data/build.json and data/apps.json')
 await live.stop()

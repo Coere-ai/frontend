@@ -22,13 +22,14 @@ import { AIS, APPS, FilmWorld, PLATFORM_CHATS } from "./world";
  * coere-server paired with Maya's memory (bake.mts).
  */
 
+/** Each chapter's length in seconds, measured from a full run. */
 const CHAPTERS = [
-  { id: "setup", title: "Set up and build" },
-  { id: "asks", title: "An app asks" },
-  { id: "context", title: "The same context" },
-  { id: "planner", title: "The planner" },
-  { id: "sent", title: "What it was sent" },
-  { id: "revoke", title: "Revoke" },
+  { id: "setup", title: "Set up and build", seconds: 43 },
+  { id: "asks", title: "An app asks", seconds: 18 },
+  { id: "context", title: "The same context", seconds: 29 },
+  { id: "planner", title: "The planner", seconds: 10 },
+  { id: "sent", title: "What it was sent", seconds: 11 },
+  { id: "revoke", title: "Revoke", seconds: 11 },
 ];
 
 const LIB = "/preview/live/lib/";
@@ -47,8 +48,8 @@ function setup(world: World): void {
   const handle = world.handle.bind(world);
   world.handle = async (m, tab) => (m?.ch === "coere-voice" ? { ok: true, result: null } : handle(m, tab));
   const now = current;
-  // Extract all on her three AIs, each at its own pace.
-  extractAll(world, { chatgpt: { chats: PLATFORM_CHATS.chatgpt ?? 11, ms: 2600 }, claude: { chats: PLATFORM_CHATS.claude ?? 25, ms: 4300 }, gemini: { chats: PLATFORM_CHATS.gemini ?? 21, ms: 3800 } }, () => now.fast());
+  // Extract all on her three AIs, each at its own pace: 148, 102 and 74 chats (bake.mts).
+  extractAll(world, { chatgpt: { chats: PLATFORM_CHATS.chatgpt ?? 148, ms: 4300 }, claude: { chats: PLATFORM_CHATS.claude ?? 102, ms: 3800 }, gemini: { chats: PLATFORM_CHATS.gemini ?? 74, ms: 3200 } }, () => now.fast());
 }
 
 /** Polls until `test` holds. */

@@ -3,8 +3,8 @@
   "paired": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:36679",
-    "lastOkAt": "2026-10-29T11:53:42.581Z",
+    "url": "http://127.0.0.1:38413",
+    "lastOkAt": "2026-10-29T18:43:09.644Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -18,26 +18,26 @@
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 4,
+     "ms": 7,
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -45,57 +45,57 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:08Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 353,
-     "items": 309
+     "ms": 1342,
+     "items": 1885
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:07Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 6,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:41Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 10,
+     "ms": 12,
      "items": null
     }
    ]
@@ -103,8 +103,8 @@
   "asked": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:36679",
-    "lastOkAt": "2026-10-29T11:53:44.316Z",
+    "url": "http://127.0.0.1:38413",
+    "lastOkAt": "2026-10-29T18:43:11.062Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -117,23 +117,23 @@
    "log": [],
    "connects": [
     {
-     "id": "con_01M63R4HK24MW8KCMVG7GBAT4Y",
+     "id": "con_01M64FJ8HXKKEHFM6H2VR02DYG",
      "name": "planner",
-     "code": "54NT-8NF8",
+     "code": "4EKH-F9Q1",
      "scopes": [
       "memory:read",
       "memory:identity",
       "memory:suggest"
      ],
      "sections": null,
-     "createdAt": "2026-10-29T11:53:44Z",
-     "expiresAt": "2026-10-29T12:03:44Z"
+     "createdAt": "2026-10-29T18:43:11Z",
+     "expiresAt": "2026-10-29T18:53:11Z"
     }
    ],
    "requests": [
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -141,8 +141,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -150,35 +150,35 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
+     "at": "2026-10-29T18:43:11Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 4,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -186,26 +186,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 4,
+     "ms": 7,
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -213,57 +213,57 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:08Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 353,
-     "items": 309
+     "ms": 1342,
+     "items": 1885
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:07Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 6,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:41Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 10,
+     "ms": 12,
      "items": null
     }
    ]
@@ -271,8 +271,8 @@
   "allowed": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:36679",
-    "lastOkAt": "2026-10-29T11:53:46.693Z",
+    "url": "http://127.0.0.1:38413",
+    "lastOkAt": "2026-10-29T18:43:13.352Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -283,15 +283,15 @@
    },
    "tokens": [
     {
-     "id": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "id": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "name": "planner",
      "scopes": [
       "memory:read",
       "memory:suggest"
      ],
      "sections": null,
-     "hint": "IBCR",
-     "createdAt": "2026-10-29T11:53:44Z",
+     "hint": "O5TD",
+     "createdAt": "2026-10-29T18:43:11Z",
      "lastUsedAt": null,
      "expiresAt": null
     }
@@ -300,8 +300,8 @@
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -309,17 +309,17 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -327,8 +327,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -336,17 +336,17 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
+     "at": "2026-10-29T18:43:13Z",
      "actor": null,
      "app": null,
      "op": "connect.token",
      "status": 200,
-     "ms": 4,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.create",
      "status": 201,
@@ -354,8 +354,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -363,8 +363,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -372,8 +372,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -381,35 +381,35 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
+     "at": "2026-10-29T18:43:11Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 4,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -417,26 +417,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 4,
+     "ms": 7,
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -444,57 +444,57 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:08Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 353,
-     "items": 309
+     "ms": 1342,
+     "items": 1885
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:07Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 6,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:41Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 10,
+     "ms": 12,
      "items": null
     }
    ]
@@ -502,8 +502,8 @@
   "used": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:36679",
-    "lastOkAt": "2026-10-29T11:53:51.354Z",
+    "url": "http://127.0.0.1:38413",
+    "lastOkAt": "2026-10-29T18:43:25.717Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -514,52 +514,44 @@
    },
    "tokens": [
     {
-     "id": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "id": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "name": "planner",
      "scopes": [
       "memory:read",
       "memory:suggest"
      ],
      "sections": null,
-     "hint": "IBCR",
-     "createdAt": "2026-10-29T11:53:44Z",
-     "lastUsedAt": "2026-10-29T11:53:47Z",
+     "hint": "O5TD",
+     "createdAt": "2026-10-29T18:43:11Z",
+     "lastUsedAt": "2026-10-29T18:43:13Z",
      "expiresAt": null
     }
    ],
    "log": [
     {
-     "at": "2026-10-29T11:53:50Z",
-     "token": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:17Z",
+     "token": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "target": "claude",
-     "chat": "bf591c00536ef830dac5a4ca0bcf41d2ba78b8e046cf73019b683afeeef5ff53",
+     "chat": "c1ddb69a08258f3a43f9bfc76b2cbde3d0f8e8ef4f6737fa42df5976bd3875d2",
      "first": true,
      "client": null,
      "items": [
       {
        "id": "core",
        "records": [
-        "core:fact_01a1850b-2cdc-7000-a066-0133f4f4dd63",
-        "core:fact_01a1850a-d1b0-7000-b842-c28f042c0235",
-        "core:fact_01a1850a-aa50-7000-bbef-f09d7d84a061",
-        "core:ent_01a1850b-effa-7000-ab8a-403a6d911d1d",
-        "core:ent_01a1850b-3600-7000-9b3d-c0a7f4476df5",
-        "core:ent_01a1850b-1e36-7000-9351-df7d90acff6a"
-       ]
-      },
-      {
-       "id": "ent_01a1850a-6e32-7000-b0e2-70fa1a97e207",
-       "records": [
-        "fact_01a1850a-c0ee-7000-b397-9abb5813a9c7"
+        "core:fact_01a1851f-e992-7001-989b-a5657d49563c",
+        "core:fact_01a18519-ff46-7000-9c83-89729b84d223",
+        "core:fact_01a1851f-e992-7002-9eeb-b90c166519f1",
+        "core:ent_01a1851f-b026-7000-9b38-5399fb4911d3"
        ]
       }
      ],
-     "tokens": 108,
+     "tokens": 68,
      "recorded": true
     },
     {
-     "at": "2026-10-29T11:53:47Z",
-     "token": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:13Z",
+     "token": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "target": null,
      "chat": null,
      "first": true,
@@ -568,86 +560,84 @@
       {
        "id": "core",
        "records": [
-        "core:fact_01a1850b-2cdc-7000-a066-0133f4f4dd63",
-        "core:fact_01a1850a-d1b0-7000-b842-c28f042c0235",
-        "core:fact_01a1850a-aa50-7000-bbef-f09d7d84a061",
-        "core:ent_01a1850b-effa-7000-ab8a-403a6d911d1d",
-        "core:ent_01a1850b-3600-7000-9b3d-c0a7f4476df5",
-        "core:ent_01a1850b-1e36-7000-9351-df7d90acff6a"
+        "core:fact_01a1851f-e992-7001-989b-a5657d49563c",
+        "core:fact_01a18519-ff46-7000-9c83-89729b84d223",
+        "core:fact_01a1851f-e992-7002-9eeb-b90c166519f1",
+        "core:ent_01a1851f-b026-7000-9b38-5399fb4911d3"
        ]
       },
       {
-       "id": "ent_01a1850a-7a62-7000-bb92-8fa7f91d59b0",
+       "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
        "records": [
-        "fact_01a1850c-93ce-7001-97c4-f4ef84f1782e",
-        "fact_01a1850a-7a80-7000-8ea6-dfcfc0b27219",
-        "fact_01a1850a-7a62-7001-8c70-1e66dc95f41b",
-        "fact_01a1850c-93ec-7001-93b6-cb28cba52adf",
-        "fact_01a1850c-93ec-7000-a112-3442adea098d",
-        "fact_01a1850c-93ce-7000-9a21-623180c7cbb6"
+        "fact_01a18524-310a-7001-bbb9-12ec79f8116f",
+        "fact_01a18515-40dc-7002-af8f-015e81498729",
+        "fact_01a18515-40dc-7001-b51e-f914845fad0a",
+        "fact_01a18524-3128-7001-8c67-8724169b8a1c",
+        "fact_01a18524-3128-7000-acd5-b6a3d64aa4c6",
+        "fact_01a18524-310a-7000-8eb8-4a0d8331ec45"
        ]
       },
       {
-       "id": "ent_01a1850b-1e36-7000-9351-df7d90acff6a",
+       "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
        "records": [
-        "fact_01a1850b-1e54-7000-956e-2c6051b7b3e5"
+        "fact_01a1851b-a544-7001-ab44-6af95f5fb643"
        ]
       }
      ],
-     "tokens": 290,
+     "tokens": 275,
      "recorded": false
     }
    ],
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 4,
+     "ms": 7,
      "items": 2
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 2,
+     "ms": 8,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inboxAck",
      "status": 204,
-     "ms": 12,
+     "ms": 19,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
-     "status": 200,
-     "ms": 2,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
-     "app": null,
-     "op": "sync.state",
      "status": 200,
      "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "people.identity",
      "status": 200,
@@ -655,89 +645,98 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:18Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "search",
      "status": 200,
-     "ms": 121,
+     "ms": 6828,
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:18Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "nodes.get",
      "status": 200,
-     "ms": 7,
+     "ms": 34,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:18Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "entities.list",
      "status": 200,
-     "ms": 5,
-     "items": 1
+     "ms": 34,
+     "items": 4
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "upcoming",
      "status": 200,
-     "ms": 30,
-     "items": 18
+     "ms": 209,
+     "items": 50
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "app": "planner",
+     "op": "upcoming",
+     "status": 200,
+     "ms": 207,
+     "items": 50
+    },
+    {
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "profile",
      "status": 200,
-     "ms": 8,
+     "ms": 79,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "context.draft",
      "status": 200,
-     "ms": 40,
-     "items": 2
+     "ms": 11,
+     "items": 1
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:16Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "profile",
      "status": 200,
-     "ms": 17,
+     "ms": 87,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:47Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "context.draft",
      "status": 200,
-     "ms": 130,
+     "ms": 565,
      "items": 3
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -745,17 +744,17 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -763,8 +762,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -772,17 +771,17 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
+     "at": "2026-10-29T18:43:13Z",
      "actor": null,
      "app": null,
      "op": "connect.token",
      "status": 200,
-     "ms": 4,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.create",
      "status": 201,
@@ -790,8 +789,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -799,8 +798,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -808,8 +807,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -817,35 +816,35 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
+     "at": "2026-10-29T18:43:11Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 4,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -853,26 +852,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 4,
+     "ms": 7,
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -880,57 +879,57 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:08Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 353,
-     "items": 309
+     "ms": 1342,
+     "items": 1885
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:07Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 6,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:41Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 10,
+     "ms": 12,
      "items": null
     }
    ]
@@ -938,8 +937,8 @@
   "revoked": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:36679",
-    "lastOkAt": "2026-10-29T11:53:51.693Z",
+    "url": "http://127.0.0.1:38413",
+    "lastOkAt": "2026-10-29T18:43:26.026Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -953,8 +952,8 @@
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:26Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -962,98 +961,98 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:26Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
-     "status": 200,
-     "ms": 3,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
-     "app": null,
-     "op": "sync.inbox",
-     "status": 200,
-     "ms": 3,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
-     "app": null,
-     "op": "sync.state",
      "status": 200,
      "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:26Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:43:26Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.revoke",
      "status": 204,
-     "ms": 9,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
-     "ms": 10,
+     "ms": 8,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 4,
+     "ms": 7,
      "items": 2
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 2,
+     "ms": 8,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inboxAck",
      "status": 204,
-     "ms": 12,
+     "ms": 19,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
-     "status": 200,
-     "ms": 2,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T11:53:51Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
-     "app": null,
-     "op": "sync.state",
      "status": 200,
      "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "app": null,
+     "op": "sync.state",
+     "status": 200,
+     "ms": 2,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T18:43:25Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "people.identity",
      "status": 200,
@@ -1061,89 +1060,98 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:18Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "search",
      "status": 200,
-     "ms": 121,
+     "ms": 6828,
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:18Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "nodes.get",
      "status": 200,
-     "ms": 7,
+     "ms": 34,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:18Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "entities.list",
      "status": 200,
-     "ms": 5,
-     "items": 1
+     "ms": 34,
+     "items": 4
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "upcoming",
      "status": 200,
-     "ms": 30,
-     "items": 18
+     "ms": 209,
+     "items": 50
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "app": "planner",
+     "op": "upcoming",
+     "status": 200,
+     "ms": 207,
+     "items": 50
+    },
+    {
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "profile",
      "status": 200,
-     "ms": 8,
+     "ms": 79,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:17Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "context.draft",
      "status": 200,
-     "ms": 40,
-     "items": 2
+     "ms": 11,
+     "items": 1
     },
     {
-     "at": "2026-10-29T11:53:50Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:16Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "profile",
      "status": 200,
-     "ms": 17,
+     "ms": 87,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:47Z",
-     "actor": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
      "app": "planner",
      "op": "context.draft",
      "status": 200,
-     "ms": 130,
+     "ms": 565,
      "items": 3
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -1151,17 +1159,17 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -1169,8 +1177,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:13Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -1178,17 +1186,17 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:46Z",
+     "at": "2026-10-29T18:43:13Z",
      "actor": null,
      "app": null,
      "op": "connect.token",
      "status": 200,
-     "ms": 4,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.create",
      "status": 201,
@@ -1196,8 +1204,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -1205,8 +1213,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -1214,8 +1222,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -1223,35 +1231,35 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:11Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:44Z",
+     "at": "2026-10-29T18:43:11Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 4,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -1259,26 +1267,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 4,
+     "ms": 7,
      "items": 0
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -1286,289 +1294,113 @@
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:09Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
-     "ms": 4,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:08Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 353,
-     "items": 309
+     "ms": 1342,
+     "items": 1885
     },
     {
-     "at": "2026-10-29T11:53:42Z",
-     "actor": "dev_01M63R4FBTRM8NY8NW0ZK25SFC",
+     "at": "2026-10-29T18:43:07Z",
+     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:42Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 6,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T11:53:41Z",
+     "at": "2026-10-29T18:43:07Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 10,
+     "ms": 12,
      "items": null
     }
    ]
   }
  },
  "decided": {
-  "tokenId": "tok_01M63R4HVVPMDCNAYWQ6P7AY5E"
+  "tokenId": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ"
  },
  "sent": [
   {
    "method": "memory.corePack",
    "answer": {
-    "version": "be078b6bf45bd92b",
+    "version": "86f4aa36073a8850",
     "lines": [
      {
-      "id": "fact_01a1850b-2cdc-7000-a066-0133f4f4dd63",
+      "id": "fact_01a1851f-e992-7001-989b-a5657d49563c",
       "group": "identity",
       "text": "You work at Kestrel Analytics as a lead research assistant."
      },
      {
-      "id": "fact_01a1850a-d1b0-7000-b842-c28f042c0235",
+      "id": "fact_01a18519-ff46-7000-9c83-89729b84d223",
       "group": "identity",
       "text": "My name is Maya Collins."
      },
      {
-      "id": "fact_01a1850a-aa50-7000-bbef-f09d7d84a061",
+      "id": "fact_01a1851f-e992-7002-9eeb-b90c166519f1",
       "group": "identity",
       "text": "Your employer is Kestrel Analytics."
      },
      {
-      "id": "ent_01a1850b-effa-7000-ab8a-403a6d911d1d",
+      "id": "fact_01a18521-c956-7000-8773-a190e71e7726",
+      "group": "identity",
+      "text": "You live in Madison."
+     },
+     {
+      "id": "ent_01a1851f-b026-7000-9b38-5399fb4911d3",
       "group": "projects",
       "text": "Working on Tidepool."
-     },
-     {
-      "id": "ent_01a1850b-3600-7000-9b3d-c0a7f4476df5",
-      "group": "projects",
-      "text": "Working on Sparrowhawk."
-     },
-     {
-      "id": "ent_01a1850b-1e36-7000-9351-df7d90acff6a",
-      "group": "projects",
-      "text": "Working on Kitchen remodel."
      }
     ],
-    "chats": 6,
+    "chats": 4,
     "hidden": []
    }
   },
   {
    "method": "memory.node",
    "args": {
-    "id": "ent_01a1850a-6e32-7000-b0e2-70fa1a97e207"
-   },
-   "answer": {
-    "identity": [
-     {
-      "id": "fact_01a1850a-6e32-7002-a5a0-dcb04704e200",
-      "field": "email",
-      "value": "caleb.moreau@lindenpost.com",
-      "href": "mailto:caleb.moreau@lindenpost.com",
-      "sources": [
-       {
-        "evidenceId": "fact_01a1850a-6e32-7002-a5a0-dcb04704e200#e0",
-        "platform": "chatgpt",
-        "convId": "chatgpt:53489641-18f7-2c51-503c-333e96abf016",
-        "title": "Flight times for the trip",
-        "msg": 5,
-        "role": "user",
-        "at": "2026-08-04T23:44:00Z",
-        "url": null,
-        "stale": false
-       }
-      ],
-      "said": "2026-08-04"
-     },
-     {
-      "id": "fact_01a1850a-c0ee-7000-b397-9abb5813a9c7",
-      "field": "org",
-      "value": "Northwind Clinic",
-      "href": null,
-      "sources": [
-       {
-        "evidenceId": "fact_01a1850a-c0ee-7000-b397-9abb5813a9c7#e0",
-        "platform": "claude",
-        "convId": "claude:10fd9feb-7ef2-d858-2753-03d0fa9005cd",
-        "title": "Caleb's new job",
-        "msg": 1,
-        "role": "user",
-        "at": "2026-07-29T17:03:00Z",
-        "url": null,
-        "stale": false
-       }
-      ],
-      "said": "2026-07-29"
-     }
-    ],
-    "node": {
-     "id": "ent_01a1850a-6e32-7000-b0e2-70fa1a97e207",
-     "kind": "person",
-     "label": "Caleb Moreau",
-     "section": "sec_people",
-     "parent": "sec_people",
-     "importance": 3,
-     "pinned": false,
-     "urgency": "none",
-     "facts": 2,
-     "history": false,
-     "aliases": [],
-     "summary": null,
-     "path": [
-      {
-       "id": "sec_people",
-       "label": "People"
-      },
-      {
-       "id": "ent_01a1850a-6e32-7000-b0e2-70fa1a97e207",
-       "label": "Caleb Moreau"
-      }
-     ]
-    },
-    "due": [],
-    "groups": [
-     {
-      "name": "facts",
-      "facts": [
-       {
-        "id": "fact_01a1850a-6e32-7002-a5a0-dcb04704e200",
-        "kind": "attribute",
-        "key": "email",
-        "text": "The email of Caleb Moreau is caleb.moreau@lindenpost.com.",
-        "specifics": [
-         [
-          29,
-          56
-         ]
-        ],
-        "importance": 3,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "due": null,
-        "progress": null,
-        "status": "active",
-        "disagree": false,
-        "held": false,
-        "pinned": false,
-        "origin": "extracted",
-        "basis": "user_stated",
-        "sensitivity": null,
-        "sources": [
-         {
-          "evidenceId": "fact_01a1850a-6e32-7002-a5a0-dcb04704e200#e0",
-          "platform": "chatgpt",
-          "convId": "chatgpt:53489641-18f7-2c51-503c-333e96abf016",
-          "title": "Flight times for the trip",
-          "msg": 5,
-          "role": "user",
-          "at": "2026-08-04T23:44:00Z",
-          "url": null,
-          "stale": false
-         }
-        ],
-        "supersededBy": null,
-        "replacedOn": null,
-        "changedBy": null,
-        "freshness": "current",
-        "mentions": 1
-       },
-       {
-        "id": "fact_01a1850a-c0ee-7000-b397-9abb5813a9c7",
-        "kind": "attribute",
-        "key": "works_at",
-        "text": "Caleb Moreau works at Northwind Clinic.",
-        "specifics": [],
-        "importance": 3,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "due": null,
-        "progress": null,
-        "status": "active",
-        "disagree": false,
-        "held": false,
-        "pinned": false,
-        "origin": "extracted",
-        "basis": "user_stated",
-        "sensitivity": null,
-        "sources": [
-         {
-          "evidenceId": "fact_01a1850a-c0ee-7000-b397-9abb5813a9c7#e0",
-          "platform": "claude",
-          "convId": "claude:10fd9feb-7ef2-d858-2753-03d0fa9005cd",
-          "title": "Caleb's new job",
-          "msg": 1,
-          "role": "user",
-          "at": "2026-07-29T17:03:00Z",
-          "url": null,
-          "stale": false
-         }
-        ],
-        "supersededBy": null,
-        "replacedOn": null,
-        "changedBy": null,
-        "freshness": "current",
-        "mentions": 1
-       }
-      ]
-     }
-    ],
-    "earlier": [],
-    "relations": [],
-    "review": []
-   }
-  },
-  {
-   "method": "memory.documents",
-   "args": {
-    "id": "ent_01a1850a-6e32-7000-b0e2-70fa1a97e207"
-   },
-   "answer": []
-  },
-  {
-   "method": "memory.node",
-   "args": {
-    "id": "ent_01a1850a-7a62-7000-bb92-8fa7f91d59b0"
+    "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8"
    },
    "answer": {
     "node": {
-     "id": "ent_01a1850a-7a62-7000-bb92-8fa7f91d59b0",
+     "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
      "kind": "event",
      "label": "PearX interview",
      "section": "sec_projects",
-     "parent": "ent_01a1850a-7990-7000-b1cb-a24375333341",
+     "parent": "ent_01a18515-4064-7001-b3d1-2042324e244a",
      "importance": 4,
      "pinned": false,
      "urgency": "upcoming",
@@ -1582,18 +1414,18 @@
        "label": "Projects"
       },
       {
-       "id": "ent_01a1850a-7990-7000-b1cb-a24375333341",
+       "id": "ent_01a18515-4064-7001-b3d1-2042324e244a",
        "label": "Startups and businesses"
       },
       {
-       "id": "ent_01a1850a-7a62-7000-bb92-8fa7f91d59b0",
+       "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
        "label": "PearX interview"
       }
      ]
     },
     "due": [
      {
-      "id": "fact_01a1850c-93ce-7001-97c4-f4ef84f1782e",
+      "id": "fact_01a18524-310a-7001-bbb9-12ec79f8116f",
       "kind": "event",
       "key": "start",
       "text": "The PearX interview is on November 4 at 2 pm over video.",
@@ -1621,7 +1453,7 @@
       "sensitivity": null,
       "sources": [
        {
-        "evidenceId": "fact_01a1850c-93ce-7001-97c4-f4ef84f1782e#e0",
+        "evidenceId": "fact_01a18524-310a-7001-bbb9-12ec79f8116f#e0",
         "platform": "claude",
         "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
         "title": "Big news about PearX",
@@ -1644,7 +1476,7 @@
       "name": "facts",
       "facts": [
        {
-        "id": "fact_01a1850a-7a62-7001-8c70-1e66dc95f41b",
+        "id": "fact_01a18515-40dc-7001-b51e-f914845fad0a",
         "kind": "goal",
         "key": "answer.traction",
         "text": "My PearX interview answer on traction should lead with the 1,200 weekly users.",
@@ -1668,7 +1500,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a1850a-7a62-7001-8c70-1e66dc95f41b#e0",
+          "evidenceId": "fact_01a18515-40dc-7001-b51e-f914845fad0a#e0",
           "platform": "chatgpt",
           "convId": "chatgpt:5e91a20c-5fe4-2cd8-cee0-1fc3efb0180d",
           "title": "PearX interview prep",
@@ -1686,7 +1518,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a1850a-7a80-7000-8ea6-dfcfc0b27219",
+        "id": "fact_01a18515-40dc-7002-af8f-015e81498729",
         "kind": "goal",
         "key": "answer.why_now",
         "text": "I want my PearX interview answer on why now to mention the records move.",
@@ -1705,7 +1537,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a1850a-7a80-7000-8ea6-dfcfc0b27219#e0",
+          "evidenceId": "fact_01a18515-40dc-7002-af8f-015e81498729#e0",
           "platform": "chatgpt",
           "convId": "chatgpt:5e91a20c-5fe4-2cd8-cee0-1fc3efb0180d",
           "title": "PearX interview prep",
@@ -1723,7 +1555,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a1850c-93ce-7000-9a21-623180c7cbb6",
+        "id": "fact_01a18524-310a-7000-8eb8-4a0d8331ec45",
         "kind": "event",
         "key": "purpose",
         "text": "My PearX interview is for Tidepool, my startup.",
@@ -1742,7 +1574,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a1850c-93ce-7000-9a21-623180c7cbb6#e0",
+          "evidenceId": "fact_01a18524-310a-7000-8eb8-4a0d8331ec45#e0",
           "platform": "claude",
           "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
           "title": "Big news about PearX",
@@ -1760,7 +1592,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a1850c-93ec-7000-a112-3442adea098d",
+        "id": "fact_01a18524-3128-7000-acd5-b6a3d64aa4c6",
         "kind": "note",
         "key": "stage",
         "text": "The PearX interview is the partner round with two partners.",
@@ -1784,7 +1616,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a1850c-93ec-7000-a112-3442adea098d#e0",
+          "evidenceId": "fact_01a18524-3128-7000-acd5-b6a3d64aa4c6#e0",
           "platform": "claude",
           "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
           "title": "Big news about PearX",
@@ -1802,7 +1634,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a1850c-93ec-7001-93b6-cb28cba52adf",
+        "id": "fact_01a18524-3128-7001-8c67-8724169b8a1c",
         "kind": "note",
         "key": "topics",
         "text": "They told me the PearX interview will cover traction, the team and why now.",
@@ -1821,7 +1653,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a1850c-93ec-7001-93b6-cb28cba52adf#e0",
+          "evidenceId": "fact_01a18524-3128-7001-8c67-8724169b8a1c#e0",
           "platform": "claude",
           "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
           "title": "Big news about PearX",
@@ -1848,7 +1680,7 @@
       "label": "for",
       "direction": "out",
       "other": {
-       "id": "ent_01a1850b-effa-7000-ab8a-403a6d911d1d",
+       "id": "ent_01a1851f-b026-7000-9b38-5399fb4911d3",
        "label": "Tidepool",
        "kind": "project"
       }
@@ -1860,18 +1692,18 @@
   {
    "method": "memory.documents",
    "args": {
-    "id": "ent_01a1850a-7a62-7000-bb92-8fa7f91d59b0"
+    "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8"
    },
    "answer": []
   },
   {
    "method": "memory.node",
    "args": {
-    "id": "ent_01a1850b-1e36-7000-9351-df7d90acff6a"
+    "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482"
    },
    "answer": {
     "node": {
-     "id": "ent_01a1850b-1e36-7000-9351-df7d90acff6a",
+     "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
      "kind": "project",
      "label": "Kitchen remodel",
      "section": "sec_home",
@@ -1889,7 +1721,7 @@
        "label": "Home and living"
       },
       {
-       "id": "ent_01a1850b-1e36-7000-9351-df7d90acff6a",
+       "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
        "label": "Kitchen remodel"
       }
      ]
@@ -1900,7 +1732,7 @@
       "name": "facts",
       "facts": [
        {
-        "id": "fact_01a1850b-1e54-7000-956e-2c6051b7b3e5",
+        "id": "fact_01a1851b-a544-7001-ab44-6af95f5fb643",
         "kind": "note",
         "key": "next_step",
         "text": "I have an interview with a contractor on Friday about the Kitchen remodel and new counters.",
@@ -1919,7 +1751,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a1850b-1e54-7000-956e-2c6051b7b3e5#e0",
+          "evidenceId": "fact_01a1851b-a544-7001-ab44-6af95f5fb643#e0",
           "platform": "claude",
           "convId": "claude:7aa7bd3c-00fb-2343-e2c1-b5a04e0b0d3f",
           "title": "Kitchen counters",
@@ -1947,7 +1779,7 @@
   {
    "method": "memory.documents",
    "args": {
-    "id": "ent_01a1850b-1e36-7000-9351-df7d90acff6a"
+    "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482"
    },
    "answer": []
   }
@@ -1983,26 +1815,24 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "df07299fc5e940d2",
+       "a2a871fcb8ba3045",
        "498ffe2eac95c620",
-       "74b7253fe9f6b3e7",
-       "1103493e4669debe",
-       "58468bb196fa3c90",
-       "f2d15ac167069af2"
+       "8ab76ed3b06fa590",
+       "1103493e4669debe"
       ],
-      "tokens": 59,
+      "tokens": 49,
       "changedOnly": false,
-      "version": "4bc11f9e4d550c66"
+      "version": "1f7da6d228e12f74"
      }
     ],
     "also": [],
     "topic": [
      "About me"
     ],
-    "tokens": 84,
+    "tokens": 74,
     "sources": [],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\n- Working on Kitchen remodel.\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -2036,26 +1866,24 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "df07299fc5e940d2",
+       "a2a871fcb8ba3045",
        "498ffe2eac95c620",
-       "74b7253fe9f6b3e7",
-       "1103493e4669debe",
-       "58468bb196fa3c90",
-       "f2d15ac167069af2"
+       "8ab76ed3b06fa590",
+       "1103493e4669debe"
       ],
-      "tokens": 59,
+      "tokens": 49,
       "changedOnly": false,
-      "version": "4bc11f9e4d550c66"
+      "version": "1f7da6d228e12f74"
      }
     ],
     "also": [],
     "topic": [
      "About me"
     ],
-    "tokens": 84,
+    "tokens": 74,
     "sources": [],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\n- Working on Kitchen remodel.\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -2090,19 +1918,17 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "df07299fc5e940d2",
+       "a2a871fcb8ba3045",
        "498ffe2eac95c620",
-       "74b7253fe9f6b3e7",
-       "1103493e4669debe",
-       "58468bb196fa3c90",
-       "f2d15ac167069af2"
+       "8ab76ed3b06fa590",
+       "1103493e4669debe"
       ],
-      "tokens": 59,
+      "tokens": 49,
       "changedOnly": false,
-      "version": "4bc11f9e4d550c66"
+      "version": "1f7da6d228e12f74"
      },
      {
-      "id": "ent_01a1850a-ddc2-7000-938c-7fd3331daf1e",
+      "id": "ent_01a1851a-1da0-7000-80a2-05bd5bcf5cb6",
       "path": [
        "School",
        "Studying",
@@ -2120,7 +1946,7 @@
       ],
       "tokens": 89,
       "changedOnly": false,
-      "version": "cfa9e465b64f6566"
+      "version": "82cdbc7b90bacbf7"
      }
     ],
     "also": [],
@@ -2128,13 +1954,13 @@
      "About me",
      "MATH 54 midterm"
     ],
-    "tokens": 172,
+    "tokens": 162,
     "sources": [
      "claude",
      "gemini"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\n- Working on Kitchen remodel.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -2170,19 +1996,17 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "df07299fc5e940d2",
+       "a2a871fcb8ba3045",
        "498ffe2eac95c620",
-       "74b7253fe9f6b3e7",
-       "1103493e4669debe",
-       "58468bb196fa3c90",
-       "f2d15ac167069af2"
+       "8ab76ed3b06fa590",
+       "1103493e4669debe"
       ],
-      "tokens": 59,
+      "tokens": 49,
       "changedOnly": false,
-      "version": "4bc11f9e4d550c66"
+      "version": "1f7da6d228e12f74"
      },
      {
-      "id": "ent_01a1850a-ddc2-7000-938c-7fd3331daf1e",
+      "id": "ent_01a1851a-1da0-7000-80a2-05bd5bcf5cb6",
       "path": [
        "School",
        "Studying",
@@ -2200,7 +2024,7 @@
       ],
       "tokens": 89,
       "changedOnly": false,
-      "version": "cfa9e465b64f6566"
+      "version": "82cdbc7b90bacbf7"
      }
     ],
     "also": [],
@@ -2208,13 +2032,13 @@
      "About me",
      "MATH 54 midterm"
     ],
-    "tokens": 172,
+    "tokens": 162,
     "sources": [
      "claude",
      "gemini"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\n- Working on Kitchen remodel.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -2251,19 +2075,17 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "df07299fc5e940d2",
+       "a2a871fcb8ba3045",
        "498ffe2eac95c620",
-       "74b7253fe9f6b3e7",
-       "1103493e4669debe",
-       "58468bb196fa3c90",
-       "f2d15ac167069af2"
+       "8ab76ed3b06fa590",
+       "1103493e4669debe"
       ],
-      "tokens": 59,
+      "tokens": 49,
       "changedOnly": false,
-      "version": "4bc11f9e4d550c66"
+      "version": "1f7da6d228e12f74"
      },
      {
-      "id": "ent_01a1850a-ddc2-7000-938c-7fd3331daf1e",
+      "id": "ent_01a1851a-1da0-7000-80a2-05bd5bcf5cb6",
       "path": [
        "School",
        "Studying",
@@ -2281,12 +2103,12 @@
       ],
       "tokens": 89,
       "changedOnly": false,
-      "version": "cfa9e465b64f6566"
+      "version": "82cdbc7b90bacbf7"
      }
     ],
     "also": [
      {
-      "id": "ent_01a1850a-dcf0-7001-bf49-bc91858b2715",
+      "id": "ent_01a1851a-1d0a-7000-81ab-7a2ad41f4a1a",
       "path": [
        "School",
        "Studying"
@@ -2303,13 +2125,13 @@
      "About me",
      "MATH 54 midterm"
     ],
-    "tokens": 172,
+    "tokens": 162,
     "sources": [
      "claude",
      "gemini"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\n- Working on Kitchen remodel.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -2347,19 +2169,17 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "df07299fc5e940d2",
+       "a2a871fcb8ba3045",
        "498ffe2eac95c620",
-       "74b7253fe9f6b3e7",
-       "1103493e4669debe",
-       "58468bb196fa3c90",
-       "f2d15ac167069af2"
+       "8ab76ed3b06fa590",
+       "1103493e4669debe"
       ],
-      "tokens": 59,
+      "tokens": 49,
       "changedOnly": false,
-      "version": "4bc11f9e4d550c66"
+      "version": "1f7da6d228e12f74"
      },
      {
-      "id": "ent_01a1850a-7a62-7000-bb92-8fa7f91d59b0",
+      "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
       "path": [
        "Projects",
        "Startups and businesses",
@@ -2376,10 +2196,10 @@
       ],
       "tokens": 165,
       "changedOnly": false,
-      "version": "3faf883ead83bda1"
+      "version": "1812e40b3ee6e7ba"
      },
      {
-      "id": "ent_01a1850b-1e36-7000-9351-df7d90acff6a",
+      "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
       "path": [
        "Home and living",
        "Kitchen remodel"
@@ -2393,12 +2213,12 @@
       ],
       "tokens": 42,
       "changedOnly": false,
-      "version": "584f3ba00fc3cefa"
+      "version": "90bf013d47dadfb9"
      }
     ],
     "also": [
      {
-      "id": "ent_01a1850a-dcf0-7002-8607-76fed961aaa6",
+      "id": "ent_01a1851a-1d0a-7001-8236-64dff13ea3e0",
       "path": [
        "School",
        "Studying",
@@ -2417,29 +2237,29 @@
      "PearX interview",
      "Kitchen remodel"
     ],
-    "tokens": 290,
+    "tokens": 281,
     "sources": [
      "chatgpt",
      "claude"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\n- Working on Kitchen remodel.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\n"
    }
   }
  ],
  "terminal": {
   "connect": {
    "command": "uv run planner --connect",
-   "asked": "Open Apps in Coere and allow planner. Code 54NT-8NF8.",
+   "asked": "Open Apps in Coere and allow planner. Code 4EKH-F9Q1.",
    "allowed": "Allowed. The token is saved in ~/event-planner/.env."
   },
   "context": {
    "command": "uv run context.py \"Help me prepare for this interview\"",
-   "out": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\n- Working on Sparrowhawk.\n- Working on Kitchen remodel.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\nFrom 8 chats\n  About me: Goes with the first message of every chat\n  Projects / Startups and businesses / PearX interview: Shares words with the draft\n  Home and living / Kitchen remodel: Shares words with the draft"
+   "out": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\nFrom 6 chats\n  About me: Goes with the first message of every chat\n  Projects / Startups and businesses / PearX interview: Shares words with the draft\n  Home and living / Kitchen remodel: Shares words with the draft"
   },
   "plan": {
    "command": "uv run planner \"Plan a dinner with Caleb next Friday\"",
-   "out": "Dinner with Caleb Moreau\nThursday, November 5, 7:30 PM to 9:30 PM (America/Los_Angeles)\nWith Caleb Moreau\nPlace idea: A restaurant near home\nWhy\n  Caleb Moreau works at Northwind Clinic.                   fact_01a1850a-c0ee-7000-b397-9abb5813a9c7\nChecked\n  Reading 1 for MATH 54 is due Nov 2.                       fact_01a1850b-b760-7001-b5c6-7003f40c0612\n  The PearX interview is on November 4 at 2 pm over video.  fact_01a1850c-93ce-7001-97c4-f4ef84f1782e\n  The MATH 54 midterm is on November 6 in Evans Hall.       fact_01a1850c-a0ee-7001-a3f6-c7fe0505fd5e\nStill open\n  Which restaurant should be booked?\nSaved ~/event-planner/plan.ics"
+   "out": "Dinner with Caleb Moreau\nFriday, November 6, 7:30 PM to 9:30 PM (America/Los_Angeles)\nWith Caleb Moreau\nPlace idea: A restaurant near home\nWhy\n  Caleb Moreau works at Northwind Clinic.  fact_01a1851a-da6a-7001-b3c9-acd719fd305a\nStill open\n  Which restaurant should be booked?\nSaved ~/event-planner/plan.ics"
   }
  }
 }

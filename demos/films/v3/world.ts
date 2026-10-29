@@ -25,6 +25,8 @@ type Build = {
   before: { status: unknown; settings: unknown; estimate: { chats: number }; overview: unknown; platforms: Record<string, number> };
   timeline: Entry[];
   answers: Answer[];
+  /** The overviews' nodes and edges, each once; an overview lists them by number (bake.mts packed). */
+  pool: { nodes: unknown[]; edges: unknown[] };
 };
 type AppsRead = { status: { [k: string]: unknown }; tokens: unknown[]; log: unknown[]; connects: unknown[]; requests: unknown[] };
 export type AccessStep = "paired" | "asked" | "allowed" | "used" | "revoked";
@@ -39,8 +41,22 @@ type Apps = {
     plan: { command: string; out: string };
   };
 };
-const BUILD = built as unknown as Build;
+const BUILD = unpacked(built as unknown as Build);
 export const APPS = apps as unknown as Apps;
+
+/** Each overview with its own nodes and edges again, from the pool. */
+function unpacked(b: Build): Build {
+  type Packed = { nodes: number[]; edges: number[] };
+  const open = (o: unknown) => {
+    const p = o as Packed;
+    return { ...p, nodes: p.nodes.map((i) => ({ ...(b.pool.nodes[i] as object) })), edges: p.edges.map((i) => ({ ...(b.pool.edges[i] as object) })) };
+  };
+  return {
+    ...b,
+    timeline: b.timeline.map((e) => (e.overview ? { ...e, overview: open(e.overview) } : e)),
+    answers: b.answers.map((a) => (a.method === "memory.overview" ? { ...a, answer: open(a.answer) } : a)),
+  };
+}
 
 /**
  * The same key for the same arguments, whatever their order and with absent
@@ -66,13 +82,15 @@ const after = (method: string, args?: unknown) => AFTER.get(keyOf(method, args ?
 /**
  * When each entry of the build plays back, in ms after Build my memory:
  * sorting the chats (which draws no graph) takes a second and a half, and
- * the graph's growth runs a little over twice as slow as Node ran it, as
- * the film slowed its models for the camera.
+ * the graph's growth, which took Node most of two minutes over her 324
+ * chats, plays in GROW_MS, as long as the film's own build of fewer chats
+ * grew on camera, so the shot sees the same share of it.
  */
 const SORT_MS = 1500;
-const PACE = 2.2;
+const GROW_MS = 13_000;
 const T0 = BUILD.timeline[0]?.t ?? 0;
 const GROW = BUILD.timeline.find((e) => (e.event?.progress as { phase?: string } | undefined)?.phase === "building")?.t ?? T0;
+const PACE = GROW_MS / Math.max(1, (BUILD.timeline.at(-1)?.t ?? GROW) - GROW);
 const playAt = (t: number) => (t < GROW ? ((t - T0) / Math.max(1, GROW - T0)) * SORT_MS : SORT_MS + (t - GROW) * PACE);
 
 export const AIS = ["chatgpt", "claude", "gemini"] as const;

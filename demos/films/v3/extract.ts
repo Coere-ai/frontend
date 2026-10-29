@@ -7,8 +7,8 @@ import type { World } from "../../stage/world";
  * background, never filmed, as in coere-v2's film), and each tab's run
  * reports its counts through the worker's relay until every chat is
  * saved. The shapes are coere-v2's lib/batch-types.ts, which onboarding's
- * parsers check field by field. Each AI holds the chats the film's sites
- * held (bake.mts counts them).
+ * parsers check field by field. Each AI holds Maya's chats on it
+ * (bake.mts counts them: 148, 102 and 74).
  */
 type Plan = Record<string, { chats: number; ms: number }>;
 
