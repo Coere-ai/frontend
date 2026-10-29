@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { Highlighted } from "@/site/code/highlighted";
 
 export type CodeSample = { label: string; language: string; code: string };
 
 /**
- * A dark code window with a tab per language. Code is shown as written,
- * with no highlighting, so it reads like a terminal and copies cleanly.
+ * A dark code window with a tab per language, colored by token kind. Copy
+ * takes the code exactly as written.
  */
 export function CodeTabs({ samples, title }: { samples: CodeSample[]; title?: string }) {
   const [picked, setPicked] = useState(0);
@@ -43,7 +44,7 @@ export function CodeTabs({ samples, title }: { samples: CodeSample[]; title?: st
         </button>
       </div>
       <pre className="overflow-x-auto p-6 text-[13px] leading-relaxed">
-        <code className={`language-${sample.language} font-mono`}>{sample.code}</code>
+        <Highlighted code={sample.code} language={sample.language} />
       </pre>
     </div>
   );

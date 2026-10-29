@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Marked, type Tokens } from "marked";
+import { highlightHtml } from "@/site/code/highlight";
 import { docPages } from "@/site/content/docs";
 
 export type TocEntry = { id: string; text: string; depth: number };
@@ -78,6 +79,9 @@ export function renderDoc(slug: string): RenderedDoc {
           return `<a href="${target.replace("/resources/#", "/resources#")}">${inner}</a>`;
         }
         return `<a href="${href}" rel="noreferrer">${inner}</a>`;
+      },
+      code({ text, lang }: Tokens.Code) {
+        return `<pre><code>${highlightHtml(text, lang ?? "")}</code></pre>\n`;
       },
       table(token: Tokens.Table) {
         const head = token.header.map((cell) => `<th>${this.parser.parseInline(cell.tokens)}</th>`).join("");

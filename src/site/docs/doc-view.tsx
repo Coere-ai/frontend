@@ -4,6 +4,7 @@ import { Container } from "@/site/ui/container";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { DocsSidebar } from "./docs-sidebar";
 import { renderDoc } from "./render";
+import "@/site/code/code.css";
 import "./docs.css";
 
 const hrefOf = (slug: string) => (slug === "overview" ? "/resources" : `/resources/${slug}`);
