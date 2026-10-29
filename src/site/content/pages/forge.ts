@@ -16,13 +16,6 @@ export const forgeHero: HeroCopy = {
   ],
 };
 
-/** The path from nothing to a first answer, as the README and server docs lay it out. */
-export const forgeSteps = [
-  { title: "Run the server", text: "pnpm server prints its address and a pairing code. The extension's Apps page connects to it." },
-  { title: "Get a token", text: "Your app asks with Coere.connect, and the person checks the code and presses Allow. Or add one on the Apps page." },
-  { title: "Ask for context", text: "Send what your user typed with a chat id. The next message in that chat gets only what changed." },
-];
-
 export const forgeGrid: GridItem[] = [
   { icon: "sparkle", title: "Draft context", text: "POST /v1/context/draft answers with a block to prepend and each memory with why it goes." },
   { icon: "graph", title: "Read the tree", text: "The section tree, any node and its children, facts, entities and their relations." },
