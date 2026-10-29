@@ -1,17 +1,21 @@
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { chatOf, CHATS, dayAt, iso, monthDay, ZONE, type SourceChat } from "./field";
-import { grow } from "./grow";
+import { addSections, grow, plantSections, sectionId } from "./grow";
 import { MORE_WORKERS, roster } from "./roster";
 
 /**
  * Northbeam Labs' memory as Coere for Teams files it from the team's chats,
  * in the shapes the engine answers the dashboard with (the same shape
  * demos/films/teams builds from coere-v2's agency corpus): Company with
- * its catalog folders and coworkers, Clients with a folder per client
- * holding its contacts, its projects and its facts by slot, and Tone and
- * voice. The Ledger API keeps its stack and its decisions in folders of
- * their own. Made up, dated from today.
+ * how the studio works, its policies, its tools and its team; Clients
+ * with a folder for each of its six clients, holding the client's
+ * contacts, its projects and its facts by slot; then the studio's other
+ * sections, each with a few folders (engineering, infrastructure,
+ * operations, architecture, writing, people, plans and deadlines), as
+ * coere-v2's Teams graph rings them after Company and Clients. The Ledger
+ * API keeps its stack and its decisions in folders of their own. Made up,
+ * dated from today.
  */
 
 type UrgencyKind = Parameters<typeof describeUrgency>[0]["kind"];
@@ -37,7 +41,7 @@ export interface Mem {
   nodes: Map<string, Node>;
   facts: Map<string, Fact>;
   self: string;
-  sections: { company: string; clients: string; tone: string };
+  sections: { company: string; clients: string };
   clientIds: Map<string, string>;
   clients: Client[];
   workers: Array<{ key: string; name: string; team: string; role: string }>;
@@ -97,6 +101,14 @@ export const DECISIONS: Line[] = [
 export function buildMemory(now: number): Mem {
   let n = 0;
   const id = (prefix: string) => `${prefix}_${(++n).toString(36).padStart(4, "0")}-northbeam`;
+  // A thing's id as the engine makes one, a prefix and a UUIDv7 from when it was first filed, so the dashboard orders
+  // things by when they were saved: the clients' people and projects a month back, the studio's own folders before
+  // anything grown.
+  const entId = (daysAgo: number): string => {
+    n += 1;
+    const t = Math.floor(now - daysAgo * 86_400_000).toString(16).padStart(12, "0");
+    return `ent_${t.slice(0, 8)}-${t.slice(8, 12)}-7${n.toString(16).padStart(3, "0")}-b${n.toString(16).padStart(3, "0")}-${(n * 2654435761).toString(16).padStart(12, "0").slice(-12)}`;
+  };
   const nodes = new Map<string, Node>();
   const facts = new Map<string, Fact>();
 
@@ -108,10 +120,12 @@ export function buildMemory(now: number): Mem {
   };
 
   const self = node({ id: id("ent"), kind: "self", label: "You", section: "", importance: 5 });
-  const sections = { company: "sec_company", clients: "sec_clients", tone: "sec_tone" };
+  const sections = { company: "sec_company", clients: "sec_clients" };
   node({ id: sections.company, kind: "section", label: "Company", section: sections.company });
   node({ id: sections.clients, kind: "section", label: "Clients", section: sections.clients });
-  node({ id: sections.tone, kind: "section", label: "Tone and voice", section: sections.tone });
+  // The studio's other sections, after Company and Clients as Coere for Teams rings them (roster.ts).
+  const r = roster(now);
+  addSections(nodes, r.sections.filter((x) => x.key !== "company"));
 
   const sourceOf = (key: string, msg: number): FactSource => {
     const c = chatOf(key);
@@ -121,7 +135,7 @@ export function buildMemory(now: number): Mem {
 
   const file = (owner: Node, client: string | null, lines: Line[]) => {
     lines.forEach((l, i) => {
-      const kind: FactView["kind"] = l.kind ?? (l.slot && SLOT_KIND[l.slot]) ?? (owner.section === sections.tone ? "style" : "note");
+      const kind: FactView["kind"] = l.kind ?? (l.slot && SLOT_KIND[l.slot]) ?? (owner.label === "How you want to come across" ? "style" : "note");
       const source = sourceOf(l.chat, 2 * i);
       const fid = id("fact");
       source.evidenceId = `${fid}#e0`;
@@ -164,53 +178,53 @@ export function buildMemory(now: number): Mem {
     });
   };
 
-  // Company: catalog folders, and the coworkers in People.
-  const folder = (section: string, parent: string, label: string, lines: Line[], owner: string | null = null) => {
-    const f = node({ id: id("ent"), kind: "folder", label, section, parent, ...(owner ? { client: owner } : {}) });
+  // The studio's own folders, each in its section, and the coworkers in Company's team folder.
+  const folder = (section: string, parent: string, label: string, lines: Line[], owner: string | null = null, ago = 30) => {
+    const f = node({ id: entId(ago), kind: "folder", label, section, parent, ...(owner ? { client: owner } : {}) });
     file(f, owner, lines);
     return f;
   };
-  folder(sections.company, sections.company, "Runbooks and checklists", [
+  folder(sectionId("operations"), sectionId("operations"), "Runbooks and checklists", [
     { text: "Every pull request needs a test and a reviewer from another team.", chat: "checklist" },
     { text: "The code review checklist asks for a rollback plan on every migration.", chat: "checklist" },
     { text: "The on call engineer acks a page within 15 minutes.", chat: "oncall" },
     { text: "Rollbacks go out with fly deploy and the last good image.", chat: "oncall" },
-  ]);
-  folder(sections.company, sections.company, "Tech stack", [
+  ], null, 700);
+  folder(sectionId("infrastructure"), sectionId("infrastructure"), "Tech stack", [
     { text: "New services start in Go with Postgres unless a client asks otherwise.", chat: "generics" },
     { text: "We use pgx v5 for Postgres in every Go service.", chat: "pgx" },
     { text: "Every service runs on Fly.io.", chat: "flyio" },
-  ]);
-  folder(sections.company, sections.company, "Technical decisions", [
+  ], null, 700);
+  folder(sectionId("architecture"), sectionId("architecture"), "Technical decisions", [
     { text: "We decided on NATS JetStream for events in client projects.", chat: "nats", kind: "decision" },
     { text: "Public APIs get a design doc before any change.", chat: "review", kind: "decision" },
-  ]);
-  folder(sections.company, sections.company, "How we work", [
+  ], null, 700);
+  folder(sectionId("company"), sectionId("company"), "How we work", [
     { text: "The interview loop has a pairing session in Go and a system design round.", chat: "loop" },
     { text: "Coding standards: errors are wrapped with the call that failed.", chat: "generics" },
-  ]);
-  folder(sections.company, sections.company, "Tools and systems", [
+  ], null, 700);
+  folder(sectionId("company"), sectionId("company"), "Tools and systems", [
     { text: "Errors go to Sentry, and alerts go to the shared on call channel.", chat: "sentry" },
     { text: "Tickets live in Linear, one project per client.", chat: "onboard" },
-  ]);
-  const people = folder(sections.company, sections.company, "People", []);
+  ], null, 700);
+  const people = folder(sections.company, sections.company, "Team", [], null, 700);
   const workerLines: Record<string, Line[]> = {
     priya: [{ text: "Priya Nair is the CTO and approves architecture changes.", chat: "review" }],
     leo: [{ text: "Leo Grant owns the NATS setup across client projects.", chat: "nats" }],
     ana: [{ text: "Ana Ruiz runs the team offsite and the hiring loop.", chat: "offsite" }],
   };
   for (const w of WORKERS) {
-    const p = node({ id: id("ent"), kind: "person", label: w.name, section: sections.company, parent: people.id, key: w.key });
+    const p = node({ id: entId(30), kind: "person", label: w.name, section: sections.company, parent: people.id, key: w.key });
     file(p, null, workerLines[w.key] ?? []);
   }
 
   // Clients: a folder each, with contacts, projects and facts by slot.
   const clientIds = new Map<string, string>();
   const client = (c: Client, contacts: Array<{ key: string; name: string; role: string; email: string; chat: string }>) => {
-    const f = node({ id: id("ent"), kind: "organization", label: c.name, section: sections.clients, parent: sections.clients, importance: 4, aliases: [...c.aliases, ...c.domains], client: c.key });
+    const f = node({ id: entId(30), kind: "organization", label: c.name, section: sections.clients, parent: sections.clients, importance: 4, aliases: [...c.aliases, ...c.domains], client: c.key });
     clientIds.set(c.key, f.id);
     for (const k of contacts) {
-      const p = node({ id: id("ent"), kind: "person", label: k.name, section: sections.clients, parent: f.id, key: k.key });
+      const p = node({ id: entId(30), kind: "person", label: k.name, section: sections.clients, parent: f.id, key: k.key });
       const said = iso(dayAt(-chatOf(k.chat).ago)).slice(0, 10);
       const src = [{ ...sourceOf(k.chat, 0), evidenceId: `${p.id}#e0` }];
       p.values = [
@@ -224,7 +238,7 @@ export function buildMemory(now: number): Mem {
     return f;
   };
   const project = (owner: Node, label: string, lines: Line[]) => {
-    const p = node({ id: id("ent"), kind: "project", label, section: sections.clients, parent: owner.id });
+    const p = node({ id: entId(30), kind: "project", label, section: sections.clients, parent: owner.id });
     owner.relations.unshift({ type: "for", label: `${label} is for this`, direction: "in", other: { id: p.id, label, kind: "project" } });
     file(p, owner.client ?? null, lines);
     return p;
@@ -279,16 +293,14 @@ export function buildMemory(now: number): Mem {
   ]);
   file(osprey, "osprey", [{ text: `The fraud rules review with Elena is on ${on(14)}.`, chat: "fraud", slot: "meetings", due: 14 }]);
 
-  // Tone and voice: how Sam likes his answers.
-  folder(sections.tone, sections.tone, "How you want to come across", [
+  // How Sam likes his answers, in Writing.
+  folder(sectionId("writing"), sectionId("writing"), "How you want to come across", [
     { text: "Answer with code first, then one line on why.", chat: "generics" },
     { text: "Client updates are short and lead with the dates.", chat: "onboard" },
-  ]);
+  ], null, 700);
 
-  // The rest of the studio, grown from its roster to its real size (grow.ts, roster.ts): the other clients and
-  // their projects, the studio's practices, policies, vendors and engineers, from as many chats as its AIs hold.
-  const r = roster(now);
-  const byLabel = (label: string) => [...nodes.values()].find((x) => x.label === label && x.kind === "folder" && x.parent && nodes.get(x.parent)?.kind === "section")!.id;
+  // The rest of the studio, grown from its roster to its real size (grow.ts, roster.ts): three more clients and their
+  // projects, the engineers, and every other section's folders, from as many chats as its AIs hold.
   const existing = [...new Map([...facts.values()].flatMap((f) => f.sources).map((src) => [src.convId, { platform: src.platform, title: src.title }])).values()];
   const grown = grow({
     seed: 0x7ec4,
@@ -299,10 +311,10 @@ export function buildMemory(now: number): Mem {
     chats: LIBRARY,
     existing,
     plant: [
-      { parent: sections.company, section: sections.company, things: r.company },
       { parent: people.id, section: sections.company, things: r.people },
       { parent: sections.clients, section: sections.clients, things: r.clientThings },
-      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+      ...Object.entries(r.named).map(([key, lines]) => ({ parent: clientIds.get(key)!, section: sections.clients, lines, client: key })),
+      ...plantSections(nodes, r.sections, now),
     ],
   });
   for (const t of r.clientThings) {
@@ -325,7 +337,7 @@ export function buildMemory(now: number): Mem {
     x.urgency = urgency;
     return urgency;
   };
-  for (const s of Object.values(sections)) for (const k of nodes.get(s)!.kids) roll(nodes.get(k)!);
+  for (const sec of [...nodes.values()].filter((x) => x.kind === "section")) for (const k of sec.kids) roll(nodes.get(k)!);
 
   return { now, chats, nodes, facts, self: self.id, sections, clientIds, clients: [...CLIENTS, ...r.clients], workers: [...WORKERS, ...MORE_WORKERS.map(({ key, name, team, role }) => ({ key, name, team, role }))], written: null };
 }

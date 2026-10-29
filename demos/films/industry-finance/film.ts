@@ -241,7 +241,7 @@ async function households(s: Stage): Promise<Tab> {
     await s.film(tab);
     return tab;
   });
-  s.say("Coere for Teams keeps one memory for the firm: Company, Clients, and how Daniel explains numbers.");
+  s.say("Coere for Teams keeps one memory for the firm: Company, Clients, and every part of the practice.");
   await s.wait(3400);
   s.say("Clients has a folder for every household.");
   await s.click(page, groupButton("Show", "Clients", "Clients"), { after: 300 });

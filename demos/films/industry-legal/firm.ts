@@ -3,16 +3,21 @@ import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDeta
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { field } from "../../../demos/industries/fields/legal.mjs";
 import { FILM_NOW, ZONE } from "./clock";
-import { grow } from "./grow";
+import { addSections, grow, plantSections, sectionId } from "./grow";
 import { MORE_WORKERS, roster } from "./roster";
 
 /**
  * Whitlock & Rhee's memory as Coere for Teams files it from the firm's
- * chats: Company with the firm's own practice, Clients with a folder per
- * client holding its contacts, its matters and its facts by slot, and Tone
- * and voice. The same shapes the teams film builds from coere-v2's agency
- * corpus (memory.ts there), here written for a litigation practice from
- * the field's data (demos/industries/fields/legal.mjs). Made up.
+ * chats: Company with how the firm works, its billing, its policies and
+ * its team; Clients with a folder for each of its eight clients, holding
+ * the client's contacts, its matters and its facts by slot; then the
+ * firm's other sections, each with a few folders of its own (practice
+ * areas, research, court and filings, writing, people, business
+ * development, plans and deadlines), as coere-v2's Teams graph rings them
+ * after Company and Clients. The same shapes the teams film builds from
+ * coere-v2's agency corpus (memory.ts there), here written for a
+ * litigation practice from the field's data
+ * (demos/industries/fields/legal.mjs). Made up.
  */
 
 type UrgencyKind = Parameters<typeof describeUrgency>[0]["kind"];
@@ -35,7 +40,7 @@ export interface Mem {
   nodes: Map<string, Node>;
   facts: Map<string, Fact>;
   self: string;
-  sections: { company: string; clients: string; tone: string };
+  sections: { company: string; clients: string };
   clientIds: Map<string, string>;
   chats: number;
   /** While a build runs, how many memories it has written; null once memory is built (always, in this film). */
@@ -48,7 +53,7 @@ export const SELF = { name: field.person.name, role: "Litigation associate", tea
 /** How many chats the firm's AIs hold across its people, every one of them a source of its memory. */
 export const LIBRARY = 384;
 
-/** The firm's clients as Settings lists them: the four the film names, then the rest of the firm's book (roster.ts). */
+/** The firm's clients as Settings lists them: the four the film names, then the four more it serves (roster.ts). */
 export const CLIENTS: Array<{ key: string; name: string; aliases: string[]; domains: string[]; status: "active" | "paused" }> = [
   { key: "hartwell", name: "Hartwell Logistics", aliases: ["Hartwell"], domains: ["hartwelllogistics.com"], status: "active" as const },
   { key: "osei", name: "Osei Bakery", aliases: ["Osei"], domains: ["oseibakery.com"], status: "active" as const },
@@ -226,21 +231,28 @@ const DUNMORE: T = {
   ],
 };
 
-const g = field.graph.hubs;
-const companyName = (i: number) => g[0]!.children[i]!.label;
-
-const COMPANY: T[] = [
+/**
+ * The firm's own folders the film's chats filled, and the section each now
+ * sits in: how the firm works, its billing and its team in Company, the
+ * court's rules in Court and filings, its templates and its briefs in
+ * Writing (roster.ts holds the rest of each section).
+ */
+const OWN: Array<T & { home: string }> = [
   {
-    label: companyName(0),
+    home: "company",
+    label: "How we work",
     kind: "folder",
     facts: [
       { text: "Every deposition outline starts with the witness's role and who they reported to.", chat: "Deposition practice notes", on: "2026-09-10" },
       { text: "Exhibits are premarked and sent to the court reporter two days before a deposition.", chat: "Deposition exhibit list", on: "2026-10-19" },
       { text: "A second associate takes notes at every deposition.", chat: "Deposition practice notes", on: "2026-09-10" },
+      { text: "Every new client gets a conflicts check before the intake call.", chat: "Conflicts check for Dunmore", on: "2026-10-16" },
+      { text: "Conflicts for Briarstone and its affiliates were cleared on September 3.", chat: "Conflicts for Briarstone", on: "2026-09-03" },
     ],
   },
   {
-    label: companyName(1),
+    home: "company",
+    label: "Billing",
     kind: "folder",
     facts: [
       { text: "Time is billed in tenths of an hour.", chat: "October billing narrative", on: "2026-10-02" },
@@ -249,15 +261,8 @@ const COMPANY: T[] = [
     ],
   },
   {
-    label: companyName(2),
-    kind: "folder",
-    facts: [
-      { text: "The Northern District of Illinois wants a joint status report before each hearing.", chat: "Court rules for the Northern District", on: "2026-09-15" },
-      { text: "Briefs over 15 pages need leave of court.", chat: "Motion to compel draft", on: "2026-10-05" },
-    ],
-  },
-  {
-    label: companyName(3),
+    home: "company",
+    label: "Team",
     kind: "folder",
     kids: [
       { label: "Grace Rhee", kind: "person", key: "grace", facts: [{ text: "Grace Rhee is the partner on Hartwell v. Briarstone.", chat: "Firm staffing", on: "2026-09-04" }] },
@@ -266,7 +271,17 @@ const COMPANY: T[] = [
     ],
   },
   {
-    label: companyName(4),
+    home: "court",
+    label: "Northern District",
+    kind: "folder",
+    facts: [
+      { text: "The Northern District of Illinois wants a joint status report before each hearing.", chat: "Court rules for the Northern District", on: "2026-09-15" },
+      { text: "Briefs over 15 pages need leave of court.", chat: "Motion to compel draft", on: "2026-10-05" },
+    ],
+  },
+  {
+    home: "writing",
+    label: "Templates",
     kind: "folder",
     facts: [
       { text: "The firm's deposition outline template has five parts.", chat: "Deposition practice notes", on: "2026-09-10" },
@@ -274,23 +289,15 @@ const COMPANY: T[] = [
     ],
   },
   {
-    label: companyName(5),
+    home: "writing",
+    label: "Briefs",
     kind: "folder",
     facts: [
-      { text: "Every new client gets a conflicts check before the intake call.", chat: "Conflicts check for Dunmore", on: "2026-10-16" },
-      { text: "Conflicts for Briarstone and its affiliates were cleared on September 3.", chat: "Conflicts for Briarstone", on: "2026-09-03" },
+      { text: "Write short plain sentences, one point to a paragraph.", chat: "Firm style guide", on: "2026-08-28", kind: "style" },
+      { text: "Lead each section of a brief with what we ask the court for.", chat: "Firm style guide", on: "2026-08-28", kind: "style" },
     ],
   },
 ];
-
-const TONE: T = {
-  label: g[2]!.children[0]!.label,
-  kind: "folder",
-  facts: [
-    { text: "Write short plain sentences, one point to a paragraph.", chat: "Firm style guide", on: "2026-08-28", kind: "style" },
-    { text: "Lead each section of a brief with what we ask the court for.", chat: "Firm style guide", on: "2026-08-28", kind: "style" },
-  ],
-};
 
 /** Ids as the engine makes them: a prefix and a UUIDv7 from the record's time, with seeded bits after (as the teams film makes them). */
 function idMaker() {
@@ -330,10 +337,12 @@ export function buildFirm(): Mem {
   };
 
   const self = node({ id: id("ent", start), kind: "self", label: "You", section: "", importance: 5 });
-  const sections = { company: "sec_company", clients: "sec_clients", tone: "sec_tone" };
+  const sections = { company: "sec_company", clients: "sec_clients" };
   node({ id: sections.company, kind: "section", label: "Company", section: sections.company });
   node({ id: sections.clients, kind: "section", label: "Clients", section: sections.clients });
-  node({ id: sections.tone, kind: "section", label: "Tone and voice", section: sections.tone });
+  // The firm's other sections, after Company and Clients as Coere for Teams rings them (roster.ts).
+  const r = roster(now);
+  addSections(nodes, r.sections.filter((x) => x.key !== "company"));
 
   const sourceOf = (f: F, fid: string): FactSource => {
     const convId = chatIds.get(f.chat)!;
@@ -416,17 +425,13 @@ export function buildFirm(): Mem {
     return n;
   };
 
-  const company = nodes.get(sections.company)!;
   const clients = nodes.get(sections.clients)!;
-  const tone = nodes.get(sections.tone)!;
-  for (const t of COMPANY) place(t, company, sections.company, null);
+  for (const t of OWN) place(t, nodes.get(sectionId(t.home))!, sectionId(t.home), null);
   for (const t of [HARTWELL, OSEI, CALDER, DUNMORE]) place(t, clients, sections.clients, null);
-  place(TONE, tone, sections.tone, null);
 
-  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): the other clients, the
-  // firm's practice areas, policies, vendors, judges and staff, from as many chats as the firm's AIs hold.
-  const r = roster(now);
-  const byLabel = (label: string) => [...nodes.values()].find((n) => n.label === label && n.kind === "folder")!.id;
+  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): four more clients, the
+  // firm's team, and every other section's folders, from as many chats as the firm's AIs hold.
+  const team = [...nodes.values()].find((n) => n.label === "Team" && n.parent === sections.company)!.id;
   const existing = [...new Map([...facts.values()].flatMap((f) => f.sources).map((src) => [src.convId, { platform: src.platform, title: src.title }])).values()];
   const grown = grow({
     seed: 0x1e6a1,
@@ -437,10 +442,10 @@ export function buildFirm(): Mem {
     chats: LIBRARY,
     existing,
     plant: [
-      { parent: sections.company, section: sections.company, things: r.company },
-      { parent: byLabel(companyName(3)), section: sections.company, things: r.people },
+      { parent: team, section: sections.company, things: r.people },
       { parent: sections.clients, section: sections.clients, things: r.clientThings },
-      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+      ...Object.entries(r.named).map(([key, lines]) => ({ parent: clientIds.get(key)!, section: sections.clients, lines, client: key })),
+      ...plantSections(nodes, r.sections, now),
     ],
   });
   for (const t of r.clientThings) {

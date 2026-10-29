@@ -2,17 +2,20 @@ import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { field } from "../../../demos/industries/fields/commerce.mjs";
-import { grow } from "./grow";
+import { addSections, grow, plantSections, sectionId } from "./grow";
 import { roster } from "./roster";
 
 /**
  * Harbourline Trading's memory as Coere for Teams files it from Grace
- * Leung's chats: Company with what the firm knows (payment terms, freight
- * partners, customs codes, pricing rules, markets, trade shows), Clients
- * with a folder per partner holding its contacts, its engagement and its
- * facts by slot, and Tone and voice. Every fact names the chat it came
- * from. The people, partners and dates are the commerce page's
- * (demos/industries/fields/commerce.mjs), made up for the demo.
+ * Leung's chats: Company with how the firm works, its policies, its
+ * systems and its team; Clients with a folder for each of its seven
+ * partners, holding the partner's contacts, its engagement and its facts
+ * by slot; then the firm's other sections, each with a few folders
+ * (sourcing, products, shipping, markets, money, sales, plans and
+ * deadlines), as coere-v2's Teams graph rings them after Company and
+ * Clients. Every fact names the chat it came from. The people, partners
+ * and dates are the commerce page's (demos/industries/fields/commerce.mjs),
+ * made up for the demo.
  */
 
 /** Grace works from Hong Kong. */
@@ -51,7 +54,7 @@ export interface Mem {
   facts: Map<string, Fact>;
   chats: Map<string, Chat>;
   self: string;
-  sections: { company: string; clients: string; tone: string };
+  sections: { company: string; clients: string };
   /** Client key to its folder id. */
   clientIds: Map<string, string>;
 }
@@ -153,7 +156,10 @@ const RHEE: Said[] = [
   f("Rhee signs the distribution terms by November 20.", "deadlines", "2026-10-09", "chatgpt", "Rhee Distribution terms", "2026-11-20"),
 ];
 
-/** Company: what the firm knows, by topic (field.graph's company). */
+/** The section each of the firm's own topics sits in (roster.ts holds the rest of each section). */
+const HOME: Record<string, string> = { "Payment terms": "money", "Freight partners": "shipping", "Customs codes": "shipping", "Pricing rules": "money", Markets: "markets", "Trade shows": "sales" };
+
+/** What the firm knows, by topic (field.graph's company). */
 const COMPANY: Array<[string, Said[]]> = [
   ["Payment terms", [
     f("Our standard terms are 30 days from the bill of lading.", undefined, "2025-03-04", "chatgpt", "Payment terms negotiation", undefined, "note"),
@@ -274,14 +280,18 @@ export function buildMemory(): Mem {
   };
 
   const self = node({ id: id("ent", start), kind: "self", label: "You", section: "", importance: 5 });
-  const sections = { company: "sec_company", clients: "sec_clients", tone: "sec_tone" };
+  const sections = { company: "sec_company", clients: "sec_clients" };
   node({ id: sections.company, kind: "section", label: "Company", section: sections.company });
   node({ id: sections.clients, kind: "section", label: "Clients", section: sections.clients });
-  node({ id: sections.tone, kind: "section", label: "Tone and voice", section: sections.tone });
+  // The firm's other sections, after Company and Clients as Coere for Teams rings them (roster.ts).
+  const r = roster(NOW);
+  addSections(nodes as never, r.sections.filter((x) => x.key !== "company"));
 
-  // Company, a topic each, with the memories behind it the graph draws.
+  // What the firm knows, a topic each in its section, with the memories behind it the graph draws. Markets' own
+  // memories sit straight on its section, beside its folders by region.
   for (const [label, list] of COMPANY) {
-    const topic = node({ id: id("ent", start + DAY), kind: "topic", label, section: sections.company, parent: sections.company, extra: 9 });
+    const home = sectionId(HOME[label]!);
+    const topic = label === "Markets" ? nodes.get(home)! : node({ id: id("ent", start + DAY), kind: "topic", label, section: home, parent: home, extra: 9 });
     for (const said of list) add(topic, said, null);
   }
 
@@ -322,14 +332,13 @@ export function buildMemory(): Mem {
   client("solano", "Solano Imports", ["Solano"], SOLANO, ["Letter of credit", CREDIT], 5);
   client("rhee", "Rhee Distribution", ["Rhee"], RHEE, null, 5);
 
-  const tone = node({ id: id("ent", start + 2 * DAY), kind: "folder", label: field.graph.hubs[2].children[0].label, section: sections.tone, parent: sections.tone, extra: 3 });
+  const tone = node({ id: id("ent", start + 2 * DAY), kind: "folder", label: field.graph.hubs[2].children[0].label, section: sectionId("sales"), parent: sectionId("sales"), extra: 3 });
   for (const said of TONE) add(tone, said, null);
+  const team = node({ id: id("ent", start + 3 * DAY), kind: "folder", label: "Team", section: sections.company, parent: sections.company });
 
-  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): the other partners and
-  // their contracts, the firm's factories, forwarders, product lines, policies and staff, from as many chats as
-  // the team's AIs hold. Memory now holds every memory the graph draws, so nothing is drawn past what is listed.
-  const r = roster(NOW);
-  const byLabel = (label: string) => [...nodes.values()].find((x) => x.label === label && (x.kind === "topic" || x.kind === "folder"))!.id;
+  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): three more partners and their
+  // contracts, the team, and every other section's folders, from as many chats as the team's AIs hold. Memory now
+  // holds every memory the graph draws, so nothing is drawn past what is listed.
   const grown = grow({
     seed: 0xc0a3,
     now: NOW,
@@ -339,10 +348,10 @@ export function buildMemory(): Mem {
     chats: LIBRARY,
     existing: [...chats.values()].map((c) => ({ platform: c.platform, title: c.title })),
     plant: [
-      { parent: sections.company, section: sections.company, things: r.company },
-      { parent: byLabel("Freight partners"), section: sections.company, things: r.forwarders },
+      { parent: team.id, section: sections.company, things: r.people },
       { parent: sections.clients, section: sections.clients, things: r.clientThings },
-      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+      ...Object.entries(r.named).map(([key, lines]) => ({ parent: clientIds.get(key)!, section: sections.clients, lines, client: key })),
+      ...plantSections(nodes as never, r.sections, NOW),
     ],
   });
   for (const c of grown.chats) chats.set(`${c.platform}:${c.title}`, { id: c.id, platform: c.platform, title: c.title });

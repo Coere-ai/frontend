@@ -1,17 +1,16 @@
 import type { IdentityValueView } from "@coere/memory";
 import { Rng } from "@v2/tools/gen-corpus/rng";
-import { dayName, type Line, type Thing } from "./grow";
+import { dayName, type Line, type SectionSpec, type Thing } from "./grow";
 
 /**
- * Harbourline Trading at its real size: the other buyers and distributors
- * the firm sells to across its markets, each with its people, its
- * contracts (their pricing in a folder of its own) and what the team's
- * chats said about it, slot by slot, and the firm's own knowledge: its
- * factories, its forwarders, its product lines, policies, decisions and
- * staff. The lines are written from templates in a trading house's own
- * words and filled from the partners below by a seeded stream, so the
- * firm is the same every time it is built. Prices move in percents and
- * volumes in containers. Every name is made up, and no line names
+ * Harbourline Trading at its real size: three more buyers the firm sells
+ * to, each with its people, its contracts (their pricing with them) and
+ * what the team's chats said about it, slot by slot; the team; and the
+ * rest of the firm's memory, section by section, each with a few folders
+ * in a trading house's own words. Partner lines are written
+ * from templates filled by a seeded stream, so the firm is the same every
+ * time it is built. Prices move in percents and volumes in containers.
+ * Every name is made up, and no line outside a partner's own folder names
  * Meridian or the film's other featured partners, so the sheet, the
  * reply's context and Cori's answer stay as they are.
  */
@@ -23,28 +22,9 @@ type PartnerDef = { key: string; name: string; short: string; what: string; city
 
 /** The firm's other partners: who they are, their people, and their contracts, each with its route and its next dated step. */
 const PARTNERS: PartnerDef[] = [
-  { key: "brightwell", name: "Brightwell Home", short: "Brightwell", what: "runs 85 home stores across the United Kingdom", city: "Manchester", country: "the UK", currency: "pounds", since: 2019, contacts: [["Harriet Cole", "head of buying"], ["Owen Pike", "supply chain manager"]], contracts: [{ label: "Brightwell enamel range", about: "enamel cookware in four colors", port: "Felixstowe", containers: 24, terms: "FOB", step: "Brightwell confirms its spring order by {d}." }, { label: "Brightwell Christmas glassware", about: "a seasonal glassware line", port: "Felixstowe", containers: 6, terms: "FOB", step: "The Christmas glassware samples go to Brightwell by {d}." }] },
-  { key: "nordhaven", name: "Nordhaven Kitchen", short: "Nordhaven", what: "sells kitchenware online across the Nordic countries", city: "Gothenburg", country: "Sweden", currency: "euros", since: 2021, contacts: [["Sofie Lund", "category manager"], ["Erik Dahl", "logistics lead"]], contracts: [{ label: "Nordhaven bamboo tools", about: "bamboo spoons, boards and utensil sets", port: "Gothenburg", containers: 10, terms: "CIF", step: "The Nordhaven bamboo order ships by {d}." }] },
-  { key: "casaluz", name: "Casa Luz Hogar", short: "Casa Luz", what: "supplies homeware to department stores in Mexico", city: "Monterrey", country: "Mexico", currency: "dollars", since: 2022, contacts: [["Mariana Ochoa", "purchasing director"], ["Diego Lara", "import manager"]], contracts: [{ label: "Casa Luz ceramic tableware", about: "stoneware plates and bowls", port: "Manzanillo", containers: 18, terms: "FOB", step: "Casa Luz signs the tableware contract by {d}." }] },
-  { key: "pacificwares", name: "Pacific Wares Australia", short: "Pacific Wares", what: "wholesales kitchenware to independent shops in Australia", city: "Melbourne", country: "Australia", currency: "Australian dollars", since: 2018, contacts: [["Lachlan Reid", "managing director"], ["Priyanka Das", "buyer"]], contracts: [{ label: "Pacific Wares stainless cutlery", about: "a stainless cutlery line in three patterns", port: "Melbourne", containers: 12, terms: "CIF", step: "The Pacific Wares cutlery reorder is due {d}." }, { label: "Pacific Wares private label", about: "a private label range under their own brand", port: "Melbourne", containers: 8, terms: "CIF", step: "Pacific Wares approves the private label artwork by {d}." }] },
-  { key: "lindenhof", name: "Lindenhof Handel", short: "Lindenhof", what: "supplies hotel and restaurant kitchens in Germany", city: "Hamburg", country: "Germany", currency: "euros", since: 2017, contacts: [["Katrin Weber", "head of purchasing"], ["Jonas Krause", "quality manager"]], contracts: [{ label: "Lindenhof hotel cookware", about: "heavy pans and stock pots for hotel kitchens", port: "Hamburg", containers: 20, terms: "CIF", step: "Lindenhof's quality audit of the new pans is on {d}." }] },
-  { key: "sunmart", name: "Sunmart Stores", short: "Sunmart", what: "runs 140 discount stores in Malaysia", city: "Kuala Lumpur", country: "Malaysia", currency: "dollars", since: 2020, contacts: [["Aisha Rahman", "general manager, homeware"], ["Kelvin Tan", "logistics manager"]], contracts: [{ label: "Sunmart value range", about: "low cost kitchen basics", port: "Port Klang", containers: 30, terms: "FOB", step: "Sunmart's year end order is confirmed by {d}." }] },
-  { key: "aldermoor", name: "Aldermoor & Co", short: "Aldermoor", what: "is a homeware brand sold in American department stores", city: "Chicago", country: "the US", currency: "dollars", since: 2023, contacts: [["Rachel Stein", "VP of sourcing"], ["Marcus Dale", "compliance manager"]], contracts: [{ label: "Aldermoor glass storage", about: "glass jars and food storage with bamboo lids", port: "Long Beach", containers: 22, terms: "FOB", step: "The Aldermoor lab test results are due {d}." }] },
-  { key: "maplecrest", name: "Maplecrest Supply", short: "Maplecrest", what: "distributes restaurant supplies across Canada", city: "Toronto", country: "Canada", currency: "Canadian dollars", since: 2021, contacts: [["Claire Fortin", "purchasing manager"], ["Ravi Sandhu", "warehouse manager"]], contracts: [{ label: "Maplecrest sheet pans", about: "aluminium sheet pans for restaurants", port: "Vancouver", containers: 14, terms: "CIF", step: "Maplecrest's next sheet pan order ships by {d}." }] },
-  { key: "dunecraft", name: "Dunecraft Trading", short: "Dunecraft", what: "imports homeware for hypermarkets in the Gulf", city: "Dubai", country: "the UAE", currency: "dollars", since: 2019, contacts: [["Omar Saleh", "commercial director"], ["Fatima Noor", "import coordinator"]], contracts: [{ label: "Dunecraft Ramadan promotion", about: "a gift box range for the Ramadan season", port: "Jebel Ali", containers: 16, terms: "CIF", step: "The Ramadan gift boxes must land in Jebel Ali by {d}." }] },
-  { key: "tierra", name: "Tierra Andina", short: "Tierra Andina", what: "sells home goods in supermarkets in Chile and Peru", city: "Santiago", country: "Chile", currency: "dollars", since: 2022, contacts: [["Camila Rojas", "head of non food"], ["Felipe Soto", "import manager"]], contracts: [{ label: "Tierra Andina kitchen basics", about: "a basics range for supermarket shelves", port: "San Antonio", containers: 15, terms: "FOB", step: "Tierra Andina confirms the 2027 range by {d}." }] },
-  { key: "hoshino", name: "Hoshino Living", short: "Hoshino", what: "runs lifestyle stores in Osaka and Kyoto", city: "Osaka", country: "Japan", currency: "yen", since: 2020, contacts: [["Aiko Hoshino", "buyer"], ["Kenji Mori", "logistics manager"]], contracts: [{ label: "Hoshino enamel kettles", about: "enamel kettles in muted colors", port: "Osaka", containers: 5, terms: "CIF", step: "Hoshino's kettle samples are due {d}." }] },
-  { key: "verdant", name: "Verdant Market", short: "Verdant", what: "is an online shop for low waste homeware in France", city: "Lyon", country: "France", currency: "euros", since: 2024, contacts: [["Camille Roux", "founder"], ["Hugo Martin", "operations lead"]], contracts: [{ label: "Verdant refill jars", about: "glass refill jars with steel lids", port: "Le Havre", containers: 4, terms: "DDP", step: "Verdant's first order lands by {d}." }] },
-  { key: "goldleaf", name: "Goldleaf Retail", short: "Goldleaf", what: "runs homeware counters in malls across the Philippines", city: "Manila", country: "the Philippines", currency: "dollars", since: 2021, contacts: [["Bianca Reyes", "merchandise manager"], ["Paolo Cruz", "import officer"]], contracts: [{ label: "Goldleaf rice cookers", about: "rice cookers under their store brand", port: "Manila", containers: 9, terms: "FOB", step: "The Goldleaf rice cooker safety tests are due {d}." }] },
-  { key: "seaholm", name: "Seaholm Provisions", short: "Seaholm", what: "supplies galleys for cruise lines from Miami", city: "Miami", country: "the US", currency: "dollars", since: 2018, contacts: [["Dana Whitfield", "procurement director"], ["Luis Ortega", "port operations manager"]], contracts: [{ label: "Seaholm galley cookware", about: "heavy duty cookware for ship galleys", port: "Miami", containers: 11, terms: "CIF", step: "Seaholm's dry dock order must ship by {d}." }] },
-  { key: "polaris", name: "Polaris Homeware", short: "Polaris", what: "sells kitchenware in 30 stores across Poland", city: "Warsaw", country: "Poland", currency: "euros", since: 2023, contacts: [["Agnieszka Nowak", "head of buying"], ["Tomasz Zielinski", "logistics manager"]], contracts: [{ label: "Polaris enamel range", about: "enamel pots in their own colors", port: "Gdansk", containers: 8, terms: "CIF", step: "Polaris approves the enamel colors by {d}." }] },
-  { key: "jadeway", name: "Jadeway Department Stores", short: "Jadeway", what: "runs eight department stores in Taiwan", city: "Taipei", country: "Taiwan", currency: "dollars", since: 2019, contacts: [["Lily Chen", "homeware buyer"], ["Victor Lin", "import manager"]], contracts: [{ label: "Jadeway wedding gift sets", about: "boxed tableware for wedding registries", port: "Keelung", containers: 7, terms: "FOB", step: "The Jadeway gift set proofs are due {d}." }] },
-  { key: "oakridge", name: "Oakridge Outfitters", short: "Oakridge", what: "sells camping gear in the US and Canada", city: "Denver", country: "the US", currency: "dollars", since: 2022, contacts: [["Tyler Grant", "sourcing manager"], ["Jenna Moss", "product developer"]], contracts: [{ label: "Oakridge camp cookware", about: "enamel camp mugs, plates and pots", port: "Long Beach", containers: 13, terms: "FOB", step: "The Oakridge camp cookware goes into production on {d}." }] },
-  { key: "cedar", name: "Cedar & Salt", short: "Cedar & Salt", what: "is a cookware brand sold online in New Zealand", city: "Auckland", country: "New Zealand", currency: "dollars", since: 2024, contacts: [["Mia Thompson", "founder"]], contracts: [{ label: "Cedar & Salt cast iron", about: "pre seasoned cast iron pans", port: "Auckland", containers: 3, terms: "DDP", step: "The Cedar & Salt cast iron samples are due {d}." }] },
-  { key: "almadena", name: "Almadena Distribuciones", short: "Almadena", what: "distributes kitchenware to shops in Portugal", city: "Porto", country: "Portugal", currency: "euros", since: 2020, contacts: [["Joana Ferreira", "commercial manager"], ["Rui Costa", "warehouse lead"]], contracts: [{ label: "Almadena glassware", about: "everyday tumblers and carafes", port: "Leixoes", containers: 9, terms: "CIF", step: "Almadena's glassware reorder is due {d}." }] },
+  { key: "nordhaven", name: "Nordhaven Kitchen", short: "Nordhaven", what: "sells kitchenware online across the Nordic countries", city: "Gothenburg", country: "Sweden", currency: "euros", since: 2021, contacts: [["Sofie Lund", "category manager"]], contracts: [{ label: "Nordhaven bamboo tools", about: "bamboo spoons, boards and utensil sets", port: "Gothenburg", containers: 10, terms: "CIF", step: "The Nordhaven bamboo order ships by {d}." }] },
+  { key: "lindenhof", name: "Lindenhof Handel", short: "Lindenhof", what: "supplies hotel and restaurant kitchens in Germany", city: "Hamburg", country: "Germany", currency: "euros", since: 2017, contacts: [["Katrin Weber", "head of purchasing"]], contracts: [{ label: "Lindenhof hotel cookware", about: "heavy pans and stock pots for hotel kitchens", port: "Hamburg", containers: 20, terms: "CIF", step: "Lindenhof's quality audit of the new pans is on {d}." }] },
   { key: "suriya", name: "Suriya Home", short: "Suriya", what: "sells homeware in hypermarkets across Thailand", city: "Bangkok", country: "Thailand", currency: "dollars", since: 2021, contacts: [["Nok Suriyawong", "buying manager"], ["Anan Chai", "logistics lead"]], contracts: [{ label: "Suriya melamine range", about: "melamine plates and bowls for families", port: "Laem Chabang", containers: 17, terms: "FOB", step: "The Suriya melamine food safety report is due {d}." }] },
-  { key: "bluefjord", name: "Blue Fjord Interiors", short: "Blue Fjord", what: "runs design shops in Oslo and Bergen", city: "Oslo", country: "Norway", currency: "euros", since: 2023, contacts: [["Ingrid Berg", "buyer"]], contracts: [{ label: "Blue Fjord stoneware", about: "hand glazed stoneware mugs", port: "Oslo", containers: 3, terms: "DDP", step: "Blue Fjord's stoneware order lands by {d}." }] },
-  { key: "kingsway", name: "Kingsway Wholesale", short: "Kingsway", what: "is a cash and carry for shops in Kenya", city: "Nairobi", country: "Kenya", currency: "dollars", since: 2022, contacts: [["David Mwangi", "purchasing manager"], ["Mercy Wanjiru", "finance officer"]], contracts: [{ label: "Kingsway aluminium pots", about: "aluminium cooking pots in five sizes", port: "Mombasa", containers: 12, terms: "CIF", step: "The Kingsway pot order ships by {d}." }] },
 ];
 
 const pick = <T>(rng: Rng, items: readonly T[], n: number): T[] => rng.shuffle([...items]).slice(0, n);
@@ -52,7 +32,7 @@ const FIRST = (name: string) => name.split(" ")[0]!;
 
 type X = { rng: Rng; on: (days: number) => string; month: (days: number) => string };
 
-/** A contract's own lines, its pricing in a folder of its own, and the dated line its partner's slots keep. */
+/** A contract's own lines, its pricing, and the dated line its partner's slots keep. */
 function contractLines(p: PartnerDef, c: Contract, x: X, used: Set<string>): { own: Line[]; pricing: Line[]; slots: Line[] } {
   const t = {
     deal: [`${c.label}`, `${c.label} terms`, `${c.label} order`, `${c.label} questions`],
@@ -130,47 +110,14 @@ function partnerThing(p: PartnerDef, x: X): Thing {
   for (const c of p.contracts) {
     const { own, pricing, slots } = contractLines(p, c, x, used);
     lines.push(...slots);
-    kids.push({ label: c.label, kind: "project", lines: own, kids: [{ label: `${c.label} pricing`, kind: "folder", lines: pricing }] });
+    // Its pricing is filed with the contract itself, so a partner's folder fans out once.
+    kids.push({ label: c.label, kind: "project", lines: [...own, ...pricing] });
   }
   return { label: p.name, kind: "organization", client: p.key, aliases: [p.short], subject: true, lines, kids };
 }
 
-/** The factories the firm buys from, and the forwarders that move its containers. */
+/** The factories the firm buys from, which a contract names. */
 const FACTORY_NAMES = ["Hengli Enamel Works", "Foshan Brightstar Ceramics", "Ningbo Crestline Glass", "Yangjiang Steelcraft", "Fujian Greenleaf Bamboo"];
-const FACTORIES: Array<[string, string[]]> = [
-  ["Hengli Enamel Works", ["Hengli Enamel Works makes our enamel cookware in Shenzhen.", "Hengli needs 45 days from deposit to loading.", "We audit Hengli every spring."]],
-  ["Foshan Brightstar Ceramics", ["Brightstar makes our stoneware and tableware.", "Brightstar's kiln shuts for two weeks at Lunar New Year."]],
-  ["Ningbo Crestline Glass", ["Crestline makes our glass jars and tumblers.", "Crestline breakage runs under 1 percent when packed in dividers."]],
-  ["Yangjiang Steelcraft", ["Steelcraft makes our cutlery and sheet pans.", "Steelcraft holds stock of the three best selling patterns."]],
-  ["Fujian Greenleaf Bamboo", ["Greenleaf makes our bamboo tools and lids.", "Greenleaf's bamboo is certified from managed forests."]],
-];
-const FORWARDERS: Array<[string, string[]]> = [
-  ["Tidelink Logistics", ["Tidelink books most of our European containers.", "Tidelink quotes are good for two weeks."]],
-  ["Eastgate Freight", ["Eastgate Freight handles our shipments to the Americas.", "Eastgate sends tracking updates every Monday."]],
-  ["Coral Bay Shipping", ["Coral Bay Shipping covers Southeast Asia and Australia.", "Coral Bay is cheapest for less than container loads."]],
-];
-
-const PRODUCT_LINES: Array<[string, string[]]> = [
-  ["Enamel cookware", ["Enamel cookware is our biggest line by volume.", "Enamel colors are matched to a physical swatch, never a screen."]],
-  ["Glassware", ["Glassware ships with dividers in every carton.", "Glass lids are tested for heat shock."]],
-  ["Bamboo kitchen tools", ["Bamboo tools are oiled before packing so they do not crack at sea."]],
-  ["Stainless cutlery", ["Cutlery comes in three patterns and two finishes.", "Every cutlery set is checked for rust after a salt spray test."]],
-  ["Ceramic tableware", ["Tableware is tested for lead and cadmium for every market.", "Tableware ships in sets of four or sixteen."]],
-];
-
-const POLICIES: Array<[string, string[]]> = [
-  ["Quality control", ["Every order gets a pre shipment inspection by a third party.", "A failed inspection means the factory reworks the order at its own cost."]],
-  ["Samples", ["Samples are free for orders over two containers.", "Samples go by courier within ten days of a request."]],
-  ["Credit", ["New partners pay a deposit until they have six months of clean payments.", "Credit limits are reviewed each January."]],
-];
-
-const DECISIONS = [
-  "We decided to quote every new partner in dollars unless they ask for euros.",
-  "We decided to stop selling non stick pans with older coatings.",
-  "We switched European bookings to Tidelink in the spring.",
-  "We decided to keep two factories for every product line.",
-  "We decided to visit every top ten partner once a year.",
-];
 
 /** The team beyond the three the film names, as Settings lists them. */
 export const MORE_WORKERS = [
@@ -181,22 +128,653 @@ export const MORE_WORKERS = [
   { key: "kit", topic: "Shipping desk", name: "Kit Wong", team: "Operations", role: "Shipping clerk", lines: ["Kit Wong prepares the shipping documents for every order."] },
 ];
 
-/** The firm's lines added to topics the film already has, by their labels. */
-const MORE_IN: Record<string, string[]> = {
-  "Payment terms": ["Deposits are 30 percent unless finance agrees to less.", "Late payers move to letters of credit."],
-  "Customs codes": ["Glass storage jars ship under HS code 7013.", "Bamboo utensils need a phytosanitary certificate for Australia."],
-  "Pricing rules": ["Freight is quoted separately from product price.", "Quotes are valid for 30 days."],
-  Markets: ["Australia and New Zealand grew fastest this year.", "The Gulf orders peak before Ramadan."],
-  "Trade shows": ["We take a booth at the Ambiente fair in Frankfurt each February.", "Trade show samples are shipped back, never sold."],
-  "How you negotiate": ["I put the volume on the table before the price.", "I write down every concession the same day."],
-};
+/** The three coworkers the film names, with what the team knows about each. */
+const NAMED_WORKERS = [
+  { key: "tomas", topic: "Sales team notes", name: "Tomas Lindqvist", role: "Sales lead", lines: ["Tomas Lindqvist leads sales and signs off on any discount past 5 percent."] },
+  { key: "mei", topic: "Shipping desk", name: "Mei Chan", role: "Shipping coordinator", lines: ["Mei Chan books containers and tracks every vessel."] },
+  { key: "arjun", topic: "Finance questions", name: "Arjun Mehta", role: "Finance manager", lines: ["Arjun Mehta approves payment terms past 45 days and every letter of credit."] },
+];
+
+/** No more lines on the partners the film names: their folders hold what the film shows. */
+const NAMED_MORE: Record<string, Line[]> = {};
+
+/**
+ * Harbourline's memory past Company and Clients, in the sections Coere for
+ * Teams rings after them, each folder in a trading house's own words.
+ * Prices move in percents and volumes in containers.
+ */
+function sections(): SectionSpec[] {
+  return [
+    {
+      key: "company",
+      label: "Company",
+      folders: [
+        {
+          label: "How we work",
+          chats: ["Team meeting notes", "Order process", "New partner checklist", "Office routines", "Order desk notes"],
+          lines: [
+            "The sales team meets Monday at 9 to walk open orders.",
+            "Every order has one account manager and one shipping coordinator.",
+            "New partners sign our terms of sale before the first order.",
+            "Orders are confirmed in writing within one working day.",
+            "Every partner call ends with the next date agreed.",
+            "Factory and partner emails are filed by order number.",
+            "We answer partner emails within one working day, in their time zone.",
+            "Each partner gets a yearly visit from its account manager.",
+            "Order changes after the deposit need the factory's written yes.",
+            "The order desk works Hong Kong hours, and Joy covers the Americas evening.",
+            "Big orders get a kickoff call with the factory and the partner.",
+            "Every partner has a file with its labels, cartons and documents.",
+            "Account managers write a short note after every partner call.",
+            "Disputes with a partner go to Tomas before any reply.",
+          ],
+        },
+        {
+          label: "Policies",
+          chats: ["Quality control policy", "Samples policy", "Credit policy", "Travel policy", "Data and email policy"],
+          lines: [
+            "Every order gets a pre shipment inspection by a third party.",
+            "Samples are free for orders over two containers.",
+            "New partners pay a deposit until they have six months of clean payments.",
+            "A failed inspection means the factory reworks the order at its own cost.",
+            "Samples go by courier within ten days of a request.",
+            "Credit limits are reviewed each January.",
+            "Factory visits are booked through the travel desk.",
+            "Gifts from factories are declined unless they are small.",
+            "Partner price lists never leave the shared drive.",
+            "Staff may not take a side job with a factory or a partner.",
+            "Laptops lock after five minutes and use two step sign in.",
+            "Partner data is never shared with another partner.",
+          ],
+        },
+        {
+          label: "Systems",
+          chats: ["ERP setup", "Shipping portal", "Shared drive structure", "Price list template"],
+          lines: [
+            "Orders, invoices and stock live in the ERP.",
+            "The forwarders' bookings show in one shipping portal.",
+            "Price lists are kept in the shared drive, one file per partner.",
+            "Inspection reports are filed against the order in the ERP.",
+            "Every container has a tracking line in the shipping sheet.",
+            "Mei updates the shipping sheet each morning.",
+            "The ERP sends a reminder when a deposit is late.",
+            "Sample requests are logged in the sample tracker.",
+            "The CRM holds every partner contact and call note.",
+            "Kit keeps the document templates in the shared drive.",
+            "Old orders are archived in the ERP after two years.",
+            "Every partner gets a login to see its order status.",
+            "The ERP backup runs each night.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Management meeting notes", "Strategy for next year"],
+        lines: [
+          ["decision", "We decided to keep two factories for every product line."],
+          ["decision", "We decided to visit every top ten partner once a year."],
+          ["decision", "We decided to quote every new partner in dollars unless they ask for euros."],
+        ],
+      },
+    },
+    {
+      key: "sourcing",
+      label: "Sourcing",
+      folders: [
+        {
+          label: "Factories",
+          chats: ["Hengli factory visit", "Brightstar order", "Crestline audit notes", "Steelcraft order", "Greenleaf factory visit", "Factory list"],
+          lines: [
+            "Hengli Enamel Works makes our enamel cookware in Shenzhen.",
+            "Brightstar makes our stoneware and tableware in Foshan.",
+            "Crestline makes our glass jars and tumblers in Ningbo.",
+            "Steelcraft makes our cutlery and sheet pans in Yangjiang.",
+            "Greenleaf makes our bamboo tools and lids in Fujian.",
+            "Hengli needs 45 days from deposit to loading.",
+            "Brightstar's kiln shuts for two weeks at Lunar New Year.",
+            "Crestline breakage runs under 1 percent when packed in dividers.",
+            "Steelcraft holds stock of the three best selling patterns.",
+            "Greenleaf's bamboo is certified from managed forests.",
+            "Every factory signs our supplier code before its first order.",
+            "Each product line has a second factory ready if the first fails.",
+            "Factories get a forecast for the next two quarters each month.",
+            "Factory contacts are in the CRM with their WeChat ids.",
+            "We pay factories by bank transfer in two parts.",
+          ],
+        },
+        {
+          label: "Factory audits",
+          chats: ["Supplier audit in Shenzhen", "Audit checklist", "Audit reports", "Social audit notes"],
+          lines: [
+            "We audit Hengli every spring.",
+            "Wing runs the factory audits and writes up each one.",
+            "Every factory gets a social audit every two years.",
+            "Audits check fire exits, overtime and wages as well as quality.",
+            "A failed audit item gets a fix date and a follow up visit.",
+            "Partners can see our audit summaries on request.",
+            "New factories are audited before any sample order.",
+            "Audit reports are filed in the shared drive by factory and year.",
+            "Brightstar passed its last audit with two small findings.",
+            "Department store partners in the US ask for audit reports every year.",
+            "Audit visits are announced a week ahead, except social audits.",
+            "Wing shares audit photos with Hannah the same day.",
+          ],
+        },
+        {
+          label: "Samples",
+          chats: ["Sample requests", "Sample tracker", "Golden samples", "Sample courier"],
+          lines: [
+            "Every order is checked against a signed golden sample.",
+            "Golden samples are kept in the Hong Kong office for two years.",
+            "Sample costs are charged back on orders under two containers.",
+            "Color samples are matched under daylight lamps.",
+            "Partners get two rounds of samples before they pay.",
+            "Samples ship by courier with a tracking number in the tracker.",
+            "A third round of samples needs Tomas's approval.",
+            "Hannah checks every sample before it goes to a partner.",
+            "Pre production samples are photographed and filed.",
+            "Samples for trade shows are made a month ahead.",
+            "Rejected samples are returned to the factory with notes.",
+          ],
+        },
+        {
+          label: "Costs and quotes",
+          chats: ["Factory price review", "Cost sheet", "Raw material prices", "Factory quotes"],
+          lines: [
+            "Wing negotiates factory prices each spring.",
+            "Factory quotes hold for 30 days unless steel or glass prices move.",
+            "Our cost sheet splits material, labor, packing and margin.",
+            "Steel prices set most of the cutlery cost.",
+            "We ask two factories to quote any new product.",
+            "Factories get a deposit of 30 percent and the rest before loading.",
+            "Price rises from factories need three months notice.",
+            "Packing costs are quoted separately from the product.",
+            "Mold costs are paid once and amortized over the first orders.",
+            "Carton costs rose this year, so packing is quoted on every order.",
+            "We share a cost breakdown with partners only on private label.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Sourcing notes"],
+        lines: ["No new factory is added without a visit by Wing.", "Factory holidays are on the shared calendar."],
+      },
+    },
+    {
+      key: "products",
+      label: "Products",
+      folders: [
+        {
+          label: "Enamel cookware",
+          chats: ["Enamel cookware specs", "Enamel colors", "Enamel range review", "Enamel questions"],
+          lines: [
+            "Enamel cookware is our biggest line by volume.",
+            "Enamel colors are matched to a physical swatch, never a screen.",
+            "Enamel pots come in four sizes and eight colors.",
+            "Every enamel batch is tested for chips after a drop test.",
+            "Induction bases are standard on the new enamel range.",
+            "Enamel lids now have steel knobs, not plastic.",
+            "Custom enamel colors need a minimum of one container.",
+            "Enamel kettles sell best in Japan and Korea.",
+            "The enamel range gets two new colors each spring.",
+            "Enamel cookware ships two to a carton with paper wrap.",
+            "We stopped the speckled finish after too many returns.",
+            "Enamel colors are named the same in every market.",
+            "The enamel milk pan is the top seller in Korea.",
+          ],
+        },
+        {
+          label: "Glassware",
+          chats: ["Glassware specs", "Glass storage range", "Glassware breakage", "Glassware questions"],
+          lines: [
+            "Glassware ships with dividers in every carton.",
+            "Glass lids are tested for heat shock.",
+            "Glass storage jars come with bamboo or steel lids.",
+            "Tumblers come in sets of four and six.",
+            "Glass for the US market is tested for lead in the rim.",
+            "Breakage claims need photos within seven days of arrival.",
+            "The refill jar line grew fastest this year.",
+            "Glass storage jars are stackable in three sizes.",
+            "Seasonal glassware is ordered by May for the Christmas season.",
+            "Every glass item is marked dishwasher safe only after testing.",
+            "Glass jars are packed upright with cardboard tops.",
+            "Glass orders get an extra 2 percent for breakage.",
+          ],
+        },
+        {
+          label: "Bamboo and wood",
+          chats: ["Bamboo kitchen tools specs", "Bamboo questions", "Wood finish tests"],
+          lines: [
+            "Bamboo tools are oiled before packing so they do not crack at sea.",
+            "Bamboo utensils need a phytosanitary certificate for Australia.",
+            "Bamboo boards come in three sizes with a juice groove.",
+            "Wood items ship with silica gel to keep out mold.",
+            "Bamboo lids are fitted to the jar at the factory.",
+            "Bamboo items are labeled with care instructions in each market's language.",
+            "We do not sell bamboo with melamine binders.",
+            "Utensil sets come in a cotton bag, not plastic.",
+            "Bamboo prices rise after a wet season in Fujian.",
+            "Every bamboo batch is checked for moisture before packing.",
+          ],
+        },
+        {
+          label: "Cutlery and tableware",
+          chats: ["Stainless cutlery specs", "Ceramic tableware specs", "Tableware tests", "Cutlery patterns"],
+          lines: [
+            "Cutlery comes in three patterns and two finishes.",
+            "Every cutlery set is checked for rust after a salt spray test.",
+            "Tableware is tested for lead and cadmium for every market.",
+            "Tableware ships in sets of four or sixteen.",
+            "Stoneware is microwave and oven safe to 220 degrees.",
+            "Cutlery is 18/10 steel for the premium line and 18/0 for value.",
+            "Tableware glazes are food safe and tested by an outside lab.",
+            "Hotel cutlery is heavier and sold by the dozen.",
+            "Sheet pans are aluminium with rolled edges.",
+            "Matte black cutlery needs extra care in packing to avoid scratches.",
+            "Tableware patterns are protected by our own design files.",
+            "Cutlery boxes show the steel grade on the front.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Product notes"],
+        lines: ["Every product has a spec sheet with materials, sizes and tests.", "New products are tested in one market before they go wide.", "Product photos are shot in Hong Kong on a white background."],
+      },
+    },
+    {
+      key: "shipping",
+      label: "Shipping",
+      folders: [
+        {
+          label: "Freight partners",
+          chats: ["Freight quote comparison", "Tidelink booking", "Eastgate quote", "Coral Bay quote", "Forwarder review"],
+          lines: [
+            "Tidelink books most of our European containers.",
+            "Eastgate Freight handles our shipments to the Americas.",
+            "Coral Bay Shipping covers Southeast Asia and Australia.",
+            "Tidelink quotes are good for two weeks.",
+            "Eastgate sends tracking updates every Monday.",
+            "Coral Bay is cheapest for less than container loads.",
+            "We switched European bookings to Tidelink in the spring.",
+            "Forwarders are reviewed each year on price, delays and claims.",
+            "Every booking is confirmed by email with the vessel name.",
+            "Forwarders send the draft bill of lading for checking before sailing.",
+            "Forwarders get our shipping forecast each month.",
+            "Claims for damage go through the forwarder within 30 days.",
+          ],
+        },
+        {
+          label: "Customs codes",
+          chats: ["Customs codes for kitchenware", "HS code questions", "Duty rates by market", "Customs broker notes"],
+          lines: [
+            "Glass storage jars ship under HS code 7013.",
+            "Bamboo utensils need a phytosanitary certificate for Australia.",
+            "Stainless cutlery ships under HS code 8215.",
+            "Ceramic tableware ships under HS code 6912.",
+            "Codes are checked with the partner's broker before the first order.",
+            "The EU needs food contact declarations for every kitchen item.",
+            "US orders need a customs bond held by the importer.",
+            "Wrong codes are fixed before the goods arrive, never after.",
+            "Kit keeps the code list for every product in the shared drive.",
+            "Korea checks country of origin marks on every item.",
+            "Codes for new products are set before the first sample ships.",
+          ],
+        },
+        {
+          label: "Documents",
+          chats: ["Shipping documents checklist", "Bill of lading questions", "Certificate of origin", "Packing list template"],
+          lines: [
+            "Every shipment has an invoice, a packing list and a bill of lading.",
+            "Certificates of origin are needed for Korea and Australia.",
+            "Kit prepares the shipping documents for every order.",
+            "Documents go to the partner's bank within five days of sailing.",
+            "The packing list shows carton count, weight and volume.",
+            "Telex release is used for partners on open terms.",
+            "Original bills go by courier for letters of credit.",
+            "Document errors are the main cause of payment delays, so two people check them.",
+            "Fumigation certificates are needed for wood items to some markets.",
+            "Document templates are updated when a market changes its rules.",
+            "Each order's documents are saved together in the ERP.",
+          ],
+        },
+        {
+          label: "Incoterms",
+          chats: ["Incoterms for Rotterdam route", "FOB or CIF", "Incoterms questions"],
+          lines: [
+            "Most partners buy FOB Shenzhen or Hong Kong.",
+            "CIF quotes include insurance at 110 percent of the invoice.",
+            "DDP is offered only to small online partners in Europe.",
+            "Risk passes to the buyer when goods are loaded on FOB terms.",
+            "Every quote names the Incoterm and the port.",
+            "EXW is never offered, since partners struggle with export clearance.",
+            "We moved two partners from CIF to FOB when freight rates rose.",
+            "Partners new to importing get a short note on what FOB means.",
+            "Insurance on CIF orders is placed with one insurer for all lanes.",
+            "Partners on FOB terms book their own insurance.",
+            "The Incoterm is printed on every proforma invoice.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Shipping notes"],
+        lines: ["Peak season space is booked six weeks ahead.", "Every delay over three days is told to the partner the same day."],
+      },
+    },
+    {
+      key: "markets",
+      label: "Markets",
+      folders: [
+        {
+          label: "Europe",
+          chats: ["European market notes", "EU rules for kitchenware", "European partners review", "Ambiente fair notes"],
+          lines: [
+            "Felix Brandt covers the European partners from Hamburg.",
+            "European buyers want food contact tests on every item.",
+            "Germany and the Nordics prefer muted colors and steel lids.",
+            "European orders peak before the autumn season.",
+            "The EU packaging rules will cut plastic in our cartons.",
+            "Spain buys more tableware than any other European market.",
+            "Partners in Europe pay in euros, and we hedge some of it.",
+            "Hotel kitchens in Germany buy heavier pans than retail.",
+            "The UK now needs its own conformity marks on some items.",
+            "Nordic buyers ask for the carbon footprint of each shipment.",
+            "Hamburg is our second port for Northern Europe.",
+          ],
+        },
+        {
+          label: "Asia Pacific",
+          chats: ["Asia Pacific notes", "Q4 pricing to Singapore", "Australia market notes", "Japan and Korea notes"],
+          lines: [
+            "Australia and New Zealand grew fastest this year.",
+            "Japanese buyers check packaging as closely as the product.",
+            "Korea needs Korean labels on every box.",
+            "Southeast Asia buys more value range items.",
+            "Australia checks wood and bamboo at the border.",
+            "Golden Week slows orders from Japan in early May.",
+            "Malaysia and Thailand prefer melamine for everyday use.",
+            "Partners in Japan expect samples within a week.",
+            "Hong Kong partners often pick up from our warehouse.",
+            "Australian buyers order twice a year, in spring and autumn.",
+            "Thailand needs Thai labels on retail packs.",
+          ],
+        },
+        {
+          label: "Americas",
+          chats: ["Americas market notes", "US compliance questions", "Mexico and Chile notes", "Canada orders"],
+          lines: [
+            "Joy Santos covers partners in the Americas.",
+            "US buyers want California Prop 65 testing on kitchen items.",
+            "Mexico orders run through Manzanillo.",
+            "Canada buys more restaurant supplies than retail.",
+            "US department stores ask for social audit reports.",
+            "Chile and Peru buy basics for supermarket shelves.",
+            "Americas orders peak before the US holiday season.",
+            "US duties on some kitchenware changed this year, so quotes are checked each month.",
+            "Canada needs French on every retail label.",
+            "Long Beach is the port for most US orders.",
+            "Partners in Mexico prefer prices in dollars.",
+          ],
+        },
+        {
+          label: "Gulf and Middle East",
+          chats: ["Gulf market notes", "Ramadan season planning", "Jebel Ali shipping"],
+          lines: [
+            "The Gulf orders peak before Ramadan.",
+            "Gift boxes sell best in the Gulf.",
+            "Partners in the Gulf want Arabic and English labels.",
+            "Jebel Ali is the port for most Gulf orders.",
+            "Gulf hypermarkets order in large single shipments.",
+            "Ramadan dates move each year, so orders are planned from the calendar.",
+            "Gulf buyers want halal friendly coatings on non stick items.",
+            "Payment in the Gulf is mostly by letter of credit.",
+            "Summer heat means glass ships with extra padding to the Gulf.",
+            "Felix covers the Gulf partners until we hire for the region.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Market notes"],
+        lines: ["Every new market starts with one partner and one product line.", "Market briefs are updated after each trade show.", "Each market has a one page brief in the shared drive.", "We review market sales at the end of each quarter."],
+      },
+    },
+    {
+      key: "money",
+      label: "Money",
+      folders: [
+        {
+          label: "Payment terms",
+          chats: ["Payment terms negotiation", "Payment terms by partner", "Late payments", "Deposits"],
+          lines: [
+            "Deposits are 30 percent unless finance agrees to less.",
+            "Late payers move to letters of credit.",
+            "Partners on open terms get a statement on the first of each month.",
+            "Payment reminders go out three days before the due date.",
+            "A payment more than 15 days late stops new orders.",
+            "Long term partners can earn 60 day terms after two clean years.",
+            "Payment terms are written on every proforma invoice.",
+            "Bank charges are split between us and the partner.",
+            "Deposits are paid before the factory buys raw materials.",
+            "Credit notes are issued within a week of an agreed claim.",
+            "Partners can pay early for a small discount.",
+          ],
+        },
+        {
+          label: "Pricing rules",
+          chats: ["Margin by region", "Q4 pricing review", "Price list updates", "Discount rules"],
+          lines: [
+            "Freight is quoted separately from product price.",
+            "Quotes are valid for 30 days.",
+            "Our target margin is higher on private label than on our own brand.",
+            "Volume discounts start at five containers a year.",
+            "Prices for the next year are sent to partners in November.",
+            "Any price below cost plus the floor margin needs Tomas.",
+            "Price lists show prices per carton and per piece.",
+            "We never match a competitor's price without seeing the quote.",
+            "Private label prices include the cost of artwork and molds.",
+            "Freight surcharges are passed through at cost.",
+            "Price breaks are shown at one, five and ten containers.",
+          ],
+        },
+        {
+          label: "Letters of credit",
+          chats: ["Letter of credit checklist", "LC discrepancies", "Bank contacts", "LC questions"],
+          lines: [
+            "Every letter of credit is checked against the order before we accept it.",
+            "Arjun approves every letter of credit.",
+            "Letters of credit must allow partial shipments.",
+            "We ask for 21 days to present documents.",
+            "Discrepancies cost a fee, so Kit checks the documents twice.",
+            "Our bank in Hong Kong advises most letters of credit.",
+            "Confirmed letters of credit are needed for new partners in some markets.",
+            "Expiry dates leave two weeks after the latest shipment date.",
+            "Kit keeps a checklist for each bank's letter of credit format.",
+            "Amendments to a letter of credit need Arjun's approval.",
+          ],
+        },
+        {
+          label: "Currency",
+          chats: ["Currency hedging", "Euro quotes", "FX questions"],
+          lines: [
+            "We quote in dollars by default.",
+            "Euro quotes are hedged when the order is confirmed.",
+            "Arjun reviews currency exposure every Friday.",
+            "Yen orders are priced with a buffer for currency moves.",
+            "Factories are paid in renminbi or dollars.",
+            "Currency rates for quotes are set each Monday.",
+            "Euro and yen quotes carry the rate date on the quote.",
+            "Big currency moves trigger a price review with Tomas.",
+            "We hold some euros to pay European costs.",
+            "Currency clauses in contracts allow a price review past a set move.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Finance notes"],
+        lines: ["Arjun sends the cash report every Monday.", "Bad debts are reviewed at the quarterly finance meeting.", "Month end closes on the third working day.", "Credit insurance covers our largest partners."],
+      },
+    },
+    {
+      key: "sales",
+      label: "Sales",
+      folders: [
+        {
+          label: "Trade shows",
+          chats: ["Trade show follow ups", "Canton Fair plan", "Ambiente fair plan", "Booth planning"],
+          lines: [
+            "We take a booth at the Ambiente fair in Frankfurt each February.",
+            "Trade show samples are shipped back, never sold.",
+            "The Canton Fair booth shows the new colors first.",
+            "Each trade show has a target list of buyers to meet.",
+            "Lead cards are typed into the CRM the same evening.",
+            "We book hotels for Frankfurt by September.",
+            "Trade show budgets are set in the January plan.",
+            "Felix and Grace staff the Frankfurt booth.",
+            "Booth staff wear the same shirts and name badges.",
+            "We send a thank you email to every buyer we met within two days.",
+            "The Hong Kong houseware fair in April is for Asian buyers.",
+          ],
+        },
+        {
+          label: "How you negotiate",
+          chats: ["Negotiation notes", "Prep for a hard call", "Renewal playbook"],
+          lines: [
+            ["style", "I put the volume on the table before the price."],
+            ["style", "I write down every concession the same day."],
+            ["style", "I ask what else matters before I talk about price."],
+            ["style", "I give a reason with every no."],
+            ["style", "I close each call by reading back what we agreed."],
+            ["style", "I keep my tone warm even when the answer is no."],
+            ["style", "I let the other side name a number first when I can."],
+            ["style", "I never negotiate by email when a call will do."],
+          ],
+        },
+        {
+          label: "Proposals",
+          chats: ["Proposal template", "Renewal proposals", "New partner proposal"],
+          lines: [
+            "Proposals fit on two pages, with prices in an appendix.",
+            "Every proposal names the Incoterm, the port and the lead time.",
+            "Renewal proposals compare this year with last year.",
+            "Proposals are read by Tomas before they go out.",
+            "We send proposals as PDF with the price list attached.",
+            "Each proposal has one clear deadline to accept.",
+            "New partner proposals include our audit summary.",
+            "Proposals list three options when the partner is price sensitive.",
+            "Every proposal is saved in the CRM with its outcome.",
+            "Lost proposals get a short note on why.",
+          ],
+        },
+        {
+          label: "Leads",
+          chats: ["New leads", "Lead follow ups", "Buyer intros"],
+          lines: [
+            "Leads from email get an answer the same day.",
+            "Leads are ranked by volume and fit with our lines.",
+            "Intros from partners get a call within two days.",
+            "We send a sample pack to qualified leads only.",
+            "Leads with no answer after three tries are closed.",
+            "Grace reviews the lead list each Friday.",
+            "Leads from trade shows are sorted by market the same week.",
+            "Every new lead is checked for credit before a quote.",
+            "Leads get our catalog as a PDF, not a printed copy.",
+            "Grace answers leads from Japan herself.",
+            "A lead becomes a partner only after the first paid order.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Sales notes"],
+        lines: ["Sales numbers by partner are shared with the team each month.", "We keep a list of partners we lost and why.", "Sales targets are set by market each January.", "Every partner has a yearly business review."],
+      },
+    },
+    {
+      key: "plans",
+      label: "Plans and deadlines",
+      folders: [
+        {
+          label: "Shipping calendar",
+          chats: ["Shipping calendar", "Holiday shutdowns", "Peak season plan", "Lunar New Year plan"],
+          lines: [
+            "Factories close for about three weeks at Lunar New Year.",
+            "Orders for spring must load before the Lunar New Year shutdown.",
+            ["task", "Last bookings before the Lunar New Year rush go in by {d}.", 40],
+            "Golden Week in October slows factories for a week.",
+            "Peak season for Europe and the US runs from July to October.",
+            ["task", "The holiday shipping calendar goes to partners by {d}.", 21],
+            "Ramadan season orders must sail eight weeks ahead.",
+            "The shipping calendar is shared with every partner in December.",
+            "Space on Europe lanes is tight from August to October.",
+            "Chinese National Day closes ports for part of the first week of October.",
+            ["task", "Spring order deadlines go to every partner by {d}.", 28],
+            "Partners get two weeks notice of any factory holiday.",
+          ],
+        },
+        {
+          label: "Year plan",
+          chats: ["Plan for next year", "Strategy for next year", "Budget planning"],
+          lines: [
+            ["event", "The planning day for next year is on {d}.", 30],
+            "We plan to add one new product line next year.",
+            "Next year's goal is two new partners in Europe.",
+            ["task", "Next year's price lists go out by {d}.", 34],
+            "We plan to cut plastic in packing by half.",
+            "The budget for next year is set in December.",
+            "We want every partner on a yearly plan by spring.",
+            "We plan to open a small office in Rotterdam.",
+            "Next year's trade show list is set in January.",
+            "We want to move one more product line to a second factory.",
+            "We aim to cut late shipments to under 5 percent.",
+          ],
+        },
+        {
+          label: "Team calendar",
+          chats: ["Team calendar", "Travel plans", "Office events"],
+          lines: [
+            ["event", "The team dinner is on {d}.", 56],
+            "The office closes for three days at Lunar New Year.",
+            ["event", "Wing's next trip to the factories starts {d}.", 24],
+            "Felix visits the European partners each March.",
+            "Quarterly reviews with the team are in the first week of each quarter.",
+            "Mei takes leave over Christmas, and Kit covers the shipping desk.",
+            "Felix and Joy visit Hong Kong each summer.",
+            "The team photo is taken at the spring dinner.",
+            ["event", "The quarterly team review is on {d}.", 66],
+            "Hannah's inspection trips are on the shared calendar.",
+          ],
+        },
+        {
+          label: "Hiring and training",
+          chats: ["Hiring plan", "Quality inspector search", "Training plan", "New hire checklist"],
+          lines: [
+            "We are hiring a second quality inspector next year.",
+            "New hires spend a week at a factory in their first month.",
+            "Every new hire learns the ERP from Kit.",
+            "Account managers take a course on letters of credit.",
+            "Interviews include a short case on a late shipment.",
+            "We hire from the Polytechnic University's logistics course.",
+            "Language classes are paid for staff who cover a market.",
+            "Each new hire shadows a trade show before working one.",
+            "Every new hire gets a buddy for the first month.",
+            "Training on customs rules is refreshed each year.",
+          ],
+        },
+      ],
+      loose: {
+        chats: ["Plans notes"],
+        lines: ["Calendars are checked every Monday at the team meeting.", "Partner deadlines live in the CRM with reminders.", ["task", "The office lease renewal is due {d}.", 62], "Every date a partner depends on is in the shared calendar."],
+      },
+    },
+  ];
+}
 
 export type Roster = {
   clients: Array<{ key: string; name: string; aliases: string[] }>;
-  company: Thing[];
-  forwarders: Thing[];
   clientThings: Thing[];
-  more: Record<string, Line[]>;
+  /** The team as persons in Company's team folder. */
+  people: Thing[];
+  /** More lines on the partners the film names, by client key. */
+  named: Record<string, Line[]>;
+  /** The firm's memory by section, Company first, each with its folders. */
+  sections: SectionSpec[];
 };
 
 export function roster(now: number): Roster {
@@ -209,39 +787,19 @@ export function roster(now: number): Roster {
       return `${["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getUTCMonth()]} ${d.getUTCFullYear()}`;
     },
   };
-  const lower = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
-  const folder = (label: string, lines: string[], topic: string[], kind?: Line["kind"]): Thing => ({ label, kind: "folder", lines: lines.map((text) => ({ text, topic, ...(kind ? { kind } : {}) })) });
-  const org = ([label, lines]: [string, string[]], topic: string[]): Thing => ({ label, kind: "organization", subject: true, lines: lines.map((text) => ({ text, topic })) });
-  const company: Thing[] = [
-    { label: "Factories", kind: "folder", kids: FACTORIES.map((f) => org(f, [`${f[0].split(" ")[0]} factory visit`, `${f[0]} order`, `${f[0]} audit notes`])) },
-    { label: "Product lines", kind: "folder", kids: PRODUCT_LINES.map(([label, lines]) => folder(label, lines, [`${label} specs`, `${label} questions`])) },
-    { label: "Policies", kind: "folder", kids: POLICIES.map(([label, lines]) => folder(label, lines, [`${label} policy`, `Updating the ${lower(label)} policy`])) },
-    folder("Decisions", DECISIONS, ["Management meeting notes", "Strategy for next year"], "decision"),
-    {
-      label: "People",
-      kind: "folder",
-      kids: MORE_WORKERS.map((w) => ({
-        label: w.name,
-        kind: "person",
-        key: w.key,
-        subject: true,
-        values: [["email", `${w.name.split(" ")[0]!.toLowerCase()}@harbourline.hk`], ["role", w.role]] as Array<[IdentityValueView["field"], string]>,
-        lines: w.lines.map((text) => ({ text, topic: [w.topic, `Notes on ${w.name.split(" ")[0]}`] })),
-      })),
-    },
-  ];
-  const forwarders = FORWARDERS.map((f) => org(f, [`${f[0].split(" ")[0]} quote`, `${f[0]} booking`]));
-  const more = Object.fromEntries(
-    Object.entries(MORE_IN).map(([label, lines]) => [
-      label,
-      lines.map((text) => ({ text, topic: label === "How you negotiate" ? ["Negotiation notes", "Prep for a hard call"] : [`${label} notes`, `${label} questions`], ...(label === "How you negotiate" ? { kind: "style" as const } : {}) })),
-    ]),
-  );
+  const people: Thing[] = [...NAMED_WORKERS, ...MORE_WORKERS].map((w) => ({
+    label: w.name,
+    kind: "person",
+    key: w.key,
+    subject: true,
+    values: [["email", `${w.name.split(" ")[0]!.toLowerCase()}@harbourline.hk`], ["role", w.role]] as Array<[IdentityValueView["field"], string]>,
+    lines: w.lines.map((text) => ({ text, topic: [w.topic, `Notes on ${w.name.split(" ")[0]}`] })),
+  }));
   return {
     clients: PARTNERS.map((p) => ({ key: p.key, name: p.name, aliases: [p.short] })),
-    company,
-    forwarders,
     clientThings: PARTNERS.map((p) => partnerThing(p, x)),
-    more,
+    people,
+    named: NAMED_MORE,
+    sections: sections(),
   };
 }

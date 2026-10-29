@@ -2,17 +2,20 @@ import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { field } from "../../../demos/industries/fields/finance.mjs";
-import { grow } from "./grow";
+import { addSections, grow, plantSections, sectionId } from "./grow";
 import { MORE_WORKERS, roster } from "./roster";
 
 /**
  * Ashgrove Wealth Partners' memory as Coere for Teams files it from the
  * team's chats (the shapes of demos/films/teams/memory.ts, written by hand
- * here instead of from coere-v2's agency corpus): Company with the firm's
- * own folders, Clients with a folder per household holding its contacts,
- * its engagement and its facts by slot, and Tone and voice. Coere for
- * Teams keeps no money amounts, so the households' facts carry
- * percentages and dates, never dollars. Made up.
+ * here instead of from coere-v2's agency corpus): Company with how the
+ * firm works, its fees, its policies and its team; Clients with a folder
+ * for each of its seven households, holding the household's contacts, its
+ * engagement and its facts by slot; then the firm's other sections, each
+ * with a few folders (investments, planning, compliance, writing, partners
+ * and tools, growth, plans and deadlines), as coere-v2's Teams graph rings
+ * them after Company and Clients. Coere for Teams keeps no money amounts,
+ * so the facts carry percentages and dates, never dollars. Made up.
  */
 
 export const ZONE = "America/Los_Angeles";
@@ -37,7 +40,7 @@ export interface Mem {
   nodes: Map<string, Node>;
   facts: Map<string, Fact>;
   self: string;
-  sections: { company: string; clients: string; tone: string };
+  sections: { company: string; clients: string };
   /** Client key to its folder id. */
   clientIds: Map<string, string>;
   clients: ClientDef[];
@@ -174,12 +177,14 @@ export const CLIENT_DEFS: ClientDef[] = [
   },
 ];
 
-type FolderDef = { label: string; facts: FactDef[] };
+/** A folder the team's chats filled, and the section it sits in. */
+type FolderDef = { label: string; home: string; facts: FactDef[] };
 
-/** Company: the firm's own knowledge, in the folders the team's chats filled. */
+/** The firm's own knowledge, in the folders the team's chats filled, each in its section (roster.ts holds the rest of each). */
 const COMPANY: FolderDef[] = [
   {
     label: "Investment policy",
+    home: "investments",
     facts: [
       { text: "Every client gets a written investment policy statement before we trade.", said: ["claude", "Investment policy template", "2026-01-14"] },
       { text: "Our core portfolios use low cost index funds for at least 80 percent of stocks.", said: ["chatgpt", "Q3 market commentary", "2026-07-08"] },
@@ -193,6 +198,7 @@ const COMPANY: FolderDef[] = [
   },
   {
     label: "Rebalancing rules",
+    home: "investments",
     facts: [
       { text: "We rebalance when an asset class drifts more than 5 points from its target.", said: ["claude", "Rebalancing rules", "2026-03-19"] },
       { text: "Rebalancing trades go in taxable accounts last, to keep taxes down.", said: ["claude", "Rebalancing rules", "2026-03-19"] },
@@ -205,6 +211,7 @@ const COMPANY: FolderDef[] = [
   },
   {
     label: "Fee schedule",
+    home: "company",
     facts: [
       { text: "The advisory fee is charged quarterly and shown on every statement.", said: ["claude", "Fee schedule wording", "2026-02-20"] },
       { text: "Fees are cut for households above the second tier.", said: ["claude", "Fee schedule wording", "2026-02-20"] },
@@ -214,7 +221,8 @@ const COMPANY: FolderDef[] = [
     ],
   },
   {
-    label: "Compliance",
+    label: "Rules and reviews",
+    home: "compliance",
     facts: [
       { text: "Every client letter is reviewed by Priya in compliance before it goes out.", said: ["gemini", "Compliance review notes", "2026-06-02"] },
       { text: "We keep notes from every client meeting for six years.", said: ["gemini", "Compliance review notes", "2026-06-02"] },
@@ -227,6 +235,7 @@ const COMPANY: FolderDef[] = [
   },
   {
     label: "Custodians",
+    home: "partners",
     facts: [
       { text: "Client accounts are held at Brightwater Custody.", said: ["chatgpt", "New client checklist", "2026-01-28"] },
       { text: "Transfers between custodians take about two weeks.", said: ["claude", "Haddad rollover steps", "2026-10-02"] },
@@ -237,6 +246,7 @@ const COMPANY: FolderDef[] = [
   },
   {
     label: "Client letters",
+    home: "writing",
     facts: [
       { text: "Quarterly letters lead with what changed, then what we did about it.", said: ["gemini", "Client letter template", "2026-07-02"] },
       { text: "Letters stay under one page and use the client's first name.", said: ["gemini", "Client letter template", "2026-07-02"] },
@@ -293,10 +303,20 @@ export function buildMemory(): Mem {
   };
 
   const self = node({ id: "ent_self", kind: "self", label: "You", section: "", importance: 5 });
-  const sections = { company: "sec_company", clients: "sec_clients", tone: "sec_tone" };
+  // Ids as the engine makes them, a prefix and a UUIDv7 from the time the thing was first filed, so the dashboard
+  // orders them by when they were saved: the clients a month back, the team's own folders before anything grown.
+  let made = 0;
+  const entId = (daysAgo: number): string => {
+    made += 1;
+    const t = Math.floor(now - daysAgo * 86_400_000).toString(16).padStart(12, "0");
+    return `ent_${t.slice(0, 8)}-${t.slice(8, 12)}-7${made.toString(16).padStart(3, "0")}-a${made.toString(16).padStart(3, "0")}-${(made * 2654435761).toString(16).padStart(12, "0").slice(-12)}`;
+  };
+  const sections = { company: "sec_company", clients: "sec_clients" };
   node({ id: sections.company, kind: "section", label: "Company", section: sections.company });
   node({ id: sections.clients, kind: "section", label: "Clients", section: sections.clients });
-  node({ id: sections.tone, kind: "section", label: "Tone and voice", section: sections.tone });
+  // The firm's other sections, after Company and Clients as Coere for Teams rings them (roster.ts).
+  const r = roster(now);
+  addSections(nodes, r.sections.filter((x) => x.key !== "company"));
 
   const sourceOf = (id: string, [platform, title, day]: Said, msg = 0): FactSource => ({
     evidenceId: `${id}#e0`,
@@ -356,19 +376,19 @@ export function buildMemory(): Mem {
     nodes.get(owner)!.facts_.push(id);
   };
 
-  // Company: one folder each.
+  // The firm's own folders, each in its section.
   COMPANY.forEach((f, i) => {
-    const folder = node({ id: `ent_company_${i}`, kind: "folder", label: f.label, section: sections.company, parent: sections.company });
+    const folder = node({ id: entId(700 + i), kind: "folder", label: f.label, section: sectionId(f.home), parent: sectionId(f.home) });
     for (const def of f.facts) addFact(folder.id, null, def);
   });
 
   // Clients: a folder per household, its contacts and its engagement inside it.
   const clientIds = new Map<string, string>();
   for (const c of CLIENT_DEFS) {
-    const folder = node({ id: `ent_client_${c.key}`, kind: "organization", label: c.name, section: sections.clients, parent: sections.clients, importance: 4, aliases: c.aliases, client: c.key });
+    const folder = node({ id: entId(30), kind: "organization", label: c.name, section: sections.clients, parent: sections.clients, importance: 4, aliases: c.aliases, client: c.key });
     clientIds.set(c.key, folder.id);
     for (const k of c.contacts) {
-      const person = node({ id: `ent_contact_${c.key}_${k.key}`, kind: "person", label: k.name, section: sections.clients, parent: folder.id });
+      const person = node({ id: entId(31), kind: "person", label: k.name, section: sections.clients, parent: folder.id });
       const said = new Date(Date.parse(`${k.said[2]}T12:00:00Z`)).toISOString().slice(0, 10);
       const value = (field: IdentityValueView["field"], v: string, href: string | null): IdentityValueView => {
         n += 1;
@@ -384,18 +404,17 @@ export function buildMemory(): Mem {
       person.relations = [{ type: "works_at", label: "Belongs to", direction: "out", other: { id: folder.id, label: c.name, kind: "organization" } }];
       folder.relations.push({ type: "works_at", label: `${k.name} is part of this`, direction: "in", other: { id: person.id, label: k.name, kind: "person" } });
     }
-    const work = node({ id: `ent_work_${c.key}`, kind: "project", label: c.work, section: sections.clients, parent: folder.id });
+    const work = node({ id: entId(32), kind: "project", label: c.work, section: sections.clients, parent: folder.id });
     folder.relations.unshift({ type: "for", label: `${c.work} is for this`, direction: "in", other: { id: work.id, label: c.work, kind: "project" } });
     for (const def of c.facts) addFact(folder.id, c.key, def, (def.slot && SLOT_KEY[def.slot]) || "");
   }
 
-  const tone = node({ id: "ent_tone", kind: "folder", label: field.graph.hubs[2].children[0].label, section: sections.tone, parent: sections.tone });
+  const tone = node({ id: entId(710), kind: "folder", label: field.graph.hubs[2].children[0].label, section: sectionId("writing"), parent: sectionId("writing") });
   for (const def of TONE) addFact(tone.id, null, def);
+  const team = node({ id: entId(51), kind: "folder", label: "Team", section: sections.company, parent: sections.company });
 
-  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): the other households,
-  // the firm's desks, model portfolios, policies, vendors and staff, from as many chats as the team's AIs hold.
-  const r = roster(now);
-  const byLabel = (label: string) => [...nodes.values()].find((x) => x.label === label && x.kind === "folder")!.id;
+  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): three more households,
+  // the team, and every other section's folders, from as many chats as the team's AIs hold.
   const existing = [...new Map([...facts.values()].flatMap((f) => f.sources).map((src) => [src.convId, { platform: src.platform, title: src.title }])).values()];
   grow({
     seed: 0xa5e6,
@@ -406,9 +425,10 @@ export function buildMemory(): Mem {
     chats: LIBRARY,
     existing,
     plant: [
-      { parent: sections.company, section: sections.company, things: r.company },
+      { parent: team.id, section: sections.company, things: r.people },
       { parent: sections.clients, section: sections.clients, things: r.clientThings },
-      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+      ...Object.entries(r.named).map(([key, lines]) => ({ parent: clientIds.get(key)!, section: sections.clients, lines, client: key })),
+      ...plantSections(nodes, r.sections, now),
     ],
   });
   for (const t of r.clientThings) {
@@ -430,7 +450,7 @@ export function buildMemory(): Mem {
     if (x.values.length) x.identity = x.values.length;
     x.urgency = urgency;
   };
-  for (const s of Object.values(sections)) for (const k of nodes.get(s)!.kids) roll(nodes.get(k)!);
+  for (const sec of [...nodes.values()].filter((x) => x.kind === "section")) for (const k of sec.kids) roll(nodes.get(k)!);
 
   return { now, nodes, facts, self: self.id, sections, clientIds, clients: [...CLIENT_DEFS, ...r.clients] };
 }

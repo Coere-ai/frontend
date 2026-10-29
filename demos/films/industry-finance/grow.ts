@@ -136,8 +136,11 @@ export function grow(input: GrowInput): Grown {
   };
 
   const place = (t: Thing, parent: GNode, section: string, client: string | null, subject: Subject | null) => {
+    // A thing's id carries its time, and the dashboard reads the newest things' memories first, a page at a time, until
+    // its budget is spent: so the things with the most to say are dated a little earlier, and come in the last page,
+    // which the page reads whole, and every folder gets its fan.
     const n = node({
-      id: id("ent", now - span * DAY),
+      id: id("ent", now - span * DAY - (t.lines?.length ?? 0) * 3_600_000),
       kind: t.kind,
       label: t.label,
       section,
@@ -336,4 +339,58 @@ export function rollUp(nodes: Map<string, GNode>, facts: Map<string, GFact>): vo
     return urgency;
   };
   for (const n of [...nodes.values()].filter((x) => x.kind === "section")) for (const k of n.kids) roll(nodes.get(k)!);
+}
+
+/**
+ * A memory past Company and Clients, in the sections Coere's Teams graph
+ * draws after them, each with a few folders and each folder with its own
+ * small fan of memories, as coere-v2's real library leans (more in the
+ * first sections and folders). A folder is written short: its name, the
+ * chats its lines came from, and its lines. A line is a note, or a kind
+ * and its words, with the days from now it is due for a task or an event
+ * (its "{d}" is that day).
+ */
+export type Said = string | [kind: string, text: string, due?: number];
+export type FolderSpec = { label: string; chats: string[]; lines: Said[]; kind?: Thing["kind"]; kids?: Thing[] };
+export type SectionSpec = { key: string; label: string; folders: FolderSpec[]; loose?: { chats: string[]; lines: Said[] } };
+
+/** A section's id, as the engine's catalog names one. */
+export const sectionId = (key: string): string => `sec_${key}`;
+
+/** The section nodes, in the order the graph rings them after Company and Clients. */
+export function addSections(nodes: Map<string, GNode>, specs: ReadonlyArray<Pick<SectionSpec, "key" | "label">>): string[] {
+  return specs.map(({ key, label }) => {
+    const id = sectionId(key);
+    nodes.set(id, { id, kind: "section", label, section: id, parent: null, importance: 3, pinned: false, urgency: "none", facts: 0, history: false, aliases: [], summary: null, kids: [], facts_: [], values: [], relations: [] });
+    return id;
+  });
+}
+
+/** One written line as grow files it: the i-th line of a folder comes from its chats in turn. */
+function lineOf(s: Said, i: number, chats: readonly string[], now: number): Line {
+  const topic = [...chats.slice(i % chats.length), ...chats.slice(0, i % chats.length)];
+  if (typeof s === "string") return { text: s, topic };
+  const [kind, text, due] = s;
+  return { text: due === undefined ? text : text.replace("{d}", dayName(now, due)), topic, kind: kind as Line["kind"], ...(due === undefined ? {} : { due }) };
+}
+
+/** A folder spec as a roster thing. */
+export function folderThing(f: FolderSpec, now: number): Thing {
+  return { label: f.label, kind: f.kind ?? "folder", lines: f.lines.map((s, i) => lineOf(s, i, f.chats, now)), ...(f.kids ? { kids: f.kids } : {}) };
+}
+
+/**
+ * Where each section's folders go. A folder the hand built memory already
+ * has in that section (by its name) takes the spec's lines as more of its own.
+ */
+export function plantSections(nodes: Map<string, GNode>, specs: readonly SectionSpec[], now: number): GrowInput["plant"] {
+  return specs.flatMap((s) => {
+    const id = sectionId(s.key);
+    const made = s.folders.map((f) => ({ f, known: [...nodes.values()].find((n) => n.parent === id && n.label === f.label) }));
+    return [
+      { parent: id, section: id, things: made.filter((x) => !x.known).map((x) => folderThing(x.f, now)) },
+      ...made.filter((x) => x.known && x.f.lines.length).map((x) => ({ parent: x.known!.id, section: id, lines: x.f.lines.map((l, i) => lineOf(l, i, x.f.chats, now)) })),
+      ...(s.loose?.lines.length ? [{ parent: id, section: id, lines: s.loose.lines.map((l, i) => lineOf(l, i, s.loose!.chats, now)) }] : []),
+    ];
+  });
 }
