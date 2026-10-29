@@ -29,7 +29,7 @@ export function IndustriesPanel() {
         </ul>
       </div>
 
-      <div className="border-l border-neutral-200 pl-12">
+      <div className="pl-12">
         <div className="flex items-baseline justify-between">
           <PanelLabel>Industries</PanelLabel>
           <PanelMore href="/industries">All industries</PanelMore>

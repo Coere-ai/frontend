@@ -12,10 +12,10 @@ const items = [
 export function AboutPanel() {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-12">
-      <ul className="flex flex-col justify-center divide-y divide-neutral-200">
+      <ul className="flex flex-col justify-center gap-4">
         {items.map((item) => (
           <li key={item.title}>
-            <Link href={item.href} className="group block py-6 first:pt-0">
+            <Link href={item.href} className="group block py-2">
               <span className="block text-[28px] font-medium tracking-[-0.03em] text-neutral-950">
                 <Underlined big>{item.title}</Underlined>
               </span>

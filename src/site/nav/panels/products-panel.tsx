@@ -27,7 +27,7 @@ export function ProductsPanel() {
         </Link>
       ))}
 
-      <div className="row-span-4 border-l border-neutral-200 pl-7">
+      <div className="row-span-4 pl-7">
         <PanelLabel>Features</PanelLabel>
         <ul className="mt-3 space-y-0.5">
           {features.filter((feature) => feature.menu !== false).map((feature) => (
