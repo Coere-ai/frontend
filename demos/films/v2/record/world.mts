@@ -5,7 +5,8 @@
  * methods.ts and memory/methods.ts), the stand in Claude and Jev the film
  * was made with (tools/demo-video/stage/story-models.ts), MiniLM from the
  * extension's own files, and a clock on the film's day. Maya's chats are
- * coere-v2's corpora at a person's scale (corpus.mts).
+ * the smart context set and her library at a person's scale (corpus.mts),
+ * and the stand ins answer both from their truth.
  *
  * The recorder (server.mts) answers the live demo's engine calls from it,
  * and keeps every answer, so the demo plays back what the real code said.
@@ -32,7 +33,7 @@ const { platformById } = await at('packages/platforms/src/index.ts')
 const { memoryMethods } = await at('apps/extension/src/engine/memory/methods.ts')
 const { engineMethods } = await at('apps/extension/src/engine/methods.ts')
 const { JEV_FAKE_KEY } = await at('tests/integration/memory-v22/world.ts')
-const { filmChats } = await import('./corpus.mts')
+const { filmLibrary } = await import('./corpus.mts')
 
 export const DAY = 86_400_000
 export type Event = { t: number; event: unknown }
@@ -98,9 +99,11 @@ export async function filmWorld() {
     search: (a: unknown) => engine.search(a),
     projectIds: async (platform: string) => (await engine.listProjects({ platform })).map((p: { id: string }) => p.id),
   }
+  // Maya opens Claude about half a minute of memory's clock after she installs Coere.
+  const chats = filmLibrary(data.STORY, TODAY, DAYS.today + 30 * 60_000)
   const first = <T extends { name: string }>(base: Map<string, T>, lead: T) => new Map<string, T>([[lead.name, lead], ...base])
-  const claude = createFakeClaude({ scenarios: first(await claudeScenarios(), await storyClaude(data.STORY)), now: clock.now })
-  const jev = createFakeJev({ scenarios: first(await jevScenarios(), await storyJev(data.STORY)), now: clock.now })
+  const claude = createFakeClaude({ scenarios: first(await claudeScenarios(), await storyClaude(chats.set)), now: clock.now })
+  const jev = createFakeJev({ scenarios: first(await jevScenarios(), await storyJev(chats.set)), now: clock.now })
   claude.knobs.scenario = 'story-extract'
   jev.knobs.scenario = 'story'
   const fetchBoth: typeof fetch = (input, init) =>
@@ -141,8 +144,6 @@ export async function filmWorld() {
     }),
   }
   await core.start()
-  // Maya opens Claude about half a minute of memory's clock after she installs Coere.
-  const chats = filmChats(data.STORY.conversations, TODAY, DAYS.today + 30 * 60_000)
   return {
     clock,
     events,
