@@ -4,9 +4,8 @@
  * SQLite driver), the worker's own method table (apps/extension/src/engine
  * methods.ts and memory/methods.ts), the stand in Claude and Jev the film
  * was made with (tools/demo-video/stage/story-models.ts), MiniLM from the
- * extension's own files, and a clock the film moves: it starts twelve days
- * ago and jumps to the days the film tells. Maya's chats are the film's
- * own (tools/demo-video/v2/data.ts).
+ * extension's own files, and a clock on the film's day. Maya's chats are
+ * coere-v2's corpora at a person's scale (corpus.mts).
  *
  * The recorder (server.mts) answers the live demo's engine calls from it,
  * and keeps every answer, so the demo plays back what the real code said.
@@ -33,21 +32,18 @@ const { platformById } = await at('packages/platforms/src/index.ts')
 const { memoryMethods } = await at('apps/extension/src/engine/memory/methods.ts')
 const { engineMethods } = await at('apps/extension/src/engine/methods.ts')
 const { JEV_FAKE_KEY } = await at('tests/integration/memory-v22/world.ts')
+const { filmChats } = await import('./corpus.mts')
 
 export const DAY = 86_400_000
 export type Event = { t: number; event: unknown }
-type Conv = { platform: string; [k: string]: unknown }
 
-/** The film's days: memory's clock is put on each as the film reaches it. */
-export const DAYS = {
-  start: data.START + 9 * 3_600_000,
-  waveOne: data.WAVE_ONE + 18 * 3_600_000,
-  today: data.START + 12 * DAY + 17 * 3_600_000,
-}
+/** The film's day: it all happens today, from the hour Maya installs Coere. */
+const TODAY = data.START + 12 * DAY
+export const DAYS = { today: TODAY + 17 * 3_600_000 }
 
 /** A clock that runs `speed` times the real pace from wherever it was last put. */
 function filmClock() {
-  let base = DAYS.start
+  let base = DAYS.today
   let from = Date.now()
   let speed = 30
   const now = () => base + (Date.now() - from) * speed
@@ -145,7 +141,8 @@ export async function filmWorld() {
     }),
   }
   await core.start()
-  const [one, two] = data.waves() as [Conv[], Conv[]]
+  // Maya opens Claude about half a minute of memory's clock after she installs Coere.
+  const chats = filmChats(data.STORY.conversations, TODAY, DAYS.today + 30 * 60_000)
   return {
     clock,
     events,
@@ -155,7 +152,7 @@ export async function filmWorld() {
     engine,
     memoryDriver,
     t0,
-    chats: { dayOne: data.dayOne().conversations as Conv[], one, two },
+    chats,
     replies: data.REPLIES as readonly string[],
     async call(method: string, args: unknown): Promise<unknown> {
       const fn = table[method]

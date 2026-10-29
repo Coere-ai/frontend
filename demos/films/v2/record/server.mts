@@ -12,13 +12,13 @@
  * The tape is written to ../data/tape.json at each part and at the end;
  * build the film again to play it back.
  *
- * To record only from a later part, prime the world first
- * (`curl 127.0.0.1:8790/prime?until=pearx`, also memory or arrive) and
- * play with `&recFrom=pearx&from=context-as-you-type`: the earlier parts
- * play from the old tape and the new recording replaces the rest of it.
+ * To record only from a later part, prime the world first (`curl
+ * 127.0.0.1:8790/prime?until=pearx`: every chat saved and memory built)
+ * and play with `&recFrom=pearx&from=features`: the earlier parts play
+ * from the old tape and the new recording replaces the rest of it.
  *
  * The date shim puts the process on the film's day, so Maya's chats
- * (written for "today" by coere-v2's corpus) are the same every run.
+ * (written for "today" by coere-v2's corpora) are the same every run.
  */
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
@@ -26,6 +26,7 @@ import { createServer } from 'node:http'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { DAYS, filmWorld } from './world.mts'
+import { thin } from './thin.mts'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const OUT = join(here, '../data')
@@ -33,12 +34,9 @@ const PORT = Number(process.env.PORT ?? 8790)
 
 const w = await filmWorld()
 
-/** The chats each replica site holds, for sites.mjs: the first day's, then each wave's. */
-const site = (c: any) => ({ id: c.platformConvId, title: c.title, at: Date.parse(c.updatedAt ?? c.capturedAt), messages: c.messages.map((m: any) => ({ role: m.role, text: m.text })) })
-writeFileSync(
-  join(OUT, 'chats.json'),
-  JSON.stringify({ dayOne: w.chats.dayOne.map((c) => ({ platform: c.platform, ...site(c) })), one: w.chats.one.map((c) => ({ platform: c.platform, ...site(c) })), two: w.chats.two.map((c) => ({ platform: c.platform, ...site(c) })) }, null, 0),
-)
+/** The chats each replica site holds, for sites.mjs: those Extract all saves, then the new ones. */
+const site = (c: any) => ({ platform: c.platform, id: c.platformConvId, title: c.title, at: Date.parse(c.updatedAt ?? c.capturedAt), messages: c.messages.map((m: any) => ({ role: m.role, text: m.text })) })
+writeFileSync(join(OUT, 'chats.json'), JSON.stringify({ extract: w.chats.extract.map(site), fresh: w.chats.fresh.map(site) }, null, 0))
 
 type Call = { t: number; key: string; method: string; ans: string }
 type Phase = { name: string; start: number; calls: Call[]; events: { t: number; event: unknown }[] }
@@ -73,17 +71,16 @@ function takeEvents(): void {
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 /** Saves chats as Extract all or a site visit does: a few at a time, one platform after another in turn. */
-async function save(chats: any[], gapMs: number): Promise<void> {
-  for (const c of chats) {
-    await w.call('upsertConversations', { convs: [c] })
+async function save(chats: any[], gapMs: number, each = 1): Promise<void> {
+  for (let i = 0; i < chats.length; i += each) {
+    await w.call('upsertConversations', { convs: chats.slice(i, i + each) })
     await pause(gapMs)
   }
 }
 
 const ACTIONS: Record<string, (o: any) => Promise<void> | void> = {
-  extract: (o) => void save(interleave(w.chats.dayOne), o.gap ?? 120),
-  waveOne: (o) => void save(w.chats.one, o.gap ?? 400),
-  waveTwo: (o) => void save(w.chats.two, o.gap ?? 200),
+  extract: (o) => void save(interleave(w.chats.extract), o.gap ?? 0, 6),
+  fresh: (o) => void save(w.chats.fresh, o.gap ?? 300),
 }
 
 /** Chats in the order Extract all saves them: the three AIs side by side. */
@@ -126,17 +123,16 @@ function save_(): void {
       }),
     ],
   }
-  writeFileSync(join(OUT, 'tape.json'), JSON.stringify(tape))
+  writeFileSync(join(OUT, 'tape.json'), JSON.stringify(thin(tape)))
   console.log('saved', pool.size, 'answers', phases.length, 'phases')
 }
 
 /**
  * Brings the world to the state a later part of the film starts in, the
- * way the film gets there (Extract all's saves, Build my memory, the two
- * waves of chats on their days), so a session can record from that part.
+ * way the film gets there (Extract all's saves, the new chats on Claude,
+ * Build my memory), so a session can record from that part.
  */
 let primed = false
-const STEPS = ['memory', 'arrive', 'pearx']
 async function settle(): Promise<void> {
   let quiet = 0
   while (quiet < 3) {
@@ -148,19 +144,11 @@ async function settle(): Promise<void> {
 }
 async function prime(until: string): Promise<void> {
   primed = true
-  const upTo = STEPS.indexOf(until)
-  await save(interleave(w.chats.dayOne), 0)
+  await save(interleave(w.chats.extract), 0, 6)
+  await save(w.chats.fresh, 0)
   for (let i = 0; i < 100 && !((await w.call('memory.status', undefined)) as any).held; i++) await pause(300)
   await w.call('memory.control', { action: 'build', mode: 'direct', from: 'onboarding' })
   await settle()
-  if (upTo >= 1) w.clock.put(DAYS.waveOne)
-  if (upTo >= 2) {
-    await save(w.chats.one, 0)
-    await settle()
-    w.clock.put(DAYS.today)
-    await save(w.chats.two, 0)
-    await settle()
-  }
   takeEvents()
   phases.splice(0)
   console.log('primed for', until)

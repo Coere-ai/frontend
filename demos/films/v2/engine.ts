@@ -16,7 +16,7 @@ import type { World, Message } from "../../stage/world";
 type Answer = { ok: true; result: unknown } | { ok: false; error: { code: string; message: string } };
 type TapePhase = { name: string; ms: number; calls: [number, string, string][]; events: [number, unknown][] };
 export type Tape = { pool: Record<string, unknown>; phases: TapePhase[] };
-export type PhaseOptions = { ms?: number; clock?: "start" | "waveOne" | "today"; speed?: number; claude?: number; jev?: number; scenario?: string; actions?: string[]; gap?: number };
+export type PhaseOptions = { ms?: number; speed?: number; claude?: number; jev?: number; scenario?: string; actions?: string[]; gap?: number };
 
 /** Arguments as a stable key: object keys sorted, as the recorder keys them. */
 export function keyOf(method: string, args: unknown): string {

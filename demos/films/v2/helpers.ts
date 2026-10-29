@@ -68,40 +68,42 @@ export async function settledDrawn(tab: Tab, ms = 20_000, fast = false): Promise
   }
 }
 
-/** graph-points.ts patchesOf: every patch of one colour on the canvas, biggest first, in the tab's pixels. */
-function patchesOf(tab: Tab, hex: string, least = 30): { x: number; y: number; area: number }[] {
-  const canvas = canvasOf(tab)!;
-  const ctx = canvas.getContext("2d")!;
+/**
+ * Where the biggest solid disc of one colour sits on the canvas, in the
+ * tab's pixels: a section's node is the largest dot of its colour, while
+ * its many memories crowd into patches of small ones. Found by the
+ * distance from each pixel of the colour to the nearest other pixel
+ * (a two pass chamfer transform), whose peak is the disc's middle.
+ */
+function discOf(tab: Tab, hex: string): { x: number; y: number; r: number } | null {
+  const canvas = canvasOf(tab);
+  const ctx = canvas?.getContext("2d");
+  if (!canvas || !ctx || canvas.width === 0) return null;
   const { width: w, height: h } = canvas;
   const ratio = w / canvas.clientWidth;
   const box = canvas.getBoundingClientRect();
   const { data } = ctx.getImageData(0, 0, w, h);
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-  const hit = new Uint8Array(w * h);
-  for (let i = 0; i < w * h; i++) if (Math.abs(data[i * 4]! - r!) + Math.abs(data[i * 4 + 1]! - g!) + Math.abs(data[i * 4 + 2]! - b!) <= 6) hit[i] = 1;
-  const out: { x: number; y: number; area: number }[] = [];
-  const stack: number[] = [];
-  for (let start = 0; start < w * h; start++) {
-    if (hit[start] !== 1) continue;
-    hit[start] = 2;
-    stack.push(start);
-    let [n, sx, sy] = [0, 0, 0];
-    while (stack.length) {
-      const i = stack.pop()!;
-      const [x, y] = [i % w, Math.floor(i / w)];
-      n++;
-      sx += x;
-      sy += y;
-      for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, y > 0 ? i - w : -1, y < h - 1 ? i + w : -1])
-        if (j >= 0 && hit[j] === 1) {
-          hit[j] = 2;
-          stack.push(j);
-        }
+  const d = new Uint16Array(w * h);
+  for (let i = 0; i < w * h; i++) d[i] = Math.abs(data[i * 4]! - r!) + Math.abs(data[i * 4 + 1]! - g!) + Math.abs(data[i * 4 + 2]! - b!) <= 6 ? 60000 : 0;
+  const at = (x: number, y: number) => (x < 0 || y < 0 || x >= w || y >= h ? 0 : d[y * w + x]!);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      if (d[i]) d[i] = Math.min(d[i]!, at(x - 1, y) + 3, at(x, y - 1) + 3, at(x - 1, y - 1) + 4, at(x + 1, y - 1) + 4);
     }
-    const area = n / (ratio * ratio);
-    if (area >= least) out.push({ x: box.left + sx / n / ratio, y: box.top + sy / n / ratio, area });
-  }
-  return out.sort((a, b) => b.area - a.area);
+  let best = 0;
+  let bx = 0;
+  let by = 0;
+  for (let y = h - 1; y >= 0; y--)
+    for (let x = w - 1; x >= 0; x--) {
+      const i = y * w + x;
+      if (!d[i]) continue;
+      d[i] = Math.min(d[i]!, at(x + 1, y) + 3, at(x, y + 1) + 3, at(x + 1, y + 1) + 4, at(x - 1, y + 1) + 4);
+      if (d[i]! > best) [best, bx, by] = [d[i]!, x, y];
+    }
+  if (best === 0) return null;
+  return { x: box.left + bx / ratio, y: box.top + by / ratio, r: best / 3 / ratio };
 }
 
 /** The section colours of coere-v2's packages/ui graph2d theme, light card. */
@@ -119,17 +121,19 @@ const said = (tab: Tab) => {
 };
 
 /**
- * stage/graph.ts sectionSpot: where a section sits on the Memory graph,
- * found off camera by its colour, a press on the biggest patch of each
- * colour saying which section it is, and Escape stepping back out.
+ * stage/graph.ts sectionSpot: which colour a section has on the Memory
+ * graph, found off camera: a press on the biggest dot of each colour, the
+ * biggest of them first, says which section it is, and Escape steps back out. `spotOf` then finds the
+ * section's dot by that colour wherever the graph has drawn it.
  */
-export async function sectionSpot(s: Stage, tab: Tab, name: string): Promise<{ x: number; y: number }> {
+export async function sectionSpot(s: Stage, tab: Tab, name: string): Promise<string> {
   for (let round = 0; round < 3; round++) {
-    for (const hex of LIGHT_COLORS) {
-      const [patch] = patchesOf(tab, hex);
-      if (!patch) continue;
+    // The biggest dots first: a section with many memories, as the film's is, is drawn largest.
+    const discs = LIGHT_COLORS.map((hex) => ({ hex, disc: discOf(tab, hex) })).sort((a, b) => (b.disc?.r ?? 0) - (a.disc?.r ?? 0));
+    for (const { hex, disc } of discs) {
+      if (!disc) continue;
       const before = said(tab);
-      pressQuietly(tab, patch);
+      pressQuietly(tab, disc);
       // The graph says where it went once it has moved there.
       const end = Date.now() + 2500;
       while (said(tab) === before && Date.now() < end) await new Promise((r) => setTimeout(r, 100));
@@ -137,11 +141,16 @@ export async function sectionSpot(s: Stage, tab: Tab, name: string): Promise<{ x
       key(tab, "Escape");
       await new Promise((r) => setTimeout(r, 600));
       await settledDrawn(tab, 4000);
-      if (now === `Showing ${name} up close.`) return patch;
+      if (now === `Showing ${name} up close.`) return hex;
     }
     await settledDrawn(tab, 4000);
   }
   throw new Error(`no section on the graph is called ${name}`);
+}
+
+/** Where a section's dot is now, by the colour sectionSpot found for it. */
+export function spotOf(tab: Tab, hex: string): { x: number; y: number } | null {
+  return discOf(tab, hex);
 }
 
 export const graphSays = said;

@@ -9,12 +9,6 @@
     "onboarding.js": {
       "from": "pages/onboarding.ts",
       "title": "Welcome to Coere"
-    },
-    "gmail-tab.js": {
-      "from": "pages/gmail-tab.ts"
-    },
-    "worker-page.js": {
-      "from": "pages/worker-page.ts"
     }
   }
 }

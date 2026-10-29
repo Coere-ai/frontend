@@ -9,7 +9,7 @@ import type { LivePart } from "./live";
 export type Film = { slug: string; title: string; showcase: LivePart };
 
 export const films = {
-  v2: { slug: "v2", title: "Coere v2: memory", showcase: { from: "context-as-you-type", to: "voice-mode" } },
+  v2: { slug: "v2", title: "Coere v2: memory", showcase: { from: "import", to: "features" } },
   v3: { slug: "v3", title: "Coere v3: apps", showcase: { from: "asks", to: "planner" } },
   teams: { slug: "teams", title: "Coere for Teams", showcase: { from: "graph", to: "new-client" } },
   memory: { slug: "memory", title: "Memory", showcase: { from: "grow" } },

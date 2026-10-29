@@ -1,52 +1,37 @@
 import { play, type Chapter } from "../../stage/player";
 import type { DemoHost } from "../../stage/host";
-import type { Stage, Tab } from "../../stage/stage";
+import type { Stage } from "../../stage/stage";
 import type { World } from "../../stage/world";
 import { extractAll } from "./batch";
 import { FilmEngine, type PhaseOptions, type Tape } from "./engine";
 import tape from "./data/tape.json";
 import { script } from "./script";
 import { hostCori } from "./cori";
-import { voiceBackEnd, type VoiceBackEnd } from "./voice";
-import { actionsWorld, type ActionsWorld } from "./actions";
-import { workersBackEnd, type WorkersBackEnd } from "./workers";
 import { DAYS } from "./days";
 
 /**
- * The v2 film, "Coere v2: memory", played live (coere-v2
- * tools/demo-video/v2.demo.ts and v2/*.ts, beat by beat): Maya installs
- * Coere, saves her chats and builds her memory, takes Cori's tour, then
- * lives with it for twelve days. Every surface is Coere's own code:
- * onboarding, the dashboard, the content script on the replica sites and
- * Cori. What the engine and memory answer is what coere-v2's real engine
- * and memory core answered for Maya's chats (record/, data/tape.json).
- * The extension's own pages open in the film's tabs as console.html and
+ * The v2 film, "Coere v2: memory", played live: Maya installs Coere and
+ * picks her AIs, Extract all saves her 324 chats and new ones save by
+ * themselves, Coere builds her memory and she looks through it, and in a
+ * new chat her memory goes in as she types. Every surface is Coere's own
+ * code: onboarding, the dashboard and the content script on the replica
+ * sites. What the engine and memory answer is what coere-v2's real engine
+ * and memory core answered for her chats (record/, data/tape.json). The
+ * extension's own pages open in the film's tabs as console.html and
  * onboarding.html beside this page (pages/), with the film's clock.
  *
  * Beside the World stand the service worker's other parts, each coere-v2's
- * own code in the top page: Extract all's batch (batch.ts), Cori's host
- * (cori.ts), voice mode (voice.ts), Coere Actions' runs (actions.ts) and
- * the worker runs (workers.ts).
+ * own code in the top page: Extract all's batch (batch.ts) and Cori's host
+ * (cori.ts).
  *
- * Chapter ids and titles follow the film's chapters file
- * (public/preview/films/v2-chapters.vtt).
+ * The seconds are each chapter's length in a full run (measured with
+ * `?debug=1`, which logs each chapter as it starts).
  */
 export const CHAPTERS: Chapter[] = [
-  { id: "install", title: "Install" },
-  { id: "choose-your-ais", title: "Choose your AIs" },
-  { id: "extract-all", title: "Extract all" },
-  { id: "build-your-memory", title: "Build your memory" },
-  { id: "the-graph-grows", title: "The graph grows" },
-  { id: "your-memory-is-ready", title: "Your memory is ready" },
-  { id: "coris-tour", title: "Cori's tour" },
-  { id: "your-memory", title: "Your memory" },
-  { id: "new-chats-come-in", title: "New chats come in" },
-  { id: "context-as-you-type", title: "Context as you type" },
-  { id: "voice-mode", title: "Voice mode" },
-  { id: "ask-cori-to-act", title: "Ask Cori to act" },
-  { id: "workers", title: "Workers" },
-  { id: "statistics", title: "Statistics" },
-  { id: "delete-a-topic", title: "Delete a topic" },
+  { id: "onboarding", title: "Onboarding", seconds: 9 },
+  { id: "import", title: "Import", seconds: 15 },
+  { id: "memory", title: "Memory", seconds: 43 },
+  { id: "features", title: "Features", seconds: 31 },
 ];
 
 const params = new URLSearchParams(location.search);
@@ -55,11 +40,9 @@ const rec = params.get("rec");
 /** What the script works with beyond the stage: the film's parts, its clock, and the engine's answers. */
 export type Film = {
   phase(name: string, o?: PhaseOptions): Promise<void>;
-  /** Puts the film's clock (every tab's Date) on one of its days. */
-  day(at: number): void;
   now(): number;
-  /** Follows a tab that navigates to a new page of its own. */
-  follow(tab: Tab, go: () => Promise<void>): Promise<void>;
+  /** Whether calls go to the recorder (`?rec=`), where the real build takes its own time. */
+  recording: boolean;
   report(): void;
 };
 
@@ -76,33 +59,22 @@ const REPLIES: readonly string[] = [
   ].join("\n"),
 ];
 
+/** What Extract all finds on each AI (record/corpus.mts SPLIT), and how long each row takes to fill. */
+const EXTRACT = { chatgpt: { chats: 148, ms: 7400 }, claude: { chats: 102, ms: 6200 }, gemini: { chats: 74, ms: 5000 } };
+
 let engine: FilmEngine | null = null;
-let voice: VoiceBackEnd | null = null;
-let actions: ActionsWorld | null = null;
-let workers: WorkersBackEnd | null = null;
 
 function makeFilm(world: World): Film {
   const host = (window as unknown as { __demo: DemoHost }).__demo;
-  const clock = { at: DAYS.start, from: Date.now() };
+  const clock = { at: DAYS.today, from: Date.now() };
   host.extra.clock = clock;
   const now = () => clock.at + (Date.now() - clock.from);
   engine?.stop();
   engine = new FilmEngine(world, tape as unknown as Tape, rec, params.get("recFrom"));
   const film: Film = {
     phase: (name, o) => engine!.phase(name, o),
-    day(at) {
-      clock.at = at;
-      clock.from = Date.now();
-    },
     now,
-    async follow(tab, go) {
-      const loaded = new Promise<void>((done) => tab.frame.addEventListener("load", () => done(), { once: true }));
-      await go();
-      await loaded;
-      tab.doc = tab.frame.contentDocument!;
-      tab.win = tab.frame.contentWindow!;
-      await tab.doc.fonts?.ready;
-    },
+    recording: Boolean(rec),
     report() {
       const lines = { unanswered: [...new Set(world.unanswered.map((u) => `${u.tab}: ${u.type}`))], misses: [...new Set(engine?.misses ?? [])] };
       console.log("REPORT", JSON.stringify(lines));
@@ -136,31 +108,7 @@ function guardListeners(world: World): void {
   world.listen = (tab, fn) => listen(tab, guard(fn));
 }
 
-/**
- * A page in a tab that scrolls an element into view (Cori's recipes in
- * Gmail do) also scrolls the frames' boxes in the top page, which never
- * scroll in a browser window; each such scroll is put back at once (as
- * the actions-gmail film does).
- */
-let pinned = false;
-function pinStage(): void {
-  if (pinned) return;
-  pinned = true;
-  document.addEventListener(
-    "scroll",
-    (e) => {
-      const el = e.target;
-      if (el instanceof HTMLElement && (el.scrollLeft || el.scrollTop)) {
-        el.scrollLeft = 0;
-        el.scrollTop = 0;
-      }
-    },
-    true,
-  );
-}
-
 function setup(world: World): void {
-  pinStage();
   guardListeners(world);
   const film = makeFilm(world);
   // The stage comes after the setup; these read it once the film starts.
@@ -168,19 +116,13 @@ function setup(world: World): void {
   stages.push((s) => (stage = s));
   const fast = () => stage?.fast ?? false;
   engine!.fast = fast;
-  // Voice mode, with the dashboard's question about its model packs answered as the offscreen document answers it.
-  voice?.dispose();
-  const back = (voice = voiceBackEnd(fast));
+  hostCori(world, engine!, (tab: string) => stage?.sites.get(tab)?.host, film.now);
+  // Voice mode stays off in this film, so onboarding's question about its models gets no state, as in the v3 film.
   const handle = world.handle.bind(world);
-  world.handle = async (m, tab) => (m?.ch === "coere-voice" && m.to === "models" ? back.models(String(m.op), m.packs as string[] | undefined) : handle(m, tab));
-  // Cori's worker runs, and Coere Actions' lone runs with Cori's Gmail tab as one of the film's tabs; the Actions messages reach the workers first.
-  workers?.dispose();
-  workers = workersBackEnd(world);
-  actions = actionsWorld(world, engine!, () => stage !== null && !stage.fast, workers.runs);
-  (window as unknown as { __demo: DemoHost }).__demo.extra.gmail = actions.bridge;
-  hostCori(world, engine!, (tab) => stage?.sites.get(tab)?.host, film.now);
-  // Extract all on Maya's three AIs: her 9 chats on ChatGPT, 22 on Claude and 18 on Gemini.
-  extractAll(world, film.now, { chatgpt: { chats: 9, ms: 3400 }, claude: { chats: 22, ms: 5600 }, gemini: { chats: 18, ms: 4900 } }, fast);
+  world.handle = async (m, tab) => (m?.ch === "coere-voice" ? { ok: true, result: null } : handle(m, tab));
+  // Cori's tip on a site shows once per install; Maya has seen it, so the visit to Claude stays on her chats.
+  world.write("local", { "coere.cori.hint": { v: 1, seen: true, at: DAYS.today - 3_600_000 } });
+  extractAll(world, film.now, EXTRACT, fast);
 }
 
 const stages: ((s: Stage) => void)[] = [];
@@ -203,11 +145,12 @@ async function film(s: Stage): Promise<void> {
     s.chapter = (id) => (console.log(at(), "chapter", id), chapter(id));
   }
   try {
-    actions!.stage = s;
-    await script(s, current!, REPLIES, voice!, actions!, workers!);
+    await script(s, current!, REPLIES);
   } finally {
     current!.report();
+    if (params.get("debug") === "1") console.log("end");
   }
 }
 
 play({ title: "Coere v2: memory", chapters: CHAPTERS }, film, setup);
+
