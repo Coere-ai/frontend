@@ -1,0 +1,109 @@
+WEBVTT
+
+1
+00:00:00.003 --> 00:00:03.200
+Coere v3 builds the same memory as v2, and lets your own apps use it.
+
+2
+00:00:03.200 --> 00:00:04.378
+Installing opens onboarding. Cori asks which AIs you use.
+
+3
+00:00:04.378 --> 00:00:08.466
+Maya uses ChatGPT, Claude and Gemini.
+
+4
+00:00:08.466 --> 00:00:10.400
+Save starts Extract all on each of them.
+
+5
+00:00:10.400 --> 00:00:12.767
+Extract all reads each AI and saves every chat, with a row for each.
+
+6
+00:00:12.767 --> 00:00:14.933
+Every chat is saved on this computer.
+
+7
+00:00:14.933 --> 00:00:17.158
+Cori asks what to build memory from. Nothing goes to an AI until Maya says yes.
+
+8
+00:00:17.158 --> 00:00:20.533
+New chats will save by themselves, and context goes into new chats as she types.
+
+9
+00:00:20.533 --> 00:00:23.030
+Coere reads her chats with Claude and grows the graph as it goes.
+
+10
+00:00:23.030 --> 00:00:25.567
+Cori works away in the corner. She can close the page, and the build goes on.
+
+11
+00:00:25.567 --> 00:00:27.390
+Cori finishes the graph with his hammer.
+
+12
+00:00:27.390 --> 00:00:28.500
+Your memory is ready. Cori offers to show Maya around.
+
+13
+00:00:28.500 --> 00:00:32.667
+The event planner is a small app of Maya’s. It asks Coere for access from its own code.
+
+14
+00:00:32.667 --> 00:00:36.500
+On the Apps page, a card asks Maya to allow it, with the same code.
+
+15
+00:00:36.500 --> 00:00:41.033
+She checks what it may do, and allows it.
+
+16
+00:00:41.033 --> 00:00:43.667
+The planner gets its token, and keeps it to itself.
+
+17
+00:00:43.667 --> 00:00:45.818
+Any app can ask for the context a chat would get for a draft.
+
+18
+00:00:45.818 --> 00:00:51.067
+It prints the memories Coere would add, and where each one sits.
+
+19
+00:00:51.067 --> 00:00:56.768
+The first time she opens an AI, Cori shows how to call him: Right Option.
+
+20
+00:00:56.768 --> 00:00:59.762
+A tap brings out his chat, and the card is gone for good.
+
+21
+00:00:59.762 --> 00:01:09.667
+On ChatGPT, the same words get the same memories, with her prep chat too.
+
+22
+00:01:09.667 --> 00:01:12.824
+Maya asks the planner for a plan. It reads her memory through Coere.
+
+23
+00:01:12.824 --> 00:01:18.867
+Each reason names the memory it came from.
+
+24
+00:01:18.867 --> 00:01:20.884
+On the Apps page, the planner shows when it was last used.
+
+25
+00:01:20.884 --> 00:01:28.955
+What it was sent lists every memory it got, chat by chat.
+
+26
+00:01:28.955 --> 00:01:35.400
+Revoke takes its token away. It stops working at once.
+
+27
+00:01:35.400 --> 00:01:38.567
+Coere v3: your memory, shared with the apps you allow.

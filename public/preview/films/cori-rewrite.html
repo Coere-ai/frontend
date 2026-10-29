@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Coere Cori Rewrite</title>
+<style>
+@font-face{font-family:"Coere Geist";src:url("fonts/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-display:swap}
+html,body{margin:0;height:100%;overflow:hidden;background:#000}
+video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+html.preview video{object-fit:cover}
+video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-size:max(12px,2.1vw);background:rgba(8,14,36,.82);color:#fff}
+</style>
+</head>
+<body>
+<video playsinline preload="metadata" poster="cori-rewrite-poster.jpg" data-still="cori-rewrite-still.jpg" aria-label="Coere Cori Rewrite">
+<source src="cori-rewrite.mp4" type="video/mp4">
+<track kind="captions" src="cori-rewrite-captions.vtt" srclang="en" label="English" default>
+<track kind="chapters" src="cori-rewrite-chapters.vtt" srclang="en" label="Chapters">
+</video>
+<script type="application/json" id="cues">{"captions":[{"start":0.0020148598413298074,"end":2.666667,"text":"Cori can fix or improve text wherever Maya writes."},{"start":2.666667,"end":8.475738580874339,"text":"Maya writes a quick email in Gmail, slips and all."},{"start":8.475738580874339,"end":12.005758960455587,"text":"She selects the paragraph."},{"start":12.005758960455587,"end":17.48800274905086,"text":"Option Shift R opens Cori’s picker beside it: Rewrite, Improve or Fix grammar only."},{"start":17.48800274905086,"end":20.49442679893245,"text":"The fixed text goes in at once. Each change is boxed in blue, only on her screen."},{"start":20.49442679893245,"end":24.634141566251927,"text":"Fix grammar only touches spelling, grammar and punctuation. Her words stay hers."},{"start":24.634141566251927,"end":28.9,"text":"Looks good keeps it."},{"start":28.9,"end":34.802830188679245,"text":"In Google Docs she wants a paragraph of her cover letter to read better."},{"start":34.802830188679245,"end":40.63755896226415,"text":"This time she picks Improve."},{"start":40.63755896226415,"end":44.25005896226415,"text":"Improve may reword a sentence, and it keeps every fact she wrote."},{"start":44.25005896226415,"end":48.9,"text":"She prefers her own words. Go back returns them exactly."},{"start":48.9,"end":58.29323634599232,"text":"It works in any text box, like her chat with Claude."},{"start":58.29323634599232,"end":65.233333,"text":"Fixed in place, ready to send."},{"start":65.233333,"end":67.46666599999999,"text":"The blue boxes are only on her screen. Nobody else sees them."}],"chapters":[{"start":2.666667,"end":12.005758960455587,"text":"Select text"},{"start":12.005758960455587,"end":17.110572889974815,"text":"Rewrite with Cori"},{"start":17.110572889974815,"end":24.634141566251927,"text":"Preview"},{"start":24.634141566251927,"end":67.46666599999999,"text":"Accept and undo"}]}</script>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var video = document.querySelector('video');
+  var data = JSON.parse(document.getElementById('cues').textContent);
+  if (params.has('preview')) {
+    document.documentElement.className = 'preview';
+    var start = Number(params.get('start')) || 0;
+    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    video.poster = video.dataset.still;
+    video.muted = true;
+    Array.prototype.forEach.call(document.querySelectorAll('track'), function (t) { t.remove(); });
+    video.addEventListener('loadedmetadata', function () { video.currentTime = start; });
+    video.addEventListener('ended', function () { video.currentTime = start; video.play().catch(function () {}); });
+    new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) { video.pause(); return; }
+      video.preload = 'auto';
+      if (!still) video.play().catch(function () {});
+    }).observe(video);
+    return;
+  }
+  video.controls = true;
+  Array.prototype.forEach.call(document.querySelectorAll('track'), function (el) {
+    var done = false;
+    function fallback() {
+      if (done) return;
+      done = true;
+      var kind = el.kind, cues = kind === 'chapters' ? data.chapters : data.captions;
+      el.remove();
+      var track = video.addTextTrack(kind, el.label, el.srclang);
+      cues.forEach(function (c) { track.addCue(new VTTCue(c.start, c.end, c.text)); });
+      track.mode = kind === 'captions' ? 'showing' : 'hidden';
+    }
+    if (el.readyState === 3) fallback();
+    el.addEventListener('error', fallback);
+    if (el.kind === 'chapters') el.track.mode = 'hidden';
+  });
+})();
+</script>
+</body>
+</html>
