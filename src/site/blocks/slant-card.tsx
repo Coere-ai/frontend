@@ -64,11 +64,11 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
     </div>
   );
 
-  /** The product on artwork: the slide's live demo, floating low and to the right like a product shot. */
+  /** The product on artwork: the slide's live demo, whole and centered in the part of the panel the cut leaves. */
   const panel = (
     <div className="relative h-full w-full overflow-hidden">
       <SizedPhoto src={background.src} alt="" fill sizes="50vw" className="object-cover" />
-      <div className="absolute right-[-6%] bottom-[-7%] w-[84%] overflow-hidden rounded-xl shadow-[0_40px_90px_-25px_rgba(0,0,0,0.75)] ring-1 ring-white/20">
+      <div className="absolute top-1/2 left-[16%] w-[78%] -translate-y-1/2 overflow-hidden rounded-xl shadow-[0_40px_90px_-25px_rgba(0,0,0,0.75)] ring-1 ring-white/20">
         <LiveDemo key={slide.label} film={slide.live.film} from={slide.live.from} to={slide.live.to} label={`${slide.label}, shown live on the app`} />
       </div>
     </div>
