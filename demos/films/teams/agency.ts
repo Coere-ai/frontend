@@ -41,11 +41,11 @@ const scope = (name: string) => groupButton("Show", "Clients", name);
 export async function agencyMemory(s: Stage, page: Tab): Promise<void> {
   s.chapter("graph");
   await s.film(page);
-  s.say("All shows Company and Clients around Maya, beside her own sections.");
+  s.say("All shows Company and Clients first, then projects, plans, money and the rest of the agency.");
   await s.wait(3800);
   for (const [part, line] of [
     ["Company", "Company holds the agency: its people, its way of working and its tools."],
-    ["Clients", "Clients has a folder for each client the chats talk about, with its contacts and promises."],
+    ["Clients", "Clients has a folder for each main client, with its contacts, its work and its promises."],
   ] as const) {
     s.say(line);
     await s.click(page, scope(part), { after: 300 });

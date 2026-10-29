@@ -148,7 +148,7 @@ export async function theBuild(s: Stage, onboarding: Tab, mem: Mem): Promise<voi
   await s.click(onboarding, button("Build my memory"), { after: 200 });
   await s.rest();
   await s.waitFor(onboarding, label("the growing graph", (doc: Document) => doc.querySelector(".ob-grow-canvas")));
-  s.say("The graph grows into Company and Clients as Coere reads the chats.");
+  s.say("The graph grows into Company, Clients and the rest of the agency as Coere reads the chats.");
   // Skipping ahead, the build's end is enough: the finish screen's own animation is not waited out.
   if (s.fast) {
     while (mem.written !== null) await new Promise((r) => setTimeout(r, 50));

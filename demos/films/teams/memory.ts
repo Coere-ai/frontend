@@ -4,18 +4,19 @@ import type { ClientView, WorkerView } from "@coere/solution";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { CLIENTS, NEW_CLIENTS, VENDOR_NAMES, WORKERS, type PlantedItem, type SolutionCorpus } from "@v2/tools/gen-corpus/solution/index";
 import { MORE_CLIENTS, teamCorpus } from "./corpus";
+import { FOLDERS as LAYOUT, KEPT_CLIENTS, OWN_TOPS, PROJECT_CLIENTS, SECTIONS, placeOf, titleCase } from "./layout";
 
 /**
  * Fernhill Creative's memory as Coere for Teams builds it from Maya's
  * chats: the agency corpus coere-v2's films and e2e specs use
  * (tools/gen-corpus/solution) with the agency's smaller clients
  * (corpus.ts), a library of LIBRARY chats across her AIs, and every item
- * those chats plant, filed as the engine files them: Company with its
- * catalog folders nested as the catalog nests them, coworkers in People
- * and each vendor and competitor in its own folder, Clients with a folder
- * per client holding its contacts, its engagement and facts by slot, and
- * her own Preferences, Writing style and Tone and voice, which the work
- * rows of the checklist keep. Amounts and credentials never reach memory,
+ * those chats plant, read as the engine reads them (coworkers, clients
+ * with their contacts and engagements, facts by slot) and then filed in
+ * the shape layout.ts gives the graph: Company in four folders with the
+ * coworkers in People, seven clients in Clients, and the rest in Coere's
+ * own sections under the agency's folders, her own lines in Preferences.
+ * Amounts and credentials never reach memory,
  * so items that carry them are left out, as are the items memory does not
  * keep (her personal life, which the checklist leaves unticked, and one
  * off questions).
@@ -193,15 +194,6 @@ const FOLDERS: Record<string, string> = {
   "style.habits": "Habits",
 };
 
-/** The sections memory files Maya's chats under, by the corpus's top level keys, in the order the graph draws them. */
-const SECTIONS: ReadonlyArray<[top: string, label: string]> = [
-  ["company", "Company"],
-  ["clients", "Clients"],
-  ["preferences", "Preferences"],
-  ["style", "Writing style"],
-  ["tone", "Tone and voice"],
-];
-
 /** The fact kind each client slot holds, as the client template files them. */
 const SLOT_KIND: Record<string, FactView["kind"]> = {
   promises: "task",
@@ -294,10 +286,12 @@ export function buildMemory(now: number): Mem {
 
   const self = node({ id: id("ent", start), kind: "self", label: "You", section: "", importance: 5 });
   // Company and Clients take the ids the Solution page knows them by (solution/memory/org-points.ts).
-  const sections = { company: "sec_company", clients: "sec_clients", preferences: "sec_preferences", style: "sec_style", tone: "sec_tone" };
+  // Her own few lines are read into a holding place, and layout.ts files them with how the team likes to work.
+  const own = node({ id: "sec_own", kind: "section", label: "Preferences", section: "sec_own" }).id;
+  const sections = { company: "sec_company", clients: "sec_clients", preferences: own, style: own, tone: own };
   const sectionOf = new Map(SECTIONS.map(([top, label]) => [top, node({ id: `sec_${top}`, kind: "section", label, section: `sec_${top}` }).id]));
 
-  const items = corpus.items.filter((i) => byConv.has(i.convId) && i.kept && !i.amounts?.length && !i.credentials?.length && sectionOf.has(i.top));
+  const items = corpus.items.filter((i) => byConv.has(i.convId) && i.kept && !i.amounts?.length && !i.credentials?.length && (sectionOf.has(i.top) || OWN_TOPS.has(i.top)));
   const saidAt = (i: PlantedItem) => Date.parse(byConv.get(i.convId)?.messages[i.msgIndex]?.createdAt ?? "") || now - DAY;
 
   // A folder per catalog part, nested as the catalog nests them: Decisions holds Technical decisions.
@@ -378,7 +372,7 @@ export function buildMemory(now: number): Mem {
     let owner: string | undefined;
     if (i.top !== "company" && i.top !== "clients") {
       // Her own: Preferences, Writing style, Tone and voice, each part in its catalog folder.
-      owner = folder(sectionOf.get(i.top)!, i.section, at);
+      owner = folder(sectionOf.get(i.top) ?? sections.preferences, i.section, at);
     } else if (i.top === "clients" && i.client) {
       const client = all.find((c) => c.key === i.client)!;
       const named = client.contacts.find((k) => i.text.startsWith(k.name) && i.slot === "contacts");
@@ -452,6 +446,80 @@ export function buildMemory(now: number): Mem {
     facts.set(fid, fact);
     nodes.get(owner)!.facts_.push(fid);
   }
+
+  // The graph's shape (layout.ts): seven clients keep their folders, the engagements of four more are projects of
+  // their own, and every other memory is filed by what it is about, in a few folders per section.
+  for (const key of PROJECT_CLIENTS) {
+    const work = nodes.get(projectIds.get(key) ?? "");
+    if (!work) continue;
+    const was = nodes.get(work.parent!)!;
+    was.kids = was.kids.filter((k) => k !== work.id);
+    Object.assign(work, { parent: "sec_projects", section: "sec_projects", label: titleCase(work.label), relations: [] });
+    nodes.get("sec_projects")!.kids.push(work.id);
+  }
+  const placed = new Map<string, string>();
+  const place = (section: string, label: string, at: number): string => {
+    const sec = `sec_${section}`;
+    const key = `${sec}/${label}`;
+    const known = placed.get(key) ?? nodes.get(sec)!.kids.find((k) => nodes.get(k)!.kind === "folder" && nodes.get(k)!.label === label);
+    const made = known ?? node({ id: id("ent", at), kind: "folder", label, section: sec, parent: sec, importance: 3 }).id;
+    placed.set(key, made);
+    return made;
+  };
+  for (const f of [...facts.values()].sort((a, b) => (a.sources[0]!.at < b.sources[0]!.at ? -1 : 1))) {
+    const owner = nodes.get(f.owner)!;
+    const to = placeOf(f, owner, owner.parent ? nodes.get(owner.parent) : undefined);
+    if (to === "stay") continue;
+    const into = place(to[0], to[1], Date.parse(f.sources[0]!.at));
+    if (into === owner.id) continue;
+    owner.facts_ = owner.facts_.filter((x) => x !== f.id);
+    nodes.get(into)!.facts_.push(f.id);
+    f.owner = into;
+  }
+  const drop = (n: Node) => {
+    n.kids.forEach((k) => drop(nodes.get(k)!));
+    if (n.facts_.length) throw new Error(`${n.label} still holds memories`);
+    nodes.delete(n.id);
+  };
+  for (const [key, cid] of [...clientIds]) {
+    if (KEPT_CLIENTS.has(key)) continue;
+    const n = nodes.get(cid)!;
+    nodes.get(n.parent!)!.kids = nodes.get(n.parent!)!.kids.filter((k) => k !== cid);
+    drop(n);
+    clientIds.delete(key);
+  }
+  // Catalog folders, vendors and competitors left empty go.
+  for (let pruned = true; pruned; ) {
+    pruned = false;
+    for (const n of nodes.values()) {
+      if (n.kind === "self" || n.kind === "section" || n.client || n.key || n.facts_.length || n.kids.length || n.values.length) continue;
+      const up = nodes.get(n.parent!);
+      if (up) up.kids = up.kids.filter((k) => k !== n.id);
+      nodes.delete(n.id);
+      pruned = true;
+    }
+  }
+  if (nodes.get(own)!.kids.length === 0) nodes.delete(own);
+  for (const n of nodes.values()) n.relations = n.relations.filter((r) => nodes.has(r.other.id));
+  // Folders in the layout's order, and the whole memory in the order the graph draws it.
+  for (const [key] of SECTIONS) {
+    const sec = nodes.get(`sec_${key}`)!;
+    const order = LAYOUT[key] ?? [];
+    const rank = (k: string) => {
+      const i = order.indexOf(nodes.get(k)!.label);
+      return i < 0 ? order.length : i;
+    };
+    sec.kids = [...sec.kids].sort((a, b) => rank(a) - rank(b));
+  }
+  const ordered: Node[] = [nodes.get(self.id)!];
+  const walk = (n: Node) => {
+    ordered.push(n);
+    n.kids.forEach((k) => walk(nodes.get(k)!));
+  };
+  for (const [key] of SECTIONS) if (nodes.has(`sec_${key}`)) walk(nodes.get(`sec_${key}`)!);
+  if (ordered.length !== nodes.size) throw new Error(`${nodes.size - ordered.length} things are off the tree`);
+  nodes.clear();
+  for (const n of ordered) nodes.set(n.id, n);
 
   // Identity values cite the chats that said them.
   for (const n of nodes.values())
