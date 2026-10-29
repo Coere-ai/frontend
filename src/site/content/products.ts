@@ -43,7 +43,7 @@ export const products: Product[] = [
     slug: "agents",
     name: "Coere Agents",
     kind: "Agents for every field",
-    tagline: "An agent for every field, built on your memory.",
+    tagline: "One worker, infinite possibilities, built on your memory.",
     description:
       "Cori, the helper in Coere, in a version for each field. Each one works from your memory and splits big tasks across workers.",
     image: `${IMAGES}/agents.webp`,
