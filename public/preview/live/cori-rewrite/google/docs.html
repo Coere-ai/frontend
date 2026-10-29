@@ -1,0 +1,394 @@
+<!doctype html><html lang="en"><head><script>window.__demoAddress="https://docs.google.com/document/d/1Qk7mZ2xV9pLr4TnW8sYb3HcJ6uFd0eGaRtE5wKq/edit"</script><script src="../rewrite.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Internship cover letter - Google Docs</title><style>
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font:14px/20px Roboto,Arial,sans-serif;color:#1f1f1f;background:#f9fbfd;display:flex;flex-direction:column}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 16px 0;background:#f9fbfd}
+.mark{width:40px;height:40px;flex:none}
+.docs-title-input{font-size:18px;border:1px solid transparent;border-radius:4px;padding:2px 6px;background:none;color:#1f1f1f;max-width:420px}
+.docs-title-input:hover{border-color:#c4c7c5}
+.saved{color:#444746;font-size:12px;margin-left:4px}
+.right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.share{height:40px;padding:0 24px;border:0;border-radius:20px;background:#c2e7ff;color:#001d35;font-weight:500;cursor:pointer}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#7b5ea7;color:#fff;font-weight:500}
+.menus{display:flex;gap:2px;padding:0 0 4px 62px;margin-top:-8px}
+.menus span{padding:2px 7px;border-radius:4px;font-size:14px;cursor:default}
+.menus span:hover{background:#e1e3e1}
+.toolbar{display:flex;align-items:center;gap:6px;margin:0 16px 8px;padding:4px 12px;height:40px;border-radius:20px;background:#edf2fa;color:#444746;font-size:14px}
+.toolbar .sep{width:1px;height:20px;background:#c7c7c7;margin:0 6px}
+.toolbar b,.toolbar i,.toolbar u{width:24px;text-align:center}
+.kix-appview-editor{flex:1;overflow:auto;padding:16px 0 64px;display:flex;justify-content:center;background:#f9fbfd}
+.kix-page{background:#fff;box-shadow:0 1px 3px 1px rgba(60,64,67,.15);cursor:text;position:relative}
+.docs-texteventtarget-iframe{position:absolute;top:-10000px;left:-10000px;width:1px;height:1px;border:0;opacity:0}
+.list{max-width:880px;margin:24px auto;width:100%}
+.list a{display:block;padding:14px 18px;margin:6px 0;background:#fff;border-radius:8px;color:#1f1f1f;text-decoration:none;box-shadow:0 1px 2px rgba(60,64,67,.2)}
+</style></head><body><div class="bar"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M10 4h14l8 8v24H10z" fill="#4285f4"/><path d="M24 4v8h8" fill="#a1c2fa"/><path d="M15 20h12M15 25h12M15 30h8" stroke="#fff" stroke-width="2"/></svg><input class="docs-title-input" aria-label="Rename" value="Internship cover letter"><span class="saved" id="saved" role="status">Saved to Drive</span><div class="right"><button class="share" type="button">Share</button><span class="avatar" role="img" aria-label="Google Account: Maya Collins (maya.collins@gmail.com)">M</span></div></div><div class="menus" role="menubar"><span role="menuitem">File</span><span role="menuitem">Edit</span><span role="menuitem">View</span><span role="menuitem">Insert</span><span role="menuitem">Format</span><span role="menuitem">Tools</span><span role="menuitem">Extensions</span><span role="menuitem">Help</span></div><div class="toolbar" role="toolbar" aria-label="Main toolbar"><span>100%</span><span class="sep"></span><span>Normal text</span><span class="sep"></span><span>Arial</span><span class="sep"></span><span>11</span><span class="sep"></span><b>B</b><i>I</i><u>U</u></div><div class="kix-appview-editor" id="editor" role="document" aria-label="Document content"><div class="kix-page" id="page"></div></div><script type="application/json" id="boot">{"id":"1Qk7mZ2xV9pLr4TnW8sYb3HcJ6uFd0eGaRtE5wKq","title":"Internship cover letter","text":"Dear Hiring Team,\n\nI am writing to apply for the software engineering internship on your platform team. I am a third year computer science student at Northfield University, and I have spent the last year building systems projects in C and Go.\n\nIn my operating systems course I wrote a thread scheduler with priority donation, and I really liked figuring out why things broke under load and then making them not break. I think that kind of work is what your team does every day.\n\nThank you for your time. I would love to talk more about the role.\n\nSincerely,\nMaya Collins","modes":{"mirror":true,"copyEvent":true,"insertText":true,"paste":true},"me":"maya.collins@gmail.com"}</script><script>"use strict";
+(() => {
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/client-dom.ts
+  function readBoot() {
+    return JSON.parse(document.getElementById("boot")?.textContent ?? "{}");
+  }
+  async function post(path, data) {
+    const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) });
+    return await r.json();
+  }
+
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/layout.ts
+  var PAGE = { width: 816, margin: 96, lineHeight: 22, top: 96 };
+  function layout(text, measure, width = PAGE.width - 2 * PAGE.margin) {
+    const lines = [];
+    let y = PAGE.top;
+    let offset = 0;
+    for (const para of text.split("\n")) {
+      let from = 0;
+      while (true) {
+        let to = para.length;
+        if (measure(para.slice(from, to)) > width) {
+          let fit = from;
+          while (fit < para.length && measure(para.slice(from, fit + 1)) <= width) fit += 1;
+          const space = para.lastIndexOf(" ", fit);
+          to = space > from ? space + 1 : Math.max(fit, from + 1);
+        }
+        lines.push({ from: offset + from, to: offset + to, y });
+        y += PAGE.lineHeight;
+        if (to >= para.length) break;
+        from = to;
+      }
+      offset += para.length + 1;
+    }
+    return lines;
+  }
+  function hit(lines, text, measure, x, y) {
+    const line = lines.find((l) => y < l.y + PAGE.lineHeight) ?? lines[lines.length - 1];
+    if (!line) return 0;
+    const dx = x - PAGE.margin;
+    let best = line.from;
+    for (let i = line.from; i <= line.to; i++) {
+      if (measure(text.slice(line.from, i)) <= dx + 3) best = i;
+      else break;
+    }
+    return best;
+  }
+
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/model.ts
+  var segmenter = new Intl.Segmenter(void 0, { granularity: "grapheme" });
+  var graphemes = (text) => segmenter.segment(text);
+  var DocModel = class {
+    constructor(text, sel = { anchor: 0, focus: 0 }) {
+      this.text = text;
+      this.sel = sel;
+    }
+    past = [];
+    get start() {
+      return Math.min(this.sel.anchor, this.sel.focus);
+    }
+    get end() {
+      return Math.max(this.sel.anchor, this.sel.focus);
+    }
+    selected() {
+      return this.text.slice(this.start, this.end);
+    }
+    select(anchor, focus = anchor) {
+      const clamp = (n) => Math.max(0, Math.min(this.text.length, n));
+      this.sel = { anchor: clamp(anchor), focus: clamp(focus) };
+    }
+    /** Replaces the selection with text, as typing or an insert does, and leaves the caret after it. */
+    replace(insert) {
+      this.past.push({ text: this.text, sel: { ...this.sel } });
+      const at2 = this.start;
+      this.text = this.text.slice(0, at2) + insert + this.text.slice(this.end);
+      this.select(at2 + insert.length);
+    }
+    /** Backspace or Delete: the selection, else one character as a person sees it on that side. */
+    erase(back) {
+      if (this.start === this.end) {
+        if (back && this.start === 0) return;
+        if (!back && this.end === this.text.length) return;
+        this.select(back ? this.before(this.start) : this.start, back ? this.start : this.after(this.start));
+      }
+      this.replace("");
+    }
+    /** The offset one character before `at`, a whole emoji or accented letter at a time, as Docs' arrow keys move. */
+    before(at2) {
+      let last = 0;
+      for (const s of graphemes(this.text)) {
+        if (s.index >= at2) break;
+        last = s.index;
+      }
+      return Math.min(last, at2);
+    }
+    /** The offset one character after `at`. */
+    after(at2) {
+      for (const s of graphemes(this.text)) if (s.index > at2) return s.index;
+      return this.text.length;
+    }
+    undo() {
+      const last = this.past.pop();
+      if (!last) return false;
+      this.text = last.text;
+      this.sel = last.sel;
+      return true;
+    }
+    /** The word around an offset, as a double click selects it. */
+    wordAt(at2) {
+      const isWord = (c) => c !== void 0 && /[\p{L}\p{N}'_]/u.test(c);
+      let a = at2;
+      let b = at2;
+      while (isWord(this.text[a - 1])) a -= 1;
+      while (isWord(this.text[b])) b += 1;
+      return { anchor: a, focus: b };
+    }
+    /** The start and end of the line of text (a paragraph) holding an offset. */
+    paragraphAt(at2) {
+      const a = this.text.lastIndexOf("\n", at2 - 1) + 1;
+      const nl = this.text.indexOf("\n", at2);
+      return { anchor: a, focus: nl < 0 ? this.text.length : nl };
+    }
+  };
+
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/client/paint.ts
+  var FONT = "15px Arial, Helvetica, sans-serif";
+  function painter(host2) {
+    const canvas = document.createElement("canvas");
+    canvas.className = "kix-canvas-tile-content";
+    canvas.setAttribute("aria-hidden", "true");
+    host2.append(canvas);
+    const NS = "http://www.w3.org/2000/svg";
+    const overlay = document.createElement("div");
+    overlay.className = "kix-canvas-tile-selection";
+    overlay.setAttribute("style", "position:absolute;left:0;top:0;pointer-events:none");
+    const svg = document.createElementNS(NS, "svg");
+    overlay.append(svg);
+    host2.append(overlay);
+    const ctx = canvas.getContext("2d");
+    let lines = [];
+    const measure = (s) => {
+      ctx.font = FONT;
+      return ctx.measureText(s).width;
+    };
+    function paint(model2, focused2) {
+      lines = layout(model2.text, measure);
+      const height = Math.max(1056, (lines[lines.length - 1]?.y ?? 0) + PAGE.lineHeight + PAGE.margin);
+      const dpr = window.devicePixelRatio || 1;
+      if (canvas.height !== Math.round(height * dpr) || canvas.width !== Math.round(PAGE.width * dpr)) {
+        canvas.width = Math.round(PAGE.width * dpr);
+        canvas.height = Math.round(height * dpr);
+        canvas.style.width = `${String(PAGE.width)}px`;
+        canvas.style.height = `${String(height)}px`;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, PAGE.width, height);
+      ctx.font = FONT;
+      ctx.textBaseline = "alphabetic";
+      const { start, end } = model2;
+      svg.setAttribute("width", String(PAGE.width));
+      svg.setAttribute("height", String(height));
+      const bands = [];
+      for (const l of lines) {
+        const text = model2.text.slice(l.from, l.to);
+        const a = Math.max(start, l.from);
+        const brk = model2.text[l.to] === "\n" && end > l.to && start <= l.to;
+        const b = Math.min(end, l.to + (brk ? 1 : 0));
+        if (b > a) {
+          const x = PAGE.margin + measure(model2.text.slice(l.from, a));
+          const w = Math.max(4, measure(model2.text.slice(a, Math.min(b, l.to))) + (b > l.to ? 4 : 0));
+          const r = document.createElementNS(NS, "rect");
+          for (const [k, v] of [["x", x], ["y", l.y], ["width", w], ["height", PAGE.lineHeight]]) r.setAttribute(k, String(v));
+          r.setAttribute("fill", "rgba(66,133,244,0.32)");
+          bands.push(r);
+        }
+        ctx.fillStyle = "#000";
+        ctx.fillText(text, PAGE.margin, l.y + 16);
+      }
+      svg.replaceChildren(...bands);
+      if (focused2 && start === end) {
+        const l = lines.find((x) => start >= x.from && start <= x.to) ?? lines[lines.length - 1];
+        if (l) {
+          ctx.fillStyle = "#000";
+          ctx.fillRect(PAGE.margin + measure(model2.text.slice(l.from, start)), l.y + 2, 1.5, PAGE.lineHeight - 4);
+        }
+      }
+    }
+    return { canvas, lines: () => lines, measure, paint };
+  }
+
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/client/target.ts
+  function textTarget(host2, model2, modes, hooks) {
+    const frame = document.createElement("iframe");
+    frame.className = "docs-texteventtarget-iframe";
+    frame.tabIndex = -1;
+    frame.setAttribute("aria-hidden", "true");
+    frame.title = "Rich Text Area";
+    host2.append(frame);
+    const doc = frame.contentDocument;
+    const editable = doc.createElement("div");
+    editable.className = "docs-texteventtarget-descendant";
+    editable.contentEditable = "true";
+    editable.setAttribute("role", "textbox");
+    editable.setAttribute("aria-label", "Document content");
+    editable.setAttribute("aria-multiline", "true");
+    doc.body.append(editable);
+    let personKeyAt = 0;
+    const byPerson = () => Date.now() - personKeyAt < 1e3;
+    function mirror() {
+      editable.textContent = modes.mirror ? model2.selected() : "";
+      const sel = doc.getSelection();
+      if (!sel || doc.activeElement !== editable) return;
+      const range = doc.createRange();
+      range.selectNodeContents(editable);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    doc.addEventListener("keydown", (e) => {
+      if (e.isTrusted && (e.ctrlKey || e.metaKey) && ["c", "x", "v"].includes(e.key.toLowerCase())) personKeyAt = Date.now();
+      hooks.key(e);
+    });
+    doc.addEventListener("copy", (e) => onCopy(e, false));
+    doc.addEventListener("cut", (e) => onCopy(e, true));
+    function onCopy(e, cut) {
+      e.preventDefault();
+      if (!(modes.copyEvent || byPerson()) || model2.start === model2.end) return;
+      e.clipboardData?.setData("text/plain", model2.selected());
+      if (cut) {
+        model2.replace("");
+        hooks.changed();
+      }
+    }
+    doc.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const text = e.clipboardData?.getData("text/plain") ?? "";
+      if (!(modes.paste || byPerson()) || !text) return;
+      model2.replace(text.replace(/\r\n?/g, "\n"));
+      hooks.changed();
+    });
+    editable.addEventListener("input", (e) => {
+      const ev = e;
+      if (modes.insertText && ev.inputType === "insertText" && ev.data) {
+        model2.replace(ev.data);
+        hooks.changed();
+      } else mirror();
+    });
+    frame.contentWindow?.addEventListener("focus", () => hooks.focused(true));
+    frame.contentWindow?.addEventListener("blur", () => hooks.focused(false));
+    return {
+      frame,
+      editable,
+      mirror,
+      focus() {
+        frame.contentWindow?.focus();
+        editable.focus();
+        mirror();
+      }
+    };
+  }
+
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/client/main.ts
+  var boot = readBoot();
+  var model = new DocModel(boot.text);
+  var host = document.getElementById("page");
+  var pages = painter(host);
+  var focused = false;
+  var timer = null;
+  var status = document.getElementById("saved");
+  var draw = () => pages.paint(model, focused);
+  function changed() {
+    draw();
+    target.mirror();
+    if (status) status.textContent = "Saving...";
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      void post(`/document/d/${boot.id}/save`, { text: model.text }).then(() => {
+        if (status) status.textContent = "Saved to Drive";
+      });
+    }, 300);
+  }
+  function selected() {
+    draw();
+    target.mirror();
+  }
+  function lineMove(from, down) {
+    const lines = pages.lines();
+    const i = lines.findIndex((l) => from >= l.from && from <= l.to);
+    const line = lines[i];
+    const next = lines[i + (down ? 1 : -1)];
+    if (!line || !next) return down ? model.text.length : 0;
+    const x = PAGE.margin + pages.measure(model.text.slice(line.from, from));
+    return hit(lines, model.text, pages.measure, x, next.y + 1);
+  }
+  function key(e) {
+    const mod = e.ctrlKey || e.metaKey;
+    const k = e.key;
+    if (mod && ["c", "x", "v"].includes(k.toLowerCase())) return;
+    const caret = model.sel.focus;
+    const move = (to) => {
+      e.preventDefault();
+      if (e.shiftKey) model.select(model.sel.anchor, to);
+      else model.select(to);
+      selected();
+    };
+    if (mod && k.toLowerCase() === "z") {
+      e.preventDefault();
+      if (model.undo()) changed();
+    } else if (mod && k.toLowerCase() === "a") {
+      e.preventDefault();
+      model.select(0, model.text.length);
+      selected();
+    } else if (k === "ArrowLeft") move(!e.shiftKey && model.start !== model.end ? model.start : model.before(caret));
+    else if (k === "ArrowRight") move(!e.shiftKey && model.start !== model.end ? model.end : model.after(caret));
+    else if (k === "ArrowUp" || k === "ArrowDown") move(lineMove(caret, k === "ArrowDown"));
+    else if (k === "Home") move(model.paragraphAt(caret).anchor);
+    else if (k === "End") move(model.paragraphAt(caret).focus);
+    else if (k === "Backspace" || k === "Delete") {
+      e.preventDefault();
+      model.erase(k === "Backspace");
+      changed();
+    } else if (k === "Enter" && !mod) {
+      e.preventDefault();
+      model.replace("\n");
+      changed();
+    } else if (k.length === 1 && !mod) {
+      e.preventDefault();
+      model.replace(k);
+      changed();
+    }
+  }
+  var target = textTarget(document.body, model, boot.modes, {
+    changed,
+    key,
+    focused(on) {
+      focused = on;
+      draw();
+    }
+  });
+  var at = (e) => {
+    const r = pages.canvas.getBoundingClientRect();
+    return hit(pages.lines(), model.text, pages.measure, e.clientX - r.left, e.clientY - r.top);
+  };
+  var dragging = false;
+  pages.canvas.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    const o = at(e);
+    if (e.detail === 2) {
+      const w = model.wordAt(o);
+      model.select(w.anchor, w.focus);
+    } else if (e.detail >= 3) {
+      const p = model.paragraphAt(o);
+      model.select(p.anchor, p.focus);
+    } else if (e.shiftKey) model.select(model.sel.anchor, o);
+    else model.select(o);
+    dragging = e.detail === 1;
+    target.focus();
+    selected();
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!dragging) return;
+    model.select(model.sel.anchor, at(e));
+    selected();
+  });
+  window.addEventListener("mouseup", () => {
+    dragging = false;
+  });
+  model.select(0);
+  draw();
+  target.focus();
+})();
+</script></body></html>

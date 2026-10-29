@@ -1,0 +1,5 @@
+{
+  "title": "Cori Rewrite",
+  "version": 2,
+  "bundles": { "rewrite.js": { "from": "rewrite.ts", "version": 2 } }
+}
