@@ -1,4 +1,5 @@
 import actionsAnywhere from "./films/actions-anywhere.json";
+import actionsCalendar from "./films/actions-calendar.json";
 import actionsGmail from "./films/actions-gmail.json";
 import benchmarksEvals from "./films/benchmarks-evals.json";
 import coriChat from "./films/cori-chat.json";
@@ -57,6 +58,7 @@ export const films = {
   voiceMode: film("voice-mode", "Voice mode", voiceMode),
   coriChat: film("cori-chat", "Cori chat", coriChat),
   actionsGmail: film("actions-gmail", "Actions in Gmail", actionsGmail),
+  actionsCalendar: film("actions-calendar", "Actions in Calendar", actionsCalendar),
   coriRewrite: film("cori-rewrite", "Cori Rewrite", coriRewrite),
   actionsAnywhere: film("actions-anywhere", "Actions on any site", actionsAnywhere),
   workers: film("workers", "Workers", workers),
