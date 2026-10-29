@@ -181,7 +181,12 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
       }
       if (mine !== run) return;
       await new Promise((r) => setTimeout(r, 900));
-      if (!loop || mine !== run) return;
+      if (mine !== run) return;
+      // A run that stops at its end says so, for the tools that play films through (demos/tools).
+      if (!loop) {
+        document.documentElement.dataset.demoEnded = "";
+        return;
+      }
       // A film started partway (a seek on its play bar) plays from the start when it comes round again;
       // a short showcase (`to` set) keeps looping its own part.
       if (!to && from) {

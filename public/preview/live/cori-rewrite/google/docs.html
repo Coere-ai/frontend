@@ -22,7 +22,7 @@ body{font:14px/20px Roboto,Arial,sans-serif;color:#1f1f1f;background:#f9fbfd;dis
 .list a{display:block;padding:14px 18px;margin:6px 0;background:#fff;border-radius:8px;color:#1f1f1f;text-decoration:none;box-shadow:0 1px 2px rgba(60,64,67,.2)}
 </style></head><body><div class="bar"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M10 4h14l8 8v24H10z" fill="#4285f4"/><path d="M24 4v8h8" fill="#a1c2fa"/><path d="M15 20h12M15 25h12M15 30h8" stroke="#fff" stroke-width="2"/></svg><input class="docs-title-input" aria-label="Rename" value="Internship cover letter"><span class="saved" id="saved" role="status">Saved to Drive</span><div class="right"><button class="share" type="button">Share</button><span class="avatar" role="img" aria-label="Google Account: Maya Collins (maya.collins@gmail.com)">M</span></div></div><div class="menus" role="menubar"><span role="menuitem">File</span><span role="menuitem">Edit</span><span role="menuitem">View</span><span role="menuitem">Insert</span><span role="menuitem">Format</span><span role="menuitem">Tools</span><span role="menuitem">Extensions</span><span role="menuitem">Help</span></div><div class="toolbar" role="toolbar" aria-label="Main toolbar"><span>100%</span><span class="sep"></span><span>Normal text</span><span class="sep"></span><span>Arial</span><span class="sep"></span><span>11</span><span class="sep"></span><b>B</b><i>I</i><u>U</u></div><div class="kix-appview-editor" id="editor" role="document" aria-label="Document content"><div class="kix-page" id="page"></div></div><script type="application/json" id="boot">{"id":"1Qk7mZ2xV9pLr4TnW8sYb3HcJ6uFd0eGaRtE5wKq","title":"Internship cover letter","text":"Dear Hiring Team,\n\nI am writing to apply for the software engineering internship on your platform team. I am a third year computer science student at Northfield University, and I have spent the last year building systems projects in C and Go.\n\nIn my operating systems course I wrote a thread scheduler with priority donation, and I really liked figuring out why things broke under load and then making them not break. I think that kind of work is what your team does every day.\n\nThank you for your time. I would love to talk more about the role.\n\nSincerely,\nMaya Collins","modes":{"mirror":true,"copyEvent":true,"insertText":true,"paste":true},"me":"maya.collins@gmail.com"}</script><script>"use strict";
 (() => {
-  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/client-dom.ts
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2new/tests/fake-google/client-dom.ts
   function readBoot() {
     return JSON.parse(document.getElementById("boot")?.textContent ?? "{}");
   }
@@ -31,7 +31,7 @@ body{font:14px/20px Roboto,Arial,sans-serif;color:#1f1f1f;background:#f9fbfd;dis
     return await r.json();
   }
 
-  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/layout.ts
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2new/tests/fake-google/docs/layout.ts
   var PAGE = { width: 816, margin: 96, lineHeight: 22, top: 96 };
   function layout(text, measure, width = PAGE.width - 2 * PAGE.margin) {
     const lines = [];
@@ -68,7 +68,7 @@ body{font:14px/20px Roboto,Arial,sans-serif;color:#1f1f1f;background:#f9fbfd;dis
     return best;
   }
 
-  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/model.ts
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2new/tests/fake-google/docs/model.ts
   var segmenter = new Intl.Segmenter(void 0, { granularity: "grapheme" });
   var graphemes = (text) => segmenter.segment(text);
   var DocModel = class {
@@ -144,7 +144,7 @@ body{font:14px/20px Roboto,Arial,sans-serif;color:#1f1f1f;background:#f9fbfd;dis
     }
   };
 
-  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/client/paint.ts
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2new/tests/fake-google/docs/client/paint.ts
   var FONT = "15px Arial, Helvetica, sans-serif";
   function painter(host2) {
     const canvas = document.createElement("canvas");
@@ -211,7 +211,7 @@ body{font:14px/20px Roboto,Arial,sans-serif;color:#1f1f1f;background:#f9fbfd;dis
     return { canvas, lines: () => lines, measure, paint };
   }
 
-  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/client/target.ts
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2new/tests/fake-google/docs/client/target.ts
   function textTarget(host2, model2, modes, hooks) {
     const frame = document.createElement("iframe");
     frame.className = "docs-texteventtarget-iframe";
@@ -281,7 +281,7 @@ body{font:14px/20px Roboto,Arial,sans-serif;color:#1f1f1f;background:#f9fbfd;dis
     };
   }
 
-  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2work/tests/fake-google/docs/client/main.ts
+  // ../../../tmp/claude-0/-home-user-frontend/eb59c364-485a-5111-b202-85d777ec981d/scratchpad/v2new/tests/fake-google/docs/client/main.ts
   var boot = readBoot();
   var model = new DocModel(boot.text);
   var host = document.getElementById("page");
