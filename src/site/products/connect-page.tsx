@@ -12,22 +12,22 @@ import { ProductHero } from "./hero";
 import { OtherProducts } from "./other-products";
 import { ProductSection } from "./product-section";
 
-/** Coere Connect: why people use it, what they use it for, then everything it does. */
+/** Coere Connect: what people use it for, everything it does, then why they choose it. */
 export function ConnectPage() {
   return (
     <>
       <ProductHero copy={connectHero} background={backgrounds.tangle} app={<FilmFrame film={films.v2} />} secondary={{ href: "#use-cases", label: "See what it does" }} />
-      <section className="py-28 md:py-32">
-        <Container>
-          <SlantCard heading="Why people choose Coere Connect" slides={connectSlides} background={backgrounds.flow} />
-        </Container>
-      </section>
       <ProductSection id="use-cases" title="Put your memory to work" line="Bring every chat in, build one memory from them, and let Cori act on it." tint>
         <UseCaseTabs cases={asUseCases(connectCases)} />
       </ProductSection>
       <ProductSection title="Everything in Coere Connect">
         <FeatureGrid items={asGrid(connectGrid)} />
       </ProductSection>
+      <section className="py-28 md:py-32">
+        <Container>
+          <SlantCard heading="Why people choose Coere Connect" slides={connectSlides} background={backgrounds.flow} />
+        </Container>
+      </section>
       <OtherProducts current="connect" />
       <ClosingCta title="Your memory, across every AI." />
     </>
