@@ -19,7 +19,7 @@ export function AgentsPage() {
     title: part.title,
     summary: part.text,
     checks: part.checks,
-    visual: <FilmFrame film={films.workers} preview from={part.from} to={part.to} />,
+    visual: <FilmFrame film={films.workers} preview part={part.part} />,
   }));
   return (
     <>

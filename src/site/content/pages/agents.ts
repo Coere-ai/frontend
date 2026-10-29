@@ -12,31 +12,28 @@ export const agentsHero: HeroCopy = {
   ],
 };
 
-/** The workers film in its three parts, by its chapters' times. */
+/** The workers film in its three parts, by the live film's chapters. */
 export const workerParts = [
   {
     key: "split",
     title: "One task, many workers",
     text: "Ask for something that needs many pages read, like twenty companies with a person to contact at each. Cori splits it across workers, each searching in a tab of its own.",
     checks: ["Watch what each worker sees, live", "Stop or Take over any one of them", "The count climbs as rows come in"],
-    from: 3,
-    to: 25.9,
+    part: { from: "handoff", to: "report" },
   },
   {
     key: "table",
     title: "One table, a source for every value",
     text: "What the workers find merges into one table with no row twice. Each value keeps the page it came from.",
     checks: ["No row twice", "Every value names its page", "Export CSV or Copy"],
-    from: 25.9,
-    to: 35.8,
+    part: { from: "report", to: "stop-all" },
   },
   {
     key: "stop",
     title: "Stop all, any time",
     text: "Start another search in a new chat, or stop everything at once. Stop all ends every worker and closes their tabs.",
     checks: ["Stop all closes every tab", "Start again in a new chat", "Cori never invents a value"],
-    from: 35.8,
-    to: 56.6,
+    part: { from: "stop-all" },
   },
 ];
 
