@@ -34,7 +34,7 @@ export function BlogPanel() {
         <PanelMore href="/blog">Read more</PanelMore>
       </div>
 
-      <ul className="grid grid-cols-3 gap-6 rounded-2xl bg-neutral-50 p-6">
+      <ul className="grid grid-cols-3 gap-6">
         {posts.slice(0, 3).map((post) => (
           <li key={post.slug}>
             <Link href={`/blog/${post.slug}`} className="group block">
