@@ -10,7 +10,7 @@ export type Slide = { label: string; text: string; byline?: string };
 
 /** The drawing box. The card keeps this shape on wide screens so the cut stays the same angle. */
 const W = 1360;
-const H = 540;
+const H = 400;
 const CUT = 160;
 const CARD = roundedPolygon([[0, 0], [830, 0], [830 + CUT, H], [0, H]], 22);
 const ART = roundedPolygon([[852, 0], [W, 0], [W, H], [852 + CUT, H]], 22);
@@ -29,8 +29,11 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
   const words = (
     <div aria-live="polite">
       <p className="text-[15px] font-medium text-brand-500">{slide.label}</p>
-      <p className="mt-5 text-[22px] leading-snug tracking-[-0.015em] text-neutral-950 text-pretty xl:text-[26px]">{slide.text}</p>
+      <p className="mt-5 text-[24px] leading-snug tracking-[-0.02em] text-neutral-950 text-pretty xl:text-[30px]">{slide.text}</p>
       {slide.byline ? <p className="mt-6 text-[15px] text-neutral-600">{slide.byline}</p> : null}
+      <p className="mt-8 text-[13px] text-neutral-500 tabular-nums">
+        {index + 1} of {slides.length}
+      </p>
     </div>
   );
 
