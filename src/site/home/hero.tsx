@@ -34,7 +34,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.55, ease }}
           className="mx-auto mt-8 max-w-2xl text-xl leading-relaxed text-neutral-600 text-balance md:text-[22px]"
         >
-          The user owned memory layer that you, your team, and your app need.
+          The user owned memory layer that you, your team, and your app need, so your AI knows you or your customers better on day one.
         </motion.p>
       </Container>
     </section>
