@@ -15,6 +15,8 @@ export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePa
   extraction: { slug: "extraction", showcase: { from: "extract", to: "change" } },
   voiceMode: { slug: "voice-mode", showcase: { from: "hold", to: "cancel" } },
   actionsGmail: { slug: "actions-gmail", showcase: { from: "ask", to: "send" } },
+  actionsAnywhere: { slug: "actions-anywhere", showcase: { from: "answers", to: "form" } },
+  v3: { slug: "v3", showcase: { from: "asks", to: "planner" } },
   workers: { slug: "workers", showcase: { from: "handoff", to: "stop-all" } },
   benchmarksEvals: { slug: "benchmarks-evals", showcase: { from: "estimate", to: "export" } },
   coriChat: { slug: "cori-chat", showcase: { from: "ask", to: "history" } },

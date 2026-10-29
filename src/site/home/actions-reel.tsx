@@ -2,23 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { films, type FilmKey } from "@/site/content/films";
+import type { LivePart } from "@/site/content/live";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { Underlined } from "@/site/ui/underlined";
 
 /**
- * The actions Cori takes, one film each. Forms and quizzes share the Any
- * site film, so each loops only its own part (its chapters' times).
+ * The actions Cori takes, each the part of its live film where Cori does
+ * it: chapters of the film's script, played on Coere's real code.
  */
-const reel: { key: string; label: string; film: FilmKey; from?: number; to?: number }[] = [
-  { key: "email", label: "Email", film: "actionsGmail" },
-  { key: "calendar", label: "Calendar", film: "actionsCalendar" },
-  { key: "writing", label: "Writing", film: "coriRewrite" },
-  { key: "forms", label: "Forms", film: "actionsAnywhere", from: 38.7, to: 72.2 },
-  { key: "quiz", label: "Quizzes", film: "actionsAnywhere", from: 3, to: 38.6 },
+const reel: { key: string; label: string; film: FilmKey; part: LivePart }[] = [
+  { key: "email", label: "Email", film: "actionsGmail", part: { from: "working", to: "draft" } },
+  { key: "calendar", label: "Calendar", film: "actionsCalendar", part: { from: "saved", to: "memory" } },
+  { key: "writing", label: "Writing", film: "coriRewrite", part: { from: "rewrite", to: "accept" } },
+  { key: "forms", label: "Forms", film: "actionsAnywhere", part: { from: "form", to: "research" } },
+  { key: "quiz", label: "Quizzes", film: "actionsAnywhere", part: { from: "answers", to: "form" } },
 ];
 
-/** How long each action plays before the next, until one is picked. */
-const ACTION_MS = 12000;
+/** How long each action plays before the next, until one is picked: about one pass of its part. */
+const ACTION_MS = 24000;
 
 /** Coere Actions as a window with a tab per action, playing its film. */
 export function ActionsReel() {
@@ -51,7 +52,7 @@ export function ActionsReel() {
           </button>
         ))}
       </div>
-      <FilmFrame key={item.key} film={films[item.film]} preview from={item.from} to={item.to} />
+      <FilmFrame key={item.key} film={films[item.film]} preview part={item.part} />
     </div>
   );
 }
