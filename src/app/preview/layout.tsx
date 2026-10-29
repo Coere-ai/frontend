@@ -9,7 +9,8 @@ import { Navbar } from "@/site/nav/navbar";
  * here may be indexed while the site is private.
  */
 export const metadata: Metadata = {
-  title: { default: "Coere | Own your memory", template: "%s | Coere" },
+  // absolute, so the root layout's own "| Coere" template doesn't wrap it a second time.
+  title: { absolute: "Coere | Own your memory", template: "%s | Coere" },
   description: "Coere is the memory layer you own, across every AI.",
   robots: { index: false, follow: false, nocache: true },
 };
