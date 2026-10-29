@@ -3,8 +3,6 @@ import { Icon, type IconProps } from "./icon";
 
 /** One line drawing per industry, keyed by name so content files stay plain data. */
 const paths = {
-  sparkles: <path d="M12 3.5 13.8 9l5.7 1.8-5.7 1.9L12 18.5l-1.8-5.8-5.7-1.9L10.2 9 12 3.5ZM18.5 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2Z" />,
-  rocket: <path d="M14.5 4.5c3 0 5 2 5 5-1.5 4-5 6.5-7.5 7.5L7 12c1-2.5 3.5-6 7.5-7.5ZM7 12l-2.5.5L3.5 15l3.5.5M12 17l-.5 2.5L9 20.5 8.5 17M14.5 9.5h.01" />,
   chart: <path d="M4 19.5h16M6.5 16V11M11 16V7M15.5 16v-6M20 16V5" />,
   cpu: (
     <>
@@ -16,13 +14,14 @@ const paths = {
   pulse: <path d="M3.5 12h4l2-5 4 10 2-5h5" />,
   cap: <path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5ZM6.5 11.5v4c3 2.5 8 2.5 11 0v-4M21.5 9.5v5" />,
   scale: <path d="M12 4v16M7 20h10M5 7h14M5 7l-2.5 6a2.5 2.5 0 0 0 5 0L5 7ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0L19 7Z" />,
-  bag: <path d="M5.5 8.5h13l-1 11.5h-11l-1-11.5ZM9 8.5V7a3 3 0 0 1 6 0v1.5" />,
-  film: (
+  globe: (
     <>
-      <rect x="3.5" y="5" width="17" height="14" rx="2" />
-      <path d="M7.5 5v14M16.5 5v14M3.5 9.5h4M3.5 14.5h4M16.5 9.5h4M16.5 14.5h4" />
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M3.5 12h17M12 3.5c2.5 2.5 3.5 5.5 3.5 8.5s-1 6-3.5 8.5c-2.5-2.5-3.5-5.5-3.5-8.5s1-6 3.5-8.5Z" />
     </>
   ),
+  cart: <path d="M3.5 4.5h2.5l2 11h10l2-8H7M9.5 19.5h.01M17 19.5h.01" />,
+  factory: <path d="M3.5 20V10.5l5 3v-3l5 3v-3l5 3V4.5h2V20h-17ZM7 17h2M11.5 17h2M16 17h2" />,
 } satisfies Record<string, ReactNode>;
 
 export type IndustryIconName = keyof typeof paths;
