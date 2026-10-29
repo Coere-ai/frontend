@@ -17,7 +17,7 @@
     "hits": [
      {
       "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-00000000014d",
+       "id": "ent_0199a5c1-8a00-7000-8000-00000000000a",
        "kind": "project",
        "name": "CS 162 project 3",
        "path": [
@@ -27,22 +27,12 @@
          "kind": "section"
         },
         {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000013",
-         "name": "Classes and subjects",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002e",
-         "name": "Computer science",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000009",
          "name": "CS 162",
          "kind": "course"
         },
         {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000014d",
+         "id": "ent_0199a5c1-8a00-7000-8000-00000000000a",
          "name": "CS 162 project 3",
          "kind": "project"
         }
@@ -50,7 +40,7 @@
       },
       "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000aed",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000adc",
         "kind": "task",
         "key": "cs_162_project_3_is_due_november_13",
         "text": "CS 162 project 3 is due November 13.",
@@ -81,9 +71,9 @@
         "urgencyLabel": "Due Nov 13",
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 1.4431433823529416,
+        "score": 1.4872380952380955,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000aed#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000adc#e0",
          "platform": "claude",
          "convId": "claude:maya-school",
          "title": "CS 162 deadlines",
@@ -93,7 +83,7 @@
         }
        },
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000b0b",
+        "id": "fact_0199a5c1-8a00-7000-8000-00000000091f",
         "kind": "attribute",
         "key": "cs_162_project_3_is_the_file_system",
         "text": "CS 162 project 3 is the file system.",
@@ -119,19 +109,19 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 1.342,
+        "score": 1.3957693292370712,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000b0b#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-00000000091f#e1",
          "platform": "chatgpt",
-         "convId": "chatgpt:c074",
+         "convId": "chatgpt:c042",
          "title": "CS 162 project 3 file system",
          "msg": 1,
-         "at": "2026-10-26T00:36:00Z",
+         "at": "2026-10-26T18:12:00Z",
          "stale": false
         }
        },
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000b0c",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000b08",
         "kind": "attribute",
         "key": "the_cs_162_project_3_design_review_is_on",
         "text": "The CS 162 project 3 design review is on November 3.",
@@ -157,25 +147,25 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 1.2378653381642515,
+        "score": 1.3135858242753624,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000b0c#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000b08#e0",
          "platform": "chatgpt",
-         "convId": "chatgpt:c074",
+         "convId": "chatgpt:c042",
          "title": "CS 162 project 3 file system",
          "msg": 2,
-         "at": "2026-10-26T00:38:00Z",
+         "at": "2026-10-26T18:14:00Z",
          "stale": false
         }
        }
       ],
-      "score": 1.8301231830775793
+      "score": 1.8936413682649604
      },
      {
       "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-00000000011d",
-       "kind": "project",
-       "name": "CS 162 project 1",
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000009",
+       "kind": "course",
+       "name": "CS 162",
        "path": [
         {
          "id": "sec_school",
@@ -183,33 +173,18 @@
          "kind": "section"
         },
         {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000013",
-         "name": "Classes and subjects",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002e",
-         "name": "Computer science",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000009",
          "name": "CS 162",
          "kind": "course"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000011d",
-         "name": "CS 162 project 1",
-         "kind": "project"
         }
        ]
       },
       "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a83",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000a1f",
         "kind": "attribute",
-        "key": "cs_162_project_1_was_user_programs_in_pi",
-        "text": "CS 162 project 1 was user programs in Pintos.",
+        "key": "cs_162_projects_go_in_through_gradescope",
+        "text": "CS 162 projects go in through Gradescope.",
         "status": "active",
         "progress": null,
         "highlights": [
@@ -223,7 +198,7 @@
          ],
          [
           7,
-          14
+          15
          ]
         ],
         "specifics": [],
@@ -232,94 +207,108 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 1.1925486205336953,
+        "score": 1.1684507042253522,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a83#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a1f#e0",
          "platform": "chatgpt",
-         "convId": "chatgpt:c032",
-         "title": "DATA 100 lab 4 notes",
-         "msg": 4,
-         "at": "2026-09-11T17:56:00Z",
+         "convId": "chatgpt:c287",
+         "title": "Pintos setup",
+         "msg": 2,
+         "at": "2026-08-25T23:46:00Z",
          "stale": false
         }
        },
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a84",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000a23",
         "kind": "attribute",
-        "key": "our_group_got_a_92_on_cs_162_project_1",
-        "text": "Our group got a 92 on CS 162 project 1.",
+        "key": "cs_162_grades_are_40_percent_projects_an",
+        "text": "CS 162 grades are 40 percent projects and the rest exams.",
         "status": "active",
         "progress": null,
         "highlights": [
          [
-          22,
-          24
+          0,
+          2
          ],
          [
-          25,
-          28
+          3,
+          6
          ],
          [
           29,
-          36
+          37
          ]
         ],
         "specifics": [],
-        "importance": 2,
+        "importance": 3,
         "urgency": "none",
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 1.1664287259355397,
+        "score": 1.1508895131086143,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a84#e0",
-         "platform": "chatgpt",
-         "convId": "chatgpt:c032",
-         "title": "DATA 100 lab 4 notes",
-         "msg": 5,
-         "at": "2026-09-11T17:58:00Z",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a23#e0",
+         "platform": "claude",
+         "convId": "claude:c034",
+         "title": "CS 162 grading",
+         "msg": 2,
+         "at": "2026-08-26T21:31:00Z",
+         "stale": false
+        }
+       },
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000a22",
+        "kind": "event",
+        "key": "the_cs_162_final_is_on_december_15",
+        "text": "The CS 162 final is on December 15.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          4,
+          6
+         ],
+         [
+          7,
+          10
+         ]
+        ],
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 0.6517808219178083,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a22#e0",
+         "platform": "claude",
+         "convId": "claude:c034",
+         "title": "CS 162 grading",
+         "msg": 1,
+         "at": "2026-08-26T21:29:00Z",
          "stale": false
         }
        }
       ],
-      "score": 1.3675129294240262
+      "score": 1.6157980746547542
      },
      {
       "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-00000000013f",
-       "kind": "project",
-       "name": "CS 162 project 2",
+       "id": "sec_school",
+       "kind": "section",
+       "name": "School",
        "path": [
         {
          "id": "sec_school",
          "name": "School",
          "kind": "section"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000013",
-         "name": "Classes and subjects",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002e",
-         "name": "Computer science",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
-         "name": "CS 162",
-         "kind": "course"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000013f",
-         "name": "CS 162 project 2",
-         "kind": "project"
         }
        ]
       },
       "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000ac6",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000ab1",
         "kind": "attribute",
         "key": "cs_162_project_2_was_the_thread_schedule",
         "text": "CS 162 project 2 was the thread scheduler.",
@@ -345,132 +334,36 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 1.2488963293650794,
+        "score": 0.9317863805970149,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000ac6#e0",
-         "platform": "claude",
-         "convId": "claude:c073",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000ab1#e0",
+         "platform": "chatgpt",
+         "convId": "chatgpt:c041",
          "title": "CS 162 project 2 threads",
          "msg": 1,
-         "at": "2026-10-05T18:07:00Z",
+         "at": "2026-10-05T15:39:00Z",
          "stale": false
         }
-       }
-      ],
-      "score": 1.2488963293650794
-     },
-     {
-      "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
-       "kind": "course",
-       "name": "CS 162",
-       "path": [
-        {
-         "id": "sec_school",
-         "name": "School",
-         "kind": "section"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000013",
-         "name": "Classes and subjects",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002e",
-         "name": "Computer science",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
-         "name": "CS 162",
-         "kind": "course"
-        }
-       ]
-      },
-      "facts": [
+       },
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a2b",
-        "kind": "event",
-        "key": "the_cs_162_final_is_on_december_15",
-        "text": "The CS 162 final is on December 15.",
+        "id": "fact_0199a5c1-8a00-7000-8000-0000000009af",
+        "kind": "attribute",
+        "key": "cs_162_project_1_was_user_programs_in_pi",
+        "text": "CS 162 project 1 was user programs in Pintos.",
         "status": "active",
         "progress": null,
         "highlights": [
          [
-          4,
+          0,
+          2
+         ],
+         [
+          3,
           6
          ],
          [
           7,
-          10
-         ]
-        ],
-        "specifics": [],
-        "importance": 4,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.5171739130434784,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a2b#e0",
-         "platform": "chatgpt",
-         "convId": "chatgpt:c062",
-         "title": "CS 162 grading",
-         "msg": 1,
-         "at": "2026-08-26T15:36:00Z",
-         "stale": false
-        }
-       },
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a12",
-        "kind": "attribute",
-        "key": "cs_162_meets_monday_and_wednesday_at_4",
-        "text": "CS 162 meets Monday and Wednesday at 4.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          0,
-          2
-         ],
-         [
-          3,
-          6
-         ]
-        ],
-        "specifics": [],
-        "importance": 3,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.4792857142857144,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a12#e0",
-         "platform": "gemini",
-         "convId": "gemini:c061",
-         "title": "CS 162 this term",
-         "msg": 1,
-         "at": "2026-08-20T20:12:00Z",
-         "stale": false
-        }
-       },
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a2c",
-        "kind": "attribute",
-        "key": "cs_162_grades_are_40_percent_homework_an",
-        "text": "CS 162 grades are 40 percent homework and the rest exams.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          0,
-          2
-         ],
-         [
-          3,
-          6
+          14
          ]
         ],
         "specifics": [],
@@ -479,23 +372,189 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 0.35088495575221235,
+        "score": 0.910650623885918,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a2c#e0",
-         "platform": "chatgpt",
-         "convId": "chatgpt:c062",
-         "title": "CS 162 grading",
-         "msg": 2,
-         "at": "2026-08-26T15:38:00Z",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-0000000009af#e0",
+         "platform": "claude",
+         "convId": "claude:c069",
+         "title": "STAT 20 final grade",
+         "msg": 3,
+         "at": "2026-05-30T18:16:00Z",
+         "stale": false
+        }
+       },
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-0000000009b0",
+        "kind": "attribute",
+        "key": "our_group_got_a_92_on_cs_162_project_1",
+        "text": "Our group got a 92 on CS 162 project 1.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          22,
+          24
+         ],
+         [
+          25,
+          28
+         ],
+         [
+          29,
+          36
+         ]
+        ],
+        "specifics": [],
+        "importance": 2,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 0.8972528661042612,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-0000000009b0#e0",
+         "platform": "claude",
+         "convId": "claude:c069",
+         "title": "STAT 20 final grade",
+         "msg": 4,
+         "at": "2026-05-30T18:18:00Z",
          "stale": false
         }
        }
       ],
-      "score": 0.6934169048535151
+      "score": 1.2621777864484829
      },
      {
       "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-0000000000e7",
+       "id": "ent_0199a5c1-8a00-7000-8000-00000000002a",
+       "kind": "person",
+       "name": "Priya Raman",
+       "path": [
+        {
+         "id": "sec_people",
+         "name": "People",
+         "kind": "section"
+        },
+        {
+         "id": "ent_0199a5c1-8a00-7000-8000-00000000002a",
+         "name": "Priya Raman",
+         "kind": "person"
+        }
+       ]
+      },
+      "facts": [
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000b0e",
+        "kind": "attribute",
+        "key": "priya_and_i_split_the_cs_162_project_3_d",
+        "text": "Priya and I split the CS 162 project 3 design doc.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          22,
+          24
+         ],
+         [
+          25,
+          28
+         ],
+         [
+          29,
+          36
+         ]
+        ],
+        "specifics": [],
+        "importance": 2,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 0.8842436974789916,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000b0e#e0",
+         "platform": "chatgpt",
+         "convId": "chatgpt:c146",
+         "title": "Priya and the design doc",
+         "msg": 1,
+         "at": "2026-10-27T19:23:00Z",
+         "stale": false
+        }
+       },
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000aa4",
+        "kind": "attribute",
+        "key": "priya_raman_runs_the_cs_162_study_group",
+        "text": "Priya Raman runs the CS 162 study group.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          21,
+          23
+         ],
+         [
+          24,
+          27
+         ]
+        ],
+        "specifics": [],
+        "importance": 3,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 0.44733333333333336,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000aa4#e0",
+         "platform": "gemini",
+         "convId": "gemini:c037",
+         "title": "Study group plan",
+         "msg": 2,
+         "at": "2026-10-01T21:41:00Z",
+         "stale": false
+        }
+       },
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000acd",
+        "kind": "attribute",
+        "key": "priya_raman_is_in_my_cs_162_study_group",
+        "text": "Priya Raman is in my CS 162 study group.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          21,
+          23
+         ],
+         [
+          24,
+          27
+         ]
+        ],
+        "specifics": [],
+        "importance": 3,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 0.419375,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000acd#e0",
+         "platform": "chatgpt",
+         "convId": "chatgpt:maya-people",
+         "title": "People I email",
+         "msg": 3,
+         "at": "2026-10-12T16:04:00Z",
+         "stale": false
+        }
+       }
+      ],
+      "score": 1.0729037936328378
+     },
+     {
+      "node": {
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000036",
        "kind": "person",
        "name": "Daniel Reyes",
        "path": [
@@ -505,12 +564,7 @@
          "kind": "section"
         },
         {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000004b",
-         "name": "Classmates and teachers",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e7",
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000036",
          "name": "Daniel Reyes",
          "kind": "person"
         }
@@ -518,7 +572,7 @@
       },
       "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000adf",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000ad1",
         "kind": "attribute",
         "key": "professor_daniel_reyes_teaches_cs_162",
         "text": "Professor Daniel Reyes teaches CS 162.",
@@ -540,9 +594,9 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 0.5013698630136987,
+        "score": 0.5228571428571429,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000adf#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000ad1#e0",
          "platform": "chatgpt",
          "convId": "chatgpt:maya-people",
          "title": "People I email",
@@ -550,22 +604,96 @@
          "at": "2026-10-12T16:12:00Z",
          "stale": false
         }
-       },
+       }
+      ],
+      "score": 0.5228571428571429
+     },
+     {
+      "node": {
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000002",
+       "kind": "project",
+       "name": "SkipDoodle",
+       "path": [
+        {
+         "id": "sec_projects",
+         "name": "Projects",
+         "kind": "section"
+        },
+        {
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000002",
+         "name": "SkipDoodle",
+         "kind": "project"
+        }
+       ]
+      },
+      "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a13",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000a17",
         "kind": "attribute",
-        "key": "professor_reyes_teaches_cs_162",
-        "text": "Professor Reyes teaches CS 162.",
+        "key": "skipdoodle_is_my_weekend_project_a_drawi",
+        "text": "SkipDoodle is my weekend project, a drawing game for kids.",
         "status": "active",
         "progress": null,
         "highlights": [
          [
-          24,
-          26
+          25,
+          32
+         ]
+        ],
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 0.4409638554216868,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a17#e0",
+         "platform": "chatgpt",
+         "convId": "chatgpt:c019",
+         "title": "SkipDoodle setup",
+         "msg": 1,
+         "at": "2026-08-20T00:28:00Z",
+         "stale": false
+        }
+       }
+      ],
+      "score": 0.4409638554216868
+     },
+     {
+      "node": {
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000034",
+       "kind": "person",
+       "name": "Sam Lee",
+       "path": [
+        {
+         "id": "sec_people",
+         "name": "People",
+         "kind": "section"
+        },
+        {
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000034",
+         "name": "Sam Lee",
+         "kind": "person"
+        }
+       ]
+      },
+      "facts": [
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000acb",
+        "kind": "attribute",
+        "key": "sam_lee_is_my_lab_partner_in_cs_162",
+        "text": "Sam Lee is my lab partner in CS 162.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          29,
+          31
          ],
          [
-          27,
-          30
+          32,
+          35
          ]
         ],
         "specifics": [],
@@ -574,130 +702,25 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 0.47253521126760567,
+        "score": 0.42468354430379746,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a13#e0",
-         "platform": "gemini",
-         "convId": "gemini:c061",
-         "title": "CS 162 this term",
-         "msg": 2,
-         "at": "2026-08-20T20:14:00Z",
-         "stale": false
-        }
-       }
-      ],
-      "score": 0.5722501447038395
-     },
-     {
-      "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-0000000000fa",
-       "kind": "task",
-       "name": "Homework 1",
-       "path": [
-        {
-         "id": "sec_school",
-         "name": "School",
-         "kind": "section"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000013",
-         "name": "Classes and subjects",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002e",
-         "name": "Computer science",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
-         "name": "CS 162",
-         "kind": "course"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000fa",
-         "name": "Homework 1",
-         "kind": "task"
-        }
-       ]
-      },
-      "facts": [
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a3e",
-        "kind": "attribute",
-        "key": "cs_162_homework_1_is_on_processes",
-        "text": "CS 162 Homework 1 is on processes.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          0,
-          2
-         ],
-         [
-          3,
-          6
-         ]
-        ],
-        "specifics": [],
-        "importance": 2,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.5018987341772151,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a3e#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000acb#e0",
          "platform": "chatgpt",
-         "convId": "chatgpt:c063",
-         "title": "CS 162 homework 2 help",
+         "convId": "chatgpt:maya-people",
+         "title": "People I email",
          "msg": 1,
-         "at": "2026-08-29T00:25:00Z",
-         "stale": false
-        }
-       },
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a3f",
-        "kind": "attribute",
-        "key": "i_got_18_out_of_20_on_cs_162_homework_1",
-        "text": "I got 18 out of 20 on CS 162 Homework 1.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          22,
-          24
-         ],
-         [
-          25,
-          28
-         ]
-        ],
-        "specifics": [],
-        "importance": 2,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.3776190476190477,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a3f#e0",
-         "platform": "chatgpt",
-         "convId": "chatgpt:c063",
-         "title": "CS 162 homework 2 help",
-         "msg": 2,
-         "at": "2026-08-29T00:27:00Z",
+         "at": "2026-10-12T16:00:00Z",
          "stale": false
         }
        }
       ],
-      "score": 0.5585415913200722
+      "score": 0.42468354430379746
      },
      {
       "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-0000000000fb",
-       "kind": "task",
-       "name": "Homework 2",
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000017",
+       "kind": "organization",
+       "name": "UC Berkeley",
        "path": [
         {
          "id": "sec_school",
@@ -705,207 +728,53 @@
          "kind": "section"
         },
         {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000013",
-         "name": "Classes and subjects",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002e",
-         "name": "Computer science",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
-         "name": "CS 162",
-         "kind": "course"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000fb",
-         "name": "Homework 2",
-         "kind": "task"
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000017",
+         "name": "UC Berkeley",
+         "kind": "organization"
         }
        ]
       },
       "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a40",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000a12",
         "kind": "attribute",
-        "key": "cs_162_homework_2_is_on_threads",
-        "text": "CS 162 Homework 2 is on threads.",
+        "key": "i_m_taking_data_100_math_54_phys_137_and",
+        "text": "I'm taking DATA 100, MATH 54, PHYS 137 and CS 162 this term.",
         "status": "active",
         "progress": null,
         "highlights": [
          [
-          0,
-          2
+          43,
+          45
          ],
          [
-          3,
-          6
+          46,
+          49
          ]
         ],
         "specifics": [],
-        "importance": 2,
+        "importance": 4,
         "urgency": "none",
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 0.495625,
+        "score": 0.40666666666666673,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a40#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a12#e1",
          "platform": "chatgpt",
-         "convId": "chatgpt:c063",
-         "title": "CS 162 homework 2 help",
-         "msg": 3,
-         "at": "2026-08-29T00:29:00Z",
-         "stale": false
-        }
-       },
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a41",
-        "kind": "attribute",
-        "key": "i_got_18_out_of_20_on_cs_162_homework_2",
-        "text": "I got 18 out of 20 on CS 162 Homework 2.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          22,
-          24
-         ],
-         [
-          25,
-          28
-         ]
-        ],
-        "specifics": [],
-        "importance": 2,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.3740566037735849,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a41#e0",
-         "platform": "chatgpt",
-         "convId": "chatgpt:c063",
-         "title": "CS 162 homework 2 help",
-         "msg": 4,
-         "at": "2026-08-29T00:31:00Z",
+         "convId": "chatgpt:c026",
+         "title": "Classes this term",
+         "msg": 1,
+         "at": "2026-08-25T01:44:00Z",
          "stale": false
         }
        }
       ],
-      "score": 0.5517334905660377
-     },
-     {
-      "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-00000000011f",
-       "kind": "task",
-       "name": "Homework 4",
-       "path": [
-        {
-         "id": "sec_school",
-         "name": "School",
-         "kind": "section"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000013",
-         "name": "Classes and subjects",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002e",
-         "name": "Computer science",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e6",
-         "name": "CS 162",
-         "kind": "course"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000011f",
-         "name": "Homework 4",
-         "kind": "task"
-        }
-       ]
-      },
-      "facts": [
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a86",
-        "kind": "attribute",
-        "key": "cs_162_homework_4_is_on_semaphores",
-        "text": "CS 162 Homework 4 is on semaphores.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          0,
-          2
-         ],
-         [
-          3,
-          6
-         ]
-        ],
-        "specifics": [],
-        "importance": 2,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.48353658536585364,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a86#e0",
-         "platform": "gemini",
-         "convId": "gemini:c064",
-         "title": "CS 162 homework 4 help",
-         "msg": 2,
-         "at": "2026-09-11T18:13:00Z",
-         "stale": false
-        }
-       },
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a87",
-        "kind": "attribute",
-        "key": "i_got_full_credit_on_cs_162_homework_4",
-        "text": "I got full credit on CS 162 Homework 4.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          21,
-          23
-         ],
-         [
-          24,
-          27
-         ]
-        ],
-        "specifics": [],
-        "importance": 2,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.40459183673469384,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a87#e0",
-         "platform": "gemini",
-         "convId": "gemini:c064",
-         "title": "CS 162 homework 4 help",
-         "msg": 3,
-         "at": "2026-09-11T18:15:00Z",
-         "stale": false
-        }
-       }
-      ],
-      "score": 0.5442253608760577
+      "score": 0.40666666666666673
      }
     ],
     "library": [],
-    "total": 36,
+    "total": 28,
     "capped": false
    }
   },
@@ -915,7 +784,7 @@
     "q": "priya raman"
    },
    "answer": {
-    "stage": 2,
+    "stage": 1,
     "intent": {
      "deadline": false,
      "history": false,
@@ -924,7 +793,7 @@
     },
     "open": {
      "node": {
-      "id": "ent_0199a5c1-8a00-7000-8000-000000000137",
+      "id": "ent_0199a5c1-8a00-7000-8000-00000000002a",
       "kind": "person",
       "name": "Priya Raman",
       "path": [
@@ -934,12 +803,7 @@
         "kind": "section"
        },
        {
-        "id": "ent_0199a5c1-8a00-7000-8000-00000000004b",
-        "name": "Classmates and teachers",
-        "kind": "folder"
-       },
-       {
-        "id": "ent_0199a5c1-8a00-7000-8000-000000000137",
+        "id": "ent_0199a5c1-8a00-7000-8000-00000000002a",
         "name": "Priya Raman",
         "kind": "person"
        }
@@ -948,7 +812,41 @@
      "children": [],
      "facts": [
       {
-       "id": "fact_0199a5c1-8a00-7000-8000-000000000adc",
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000aa4",
+       "kind": "attribute",
+       "key": "priya_raman_runs_the_cs_162_study_group",
+       "text": "Priya Raman runs the CS 162 study group.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ],
+        [
+         6,
+         11
+        ]
+       ],
+       "specifics": [],
+       "importance": 3,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 3,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000aa4#e0",
+        "platform": "gemini",
+        "convId": "gemini:c037",
+        "title": "Study group plan",
+        "msg": 2,
+        "at": "2026-10-01T21:41:00Z",
+        "stale": false
+       }
+      },
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000acd",
        "kind": "attribute",
        "key": "priya_raman_is_in_my_cs_162_study_group",
        "text": "Priya Raman is in my CS 162 study group.",
@@ -972,7 +870,7 @@
        "sensitivity": null,
        "score": 3,
        "evidence": {
-        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000adc#e0",
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000acd#e0",
         "platform": "chatgpt",
         "convId": "chatgpt:maya-people",
         "title": "People I email",
@@ -982,7 +880,7 @@
        }
       },
       {
-       "id": "fact_0199a5c1-8a00-7000-8000-000000000add",
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000ace",
        "kind": "attribute",
        "key": "email",
        "text": "Priya Raman's email is priya.raman@northfield.edu.",
@@ -1019,7 +917,7 @@
        "sensitivity": null,
        "score": 3,
        "evidence": {
-        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000add#e0",
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000ace#e0",
         "platform": "chatgpt",
         "convId": "chatgpt:maya-people",
         "title": "People I email",
@@ -1029,20 +927,16 @@
        }
       },
       {
-       "id": "fact_0199a5c1-8a00-7000-8000-000000000ab9",
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000a56",
        "kind": "attribute",
-       "key": "priya_raman_runs_the_cs_162_study_group",
-       "text": "Priya Raman runs the CS 162 study group.",
+       "key": "priya_tutors_data_8_with_me_on_mondays",
+       "text": "Priya tutors DATA 8 with me on Mondays.",
        "status": "active",
        "progress": null,
        "highlights": [
         [
          0,
          5
-        ],
-        [
-         6,
-         11
         ]
        ],
        "specifics": [],
@@ -1053,12 +947,192 @@
        "sensitivity": null,
        "score": 2,
        "evidence": {
-        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000ab9#e0",
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a56#e0",
         "platform": "gemini",
-        "convId": "gemini:c077",
-        "title": "Study group plan",
+        "convId": "gemini:c148",
+        "title": "Tutoring with Priya",
+        "msg": 1,
+        "at": "2026-09-04T20:18:00Z",
+        "stale": false
+       }
+      },
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000a84",
+       "kind": "attribute",
+       "key": "priya_is_a_computer_science_major_from_s",
+       "text": "Priya is a computer science major from San Jose.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ]
+       ],
+       "specifics": [],
+       "importance": 2,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 2,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a84#e0",
+        "platform": "chatgpt",
+        "convId": "chatgpt:c147",
+        "title": "Studying with Priya",
+        "msg": 1,
+        "at": "2026-09-19T16:57:00Z",
+        "stale": false
+       }
+      },
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000a85",
+       "kind": "attribute",
+       "key": "priya_likes_to_study_at_doe_library",
+       "text": "Priya likes to study at Doe Library.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ]
+       ],
+       "specifics": [],
+       "importance": 2,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 2,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a85#e0",
+        "platform": "chatgpt",
+        "convId": "chatgpt:c147",
+        "title": "Studying with Priya",
         "msg": 2,
-        "at": "2026-10-01T03:57:00Z",
+        "at": "2026-09-19T16:59:00Z",
+        "stale": false
+       }
+      },
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000a89",
+       "kind": "event",
+       "key": "priya_s_birthday_is_january_9",
+       "text": "Priya's birthday is January 9.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ]
+       ],
+       "specifics": [],
+       "importance": 2,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 2,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a89#e0",
+        "platform": "chatgpt",
+        "convId": "chatgpt:c149",
+        "title": "Birthday idea for Priya",
+        "msg": 1,
+        "at": "2026-09-21T22:03:00Z",
+        "stale": false
+       }
+      },
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000aa5",
+       "kind": "attribute",
+       "key": "priya_draws_great_system_diagrams",
+       "text": "Priya draws great system diagrams.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ]
+       ],
+       "specifics": [],
+       "importance": 2,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 2,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000aa5#e0",
+        "platform": "claude",
+        "convId": "claude:c313",
+        "title": "Exam prep with Priya",
+        "msg": 1,
+        "at": "2026-10-02T02:44:00Z",
+        "stale": false
+       }
+      },
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000aa6",
+       "kind": "attribute",
+       "key": "priya_and_i_swap_notes_before_cs_162_exa",
+       "text": "Priya and I swap notes before CS 162 exams.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ]
+       ],
+       "specifics": [],
+       "importance": 2,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 2,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000aa6#e0",
+        "platform": "claude",
+        "convId": "claude:c313",
+        "title": "Exam prep with Priya",
+        "msg": 2,
+        "at": "2026-10-02T02:46:00Z",
+        "stale": false
+       }
+      },
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000b0e",
+       "kind": "attribute",
+       "key": "priya_and_i_split_the_cs_162_project_3_d",
+       "text": "Priya and I split the CS 162 project 3 design doc.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ]
+       ],
+       "specifics": [],
+       "importance": 2,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 2,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000b0e#e0",
+        "platform": "chatgpt",
+        "convId": "chatgpt:c146",
+        "title": "Priya and the design doc",
+        "msg": 1,
+        "at": "2026-10-27T19:23:00Z",
         "stale": false
        }
       }
@@ -1068,7 +1142,7 @@
     "hits": [
      {
       "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-000000000137",
+       "id": "ent_0199a5c1-8a00-7000-8000-00000000002a",
        "kind": "person",
        "name": "Priya Raman",
        "path": [
@@ -1078,12 +1152,7 @@
          "kind": "section"
         },
         {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000004b",
-         "name": "Classmates and teachers",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000137",
+         "id": "ent_0199a5c1-8a00-7000-8000-00000000002a",
          "name": "Priya Raman",
          "kind": "person"
         }
@@ -1091,7 +1160,7 @@
       },
       "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000add",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000ace",
         "kind": "attribute",
         "key": "email",
         "text": "Priya Raman's email is priya.raman@northfield.edu.",
@@ -1128,7 +1197,7 @@
         "sensitivity": null,
         "score": 1.4300000000000002,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000add#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000ace#e0",
          "platform": "chatgpt",
          "convId": "chatgpt:maya-people",
          "title": "People I email",
@@ -1138,7 +1207,41 @@
         }
        },
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000adc",
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000aa4",
+        "kind": "attribute",
+        "key": "priya_raman_runs_the_cs_162_study_group",
+        "text": "Priya Raman runs the CS 162 study group.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          0,
+          5
+         ],
+         [
+          6,
+          11
+         ]
+        ],
+        "specifics": [],
+        "importance": 3,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 1.3849549538650148,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000aa4#e0",
+         "platform": "gemini",
+         "convId": "gemini:c037",
+         "title": "Study group plan",
+         "msg": 2,
+         "at": "2026-10-01T21:41:00Z",
+         "stale": false
+        }
+       },
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000acd",
         "kind": "attribute",
         "key": "priya_raman_is_in_my_cs_162_study_group",
         "text": "Priya Raman is in my CS 162 study group.",
@@ -1160,9 +1263,9 @@
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 1.3740497967479675,
+        "score": 1.3529105691056913,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000adc#e0",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000acd#e0",
          "platform": "chatgpt",
          "convId": "chatgpt:maya-people",
          "title": "People I email",
@@ -1170,217 +1273,60 @@
          "at": "2026-10-12T16:04:00Z",
          "stale": false
         }
-       },
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000ab9",
-        "kind": "attribute",
-        "key": "priya_raman_runs_the_cs_162_study_group",
-        "text": "Priya Raman runs the CS 162 study group.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          0,
-          5
-         ],
-         [
-          6,
-          11
-         ]
-        ],
-        "specifics": [],
-        "importance": 2,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 1.26896373725642,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000ab9#e0",
-         "platform": "gemini",
-         "convId": "gemini:c077",
-         "title": "Study group plan",
-         "msg": 2,
-         "at": "2026-10-01T03:57:00Z",
-         "stale": false
-        }
        }
       ],
-      "score": 1.8264520301006582
+      "score": 2.117544643847007
      },
      {
       "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-00000000003d",
-       "kind": "person",
-       "name": "Priya Okafor",
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000016",
+       "kind": "folder",
+       "name": "Fitness",
        "path": [
         {
-         "id": "sec_people",
-         "name": "People",
+         "id": "sec_health",
+         "name": "Health",
          "kind": "section"
         },
         {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000006",
-         "name": "Coworkers and work contacts",
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000016",
+         "name": "Fitness",
          "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000003d",
-         "name": "Priya Okafor",
-         "kind": "person"
         }
        ]
       },
       "facts": [
        {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000935",
+        "id": "fact_0199a5c1-8a00-7000-8000-0000000009cf",
         "kind": "attribute",
-        "key": "priya_okafor_is_the_head_of_the_design_t",
-        "text": "Priya Okafor is the head of the design team at Kestrel.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          0,
-          5
-         ]
-        ],
-        "specifics": [],
-        "importance": 3,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.9120149253731342,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000935#e0",
-         "platform": "gemini",
-         "convId": "gemini:c115",
-         "title": "Message for Priya",
-         "msg": 1,
-         "at": "2026-02-21T23:13:00Z",
-         "stale": false
-        }
-       },
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000936",
-        "kind": "attribute",
-        "key": "priya_runs_the_friday_data_review",
-        "text": "Priya runs the Friday data review.",
-        "status": "active",
-        "progress": null,
-        "highlights": [
-         [
-          0,
-          5
-         ]
-        ],
-        "specifics": [],
-        "importance": 2,
-        "urgency": "none",
-        "urgencyLabel": null,
-        "basis": "user_stated",
-        "sensitivity": null,
-        "score": 0.8393939393939394,
-        "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000936#e0",
-         "platform": "gemini",
-         "convId": "gemini:c115",
-         "title": "Message for Priya",
-         "msg": 2,
-         "at": "2026-02-21T23:15:00Z",
-         "stale": false
-        }
-       }
-      ],
-      "score": 1.0379240162822252
-     },
-     {
-      "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-00000000002b",
-       "kind": "person",
-       "name": "Ellen Collins",
-       "path": [
-        {
-         "id": "sec_people",
-         "name": "People",
-         "kind": "section"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-000000000029",
-         "name": "Family",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002a",
-         "name": "Parents",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000002b",
-         "name": "Ellen Collins",
-         "kind": "person"
-        }
-       ]
-      },
-      "facts": [],
-      "score": 0.5676547842401501
-     },
-     {
-      "node": {
-       "id": "ent_0199a5c1-8a00-7000-8000-0000000000e7",
-       "kind": "person",
-       "name": "Daniel Reyes",
-       "path": [
-        {
-         "id": "sec_people",
-         "name": "People",
-         "kind": "section"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-00000000004b",
-         "name": "Classmates and teachers",
-         "kind": "folder"
-        },
-        {
-         "id": "ent_0199a5c1-8a00-7000-8000-0000000000e7",
-         "name": "Daniel Reyes",
-         "kind": "person"
-        }
-       ]
-      },
-      "facts": [
-       {
-        "id": "fact_0199a5c1-8a00-7000-8000-000000000a13",
-        "kind": "attribute",
-        "key": "professor_reyes_teaches_cs_162",
-        "text": "Professor Reyes teaches CS 162.",
+        "key": "i_run_in_hoka_clifton_shoes",
+        "text": "I run in Hoka Clifton shoes.",
         "status": "active",
         "progress": null,
         "highlights": [],
         "specifics": [],
-        "importance": 3,
+        "importance": 2,
         "urgency": "none",
         "urgencyLabel": null,
         "basis": "user_stated",
         "sensitivity": null,
-        "score": 0.5124661246612466,
+        "score": 0.4804369918699186,
         "evidence": {
-         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000a13#e0",
-         "platform": "gemini",
-         "convId": "gemini:c061",
-         "title": "CS 162 this term",
-         "msg": 2,
-         "at": "2026-08-20T20:14:00Z",
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-0000000009cf#e0",
+         "platform": "claude",
+         "convId": "claude:c324",
+         "title": "Running shoes",
+         "msg": 1,
+         "at": "2026-06-29T17:32:00Z",
          "stale": false
         }
        }
       ],
-      "score": 0.5124661246612466
+      "score": 0.4804369918699186
      }
     ],
     "library": [],
-    "total": 6,
+    "total": 11,
     "capped": false
    }
   },
@@ -1393,12 +1339,10 @@
    "answer": {
     "rows": [
      {
-      "factId": "fact_0199a5c1-8a00-7000-8000-000000000a2b",
+      "factId": "fact_0199a5c1-8a00-7000-8000-000000000a22",
       "text": "The CS 162 final is on December 15.",
       "path": [
        "School",
-       "Classes and subjects",
-       "Computer science",
        "CS 162"
       ],
       "highlights": [
@@ -1413,20 +1357,18 @@
       ],
       "urgency": "none",
       "urgencyLabel": null,
-      "platform": "chatgpt",
-      "convId": "chatgpt:c062",
+      "platform": "claude",
+      "convId": "claude:c034",
       "title": "CS 162 grading",
       "msg": 1,
-      "date": 1787758560000,
-      "score": 1.458671876491818
+      "date": 1787779740000,
+      "score": 1.4654727774724734
      },
      {
-      "factId": "fact_0199a5c1-8a00-7000-8000-000000000aed",
+      "factId": "fact_0199a5c1-8a00-7000-8000-000000000adc",
       "text": "CS 162 project 3 is due November 13.",
       "path": [
        "School",
-       "Classes and subjects",
-       "Computer science",
        "CS 162",
        "CS 162 project 3"
       ],
@@ -1447,7 +1389,7 @@
       "title": "CS 162 deadlines",
       "msg": 1,
       "date": 1792000800000,
-      "score": 1.4560794727476312
+      "score": 1.4546054577228127
      }
     ],
     "late": false
@@ -1455,7 +1397,7 @@
   }
  ],
  "now": {
-  "fact_0199a5c1-8a00-7000-8000-000000000aed": {
+  "fact_0199a5c1-8a00-7000-8000-000000000adc": {
    "text": "CS 162 project 3 is due November 13.",
    "source": {
     "platform": "claude",
@@ -1464,34 +1406,43 @@
     "date": 1792000800000
    }
   },
-  "fact_0199a5c1-8a00-7000-8000-000000000b0b": {
+  "fact_0199a5c1-8a00-7000-8000-00000000091f": {
    "text": "CS 162 project 3 is the file system.",
    "source": {
     "platform": "chatgpt",
-    "convId": "chatgpt:c074",
+    "convId": "chatgpt:c042",
     "title": "CS 162 project 3 file system",
-    "date": 1792974960000
+    "date": 1793038320000
    }
   },
-  "fact_0199a5c1-8a00-7000-8000-000000000b0c": {
+  "fact_0199a5c1-8a00-7000-8000-000000000b08": {
    "text": "The CS 162 project 3 design review is on November 3.",
    "source": {
     "platform": "chatgpt",
-    "convId": "chatgpt:c074",
+    "convId": "chatgpt:c042",
     "title": "CS 162 project 3 file system",
-    "date": 1792975080000
+    "date": 1793038440000
    }
   },
-  "fact_0199a5c1-8a00-7000-8000-000000000a83": {
-   "text": "CS 162 project 1 was user programs in Pintos.",
+  "fact_0199a5c1-8a00-7000-8000-000000000a1f": {
+   "text": "CS 162 projects go in through Gradescope.",
    "source": {
     "platform": "chatgpt",
-    "convId": "chatgpt:c032",
-    "title": "DATA 100 lab 4 notes",
-    "date": 1789149360000
+    "convId": "chatgpt:c287",
+    "title": "Pintos setup",
+    "date": 1787701560000
    }
   },
-  "fact_0199a5c1-8a00-7000-8000-000000000adc": {
+  "fact_0199a5c1-8a00-7000-8000-000000000aa4": {
+   "text": "Priya Raman runs the CS 162 study group.",
+   "source": {
+    "platform": "gemini",
+    "convId": "gemini:c037",
+    "title": "Study group plan",
+    "date": 1790890860000
+   }
+  },
+  "fact_0199a5c1-8a00-7000-8000-000000000acd": {
    "text": "Priya Raman is in my CS 162 study group.",
    "source": {
     "platform": "chatgpt",
@@ -1500,7 +1451,7 @@
     "date": 1791821040000
    }
   },
-  "fact_0199a5c1-8a00-7000-8000-000000000add": {
+  "fact_0199a5c1-8a00-7000-8000-000000000ace": {
    "text": "Priya Raman's email is priya.raman@northfield.edu.",
    "source": {
     "platform": "chatgpt",
@@ -1509,22 +1460,13 @@
     "date": 1791821160000
    }
   },
-  "fact_0199a5c1-8a00-7000-8000-000000000ab9": {
-   "text": "Priya Raman runs the CS 162 study group.",
-   "source": {
-    "platform": "gemini",
-    "convId": "gemini:c077",
-    "title": "Study group plan",
-    "date": 1790827020000
-   }
-  },
-  "fact_0199a5c1-8a00-7000-8000-000000000a2b": {
+  "fact_0199a5c1-8a00-7000-8000-000000000a22": {
    "text": "The CS 162 final is on December 15.",
    "source": {
-    "platform": "chatgpt",
-    "convId": "chatgpt:c062",
+    "platform": "claude",
+    "convId": "claude:c034",
     "title": "CS 162 grading",
-    "date": 1787758560000
+    "date": 1787779740000
    }
   }
  },
@@ -1538,7 +1480,7 @@
   "until": null,
   "stopClass": null,
   "set": {
-   "id": "set_01M63W1PRCE00VP2SC20G8608G",
+   "id": "set_01M63W0VWPE00VSZA1HPFMG2RW",
    "origin": "library",
    "mode": "direct",
    "state": "running",
@@ -1554,7 +1496,7 @@
   "held": null,
   "counts": {
    "memories": 532,
-   "dueSoon": 1,
+   "dueSoon": 0,
    "review": 0,
    "sourceChats": 324,
    "sourceChatsBy": {
@@ -1569,7 +1511,7 @@
    "refusedJobs": 0
   },
   "spend": {
-   "monthMicros": 189,
+   "monthMicros": 181,
    "capMicros": 200000000
   },
   "poolSlots": {

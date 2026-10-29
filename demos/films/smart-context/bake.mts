@@ -65,14 +65,16 @@ const query = { platform: 'chatgpt', chat: { kind: 'draft', session: 'bake' }, t
 const graph = await api('memory.contextGraph', query)
 console.error(`graph: ${graph.nodes.length} nodes, ${graph.nodes.reduce((n: number, x: { memories: number[] }) => n + x.memories.length, 0)} memory dots, more ${graph.more}`)
 
-// What the memory search finds as she types, each step of the word, with nothing skipped: the tab skips what already goes.
+// What the memory search finds as she types, each step of the word. The tab sends what already goes with her draft as `skip`
+// (the interview and Tidepool; About me is no node), and the search leaves those out, so the top rows are four others.
 const WORDS = ['plan']
+const going = [maya.ids.things.pearx!, maya.ids.things.tidepool!]
 const find: Record<string, unknown> = {}
 for (const word of WORDS)
   for (let i = 0; i <= word.length; i++) {
     const q = word.slice(0, i)
     if (q in find) continue
-    find[q] = await api('memory.contextFind', { ...query, query: q, skip: [] })
+    find[q] = await api('memory.contextFind', { ...query, query: q, skip: going })
   }
 console.error('plan finds', JSON.stringify((find.plan as { results: Array<{ id: string }> }).results.map((r) => rows.find((x) => x.id === r.id)?.name)), (find.plan as { lit: string[] }).lit.length, 'lit')
 
@@ -88,7 +90,7 @@ const pathOf = (key: string): string[] => {
 }
 const chatsOf = (text: string) => world.facts.find((f) => f.text === text)?.chats.map((c) => maya.chatIds[c]!) ?? []
 const featured: Record<string, unknown> = {}
-for (const key of ['pearx', 'tidepool', 'launch', 'stripe', 'skipdoodle', 'iris']) {
+for (const key of ['pearx', 'tidepool', 'launch', 'stripe', 'skipdoodle']) {
   featured[key] = {
     id: maya.ids.things[key],
     path: pathOf(key),

@@ -19,7 +19,8 @@ import { setupConsole } from "./console";
  * Her memory is the whole of it: 532 memories from 324 chats (ChatGPT 148,
  * Claude 102, Gemini 74), written by maya-world.mts and maya-memory.mts
  * through coere-v2's own write path and read back by its memory core
- * (bake.mts), so the memory search draws her real, dense graph.
+ * (bake.mts), so the memory search draws her real graph: about a dozen
+ * sections, each with a few folders and a small fan of memories round each.
  */
 
 const MAYA = { name: "Maya Collins", first: "Maya", initials: "MC" };

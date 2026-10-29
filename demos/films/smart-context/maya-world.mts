@@ -1,17 +1,25 @@
 /**
  * Maya Collins's world, as her memory holds it after a year of chats:
- * 324 chats (ChatGPT 148, Claude 102, Gemini 74) and the things and
- * memories they taught, from school, work, Tidepool and her side
- * projects to the people, plans, trips, health, money, home, hobbies and
- * food in her life. It is the same person the films show: the Smart
- * context film's interview, Tidepool and SkipDoodle, and the Cori chat
- * film's CS 162 project and the people she writes to.
+ * 324 chats (ChatGPT 148, Claude 102, Gemini 74) and the memories they
+ * taught. It is the same person the films show: the Smart context film's
+ * interview, Tidepool and SkipDoodle, and the Cori chat film's CS 162
+ * project and the people she writes to.
  *
- * Seeded and deterministic: the same seed gives the same world. Most of
- * it is made from small pools and templates (her courses' weeks, the
- * people she knows, the companies she applied to), and the lines the
- * films show are written as the films say them. Nothing here imports
- * coere-v2; maya-memory.mts writes it into a real memory store.
+ * Her memory is filed the way a real library leans (the owner's graph
+ * brief, coere-v2 packages/ui/src/gallery/sample-graph.ts): about a dozen
+ * sections, each with two to four folders, and each folder a tidy handful
+ * of memories. A folder is one place in her memory: a course, a project, a
+ * person, or a folder of her own notes (Events, Budget, Emails). Her
+ * courses hold their deadlines, grades and notes, not numbered work; her
+ * job holds its people and studies. A few small things sit loose on a
+ * section, and some of her memories sit on a section itself, as a real
+ * memory keeps them.
+ *
+ * Seeded and deterministic: the same seed gives the same world. The lines
+ * the films show are written as the films say them, in the chats the films
+ * name, and the chats behind them are fixed, so every "From N chats" the
+ * strip shows stays as it was. Nothing here imports coere-v2;
+ * maya-memory.mts writes it into a real memory store.
  *
  * Every name is made up.
  */
@@ -94,13 +102,8 @@ function seeded(seed: number): () => number {
   }
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-const FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 /** "2026-10-14" from a day of 2026 counted from Jan 1 (0). */
 const iso = (dayOfYear: number, year = 2026): string => new Date(Date.UTC(year, 0, 1 + dayOfYear)).toISOString().slice(0, 10)
-const doy = (date: string): number => Math.round((Date.parse(`${date}T00:00:00Z`) - Date.parse(`${date.slice(0, 4)}-01-01T00:00:00Z`)) / 86_400_000)
-/** "Oct 14" for a date. */
-const short = (date: string): string => `${MONTHS[Number(date.slice(5, 7)) - 1]} ${Number(date.slice(8, 10))}`
 /** A name inside a sentence or a title: its first word lowered when that word is a plain one ("Lunch with Lena Delacroix", "the clinic wait times study"); a name stays as it is. */
 const PROPER = new Set(['Japanese', 'Tuesday', 'Women', 'Bay', 'Portuguese', 'Spring', 'Iris', 'Lena', 'Dana', 'Alex', 'Elena'])
 const lower = (s: string): string => {
@@ -197,20 +200,57 @@ const say = (s: string, text: string, o: Omit<Say, 's' | 'text'> = {}): Say => (
 /** A memory about her, filed in a folder of a section. */
 const mine = (folder: string, text: string, o: Omit<Say, 's' | 'text' | 'under'> = {}): Say => ({ s: 'self', text, under: `folder:${folder}`, ...o })
 
+/** A memory about her, filed on one of her things (a course, a project, a person). */
+const on = (thing: string, text: string, o: Omit<Say, 's' | 'text' | 'under'> = {}): Say => ({ s: 'self', text, under: thing, ...o })
+
+/** One line of a chat: a memory's words for the place the chat is about, with its options, or a memory said elsewhere. */
+type Line = string | [string, Omit<Say, 's' | 'text' | 'under'>] | Say
+/** A chat: its title, its lines, and the day it was had or a span of days to pick from, and its AI when the film names it. */
+type Talk = [title: string, lines: Line[], when?: string | [number, number], platform?: Platform]
+
+/**
+ * Chats about one place in her memory. `at` is a thing's key (its own
+ * memories) or `folder:<section>/<Folder>` (hers, filed there), or
+ * `self@<thing>` for hers filed on a thing.
+ */
+function place(w: Builder, at: string, talks: Talk[], days: [number, number] = [10, 299]): void {
+  const lineOf = (l: Line): Say => {
+    if (typeof l === 'object' && !Array.isArray(l)) return l
+    const [text, o] = typeof l === 'string' ? [l, {}] : l
+    if (at.startsWith('folder:')) return mine(at.slice('folder:'.length), text, o)
+    if (at.startsWith('self@')) return on(at.slice('self@'.length), text, o)
+    return say(at, text, o)
+  }
+  for (const [title, lines, when, platform] of talks) {
+    const span = Array.isArray(when) ? when : days
+    const day = typeof when === 'string' ? when : iso(w.int(span[0], span[1]))
+    w.chat(title, day, lines.map(lineOf), platform)
+  }
+}
+
 // ---------------------------------------------------------------- the films' own lines
 
-/** What the Smart context film shows and the Cori chat film asks about, said in the chats the films name. */
+/**
+ * What the Smart context film shows and the Cori chat film asks about,
+ * said in the chats the films name. The chats behind the strip's memories
+ * are fixed here, with their AIs, so the strip's counts never move: the
+ * interview from six chats, Tidepool from nine, the launch talk from two,
+ * the Stripe application from three and who she is from fifteen.
+ */
 function filmed(w: Builder): void {
-  w.thing('tidepool', 'Tidepool', 'project', 'projects/Startups and businesses', 5)
-  w.thing('pearx', 'PearX interview', 'event', 'projects/Startups and businesses', 5)
-  w.thing('launch', 'Tidepool launch day talk', 'event', 'projects/Startups and businesses', 4)
+  w.thing('tidepool', 'Tidepool', 'project', 'projects', 5)
+  w.thing('launch', 'Tidepool launch day talk', 'event', { parent: 'tidepool' }, 4)
+  w.thing('skipdoodle', 'SkipDoodle', 'project', 'projects', 4)
+  w.thing('sparrowhawk', 'Sparrowhawk', 'project', 'projects', 4)
+  w.thing('kitchen', 'Kitchen remodel', 'project', 'projects', 2)
+  w.thing('kestrel', 'Kestrel Analytics', 'organization', 'work', 5, ['Kestrel'])
+  w.thing('pearx', 'PearX interview', 'event', 'work/Interviews', 5)
   w.thing('stripe', 'Stripe application', 'task', 'work/Job applications', 4)
   w.thing('notion', 'Notion PM role', 'task', 'work/Job applications', 3)
-  w.thing('skipdoodle', 'SkipDoodle', 'project', 'projects/Software and apps', 4)
-  w.thing('sparrowhawk', 'Sparrowhawk', 'project', 'projects/Software and apps', 4)
-  w.thing('kitchen', 'Kitchen remodel', 'project', 'projects/Home projects', 3)
-  w.thing('kestrel', 'Kestrel Analytics', 'organization', 'work', 5, ['Kestrel'])
-  w.thing('iris', 'Iris Sato', 'person', 'people/Coworkers and work contacts', 4)
+  w.thing('berkeley', 'UC Berkeley', 'organization', 'school', 3, ['Cal'])
+  w.thing('cs162', 'CS 162', 'course', 'school', 5)
+  w.thing('cs162_p3', 'CS 162 project 3', 'project', { parent: 'cs162' }, 4)
+  w.thing('harbor', 'Harbor Clinic', 'organization', 'health', 2)
 
   const pearx = {
     when: say('pearx', 'The PearX interview is on November 4 at 2 pm over video.', { kind: 'event', imp: 5, due: '2026-11-04' }),
@@ -232,10 +272,14 @@ function filmed(w: Builder): void {
   w.chat('Practice questions for PearX', '2026-10-22', [pearx.traction, say('pearx', 'I practice my PearX answers with Iris on Sunday nights.', { imp: 3 })], 'chatgpt')
   w.chat('Why now story', '2026-10-24', [pearx.whyNow, say('pearx', 'The why now story is that clinics moved their records online in the last two years.', { imp: 3 })], 'claude')
   w.chat('PearX application', '2026-09-20', [say('pearx', 'I applied to PearX for the winter batch in September.', { imp: 3 }), pearx.forTidepool], 'gemini')
+  w.chat('Following up on PearX interview', '2026-10-26', [pearx.forTidepool], 'gemini')
   w.chat('Tidepool one line pitch', '2026-07-02', [tide.what, say('tidepool', 'The one line pitch is online booking for small clinics that still run on the phone.', { imp: 3 })], 'claude')
-  w.chat('Cofounder agreement', '2026-03-12', [tide.team, say('iris', 'Iris Sato and I split Tidepool equity evenly.', { imp: 3 })], 'chatgpt')
+  w.chat('Cofounder agreement', '2026-03-12', [tide.team, on('tidepool', 'Iris Sato and I split Tidepool equity evenly.', { imp: 3 })], 'chatgpt')
+  w.chat('Notes on Tidepool', '2026-10-11', [tide.team], 'claude')
   w.chat('Pre seed round notes', '2026-06-08', [tide.money, say('tidepool', 'Hearth Ventures led the Tidepool pre seed, with two angels.', { imp: 3 })], 'gemini')
+  w.chat('More on Tidepool', '2026-09-14', [tide.money], 'chatgpt')
   w.chat('Tidepool metrics for October', '2026-10-03', [tide.users, say('tidepool', 'Tidepool grows about 15 percent a month.', { imp: 4 })], 'chatgpt')
+  w.chat('Investor update October', '2026-10-06', [tide.users, say('tidepool', 'The October investor update leads with the 15 percent growth.', { imp: 3 })], 'claude')
 
   const launch = [
     say('launch', 'Keep the Tidepool launch day talk under three minutes and end on the ask.', { kind: 'instruction', imp: 4 }),
@@ -262,20 +306,30 @@ function filmed(w: Builder): void {
   // Who she is, said in the chats over the year: the lines her About me is made from.
   const job = mine('work', 'I work at Kestrel Analytics as a lead research assistant.', { imp: 5, core: true, claim: 'job_title' })
   const name = mine('personal', 'My name is Maya Collins.', { imp: 5, core: true, claim: 'name' })
-  const style = mine('style/Short warm sentences', 'When I write, I use short warm sentences and never use exclamation marks.', { kind: 'style', imp: 5, core: true })
+  const style = mine('style', 'When I write, I use short warm sentences and never use exclamation marks.', { kind: 'style', imp: 5, core: true })
+  const major = on('berkeley', 'I am a third year data science major at UC Berkeley.', { imp: 5, core: true })
+  const term = say('berkeley', "I'm taking DATA 100, MATH 54, PHYS 137 and CS 162 this term.", { imp: 4 })
+  const sparrow = say('sparrowhawk', 'Sparrowhawk is the volunteer app for the East Bay bird rescue.', { imp: 4, core: true })
   w.chat('Kestrel first week', '2026-01-12', [job, say('kestrel', 'Kestrel Analytics does research studies for health and city clients.', { imp: 4 })], 'claude')
   w.chat('Rewrite my LinkedIn summary', '2026-02-03', [job, name, style], 'chatgpt')
   w.chat('Cover letter for Stripe', '2026-09-09', [name, job, stripe], 'claude')
   w.chat('Edit this email to Nadia', '2026-05-14', [style, say('kestrel', 'Kestrel Analytics has about forty people in its Oakland office.', { imp: 2 })], 'gemini')
-  w.chat('Make this sound like me', '2026-07-21', [style, mine('style/Greetings and sign offs', 'I sign my emails with Thanks, then my first name.', { kind: 'style', imp: 3 })], 'claude')
+  w.chat('Make this sound like me', '2026-07-21', [style, mine('style/Emails', 'I sign my emails with Thanks, then my first name.', { kind: 'style', imp: 3 })], 'claude')
+  w.chat('Classes this term', '2026-08-25', [term, major], 'chatgpt')
+  w.chat('Fall schedule check', '2026-08-18', [term, mine('school', 'I keep Friday afternoons free for Tidepool.', { imp: 3 })], 'gemini')
+  w.chat('Data science major requirements', '2026-04-02', [major, mine('school', 'I still need one domain emphasis course for the data science major.', { imp: 3 })], 'gemini')
+  w.chat('Working on Tidepool tonight', '2026-09-30', [on('tidepool', 'I spend most evenings on Tidepool.', { imp: 4, core: true })], 'claude')
+  w.chat('Working on SkipDoodle', '2026-09-27', [on('skipdoodle', 'I work on SkipDoodle on weekends.', { imp: 3, core: true })], 'gemini')
+  w.chat('Sparrowhawk database upgrade', '2026-09-18', [say('sparrowhawk', 'Sparrowhawk runs on Postgres 16 after the upgrade.', { imp: 3 }), sparrow], 'chatgpt')
+  w.chat('Back to Sparrowhawk', '2026-10-21', [sparrow], 'claude')
 
   // The Cori chat film: the people she writes to, the course's due date and the clinic's form (coere-v2 tools/gen-fake-memory/maya).
-  w.thing('sam_lee', 'Sam Lee', 'person', 'people/Classmates and teachers', 3)
-  w.thing('priya_raman', 'Priya Raman', 'person', 'people/Classmates and teachers', 3)
-  w.thing('jordan', 'Jordan Ellis', 'person', 'people/Service providers', 3)
-  w.thing('reyes', 'Daniel Reyes', 'person', 'people/Classmates and teachers', 3, ['Professor Reyes', 'Prof. Reyes'])
-  w.thing('alex_kim', 'Alex Kim', 'person', 'people/Friends', 3)
-  w.thing('nora', 'Nora Patel', 'person', 'people/Service providers', 3)
+  w.thing('priya_raman', 'Priya Raman', 'person', 'people', 4)
+  w.thing('sam_lee', 'Sam Lee', 'person', 'people', 2)
+  w.thing('reyes', 'Daniel Reyes', 'person', 'people', 2, ['Professor Reyes', 'Prof. Reyes'])
+  w.thing('jordan', 'Jordan Ellis', 'person', 'people', 2)
+  w.thing('alex_kim', 'Alex Kim', 'person', 'people', 2)
+  w.thing('nora', 'Nora Patel', 'person', { parent: 'harbor' }, 2)
   const email = (s: string, who: string, address: string) =>
     say(s, `${who}'s email is ${address}.`, { claim: 'email', value: { type: 'email', email: address }, specific: { type: 'email', text: address } })
   w.chat('People I email', '2026-10-12T16:00:00Z', [
@@ -293,597 +347,566 @@ function filmed(w: Builder): void {
     email('nora', 'Nora Patel', 'nora.patel@harborclinic.org'),
   ], 'chatgpt', 'maya-people')
   w.chat('Clinic paperwork', '2026-10-16T18:00:00Z', [
-    mine('personal/Contact details', 'My email is maya.collins@gmail.com.', { claim: 'email', value: { type: 'email', email: 'maya.collins@gmail.com' }, specific: { type: 'email', text: 'maya.collins@gmail.com' } }),
-    mine('personal/Contact details', 'My cell is (510) 555-0142.', { claim: 'phone', value: { type: 'phone', phone: '(510) 555-0142' }, specific: { type: 'phone', text: '(510) 555-0142' } }),
+    mine('personal', 'My email is maya.collins@gmail.com.', { claim: 'email', value: { type: 'email', email: 'maya.collins@gmail.com' }, specific: { type: 'email', text: 'maya.collins@gmail.com' } }),
+    mine('personal', 'My cell is (510) 555-0142.', { claim: 'phone', value: { type: 'phone', phone: '(510) 555-0142' }, specific: { type: 'phone', text: '(510) 555-0142' } }),
     mine('personal', 'My date of birth is 2005-03-14.', { claim: 'birth_date' }),
-    mine('personal/Contact details', 'My street address is 2412 Durant Ave, Apt 3, Berkeley, California 94704.', { claim: 'street_address', sens: 'location' }),
+    mine('personal', 'My street address is 2412 Durant Ave, Apt 3, Berkeley, California 94704.', { claim: 'street_address', sens: 'location' }),
   ], 'claude', 'maya-clinic')
-}
-
-// ---------------------------------------------------------------- school
-
-interface Course {
-  key: string
-  code: string
-  folder: string
-  prof: [key: string, name: string]
-  meets: string
-  term: 'fall' | 'spring'
-  /** What each week's work was on. */
-  weeks: string[]
-  work: 'Lab' | 'Problem Set' | 'Homework'
-  extra?: string[]
-}
-
-const FALL: Course[] = [
-  {
-    key: 'data100', code: 'DATA 100', folder: 'school/Classes and subjects/Data science', prof: ['prof_kim', 'Prof. Kim'], meets: 'Tuesday and Thursday at 11', term: 'fall', work: 'Lab',
-    weeks: ['pandas basics', 'data cleaning', 'joins and groupby', 'visualization', 'sampling', 'linear regression', 'feature engineering', 'cross validation', 'logistic regression', 'PCA'],
-    extra: ['DATA 100 Project 1 uses the housing data.', 'DATA 100 Project 2 uses the Bay Area transit data.'],
-  },
-  {
-    key: 'math54', code: 'MATH 54', folder: 'school/Classes and subjects/Mathematics', prof: ['prof_hartmann', 'Prof. Hartmann'], meets: 'Monday, Wednesday and Friday at 9', term: 'fall', work: 'Problem Set',
-    weeks: ['row reduction', 'matrix algebra', 'determinants', 'vector spaces', 'eigenvalues', 'diagonalization', 'orthogonality', 'least squares', 'first order ODEs'],
-  },
-  {
-    key: 'phys137', code: 'PHYS 137', folder: 'school/Classes and subjects/Physics', prof: ['prof_alvarez', 'Prof. Alvarez'], meets: 'Tuesday and Thursday at 2', term: 'fall', work: 'Problem Set',
-    weeks: ['waves', 'interference', 'diffraction', 'the photoelectric effect', 'the Bohr model', 'wave functions', 'the infinite well', 'tunneling'],
-  },
-  {
-    key: 'cs162', code: 'CS 162', folder: 'school/Classes and subjects/Computer science', prof: ['reyes', 'Professor Reyes'], meets: 'Monday and Wednesday at 4', term: 'fall', work: 'Homework',
-    weeks: ['processes', 'threads', 'locks', 'semaphores', 'scheduling', 'deadlock', 'virtual memory', 'caching'],
-  },
-]
-
-const SPRING: Array<{ key: string; code: string; folder: string; grade: string; items: Array<[string, string]> }> = [
-  { key: 'cs61b', code: 'CS 61B', folder: 'school/Classes and subjects/Computer science', grade: 'an A minus', items: [['Project 1', 'CS 61B Project 1 was a deque in Java.'], ['Project 2', 'CS 61B Project 2 was Gitlet, a small version control system.'], ['Final', 'The CS 61B final was on May 12.']] },
-  { key: 'stat20', code: 'STAT 20', folder: 'school/Classes and subjects/Mathematics', grade: 'an A', items: [['Midterm', 'I got a 91 on the STAT 20 midterm.'], ['Final project', 'My STAT 20 final project looked at BART delays.']] },
-  { key: 'econ1', code: 'ECON 1', folder: 'school/Classes and subjects/Economics', grade: 'a B plus', items: [['Problem Set 3', 'ECON 1 Problem Set 3 was on supply shocks.'], ['Final', 'The ECON 1 final was open note.']] },
-  { key: 'r1b', code: 'ENGLISH R1B', folder: 'school/Classes and subjects/English and writing', grade: 'an A minus', items: [['Research essay', 'My R1B research essay was on public libraries.'], ['Essay 2', 'R1B Essay 2 was a close reading of a short story.']] },
-]
-
-/** The fall's start: week 1's work is due Aug 22. */
-const WEEK1 = doy('2026-08-22')
-const TODAY = doy('2026-10-29')
-
-function school(w: Builder): void {
-  w.thing('prof_kim', 'Prof. Kim', 'person', 'people/Classmates and teachers', 2)
-  w.thing('prof_hartmann', 'Prof. Hartmann', 'person', 'people/Classmates and teachers', 2)
-  w.thing('prof_alvarez', 'Prof. Alvarez', 'person', 'people/Classmates and teachers', 2)
-  w.thing('berkeley', 'UC Berkeley', 'organization', 'school/Schools attended', 4, ['Cal'])
-  const rooms = ['Soda 306', 'Evans 10', 'Wheeler 150', 'Dwinelle 155', 'Physics 1']
-  const term = say('berkeley', "I'm taking DATA 100, MATH 54, PHYS 137 and CS 162 this term.", { imp: 4 })
-  w.chat('Classes this term', '2026-08-25', [term, mine('school/Academic life', 'I am a third year data science major at UC Berkeley.', { imp: 5, core: true })], 'chatgpt')
-  w.chat('Fall schedule check', '2026-08-18', [term, mine('school/Academic life', 'I keep Friday afternoons free for Tidepool.', { imp: 3 })])
-  w.chat('Data science major requirements', '2026-04-02', [
-    mine('school/Academic life', 'I am a third year data science major at UC Berkeley.', { imp: 5, core: true }),
-    mine('school/Academic life', 'I still need one domain emphasis course for the data science major.', { imp: 3 }),
-  ])
-  w.chat('Minor in public health', '2026-04-20', [mine('school/Academic life', 'I am thinking about a public health minor.', { imp: 2 })])
-  w.chat('Meeting my advisor', '2026-09-16', [mine('school/Academic life', 'My advisor is Dr. Okonkwo and we meet once a term.', { imp: 2 }), mine('school/Academic life', 'I plan to graduate in May 2028.', { imp: 4 })])
-
-  for (const c of FALL) {
-    w.thing(c.key, c.code, 'course', c.folder, 4)
-    const facts = [
-      say(c.key, `${c.code} meets ${c.meets}.`, { imp: 3 }),
-      say(c.prof[0], `${c.prof[1]} teaches ${c.code}.`, { imp: 3 }),
-      say(c.key, `${c.code} office hours are on ${w.pick(['Monday', 'Tuesday', 'Wednesday', 'Thursday'])} at ${w.int(1, 5)} in ${w.pick(rooms)}.`, { imp: 2 }),
-      say(c.key, `The ${c.code} final is on December ${w.int(14, 18)}.`, { kind: 'event', imp: 4 }),
-      say(c.key, `${c.code} grades are ${w.pick(['40 percent', '30 percent', '50 percent'])} homework and the rest exams.`, { imp: 2 }),
-    ]
-    w.chat(`${c.code} this term`, iso(WEEK1 - w.int(1, 4)), facts.slice(0, 3), c.code === 'MATH 54' ? 'chatgpt' : undefined)
-    w.chat(`${c.code} grading`, iso(WEEK1 + w.int(3, 10)), facts.slice(3))
-    if (c.code === 'MATH 54') w.chat('MATH 54 this term', '2026-08-27', [say('math54', 'MATH 54 homework is graded on effort.', { imp: 3 })], 'chatgpt')
-    if (c.code === 'PHYS 137') w.chat('PHYS 137 lab 1 done', '2026-09-08', [say('phys137', 'PHYS 137 lab 1 is done.', { imp: 2 })], 'chatgpt')
-    // Each week's work: done ones with what it was on and how it went, the next ones with a due date.
-    let pending: Say[] = []
-    let last = ''
-    c.weeks.forEach((topic, i) => {
-      const n = i + 1
-      const due = iso(WEEK1 + 7 * i + (c.key === 'phys137' ? 0 : c.key === 'math54' ? -1 : c.key === 'cs162' ? 1 : 0))
-      const name = `${c.work} ${n}`
-      const key = `${c.key}_${slug(name)}`
-      w.thing(key, name, 'task', { parent: c.key }, doy(due) >= TODAY ? 4 : 2)
-      const done = doy(due) < TODAY
-      const said: Say[] = [say(key, `${c.code} ${name} is on ${topic}.`, { imp: 2 })]
-      if (c.key !== 'cs162' || !done) said.push(say(key, `${c.code} ${name} is due ${short(due)}.`, done ? { imp: 2 } : { imp: 4, due }))
-      if (done && w.rand() < 0.5) said.push(say(key, `I got ${w.pick(['full credit', 'a 9 out of 10', 'an 8 out of 10', '18 out of 20'])} on ${c.code} ${name}.`, { imp: 2 }))
-      pending.push(...said)
-      last = due
-      if (pending.length >= 3 || i === c.weeks.length - 1) {
-        const verb = w.pick(['help', 'questions', 'check', 'notes', 'hints', 'review'])
-        w.chat(`${c.code} ${name.toLowerCase()} ${verb}`, iso(doy(last) - w.int(1, 4)), pending)
-        pending = []
-      }
-    })
-    w.thing(`${c.key}_midterm`, 'Midterm', 'event', { parent: c.key }, 3)
-    const mid = iso(WEEK1 + 40 + w.int(0, 6))
-    w.chat(`Studying for the ${c.code} midterm`, iso(doy(mid) - 3), [say(`${c.key}_midterm`, `The ${c.code} midterm is on ${short(mid)}.`, { imp: 3 })])
-    w.chat(`${c.code} midterm results`, iso(doy(mid) + 6), [say(`${c.key}_midterm`, `I got a ${w.int(78, 94)} on the ${c.code} midterm.`, { imp: 3 })])
-  }
-  // DATA 100's projects, CS 162's three projects and the history reading list.
-  w.thing('data100_p1', 'Project 1', 'project', { parent: 'data100' }, 3)
-  w.thing('data100_p2', 'Project 2', 'project', { parent: 'data100' }, 4)
-  w.chat('DATA 100 project 1 cleaning', '2026-09-18', [say('data100_p1', 'DATA 100 Project 1 uses the housing data.', { imp: 3 }), say('data100_p1', 'I got 47 out of 50 on DATA 100 Project 1.', { imp: 2 })])
-  w.chat('DATA 100 project 2 plan', '2026-10-21', [say('data100_p2', 'DATA 100 Project 2 uses the Bay Area transit data.', { imp: 3 }), say('data100_p2', 'DATA 100 Project 2 is due Nov 20.', { imp: 4, due: '2026-11-20' })])
-  w.chat('DATA 100 problem set due date', '2026-08-30', [say('data100', 'Problem Set 1 for DATA 100 is due Sep 5.', { imp: 2 })], 'chatgpt')
-  w.thing('cs162_p1', 'CS 162 project 1', 'project', { parent: 'cs162' }, 3)
-  w.thing('cs162_p2', 'CS 162 project 2', 'project', { parent: 'cs162' }, 3)
-  w.thing('cs162_p3', 'CS 162 project 3', 'project', { parent: 'cs162' }, 4)
-  w.chat('CS 162 project 1 user programs', '2026-09-14', [say('cs162_p1', 'CS 162 project 1 was user programs in Pintos.', { imp: 2 }), say('cs162_p1', 'Our group got a 92 on CS 162 project 1.', { imp: 2 })])
-  w.chat('CS 162 project 2 threads', '2026-10-05', [say('cs162_p2', 'CS 162 project 2 was the thread scheduler.', { imp: 2 }), say('sam_lee', 'Sam Lee pushed the lock fixes for our scheduler.', { imp: 2 })])
   w.chat('CS 162 deadlines', '2026-10-14T18:00:00Z', [
     say('cs162_p3', 'CS 162 project 3 is due November 13.', { kind: 'task', imp: 4, due: '2026-11-13', specific: { type: 'date', text: 'November 13' } }),
     mine('personal', 'I live in Berkeley.', { imp: 4, claim: 'city', core: true }),
   ], 'claude', 'maya-school')
-  w.chat('CS 162 project 3 file system', '2026-10-26', [say('cs162_p3', 'CS 162 project 3 is the file system.', { imp: 3 }), say('cs162_p3', 'The CS 162 project 3 design review is on November 3.', { imp: 3 })])
-  w.thing('history', 'History reading list', 'topic', 'school/Classes and subjects/History', 2)
-  w.chat('History reading list', '2026-09-03', [say('history', 'The history reading list has six books for the term.', { imp: 2 })], 'chatgpt')
-  w.chat('Reading list book two', '2026-09-24', [say('history', 'The second book on the history reading list is about the Gold Rush.', { imp: 2 })])
-  w.thing('study_group', 'CS 162 study group', 'group', 'school/Studying', 3)
-  w.chat('Study group plan', '2026-10-01', [say('study_group', 'The CS 162 study group meets Thursday at 6 in Soda 405.', { imp: 3 }), say('priya_raman', 'Priya Raman runs the CS 162 study group.', { imp: 2 })])
-  w.thing('tutoring', 'DATA 8 tutoring', 'task', 'school/Campus life', 3)
-  w.chat('Tutoring hours', '2026-09-02', [say('tutoring', 'I tutor DATA 8 students on Monday evenings.', { imp: 3 }), say('tutoring', 'Tutoring pays 22 dollars an hour.', { imp: 2, sens: 'finance' })])
-
-  for (const c of SPRING) {
-    w.thing(c.key, c.code, 'course', c.folder, 2)
-    w.chat(`${c.code} final grade`, iso(doy('2026-05-20') + w.int(0, 8)), [say(c.key, `I took ${c.code} last spring and got ${c.grade}.`, { imp: 2 })])
-    for (const [name, text] of c.items) {
-      const key = `${c.key}_${slug(name)}`
-      w.thing(key, name, 'task', { parent: c.key }, 2)
-      w.chat(`${c.code} ${name.toLowerCase()}`, iso(doy('2026-02-01') + w.int(0, 100)), [say(key, text, { imp: 2 })])
-    }
-  }
 }
 
-// ---------------------------------------------------------------- people
+// ---------------------------------------------------------------- school: four courses, and what sits loose
 
-const FRIENDS: Array<[string, string]> = [
-  ['lena', 'Lena Delacroix'], ['caleb', 'Caleb Moreau'], ['omar', 'Omar Haddad'], ['silas', 'Silas Haddad'], ['june', 'June Park'], ['marcus', 'Marcus Bell'],
-  ['tess', 'Tess Whitaker'], ['ravi', 'Ravi Menon'], ['hana', 'Hana Ito'], ['diego', 'Diego Ruiz'], ['nina', 'Nina Kowalski'], ['ellie', 'Ellie Brandt'],
-]
-const COWORKERS: Array<[string, string, string]> = [
-  ['nadia', 'Nadia Reyes', 'my manager at Kestrel Analytics'], ['priya_okafor', 'Priya Okafor', 'the head of the design team at Kestrel'], ['dana', 'Dana Brooks', 'a research analyst at Kestrel'],
-  ['owen', 'Owen Fischer', 'a data engineer at Kestrel'], ['amara', 'Amara Osei', 'a survey lead at Kestrel'], ['ben_k', 'Ben Kaplan', 'the client lead for health studies at Kestrel'],
-  ['leah', 'Leah Moran', 'an intern on my team at Kestrel'], ['victor', 'Victor Chen', 'the head of research at Kestrel'],
-]
-const CLASSMATES: Array<[string, string, string]> = [
-  ['zoe', 'Zoe Martin', 'DATA 100'], ['kenji', 'Kenji Watanabe', 'MATH 54'], ['aisha', 'Aisha Rahman', 'PHYS 137'], ['luca', 'Luca Romano', 'DATA 100'], ['grace', 'Grace Liu', 'MATH 54'], ['tom', 'Tom Becker', 'PHYS 137'],
-]
-const FAMILY: Array<[string, string, string, string]> = [
-  ['mom', 'Ellen Collins', 'Parents', 'My mom, Ellen Collins, is a nurse in Sacramento.'],
-  ['dad', 'Mark Collins', 'Parents', 'My dad, Mark Collins, teaches high school history.'],
-  ['theo', 'Theo Collins', 'Siblings', 'My brother Theo is a high school senior.'],
-  ['grandma', 'Rose Collins', 'Grandparents', 'My grandma Rose lives in Fresno.'],
-  ['aunt', 'Carol Diaz', 'Extended family', 'My aunt Carol hosts Thanksgiving every year.'],
-  ['ben_cousin', 'Ben Diaz', 'Extended family', 'My cousin Ben is studying nursing in San Diego.'],
-]
-const ORIGINS = ['high school in Sacramento', 'my freshman dorm', 'Tuesday soccer', 'the climbing gym', 'my R1B class', 'Kestrel', 'a hackathon last year']
-const CITIES = ['Oakland', 'San Francisco', 'Sacramento', 'Portland', 'Seattle', 'Los Angeles', 'Davis', 'Berkeley']
-const INTO = ['pottery', 'trail running', 'jazz records', 'film photography', 'board games', 'baking bread', 'birding', 'rock climbing', 'chess', 'thrifting']
-const JOBS = ['Airtable', 'a design studio', 'Kaiser', 'a climate startup', 'the city library', 'Lyft', 'a law firm', 'a coffee roaster']
+function school(w: Builder): void {
+  w.thing('math54', 'MATH 54', 'course', 'school', 4)
+  w.thing('phys137', 'PHYS 137', 'course', 'school', 4)
+  w.thing('data100', 'DATA 100', 'course', 'school', 4)
+  w.thing('history', 'History reading list', 'topic', 'school', 2)
 
-function people(w: Builder): void {
-  const day = () => `${FULL[w.int(0, 11)]} ${w.int(1, 28)}`
-  for (const [key, name] of FRIENDS) w.thing(key, name, 'person', 'people/Friends', key === 'lena' ? 4 : 2)
-  w.chat('Gift for Lena', '2026-04-06', [say('lena', 'Lena Delacroix is my oldest friend from school.', { imp: 4 }), say('lena', 'Lena loves anything with lemons.', { imp: 2 })], 'gemini')
-  w.chat('Omar and Lena', '2026-06-14', [say('omar', 'Omar Haddad is marrying Lena in December.', { imp: 3 }), say('silas', "Silas Haddad is Omar's brother.", { imp: 2 })], 'gemini')
-  w.chat('Soccer friends', '2026-03-03', [say('caleb', 'Caleb Moreau plays Tuesday soccer with me.', { imp: 2 })])
-  for (const [key, name] of FRIENDS.slice(4)) {
-    const first = name.split(' ')[0]!
-    const said = [
-      say(key, `${name} is my friend from ${w.pick(ORIGINS)}.`, { imp: 3 }),
-      say(key, `${first} lives in ${w.pick(CITIES)}.`, { imp: 2 }),
-    ]
-    if (w.rand() < 0.7) said.push(say(key, `${first}'s birthday is ${day()}.`, { kind: 'event', imp: 3, sens: 'relationships' }))
-    if (w.rand() < 0.6) said.push(say(key, `${first} is really into ${w.pick(INTO)}.`, { imp: 2 }))
-    w.chat(w.pick([`Birthday idea for ${first}`, `Plans with ${first}`, `Text to ${first}`, `Catching up with ${first}`]), iso(w.int(10, 290)), said.slice(0, 2))
-    w.chat(w.pick([`What to get ${first}`, `${first} visit`, `Dinner with ${first}`]), iso(w.int(10, 295)), said.slice(2).length ? said.slice(2) : [said[0]!])
-    if (w.rand() < 0.5) w.chat(`${first} just got a new job`, iso(w.int(60, 298)), [say(key, `${first} just started a job at ${w.pick(JOBS)}.`, { imp: 2 })])
-  }
-  for (const [key, name, role] of COWORKERS) {
-    w.thing(key, name, 'person', 'people/Coworkers and work contacts', key === 'nadia' ? 4 : 2)
-    const first = name.split(' ')[0]!
-    w.chat(w.pick([`Working with ${first}`, `Message for ${first}`, `${first} feedback`]), iso(w.int(12, 298)), [
-      say(key, `${name} is ${role}.`, { imp: key === 'nadia' ? 4 : 3 }),
-      ...(w.rand() < 0.6 ? [say(key, `${first} ${w.pick(['prefers Slack over email', 'works from the Oakland office on Tuesdays', 'reviews my survey drafts', 'runs the Friday data review', 'is out on leave in December'])}.`, { imp: 2 })] : []),
-    ])
-  }
-  w.chat('Wedding gift for Dana', '2026-10-01', [say('dana', 'Dana Brooks is a coworker getting married in May.', { imp: 3 })])
-  w.chat('One on one with Nadia', '2026-09-11', [say('nadia', 'Nadia wants my clinic study draft by the end of November.', { imp: 4, due: '2026-11-30' }), say('nadia', 'Nadia Reyes is my manager at Kestrel Analytics.', { imp: 4 })])
-  for (const [key, name, course] of CLASSMATES) {
-    w.thing(key, name, 'person', 'people/Classmates and teachers', 2)
-    const first = name.split(' ')[0]!
-    w.chat(w.pick([`Study session with ${first}`, `${course} with ${first}`, `Splitting the ${course} work`]), iso(WEEK1 + w.int(5, 55)), [
-      say(key, `${name} is in my ${course} section.`, { imp: 2 }),
-      say(key, `${first} and I study for ${course} on ${w.pick(['Sundays', 'Monday nights', 'Wednesdays', 'Friday mornings'])}.`, { imp: 2 }),
-    ])
-  }
-  for (const [key, name, folder, line] of FAMILY) {
-    w.thing(key, name, 'person', `people/Family/${folder}`, key === 'mom' || key === 'theo' ? 4 : 3)
-    w.chat(w.pick([`Call with ${name.split(' ')[0]}`, `Note for ${name.split(' ')[0]}`, `Family update`]), iso(w.int(5, 290)), [say(key, line, { imp: 3, sens: 'relationships' })])
-  }
-  w.chat("Theo's college essays", '2026-10-11', [say('theo', 'Theo is applying to UC Davis and Cal Poly.', { imp: 3 }), say('theo', "Theo's college applications are due November 30.", { imp: 4, due: '2026-11-30' })])
-  w.chat("Mom's birthday", '2026-02-10', [say('mom', "My mom's birthday is February 22.", { kind: 'event', imp: 4 }), say('mom', 'My mom likes orchids and mystery novels.', { imp: 2 })])
-  w.chat('Thanksgiving at Aunt Carol', '2026-10-20', [say('aunt', 'Thanksgiving is at Aunt Carol in Sacramento again this year.', { kind: 'event', imp: 3 })])
-  w.thing('elena', 'Elena Lindqvist', 'person', 'people/Coworkers and work contacts/Mentors', 3)
-  w.chat('Mentor questions', '2026-03-22', [say('elena', 'Elena Lindqvist is a mentor from my last job.', { imp: 3 }), say('elena', 'Elena runs product at a health startup in San Francisco.', { imp: 2 })], 'gemini')
-  w.chat('Coffee with Elena', '2026-10-23', [say('elena', 'Elena thinks I should lead with Tidepool in interviews.', { imp: 2 })])
-  w.thing('jess', 'Jess Moreno', 'person', 'people/Neighbors and community', 3)
-  w.thing('gary', 'Gary Novak', 'person', 'people/Service providers', 2)
-  w.thing('luis', 'Luis Ortega', 'person', 'people/Service providers', 2)
-  w.thing('dr_lin', 'Dr. Lin', 'person', 'people/Service providers', 2)
-  w.chat('Roommate chores', '2026-02-18', [say('jess', 'Jess Moreno is my roommate on Durant Ave.', { imp: 3 }), say('jess', 'Jess and I split chores by week.', { imp: 2 })])
-  w.chat('Email to the landlord', '2026-01-28', [say('gary', 'Gary Novak is my landlord.', { imp: 2 })])
-  w.chat("Mom's kitchen contractor", '2026-05-02', [say('luis', "Luis Ortega is the contractor on my mom's kitchen remodel.", { imp: 2 })])
-  w.chat('Dentist reminder', '2026-03-09', [say('dr_lin', 'Dr. Lin is my dentist on Shattuck.', { imp: 2, sens: 'health' })])
-  w.chat('Logo feedback for Jordan', '2026-09-26', [say('jordan', 'Jordan Ellis is trying a darker blue for the Tidepool logo.', { imp: 2 })])
-  w.chat('Iris and the backend', '2026-05-27', [say('iris', 'Iris Sato is my cofounder at Tidepool and writes the code.', { imp: 4 }), say('iris', 'Iris likes Tesselcrest and plays it every Friday.', { imp: 2 })], 'gemini')
+  place(w, 'cs162', [
+    ['CS 162 this term', ['CS 162 meets Monday and Wednesday at 4.', 'CS 162 office hours are Tuesday at 3 in Soda 306.'], '2026-08-21'],
+    ['CS 162 grading', [['The CS 162 final is on December 15.', { kind: 'event', imp: 4 }], 'CS 162 grades are 40 percent projects and the rest exams.'], '2026-08-26'],
+    ['Studying for the CS 162 midterm', [['The CS 162 midterm is on October 7.', { kind: 'event' }]], '2026-10-03'],
+    ['CS 162 midterm results', ['I got an 86 on the CS 162 midterm.'], '2026-10-14'],
+    ['Study group plan', ['The CS 162 study group meets Thursday at 6 in Soda 405.', say('priya_raman', 'Priya Raman runs the CS 162 study group.', { imp: 3 })], '2026-10-01', 'gemini'],
+    ['Pintos deadlock help', [['Deadlock and virtual memory are the hardest CS 162 topics for me.', { imp: 2 }]], [230, 280]],
+    ['CS 162 lecture notes', [['Professor Reyes posts CS 162 lecture notes on Sunday nights.', { imp: 2 }], ['CS 162 discussion section is Friday at 10.', { imp: 2 }]], [235, 290]],
+  ])
+  // Her first two CS 162 projects are done and graded; they sit with the rest of her school year.
+  place(w, 'folder:school', [
+    ['CS 162 project 1 user programs', [['CS 162 project 1 was user programs in Pintos.', { imp: 2 }], ['Our group got a 92 on CS 162 project 1.', { imp: 2 }]], '2026-09-14'],
+    ['CS 162 project 2 threads', [['CS 162 project 2 was the thread scheduler.', { imp: 2 }], say('sam_lee', 'Sam Lee pushed the lock fixes for our scheduler.', { imp: 2 })], '2026-10-05'],
+  ])
+  place(w, 'cs162_p3', [
+    ['CS 162 project 3 file system', ['CS 162 project 3 is the file system.', 'The CS 162 project 3 design review is on November 3.'], '2026-10-26'],
+  ])
+  place(w, 'math54', [
+    ['MATH 54 this term', ['MATH 54 meets Monday, Wednesday and Friday at 9.', 'MATH 54 homework is graded on effort.', say('math54', 'Prof. Hartmann teaches MATH 54.', { imp: 3 })], '2026-08-27', 'chatgpt'],
+    ['MATH 54 final date', [['The MATH 54 final is on December 17.', { kind: 'event', imp: 4 }]], [240, 260]],
+    ['MATH 54 midterm prep', [['The MATH 54 midterm is on October 9.', { kind: 'event' }], ['MATH 54 office hours are Wednesday at 2 in Evans 10.', { imp: 2 }]], '2026-10-04'],
+    ['MATH 54 midterm results', ['I got a 91 on the MATH 54 midterm.'], '2026-10-16'],
+    ['Eigenvalues finally clicked', [['Eigenvalues took me the longest in MATH 54.', { imp: 2 }]], [255, 275]],
+    ['MATH 54 due dates', [['The next MATH 54 problem set is due November 2.', { imp: 4, due: '2026-11-02' }], ['MATH 54 drops the lowest problem set score.', { imp: 2 }]], '2026-10-27'],
+    ['Study session with Kenji', [['Kenji Watanabe and I study for MATH 54 on Sunday nights.', { imp: 2 }]], [240, 290]],
+    ['Taking notes for MATH 54', [['I keep my MATH 54 notes in one ruled notebook.', { imp: 2 }]], [236, 260]],
+  ])
+  place(w, 'phys137', [
+    ['PHYS 137 this term', ['PHYS 137 meets Tuesday and Thursday at 2.', 'Prof. Alvarez teaches PHYS 137.'], '2026-08-20'],
+    ['PHYS 137 lab 1 done', [['PHYS 137 lab 1 is done.', { imp: 2 }]], '2026-09-08', 'chatgpt'],
+    ['PHYS 137 grading', [['The PHYS 137 final is on December 16.', { kind: 'event', imp: 4 }], ['PHYS 137 lab reports are graded out of 20.', { imp: 2 }]], [236, 250]],
+    ['PHYS 137 midterm prep', [['The PHYS 137 midterm is on October 13.', { kind: 'event' }]], '2026-10-09'],
+    ['PHYS 137 midterm results', ['I got an 84 on the PHYS 137 midterm.'], '2026-10-20'],
+    ['Lab partner for PHYS 137', [['Aisha Rahman is my PHYS 137 lab partner.', { imp: 2 }], ['PHYS 137 lab reports are due the Monday after each lab.', { imp: 3 }]], [240, 260]],
+    ['Quantum tunneling questions', [['Tunneling is my favorite PHYS 137 topic so far.', { imp: 2 }]], [270, 295]],
+  ])
+  place(w, 'data100', [
+    ['DATA 100 this term', ['DATA 100 meets Tuesday and Thursday at 11.', 'Prof. Kim teaches DATA 100.'], '2026-08-19'],
+    ['DATA 100 problem set due date', [['Problem Set 1 for DATA 100 is due Sep 5.', { imp: 2 }]], '2026-08-30', 'chatgpt'],
+    ['DATA 100 project 1 cleaning', ['DATA 100 Project 1 uses the housing data.', ['I got 47 out of 50 on DATA 100 Project 1.', { imp: 2 }]], '2026-09-18'],
+    ['DATA 100 project 2 plan', ['DATA 100 Project 2 uses the Bay Area transit data.', ['DATA 100 Project 2 is due Nov 20.', { imp: 4, due: '2026-11-20' }]], '2026-10-21'],
+    ['DATA 100 final date', [['The DATA 100 final is on December 14.', { kind: 'event', imp: 4 }], ['DATA 100 labs are due Friday at midnight.', { imp: 3 }]], [236, 250]],
+    ['DATA 100 with Zoe', [['Zoe Martin and Luca Romano are in my DATA 100 section.', { imp: 2 }]], [240, 280]],
+    ['DATA 100 midterm results', ['I got a 93 on the DATA 100 midterm.'], '2026-10-15'],
+    ['Cross validation again', [['Cross validation was the part of DATA 100 I had to reread.', { imp: 2 }], ['DATA 100 office hours are Monday at 1 in Wheeler 150.', { imp: 2 }]], [255, 290]],
+  ])
+  place(w, 'history', [
+    ['History reading list', ['The history reading list has six books for the term.'], '2026-09-03', 'chatgpt'],
+    ['Reading list book two', ['The second book on the history reading list is about the Gold Rush.'], '2026-09-24'],
+  ])
+  // What school she did before this term, and her plans for it, sit on the section itself.
+  place(w, 'folder:school', [
+    ['CS 61B final grade', ['I took CS 61B last spring and got an A minus.', 'CS 61B Project 2 was Gitlet, a small version control system.'], [140, 150]],
+    ['STAT 20 final grade', ['I took STAT 20 last spring and got an A.', 'My STAT 20 final project looked at BART delays.'], [140, 150]],
+    ['ECON 1 final grade', ['I took ECON 1 last spring and got a B plus.'], [140, 150]],
+    ['R1B research essay', ['I took ENGLISH R1B last spring and got an A minus.', 'My R1B research essay was on public libraries.'], [60, 130]],
+    ['Minor in public health', [['I am thinking about a public health minor.', { imp: 2 }]], '2026-04-20'],
+    ['Meeting my advisor', [['My advisor is Dr. Okonkwo and we meet once a term.', { imp: 2 }], ['I plan to graduate in May 2028.', { imp: 4 }]], '2026-09-16'],
+  ])
 }
 
-// ---------------------------------------------------------------- work
-
-const STUDIES: Array<[string, string, string, string]> = [
-  ['clinic_study', 'Clinic wait times study', 'Harbor Health', 'Median clinic wait times went up 12 minutes since spring.'],
-  ['rent_survey', 'Bay Area rent survey', 'the city of Oakland', 'Renters under 30 spend 46 percent of their income on rent.'],
-  ['transit', 'Transit ridership dashboard', 'AC Transit', 'Weekend ridership is back to 90 percent of 2019.'],
-  ['food_security', 'Student food security study', 'the Berkeley Food Pantry', 'One in three students skipped a meal for money last term.'],
-  ['hiring', 'Small business hiring report', 'the Oakland Chamber', 'Half the shops we surveyed want to hire this winter.'],
-  ['library', 'Library usage study', 'the Berkeley Public Library', 'Evening visits doubled after the hours changed.'],
-]
-const COMPANIES: Array<[string, string, string[]]> = [
-  ['figma', 'Figma', ['I applied to Figma for the data analyst intern role.', 'Figma said no to my application in October.']],
-  ['airbnb', 'Airbnb', ['I applied to Airbnb for the analytics intern role.', 'The Airbnb phone screen was on October 2.']],
-  ['duolingo', 'Duolingo', ['I applied to Duolingo for the data science intern role on September 30.']],
-  ['databricks', 'Databricks', ['I finished the Databricks online assessment.', 'Databricks wants a take home by November 10.']],
-  ['lyft', 'Lyft', ['I applied to Lyft for the data intern role and have not heard back.']],
-  ['plaid', 'Plaid', ['Caleb referred me to Plaid for the analytics role.']],
-  ['asana', 'Asana', ['I applied to Asana for the product analyst intern role.']],
-  ['instacart', 'Instacart', ['I withdrew my Instacart application.']],
-]
+// ---------------------------------------------------------------- work: Kestrel, applications, interviews
 
 function work(w: Builder): void {
-  w.thing('weekly', 'Weekly reports', 'topic', { parent: 'kestrel' }, 3)
-  w.chat('Kestrel team and hours', '2026-01-15', [
-    mine('work', 'I work at Kestrel Analytics 20 hours a week, Monday to Wednesday.', { imp: 4 }),
-    say('kestrel', 'Kestrel Analytics is in downtown Oakland.', { imp: 3 }),
-  ], 'claude')
-  w.chat('Tools at Kestrel', '2026-02-09', [say('kestrel', 'Kestrel uses BigQuery, dbt and Tableau.', { imp: 3 }), mine('work', 'I write most of my Kestrel queries in SQL.', { imp: 2 })])
-  w.chat('Raise at Kestrel', '2026-07-08', [mine('work', 'I got a raise to 32 dollars an hour at Kestrel in July.', { imp: 3, sens: 'finance' }), mine('work', 'I was promoted to lead research assistant in July.', { imp: 4 })])
-  for (const [key, name, client, finding] of STUDIES) {
-    w.thing(key, name, 'project', { parent: 'kestrel' }, key === 'clinic_study' ? 4 : 3)
-    const start = w.int(15, 270)
-    w.chat(`${name} kickoff`, iso(start), [say(key, `The ${lower(name)} is for ${client}.`, { imp: 3 })])
-    w.chat(w.pick([`${name} findings`, `Charts for the ${lower(name)}`, `${name} write up`]), iso(Math.min(start + w.int(10, 40), 300)), [say(key, finding, { imp: 3 })])
-    if (w.rand() < 0.6) w.chat(`${name} survey questions`, iso(Math.min(start + w.int(2, 9), 300)), [say(key, `The ${lower(name)} surveyed ${w.int(3, 18) * 100} people.`, { imp: 2 })])
-  }
-  // Her weekly reports: each its own chat, Friday by Friday.
-  const topics = ['response rates', 'the clinic survey launch', 'cleaning the wait times data', 'the rent survey pilot', 'dashboard fixes', 'the transit data refresh', 'survey weighting', 'the food pantry interviews', 'the hiring report draft', 'library foot traffic', 'chart reviews', 'the clinic study draft']
-  topics.forEach((topic, i) => {
-    const key = `report_${i + 1}`
-    w.thing(key, `Weekly Report ${i + 1}`, 'task', { parent: 'weekly' }, i >= topics.length - 2 ? 3 : 2)
-    const due = iso(doy('2026-08-14') + 7 * i)
-    w.chat(`Weekly report ${i + 1} draft`, iso(doy(due) - 1), [
-      say(key, `Weekly report ${i + 1} covered ${topic}.`, { imp: 2 }),
-      ...(doy(due) >= TODAY - 1 ? [say(key, `Weekly report ${i + 1} is due ${short(due)} at noon.`, { imp: 3, due })] : []),
-    ])
-  })
-  w.chat('Weekly report format', '2026-08-12', [say('weekly', 'Weekly reports are due Friday at noon.', { imp: 3 }), say('weekly', 'Weekly reports have three parts: done, next and blocked.', { imp: 2 })])
-  w.thing('github', 'GitHub handles for the team', 'topic', 'work', 2)
-  w.chat('GitHub handles for the team', '2026-10-25', [say('github', "The team's GitHub handles are in the shared doc.", { imp: 2 }), say('github', 'Iris is irissato on GitHub.', { imp: 2 })], 'chatgpt')
-  w.thing('sabletide', 'Sabletide', 'organization', { parent: 'kestrel' }, 2)
-  w.chat('Data vendor contract', '2026-04-15', [say('sabletide', 'Sabletide is the data vendor Kestrel uses.', { imp: 2 }), say('sabletide', 'The Sabletide contract renews in January.', { imp: 2 })])
-
-  for (const [key, name, lines] of COMPANIES) {
-    w.thing(key, `${name} application`, 'task', 'work/Job applications', 3)
-    w.chat(w.pick([`Applying to ${name}`, `${name} cover letter`, `${name} application questions`]), iso(w.int(240, 290)), [say(key, lines[0]!, { imp: 3 })])
-    if (lines[1]) w.chat(`${name} next steps`, iso(w.int(270, 300)), [say(key, lines[1], { imp: 3, ...(key === 'databricks' ? { due: '2026-11-10' } : {}) })])
-  }
-  w.thing('resume', 'Resume', 'document', 'work/Job search', 3)
-  w.chat('Tighten my resume', '2026-08-28', [say('resume', 'My resume leads with the Kestrel clinic study.', { imp: 3 }), say('resume', 'I keep my resume to one page.', { imp: 2 })])
-  w.chat('Resume bullet for Tidepool', '2026-09-05', [say('resume', 'My resume says I grew Tidepool to 1,200 weekly users.', { imp: 2 })])
-  w.chat('Internship timeline', '2026-08-31', [mine('work/Job search', 'I want a data internship for summer 2027.', { kind: 'goal', imp: 4 })])
+  place(w, 'self@kestrel', [
+    ['Kestrel team and hours', [['I work at Kestrel Analytics 20 hours a week, Monday to Wednesday.', { imp: 4 }], say('kestrel', 'Kestrel Analytics is in downtown Oakland.', { imp: 3 })], '2026-01-15', 'claude'],
+    ['Tools at Kestrel', [say('kestrel', 'Kestrel uses BigQuery, dbt and Tableau.', { imp: 3 })], '2026-02-09'],
+    ['Raise at Kestrel', [['I got a raise to 32 dollars an hour at Kestrel in July.', { sens: 'finance' }], ['I was promoted to lead research assistant in July.', { imp: 4 }]], '2026-07-08'],
+    ['One on one with Nadia', [['Nadia wants my clinic study draft by the end of November.', { imp: 4, due: '2026-11-30' }], ['Nadia Reyes is my manager at Kestrel Analytics.', { imp: 4 }]], '2026-09-11'],
+    ['Who is who at Kestrel', ['Victor Chen is the head of research at Kestrel.', ['Owen Fischer is the data engineer who keeps our BigQuery tables clean.', { imp: 2 }]], [20, 60]],
+    ['Working with Dana', [['Dana Brooks is a research analyst at Kestrel.', { imp: 2 }]], [60, 200]],
+    ['Message for Leah', [['Leah Moran is an intern on my team at Kestrel.', { imp: 2 }]], [180, 260]],
+    ['Survey questions with Amara', [['Amara Osei leads surveys at Kestrel.', { imp: 2 }]], [80, 220]],
+    ['Weekly report format', ['Weekly reports at Kestrel are due Friday at noon.', ['Weekly reports have three parts: done, next and blocked.', { imp: 2 }]], '2026-08-12'],
+    ['Weekly report draft', [['My last weekly report covered the clinic study draft.', { imp: 2 }]], '2026-10-22'],
+    ['Clinic wait times study kickoff', ['The clinic wait times study is for Harbor Health.'], [120, 140]],
+    ['Charts for the clinic study', ['Median clinic wait times went up 12 minutes since spring.'], [160, 200]],
+    ['Bay Area rent survey kickoff', [['The Bay Area rent survey is for the city of Oakland.', { imp: 2 }]], [40, 70]],
+    ['Rent survey findings', [['Renters under 30 spend 46 percent of their income on rent.', { imp: 2 }]], [80, 110]],
+    ['Transit ridership dashboard', [['The transit ridership dashboard is for AC Transit.', { imp: 2 }], ['Weekend ridership is back to 90 percent of 2019.', { imp: 2 }]], [100, 180]],
+    ['Food security study write up', [['The student food security study is for the Berkeley Food Pantry.', { imp: 2 }], ['One in three students skipped a meal for money last term.', { imp: 2 }]], [150, 240]],
+    ['Small business hiring report charts', [['The small business hiring report is for the Oakland Chamber.', { imp: 2 }], ['Half the shops we surveyed want to hire this winter.', { imp: 2 }]], [200, 280]],
+    ['Data vendor contract', [['Sabletide is the data vendor Kestrel uses.', { imp: 2 }], ['The Sabletide contract renews in January.', { imp: 2 }]], '2026-04-15'],
+    ['Friday data review', [['Owen runs the Friday data review at Kestrel.', { imp: 2 }], ['Kestrel keeps Wednesday afternoons free of meetings.', { imp: 2 }]], [90, 250]],
+  ])
+  place(w, 'folder:work/Job applications', [
+    ['Applying to Figma', ['I applied to Figma for the data analyst intern role.'], [240, 255]],
+    ['Figma next steps', ['Figma said no to my application in October.'], [280, 295]],
+    ['Duolingo application questions', ['I applied to Duolingo for the data science intern role on September 30.'], '2026-09-29'],
+    ['Lyft cover letter', [['I applied to Lyft for the data intern role and have not heard back.', { imp: 2 }]], [245, 270]],
+    ['Plaid referral', ['Caleb referred me to Plaid for the analytics role.'], [250, 280]],
+    ['Asana application', [['I applied to Asana for the product analyst intern role.', { imp: 2 }]], [250, 285]],
+    ['Instacart next steps', [['I withdrew my Instacart application.', { imp: 2 }]], [275, 295]],
+    ['Internship timeline', [['I want a data internship for summer 2027.', { kind: 'goal', imp: 4 }], ['I track every application in one spreadsheet.', { imp: 2 }]], '2026-08-31'],
+  ])
+  place(w, 'folder:work/Interviews', [
+    ['Airbnb phone screen', ['The Airbnb phone screen was on October 2.'], '2026-09-28'],
+    ['Databricks next steps', [['I finished the Databricks online assessment.', { imp: 2 }], ['Databricks wants a take home by November 10.', { imp: 4, due: '2026-11-10' }]], '2026-10-23'],
+    ['Mentor questions', ['Elena Lindqvist is a mentor from my last job.'], '2026-03-22', 'gemini'],
+    ['Coffee with Elena', [['Elena thinks I should lead with Tidepool in interviews.', { imp: 3 }]], '2026-10-23'],
+  ])
+  // Her side job sits on the section.
+  place(w, 'folder:work', [
+    ['Tutoring hours', ['I tutor DATA 8 students on Monday evenings.', ['Tutoring pays 22 dollars an hour.', { sens: 'finance' }]], '2026-09-02'],
+  ])
 }
 
-// ---------------------------------------------------------------- projects
+// ---------------------------------------------------------------- projects: Tidepool, SkipDoodle, Sparrowhawk
 
 function projects(w: Builder): void {
-  const clinics: Array<[string, string, string]> = [
-    ['orrinwood', 'Orrinwood Family Clinic', 'Orrinwood Family Clinic was the first Tidepool pilot.'],
-    ['bayview', 'Bayview Pediatrics', 'Bayview Pediatrics books about 300 visits a week on Tidepool.'],
-    ['elm_dental', 'Elm Street Dental', 'Elm Street Dental joined the Tidepool pilot in July.'],
-    ['lakeside', 'Lakeside Physical Therapy', 'Lakeside Physical Therapy wants text reminders from Tidepool.'],
-  ]
-  w.thing('pilot', 'Pilot clinics', 'topic', { parent: 'tidepool' }, 4)
-  for (const [key, name, line] of clinics) {
-    w.thing(key, name, 'organization', { parent: 'pilot' }, 3)
-    w.chat(`${name} check in`, iso(w.int(120, 295)), [say(key, line, { imp: 3 }), say(key, `${name} pays the pilot price of 199 dollars a month.`, { imp: 2 })])
-  }
-  w.thing('orrinwood_st', 'Orrinwood', 'place', 'knowledge/Geography and places', 2)
-  w.chat('Clinic address', '2026-04-11', [say('orrinwood_st', 'Orrinwood is the street the clinic is on.', { imp: 2 })])
-  const parts: Array<[string, string, ThingKind, string[]]> = [
-    ['tp_pricing', 'Pricing', 'topic', ['Tidepool charges clinics 199 dollars a month.', 'We want a per seat price for bigger clinics next year.']],
-    ['tp_investors', 'Investor updates', 'document', ['I send Tidepool investors an update on the first Monday of each month.', 'The October investor update leads with the 15 percent growth.']],
-    ['tp_hiring', 'Hiring plan', 'topic', ['We want to hire a part time designer for Tidepool in January.', 'Tidepool can afford one hire before the seed round.']],
-    ['tp_logo', 'Tidepool logo', 'project', ['The Tidepool logo is a small wave in teal.']],
-    ['tp_seed', 'Seed round', 'project', ['Tidepool plans to raise a seed round in the spring.', 'The seed round target is 1.5 million dollars.']],
-    ['tp_goals', 'Tidepool goals', 'topic', ['Tidepool wants ten clinics by March.', 'Tidepool needs text reminders before the seed round.']],
-    ['tp_tablets', 'Front desk tablets', 'product', ['Ferrostone makes the clinic tablets.', 'Each pilot clinic got one Tidepool tablet.']],
-    ['tp_growth', 'Weekly users', 'topic', ['Tidepool had 400 weekly users in May.', 'Tidepool reached 800 weekly users in July.']],
-  ]
-  for (const [key, name, kind, lines] of parts) {
-    w.thing(key, name, kind, { parent: 'tidepool' }, 3)
-    lines.forEach((line, i) => w.chat(i === 0 ? `Tidepool ${name.toLowerCase().replace(/^tidepool /, '')}` : w.pick([`${name} again`, `Thinking about ${name.toLowerCase()}`, `Tidepool ${name.toLowerCase()} notes`]), iso(w.int(90, 299)), [say(key, line, { imp: 3 })]))
-  }
-  w.chat('Investor update October', '2026-10-06', [say('tidepool', 'Tidepool has 1,200 weekly users across four clinics.', { imp: 5 }), say('tp_investors', 'The October investor update leads with the 15 percent growth.', { imp: 3 })], 'claude')
-  w.chat('Working on Tidepool tonight', '2026-09-30', [mine('projects', 'I spend most evenings on Tidepool.', { imp: 4, core: true })], 'claude')
-
-  const skip: Array<[string, string, string[]]> = [
-    ['sd_undo', 'Undo feature', ['SkipDoodle keeps the drawing state in one hook, so undo stays simple.']],
-    ['sd_stickers', 'Sticker packs', ['SkipDoodle has three sticker packs: animals, space and food.', 'Kids unlock a sticker pack after ten drawings.']],
-    ['sd_colors', 'Color palette', ['SkipDoodle uses eight bright colors and a rainbow brush.']],
-    ['sd_offline', 'Offline mode', ['SkipDoodle saves drawings offline and syncs them later.']],
-    ['sd_store', 'App Store listing', ['SkipDoodle is waiting on App Store review.', 'The SkipDoodle listing has six screenshots.']],
-    ['sd_beta', 'Beta testers', ['Twelve families are testing SkipDoodle.', 'My cousin Ben tests SkipDoodle with his little sister.']],
-  ]
-  for (const [key, name, lines] of skip) {
-    w.thing(key, name, 'task', { parent: 'skipdoodle' }, 2)
-    for (const line of lines) w.chat(w.pick([`SkipDoodle ${name.toLowerCase()}`, `${name} for SkipDoodle`, `SkipDoodle bug`]), iso(w.int(232, 300)), [say(key, line, { imp: 2 })])
-  }
-  w.chat('Working on SkipDoodle', '2026-09-27', [mine('projects', 'I work on SkipDoodle on weekends.', { imp: 3, core: true })])
-
-  const sparrow: Array<[string, string, string[]]> = [
-    ['sh_db', 'Database upgrade', ['Sparrowhawk moved to Postgres 16.', 'The Sparrowhawk upgrade took one evening.']],
-    ['sh_donations', 'Donations', ['Sparrowhawk takes donations through Stripe.']],
-    ['sh_volunteers', 'Volunteer schedule', ['Sparrowhawk has 40 volunteers on the schedule.', 'Volunteers sign up for two hour shifts in Sparrowhawk.']],
-    ['sh_news', 'Newsletter', ['The Sparrowhawk newsletter goes out on the 1st of each month.']],
-  ]
-  w.chat('Sparrowhawk database upgrade', '2026-09-18', [say('sparrowhawk', 'Sparrowhawk runs on Postgres 16 after the upgrade.', { imp: 3 }), say('sparrowhawk', 'Sparrowhawk is the volunteer app for the East Bay bird rescue.', { imp: 4, core: true })], 'chatgpt')
-  for (const [key, name, lines] of sparrow) {
-    w.thing(key, name, 'task', { parent: 'sparrowhawk' }, 2)
-    for (const line of lines) w.chat(w.pick([`Sparrowhawk ${name.toLowerCase()}`, `${name} in Sparrowhawk`]), iso(w.int(100, 295)), [say(key, line, { imp: 2 })], 'claude')
-  }
-
-  const kitchen: Array<[string, string, string[]]> = [
-    ['k_counters', 'Counters', ['The counters are white oak.']],
-    ['k_cabinets', 'Cabinets', ['The kitchen cabinets will be sage green.']],
-    ['k_budget', 'Budget', ['The kitchen remodel budget is 18,000 dollars.']],
-    ['k_timeline', 'Timeline', ['The kitchen remodel should be done by Thanksgiving.']],
-  ]
-  w.chat("Mom's kitchen remodel", '2026-04-28', [say('kitchen', 'The kitchen counters will be white oak.', { imp: 3 }), say('kitchen', "The kitchen remodel is at my mom's house in Sacramento.", { imp: 3 })], 'gemini')
-  for (const [key, name, lines] of kitchen) {
-    w.thing(key, name, 'task', { parent: 'kitchen' }, 2)
-    for (const line of lines) w.chat(`Kitchen ${name.toLowerCase()}`, iso(w.int(120, 290)), [say(key, line, { imp: 2 })], 'gemini')
-  }
-  const more: Array<[string, string, string, string[]]> = [
-    ['garden', 'Raised garden bed', 'projects/Home projects', ['I built a raised garden bed on the balcony.', 'The raised bed has basil, chard and cherry tomatoes.']],
-    ['site', 'Personal website', 'projects/Software and apps', ['My personal website runs on Astro.', 'I want to add the Tidepool case study to my website.']],
-    ['busbuddy', 'Bus Buddy', 'projects/Hackathons', ['Bus Buddy was our CalHacks project, an app for late buses.', 'Bus Buddy won the best civic hack prize.']],
-    ['bookclub_app', 'Book club app idea', 'projects/Project ideas', ['I want to build a tiny app for my book club to vote on books.']],
-  ]
-  for (const [key, name, where, lines] of more) {
-    w.thing(key, name, 'project', where, 2)
-    lines.forEach((line, i) => w.chat(i ? `${name} update` : name, iso(w.int(30, 298)), [say(key, line, { imp: 2 })]))
-  }
+  w.thing('busbuddy', 'Bus Buddy', 'project', 'projects', 2)
+  place(w, 'tidepool', [
+    ['Orrinwood Family Clinic check in', ['Orrinwood Family Clinic was the first Tidepool pilot.'], [120, 200]],
+    ['Bayview Pediatrics check in', ['Bayview Pediatrics books about 300 visits a week on Tidepool.'], [200, 280]],
+    ['Elm Street Dental check in', [['Elm Street Dental joined the Tidepool pilot in July.', { imp: 2 }]], [190, 220]],
+    ['Text reminders for Lakeside', ['Lakeside Physical Therapy wants text reminders from Tidepool.'], [230, 290]],
+    ['Tidepool pricing', ['Tidepool charges clinics 199 dollars a month.', ['We want a per seat price for bigger clinics next year.', { imp: 2 }]], [100, 200]],
+    ['Tidepool investor updates', ['I send Tidepool investors an update on the first Monday of each month.'], [150, 250]],
+    ['Tidepool hiring plan', ['The Tidepool hiring plan is one part time designer in January.', ['Tidepool can afford one hire before the seed round.', { imp: 2 }]], [200, 290]],
+    ['Tidepool logo ideas', [['The Tidepool logo is a small wave in teal.', { imp: 2 }], say('jordan', 'Jordan Ellis is trying a darker blue for the Tidepool logo.', { imp: 2 })], '2026-09-26'],
+    ['Seed round thinking', ['Tidepool plans to raise a seed round in the spring.', ['The seed round target is 1.5 million dollars.', { imp: 2 }]], [220, 295]],
+    ['Tidepool goals', ['Tidepool wants ten clinics by March.', ['Tidepool needs text reminders before the seed round.', { imp: 2 }]], [180, 280]],
+    ['Front desk tablets', [['Each pilot clinic got one Tidepool front desk tablet.', { imp: 2 }]], [130, 200]],
+    ['Tidepool weekly users', [['Tidepool had 400 weekly users in May and 800 in July.', { imp: 2 }]], [190, 210]],
+    ['Iris and the backend', [on('tidepool', 'Iris Sato writes the Tidepool backend in Go.', { imp: 2 })], '2026-05-27', 'gemini'],
+  ])
+  place(w, 'skipdoodle', [
+    ['SkipDoodle undo feature', [['SkipDoodle keeps the drawing state in one hook, so undo stays simple.', { imp: 2 }]], [232, 300]],
+    ['Sticker packs for SkipDoodle', [['SkipDoodle has three sticker packs: animals, space and food.', { imp: 2 }], ['Kids unlock a sticker pack after ten drawings.', { imp: 2 }]], [232, 300]],
+    ['Color palette for SkipDoodle', [['SkipDoodle uses eight bright colors and a rainbow brush.', { imp: 2 }]], [232, 300], 'claude'],
+    ['SkipDoodle offline mode', [['SkipDoodle saves drawings offline and syncs them later.', { imp: 2 }]], [232, 300]],
+    ['SkipDoodle App Store listing', ['SkipDoodle is waiting on App Store review.', ['The SkipDoodle listing has six screenshots.', { imp: 2 }]], [270, 300]],
+    ['Beta testers for SkipDoodle', ['Twelve families are testing SkipDoodle.'], [250, 290]],
+    ['SkipDoodle bug', [['My cousin Ben tests SkipDoodle with his little sister.', { imp: 2 }]], [250, 300], 'claude'],
+  ])
+  place(w, 'sparrowhawk', [
+    ['Sparrowhawk upgrade notes', [['The Sparrowhawk upgrade took one evening.', { imp: 2 }]], [262, 270], 'claude'],
+    ['Donations in Sparrowhawk', [['Sparrowhawk takes donations through Stripe.', { imp: 2 }]], [100, 290], 'claude'],
+    ['Sparrowhawk volunteer schedule', ['Sparrowhawk has 40 volunteers on the schedule.', ['Volunteers sign up for two hour shifts in Sparrowhawk.', { imp: 2 }]], [100, 290], 'claude'],
+    ['Sparrowhawk newsletter', [['The Sparrowhawk newsletter goes out on the 1st of each month.', { imp: 2 }]], [100, 290]],
+    ['Shift reminders', [['Sparrowhawk sends a text the night before each shift.', { imp: 2 }]], [200, 295]],
+  ])
+  place(w, 'kitchen', [
+    ["Mom's kitchen remodel", ['The kitchen counters will be white oak.', "The kitchen remodel is at my mom's house in Sacramento."], '2026-04-28', 'gemini'],
+    ["Mom's kitchen contractor", [on('kitchen', "Luis Ortega is the contractor on my mom's kitchen remodel.", { imp: 2 })], '2026-05-02', 'gemini'],
+  ])
+  place(w, 'busbuddy', [
+    ['Bus Buddy', [['Bus Buddy was our CalHacks project, an app for late buses.', { imp: 2 }], ['Bus Buddy won the best civic hack prize.', { imp: 2 }]], [30, 120]],
+  ])
+  place(w, 'folder:projects', [
+    ['Personal website', [['My personal website runs on Astro.', { imp: 2 }], ['I want to add the Tidepool case study to my website.', { imp: 2 }]], [60, 290]],
+    ['Book club app idea', [['I want to build a tiny app for my book club to vote on books.', { imp: 2 }]], [60, 290]],
+  ])
 }
 
-// ---------------------------------------------------------------- plans, travel, health, money, home
+// ---------------------------------------------------------------- people: her friends, her family and who she writes to
+
+function people(w: Builder): void {
+  w.thing('lena', 'Lena Delacroix', 'person', 'people', 4)
+  w.thing('caleb', 'Caleb Moreau', 'person', 'people', 3)
+  place(w, 'lena', [
+    ['Gift for Lena', ['Lena Delacroix is my oldest friend from school.', ['Lena loves anything with lemons.', { imp: 2 }]], '2026-04-06', 'gemini'],
+    ['Omar and Lena', ['Omar Haddad is marrying Lena in December.', ["Omar's brother Silas is in Lena's wedding party.", { imp: 2 }]], '2026-06-14', 'gemini'],
+    ['Montreal with Lena', [['Lena and I went to Montreal in June.', { imp: 2 }]], [160, 180]],
+    ['Catching up with Lena', ['Lena lives in Portland now and works as a pastry chef.', ['Lena and I call every other Sunday.', { imp: 2 }]], [100, 280]],
+    ['Lunch with Lena Delacroix', [['Lunch with Lena Delacroix is on Saturday at noon.', { kind: 'event', imp: 2 }]], [285, 298]],
+  ])
+  place(w, 'caleb', [
+    ['Soccer friends', ['Caleb Moreau plays Tuesday soccer with me.'], '2026-03-03'],
+    ['Caleb just got a new job', [['Caleb works as an analyst at Plaid.', { imp: 2 }]], [120, 200]],
+    ['Running with Caleb', [['Caleb and I run the Bay Trail on Saturday mornings.', { imp: 2 }], ['Caleb is training for the Oakland half marathon too.', { imp: 2 }]], [60, 280]],
+    ['Birthday idea for Caleb', [["Caleb's birthday is August 3.", { kind: 'event' }]], [190, 210]],
+    ['Text to Caleb', [['Caleb lent me his camping stove for Tahoe.', { imp: 2 }], ['Caleb is from Montreal and speaks French.', { imp: 2 }]], [250, 295]],
+  ])
+  place(w, 'priya_raman', [
+    ['Priya and the design doc', [['Priya and I split the CS 162 project 3 design doc.', { imp: 2 }]], '2026-10-27'],
+    ['Studying with Priya', [['Priya is a computer science major from San Jose.', { imp: 2 }], ['Priya likes to study at Doe Library.', { imp: 2 }]], [240, 290]],
+    ['Tutoring with Priya', [['Priya tutors DATA 8 with me on Mondays.', { imp: 2 }]], [245, 290]],
+    ['Birthday idea for Priya', [["Priya's birthday is January 9.", { kind: 'event', imp: 2 }]], [250, 295]],
+  ])
+  place(w, 'alex_kim', [
+    ['Dinner with Alex Kim', [['Dinner with Alex Kim is on November 14 in the Mission.', { kind: 'event', due: '2026-11-14' }]], '2026-10-28'],
+  ])
+  place(w, 'folder:people/Family', [
+    ['Call with Mom', ['My mom, Ellen Collins, is a nurse in Sacramento.', ['I call my parents on Sunday evenings.', { imp: 2 }]], [10, 120]],
+    ['Note for Dad', ['My dad, Mark Collins, teaches high school history.', ['My dad coaches the school debate team this year.', { imp: 2 }]], [30, 200]],
+    ["Theo's college essays", ['My brother Theo is a high school senior.', 'Theo is applying to UC Davis and Cal Poly.', ["Theo's college applications are due November 30.", { imp: 4, due: '2026-11-30' }]], '2026-10-11'],
+    ["Mom's birthday", [["My mom's birthday is February 22.", { kind: 'event', imp: 4 }], ['My mom likes orchids and mystery novels.', { imp: 2 }]], '2026-02-10'],
+    ['Family update', [['My grandma Rose lives in Fresno.', { imp: 2 }], ['My cousin Ben is studying nursing in San Diego.', { imp: 2 }]], [40, 260]],
+    ['Thanksgiving at Aunt Carol', [['Thanksgiving is at Aunt Carol in Sacramento again this year.', { kind: 'event' }], ['My aunt Carol hosts Thanksgiving every year.', { imp: 2 }]], '2026-10-20'],
+  ])
+}
+
+// ---------------------------------------------------------------- plans and deadlines
+
+function plans(w: Builder): void {
+  w.thing('lena_wedding', "Lena's wedding", 'event', 'plans/Events', 4)
+  place(w, 'lena_wedding', [
+    ["Lena's wedding plans", [["Lena's wedding is for Lena Delacroix and Omar Haddad on December 12 in Portland.", { kind: 'event', imp: 4, due: '2026-12-12' }], "I'm a bridesmaid at Lena's wedding."], '2026-07-19', 'gemini'],
+    ['Bridesmaid dress', [['The bridesmaid dresses are dusty blue.', { imp: 2 }]], '2026-09-21', 'chatgpt'],
+  ])
+  const event = (text: string, due: string, o: Omit<Say, 's' | 'text' | 'under'> = {}): Line => [text, { kind: 'event', imp: due ? 3 : 2, ...(due ? { due } : {}), ...o }]
+  place(w, 'folder:plans/Events', [
+    ['Bank appointment', [event('Bank appointment is on Thursday at 9am.', '2026-11-05')], '2026-10-27', 'claude'],
+    ['Dentist cleaning', [event('My dentist cleaning is on November 18 at 10.', '2026-11-18')], [285, 300]],
+    ['Planning DMV for Real ID', [event('My DMV appointment for Real ID is December 3 at 1:30.', '2026-12-03')], [280, 300]],
+    ['Reminder: eye exam', [event('My eye exam is on January 8.', '2027-01-08')], [280, 300]],
+    ['Haircut', [event('My haircut with Mia is November 7 at 11.', '2026-11-07')], [290, 300]],
+    ["Iris's birthday dinner", [event("Iris's birthday dinner is November 21 at Comal.", '2026-11-21')], [285, 300]],
+    ['Planning friendsgiving', [event('I am hosting Friendsgiving on November 22.', '2026-11-22')], [280, 300]],
+    ['Japanese Breakfast concert', [event('The Japanese Breakfast concert is December 5 at the Fox.', '2026-12-05')], [270, 300]],
+    ['Women in Data conference', [event('The Women in Data conference is March 10 in San Francisco.', '2027-03-10')], [260, 300]],
+    ['Coffee with Elena Lindqvist', [event('Coffee with Elena Lindqvist is on Monday at 10.', '')], [285, 298]],
+    ['PearX demo day', [event('PearX demo day is in late January if we get in.', '')], [280, 298]],
+    ['A coworker wedding', [event("Dana's wedding is in Austin in May, and I need a gift.", '', { imp: 3 })], '2026-10-01', 'chatgpt'],
+  ])
+  const due = (text: string, at: string): Line => [text, { kind: 'task', imp: at ? 4 : 3, ...(at ? { due: at } : {}) }]
+  place(w, 'folder:plans/Deadlines', [
+    ['Deadlines', [due('My lease renewal is due December 1.', '2026-12-01'), due('I need to renew my passport before the Lisbon trip.', '')], [260, 295]],
+    ['Taxes done', [due('I filed my taxes on April 10.', '')], '2026-04-11'],
+    ['FAFSA reminder', [due('The FAFSA for next year opens October 1.', '')], [250, 270]],
+    ['Spring registration', [due('Spring registration opens for me on November 12.', '2026-11-12')], [280, 298]],
+    ['To do this week', [due('I need to return the library books by November 9.', '2026-11-09'), due('I need to pick up my bike from the shop.', '')], [290, 300]],
+    ['Timesheet reminder', [due('My Kestrel timesheet is due every other Friday.', '')], [30, 200]],
+  ])
+  const goal = (text: string): Line => [text, { kind: 'goal', imp: 3 }]
+  place(w, 'folder:plans/Goals', [
+    ['Goals check in', [goal('I want to run a half marathon in April.'), goal('I want to read 24 books this year.')], [10, 60]],
+    ['Saving plan', [goal('I want to save 8,000 dollars by June.')], [20, 120]],
+    ['Learning Portuguese', [goal('I want to learn basic Portuguese before Lisbon.')], [150, 260]],
+    ['Planning ahead', [goal('I want Tidepool in ten clinics before I graduate.'), goal('I want to cook dinner at home five nights a week.')], [200, 290]],
+  ])
+}
+
+// ---------------------------------------------------------------- the rest of her life: writing, health, money, travel, home
 
 function life(w: Builder): void {
-  // Plans and deadlines.
-  w.thing('weddings', 'Weddings', 'topic', 'plans/Events', 3)
-  w.thing('lena_wedding', "Lena's wedding", 'event', { parent: 'weddings' }, 4)
-  w.thing('dana_wedding', "Dana's wedding", 'event', { parent: 'weddings' }, 3)
-  w.chat("Lena's wedding plans", '2026-07-19', [
-    say('lena_wedding', "Lena's wedding is for Lena Delacroix and Omar Haddad on December 12 in Portland.", { kind: 'event', imp: 4, due: '2026-12-12' }),
-    say('lena_wedding', "I'm a bridesmaid at Lena's wedding.", { imp: 3 }),
-  ], 'gemini')
-  w.chat('Bridesmaid dress', '2026-09-21', [say('lena_wedding', 'The bridesmaid dresses are dusty blue.', { imp: 2 })], 'chatgpt')
-  w.chat('A coworker wedding', '2026-10-01', [say('dana_wedding', "Dana's wedding is in Austin in May, and I need a gift.", { kind: 'event', imp: 3 })], 'chatgpt')
-  const events: Array<[string, string, string, string, string]> = [
-    ['bank', 'Bank appointment', 'plans/Events/Appointments', 'Bank appointment is on Thursday at 9am.', '2026-11-05'],
-    ['dentist', 'Dentist cleaning', 'plans/Events/Appointments', 'My dentist cleaning is on November 18 at 10.', '2026-11-18'],
-    ['dmv', 'DMV for Real ID', 'plans/Events/Appointments', 'My DMV appointment for Real ID is December 3 at 1:30.', '2026-12-03'],
-    ['eye', 'Eye exam', 'plans/Events/Appointments', 'My eye exam is on January 8.', '2027-01-08'],
-    ['haircut', 'Haircut', 'plans/Events/Appointments', 'My haircut with Mia is November 7 at 11.', '2026-11-07'],
-    ['iris_bday', "Iris's birthday dinner", 'plans/Events/Parties and celebrations', "Iris's birthday dinner is November 21 at Comal.", '2026-11-21'],
-    ['friendsgiving', 'Friendsgiving', 'plans/Events/Parties and celebrations', 'I am hosting Friendsgiving on November 22.', '2026-11-22'],
-    ['concert', 'Japanese Breakfast concert', 'plans/Events/Concerts and shows', 'The Japanese Breakfast concert is December 5 at the Fox.', '2026-12-05'],
-    ['wid', 'Women in Data conference', 'plans/Events/Conferences and meetups', 'The Women in Data conference is March 10 in San Francisco.', '2027-03-10'],
-    ['coffee_elena', 'Coffee with Elena Lindqvist', 'plans', 'Coffee with Elena Lindqvist is on Monday at 10.', ''],
-    ['lunch_lena', 'Lunch with Lena Delacroix', 'plans', 'Lunch with Lena Delacroix is on Saturday at noon.', ''],
-    ['dinner_alex', 'Dinner with Alex Kim', 'plans', 'Dinner with Alex Kim is on November 14 in the Mission.', '2026-11-14'],
-    ['demo_day', 'PearX demo day', 'plans/Events', 'PearX demo day is in late January if we get in.', ''],
-  ]
-  for (const [key, name, where, line, due] of events) {
-    w.thing(key, name, 'event', where, due ? 3 : 2)
-    w.chat(w.pick([name, `Reminder: ${lower(name)}`, `Planning ${lower(name)}`]), iso(Math.min(doy(due || '2026-10-20') - w.int(5, 20), 300)), [say(key, line, { kind: 'event', imp: due ? 3 : 2, ...(due ? { due } : {}) })], key === 'bank' ? 'claude' : undefined)
-  }
-  const deadlines: Array<[string, string, string]> = [
-    ['plans/Deadlines/Renewals and expirations', 'My lease renewal is due December 1.', '2026-12-01'],
-    ['plans/Deadlines/Renewals and expirations', 'I need to renew my passport before the Lisbon trip.', ''],
-    ['plans/Deadlines/Tax deadlines', 'I filed my taxes on April 10.', ''],
-    ['plans/Deadlines/School deadlines', 'The FAFSA for next year opens October 1.', ''],
-    ['plans/Deadlines/School deadlines', 'Spring registration opens for me on November 12.', '2026-11-12'],
-    ['plans/Goals', 'I want to run a half marathon in April.', ''],
-    ['plans/Goals', 'I want to read 24 books this year.', ''],
-    ['plans/Goals', 'I want to save 8,000 dollars by June.', ''],
-    ['plans/Goals', 'I want to learn basic Portuguese before Lisbon.', ''],
-    ['plans/To do lists/Errands', 'I need to return the library books by November 9.', '2026-11-09'],
-    ['plans/To do lists/Errands', 'I need to pick up my bike from the shop.', ''],
-  ]
-  for (const [where, line, due] of deadlines)
-    w.chat(w.pick(['Reminders', 'To do this week', 'Deadlines', 'Quick note', 'Planning ahead', 'Goals check in']), iso(Math.min(doy(due || '2026-09-30') - w.int(3, 40), 300)), [mine(where, line, { kind: /want/.test(line) ? 'goal' : 'task', imp: due ? 4 : 3, ...(due ? { due } : {}) })])
+  place(w, 'folder:style/Emails', [
+    ['Writing preferences', [['I start emails with Hi, never Hey.', { kind: 'style', imp: 2 }], ['I put the ask in the first line of an email.', { kind: 'style', imp: 3 }]], [40, 200]],
+    ['Email to my professor', [['With professors I write short, formal emails.', { kind: 'style', imp: 2 }]], [230, 290]],
+    ['Email to Nadia', [['With Nadia I am direct and lead with the numbers.', { kind: 'style', imp: 2 }], ['I keep work emails under five sentences.', { kind: 'style', imp: 2 }]], [60, 280]],
+    ['Subject lines', [['I write subject lines in plain words, no all caps.', { kind: 'style', imp: 2 }], ['I answer email in two batches, at 10 and at 4.', { kind: 'preference', imp: 2 }]], [90, 260]],
+  ])
+  place(w, 'folder:style/Cover letters', [
+    ['Cover letter template', [['My cover letter template has three short paragraphs.', { imp: 3 }], ['My cover letters open with Tidepool, then Kestrel.', { imp: 2 }]], [220, 250]],
+    ['Tighten my resume', [['My resume leads with the Kestrel clinic study.', { imp: 3 }], ['I keep my resume to one page.', { imp: 2 }]], '2026-08-28'],
+    ['Resume bullet for Tidepool', [['My resume says I grew Tidepool to 1,200 weekly users.', { imp: 2 }]], '2026-09-05'],
+    ['Closing line', [['I end cover letters with one line on why that team.', { kind: 'style', imp: 2 }]], [240, 290]],
+  ])
 
-  // Travel.
-  const trips: Array<[string, string, number, string[]]> = [
-    ['lisbon', 'Lisbon trip', 4, ['The Lisbon trip is in March for six days.', 'I am staying in Alfama on the Lisbon trip.', 'The Lisbon trip budget is 2,000 dollars.']],
-    ['montreal', 'Montreal trip', 3, ['The Montreal trip budget is $1,400 for 5 nights.', 'I went to Montreal with Lena in June.']],
-    ['portland', 'Portland for the wedding', 3, ['I fly to Portland on December 11 for the wedding.', 'I am staying with Lena\'s family in Portland.']],
-    ['tahoe', 'Tahoe ski weekend', 2, ['The Tahoe ski weekend is January 16 to 18.', 'We rented a cabin in Truckee for Tahoe.']],
-    ['austin', 'Austin in May', 2, ['I am going to Austin in May for Dana\'s wedding.']],
-    ['seattle', 'Seattle visit', 2, ['I visited June in Seattle in July.']],
-    ['la', 'Spring break in LA', 2, ['I spent spring break in Los Angeles with Hana.']],
-  ]
-  for (const [key, name, imp, lines] of trips) {
-    w.thing(key, name, 'event', 'travel/Trips', imp)
-    lines.forEach((line, i) => w.chat(i === 0 && key === 'lisbon' ? 'Lisbon trip' : w.pick([`${name} planning`, `${name} ideas`, `${name} budget`, `${name} packing`]), iso(w.int(20, 295)), [say(key, line, { kind: 'event', imp: i ? 2 : imp })], key === 'lisbon' && i === 0 ? 'chatgpt' : key === 'montreal' && i === 0 ? 'claude' : undefined))
-  }
-  w.thing('lisbon_flight', 'Flight times for the trip', 'event', { parent: 'lisbon' }, 2)
-  w.chat('Flight times for the trip', '2026-10-06', [say('lisbon_flight', 'The flight to Lisbon leaves at 7:40 am.', { imp: 2 })], 'chatgpt')
-  w.chat('Travel style', '2026-03-28', [mine('travel/Travel preferences', 'I travel carry on only.', { kind: 'preference', imp: 2 }), mine('travel/Travel preferences', 'I like an aisle seat on long flights.', { kind: 'preference', imp: 2 })])
-  w.chat('Airline miles', '2026-06-02', [mine('travel/Points and loyalty', 'I collect Alaska miles.', { imp: 2 })])
+  place(w, 'folder:health/Fitness', [
+    ['Running plan', [['I run three times a week, about 15 miles total.', { imp: 3 }], ['My half marathon plan builds to a 10 mile long run.', { imp: 3 }]], [20, 120]],
+    ['Training week', [['My long run is on Saturday mornings on the Bay Trail.', { imp: 2 }], ['I stretch for ten minutes after every run.', { imp: 2 }]], [60, 250]],
+    ['Climbing for strength', [['I climb twice a week for strength.', { imp: 3 }]], [80, 200]],
+    ['Protein question', [['I try to eat 80 grams of protein a day.', { imp: 2 }], ['I log my runs on Strava.', { imp: 2 }]], [90, 280]],
+    ['Knee pain', [['My right knee hurts after long runs.', { sens: 'health' }], ['My physical therapist gave me three knee exercises.', { sens: 'health' }]], [120, 260]],
+    ['Feeling better', [['Long walks help me when I feel stressed.', { sens: 'health' }]], [100, 290]],
+  ])
+  place(w, 'folder:health/Sleep', [
+    ['Sleep tips', [['I try to be asleep by 11:30 on school nights.', { imp: 3 }], ['I keep my phone out of the bedroom at night.', { imp: 2 }]], [30, 280]],
+    ['Bad sleep before deadlines', [['I sleep worse the night before a big deadline.', { imp: 2 }], ['A cool room and white noise help me sleep.', { imp: 2 }]], [100, 290]],
+    ['How much sleep I need', [['I aim for seven and a half hours of sleep.', { imp: 2 }], ['No coffee after 2 pm helps me fall asleep.', { imp: 2 }]], [150, 295]],
+  ])
+  place(w, 'harbor', [
+    ['Harbor Clinic visit', [['Harbor Clinic is my clinic for checkups.', { sens: 'health' }], ['Harbor Clinic is on Telegraph Ave near campus.', { imp: 2 }], say('nora', 'Nora Patel works at Harbor Clinic.', { imp: 2 })], '2026-09-19'],
+    ['Doctor visit notes', [['My next checkup at Harbor Clinic is in January.', { sens: 'health' }], ['I got my flu shot on October 4.', { sens: 'health' }]], [278, 290]],
+  ])
+  place(w, 'folder:health', [
+    ['Health question', [['I have seasonal allergies and take Zyrtec in spring.', { sens: 'health' }]], [60, 120]],
+    ['Dentist reminder', [['Dr. Lin is my dentist on Shattuck.', { sens: 'health' }]], '2026-03-09'],
+  ])
 
-  // Health.
-  w.thing('harbor', 'Harbor Clinic', 'organization', 'health/Care team', 3)
-  const health: Array<[string, string, Sensitivity | undefined]> = [
-    ['health/Checkups and screenings', 'Next checkup is in January.', 'health'],
-    ['health/Checkups and screenings', 'I got my flu shot on October 4.', 'health'],
-    ['health/Allergies', 'I have seasonal allergies and take Zyrtec in spring.', 'health'],
-    ['health/Conditions/Bones, joints and muscles', 'My right knee hurts after long runs.', 'health'],
-    ['health/Conditions/Bones, joints and muscles', 'My physical therapist gave me three knee exercises.', 'health'],
-    ['health/Sleep', 'I try to be asleep by 11:30 on school nights.', undefined],
-    ['health/Fitness/Cardio and running', 'I run three times a week, about 15 miles total.', undefined],
-    ['health/Fitness/Cardio and running', 'My half marathon plan builds to a 10 mile long run.', undefined],
-    ['health/Fitness/Strength training', 'I climb twice a week for strength.', undefined],
-    ['health/Nutrition', 'I try to eat 80 grams of protein a day.', undefined],
-    ['health/Mental health', 'Long walks help me when I feel stressed.', 'health'],
-  ]
-  for (const [where, line, sens] of health) w.chat(w.pick(['Health question', 'Running plan', 'Doctor visit notes', 'Feeling better', 'Training week', 'Sleep tips']), iso(w.int(10, 299)), [mine(where, line, { imp: 3, ...(sens ? { sens } : {}) })])
-  w.chat('Harbor Clinic visit', '2026-09-19', [say('harbor', 'Harbor Clinic is my clinic for checkups.', { imp: 3, sens: 'health' }), say('nora', 'Nora Patel works at Harbor Clinic.', { imp: 2 })])
+  place(w, 'folder:money/Budget', [
+    ['Monthly budget', [['My share of the rent is 1,450 dollars a month.', { sens: 'finance' }], ['I budget 400 dollars a month for groceries.', { imp: 3 }]], [5, 60]],
+    ['Paying bills', [['I pay for Spotify, iCloud and ChatGPT Plus.', { imp: 2 }], ['I split utilities with Jess on Splitwise.', { imp: 2 }]], [40, 200]],
+    ['Budget check', [['I track my spending in a Google Sheet.', { imp: 3 }], ['I review my budget on Sunday nights.', { imp: 2 }]], [60, 280]],
+    ['Fun money', [['I keep a 50 dollar a week fun budget.', { imp: 2 }]], [120, 290]],
+    ['Saving for Lisbon', [['I am saving for the Lisbon trip in a separate account.', { imp: 3 }], ['Tutoring and Kestrel are my two paychecks.', { sens: 'finance' }]], [200, 280]],
+  ])
+  place(w, 'folder:money/Investing', [
+    ['Roth IRA question', [['I put 100 dollars a month into a Roth IRA.', { imp: 3 }], ['My Roth IRA is in a target date fund.', { imp: 2 }]], [30, 150]],
+    ['Index funds', [['I buy index funds and do not pick stocks.', { imp: 2 }], ['I read the Bogleheads guide last summer.', { imp: 2 }]], [150, 280]],
+    ['Emergency fund first', [['I keep three months of rent in savings before I invest more.', { imp: 2 }]], [100, 260]],
+  ])
+  place(w, 'folder:money', [
+    ['Money question', [['I have about 9,000 dollars in student loans.', { sens: 'finance' }], ['My credit card is on autopay.', { sens: 'finance' }]], [10, 200]],
+    ['Tax forms', [['I need my 1098-T for taxes.', { sens: 'finance' }]], [20, 90]],
+  ])
 
-  // Money.
-  const money: Array<[string, string, string]> = [
-    ['money/Budget/Housing costs', 'My share of the rent is 1,450 dollars a month.', 'finance'],
-    ['money/Budget/Food costs', 'I budget 400 dollars a month for groceries.', 'finance'],
-    ['money/Budget/Subscriptions', 'I pay for Spotify, iCloud and ChatGPT Plus.', 'finance'],
-    ['money/Saving/Savings goals', 'I am saving for the Lisbon trip in a separate account.', 'finance'],
-    ['money/Investing/Retirement accounts', 'I put 100 dollars a month into a Roth IRA.', 'finance'],
-    ['money/Debt/Student loans', 'I have about 9,000 dollars in student loans.', 'finance'],
-    ['money/Debt/Credit cards', 'My credit card is on autopay.', 'finance'],
-    ['money/Taxes/Tax forms', 'I need my 1098-T for taxes.', 'finance'],
-    ['money/Income/Side income', 'Tutoring and Kestrel are my two paychecks.', 'finance'],
-  ]
-  for (const [where, line, sens] of money) w.chat(w.pick(['Budget check', 'Money question', 'Monthly budget', 'Saving plan', 'Paying bills']), iso(w.int(5, 299)), [mine(where, line, { imp: 3, sens: sens as Sensitivity })])
+  w.thing('lisbon', 'Lisbon trip', 'event', 'travel', 4)
+  w.thing('kyoto', 'Kyoto trip', 'event', 'travel', 3)
+  w.thing('portland', 'Portland for the wedding', 'event', 'travel', 2)
+  w.thing('tahoe', 'Tahoe ski weekend', 'event', 'travel', 2)
+  place(w, 'lisbon', [
+    ['Lisbon trip', [['The Lisbon trip is in March for six days.', { kind: 'event', imp: 4 }]], [200, 260], 'chatgpt'],
+    ['Lisbon trip planning', [['I am staying in Alfama on the Lisbon trip.', { imp: 2 }], ['The Lisbon trip budget is 2,000 dollars.', { imp: 3 }]], [220, 290]],
+    ['Flight times for the trip', [['The flight to Lisbon leaves at 7:40 am.', { imp: 2 }]], '2026-10-06', 'chatgpt'],
+    ['Lisbon day trips', [['I want a day trip to Sintra from Lisbon.', { imp: 2 }], ['I booked a fado night for the second evening in Lisbon.', { imp: 2 }]], [230, 295]],
+    ['Lisbon food list', [['Pasteis de Belem is first on my Lisbon food list.', { imp: 2 }], ['June Park is coming with me to Lisbon.', { imp: 3 }]], [240, 295]],
+  ])
+  place(w, 'kyoto', [
+    ['Kyoto trip ideas', [['I am planning a Kyoto trip for next summer with Hana.', { imp: 3 }], ['The Kyoto trip would be ten days in July.', { imp: 2 }]], [180, 280]],
+    ['Kyoto trip budget', [['The Kyoto trip budget is 3,000 dollars.', { imp: 2 }], ['A JR Pass does not pay off for the Kyoto trip.', { imp: 2 }]], [200, 290]],
+    ['Kyoto must sees', [['I want to see Fushimi Inari early in the morning.', { imp: 2 }], ['I want to stay in a ryokan for one night in Kyoto.', { imp: 2 }], ['Hana Ito grew up near Kyoto and will show us around.', { imp: 2 }]], [210, 295]],
+  ])
+  place(w, 'portland', [
+    ['Portland for the wedding planning', [['I fly to Portland on December 11 for the wedding.', { kind: 'event', imp: 3 }], ["I am staying with Lena's family in Portland.", { imp: 2 }]], [250, 295]],
+  ])
+  place(w, 'tahoe', [
+    ['Tahoe ski weekend packing', [['The Tahoe ski weekend is January 16 to 18.', { kind: 'event', imp: 2 }], ['We rented a cabin in Truckee for Tahoe.', { imp: 2 }]], [260, 298]],
+  ])
+  place(w, 'folder:travel', [
+    ['Travel style', [['I travel carry on only.', { kind: 'preference', imp: 2 }], ['I like an aisle seat on long flights.', { kind: 'preference', imp: 2 }]], '2026-03-28'],
+    ['Airline miles', [['I collect Alaska miles.', { imp: 2 }]], '2026-06-02'],
+    ['Montreal trip budget', [['The Montreal trip budget was $1,400 for 5 nights.', { imp: 2 }]], [120, 150], 'claude'],
+    ['Seattle visit', [['I visited June in Seattle in July.', { imp: 2 }]], [180, 220]],
+  ])
 
-  // Home.
-  w.thing('apartment', 'Durant Ave apartment', 'place', 'home/Your homes', 3)
-  w.thing('heater', 'Broken heater', 'topic', { parent: 'apartment' }, 2)
-  w.chat('Broken heater', '2026-10-17', [say('heater', 'The landlord fixes the heater on Wednesday.', { imp: 3 })], 'claude')
-  const home: Array<[string, string]> = [
-    ['apartment', 'I live in a two bedroom apartment on Durant Ave with Jess.'],
-    ['apartment', 'The apartment internet is Sonic fiber.'],
-    ['apartment', 'Trash goes out on Tuesday night.'],
-    ['apartment', 'My renters insurance is with Lemonade.'],
-    ['apartment', 'The pothos and the basil live by the kitchen window.'],
-  ]
-  for (const [key, line] of home) w.chat(w.pick(['Apartment stuff', 'Home question', 'Chores and bills', 'Moving things around']), iso(w.int(10, 299)), [say(key, line, { imp: 2 })])
-  w.thing('bike', 'Commuter bike', 'product', 'home/Vehicles', 2)
-  w.chat('Bike tune up', '2026-08-08', [say('bike', 'My commuter bike is a gray Linus.', { imp: 2 }), say('bike', 'The bike shop on Telegraph does my tune ups.', { imp: 2 })])
+  w.thing('apartment', 'Durant Ave apartment', 'place', 'personal', 3)
+  place(w, 'apartment', [
+    ['Apartment stuff', ['I live in a two bedroom apartment on Durant Ave with Jess.', ['The apartment internet is Sonic fiber.', { imp: 2 }]], [10, 120]],
+    ['Broken heater', ['The landlord fixes the heater on Wednesday.'], '2026-10-17', 'claude'],
+    ['Roommate chores', ['Jess Moreno is my roommate on Durant Ave.', ['Jess and I split chores by week.', { imp: 2 }]], '2026-02-18'],
+    ['Email to the landlord', [['Gary Novak is my landlord.', { imp: 2 }]], '2026-01-28'],
+    ['Chores and bills', [['Trash goes out on Tuesday night.', { imp: 2 }], ['My renters insurance is with Lemonade.', { imp: 2 }]], [40, 280]],
+    ['Balcony garden', [['I built a raised garden bed on the balcony.', { imp: 2 }], ['The raised bed has basil, chard and cherry tomatoes.', { imp: 2 }]], [90, 200]],
+    ['Bike tune up', [['My commuter bike is a gray Linus.', { imp: 2 }], ['The bike shop on Telegraph does my tune ups.', { imp: 2 }]], '2026-08-08'],
+  ])
+  place(w, 'folder:personal/Cooking', [
+    ['Pear tart recipe', ['The pear tart for Sunday needs four pears.'], [200, 299], 'gemini'],
+    ['Lentil soup recipe', [['My lentil soup uses smoked paprika and lemon.', { imp: 2 }]], [5, 299]],
+    ['Shakshuka for four', [['Shakshuka is my go to Sunday breakfast.', { imp: 2 }]], [5, 299]],
+    ['Fixing my chickpea curry', [['The chickpea curry freezes well for a week.', { imp: 2 }]], [5, 299]],
+    ['Banana bread recipe', [['My banana bread uses brown butter.', { imp: 2 }]], [5, 299]],
+    ['Pesto pasta', [['I make pesto with the basil from the balcony.', { imp: 2 }]], [150, 260]],
+    ['Dinner ideas', [['I cook vegetarian on weeknights.', { kind: 'preference', imp: 3 }], ['I do not like cilantro.', { kind: 'preference', imp: 2 }]], [5, 299]],
+    ['Meal plan for the week', [['I meal prep on Sunday afternoons.', { kind: 'preference', imp: 2 }], ['Overnight oats are my weekday breakfast.', { imp: 2 }]], [5, 299]],
+    ['Where to eat', [['Cheese Board Pizza is my favorite place in Berkeley.', { kind: 'preference', imp: 2 }], ['My coffee order is an oat milk cortado.', { kind: 'preference', imp: 2 }]], [5, 299]],
+  ])
+  place(w, 'folder:personal/Gifts and occasions', [
+    ['What to get Lena', [['I want to get Lena a small lemon tree for her new place.', { imp: 2 }]], [200, 280]],
+    ['Wedding gift for Dana', [["Dana's wedding gift is a set of linen napkins from her registry.", { imp: 2 }]], '2026-10-01'],
+    ['Gift for Theo', [['I want to get Theo a good backpack for college.', { imp: 2 }]], [250, 295]],
+    ['Holiday gifts', [['I give friends homemade banana bread at the holidays.', { imp: 2 }], ['I spend about 40 dollars on a birthday gift.', { imp: 3 }]], [250, 298]],
+    ['What to get Caleb', [['Caleb wants a new running vest for his birthday.', { imp: 2 }]], [170, 205]],
+    ['Friendsgiving plans', [['For Friendsgiving I am bringing the pear tart.', { imp: 2 }]], [285, 298]],
+    ["Iris's birthday gift", [["Iris's birthday gift is a Tesselcrest expansion.", { imp: 2 }]], [285, 298]],
+    ['Gift list', [['I keep a gift ideas note on my phone.', { imp: 2 }], ['I gave my mom an orchid for her birthday last year.', { imp: 2 }]], [30, 200]],
+  ])
 }
 
-// ---------------------------------------------------------------- hobbies, food, preferences, information
+// ---------------------------------------------------------------- code, preferences and hobbies
 
 function interests(w: Builder): void {
-  w.thing('soccer', 'Tuesday soccer', 'group', 'hobbies/Sports/Your teams', 3)
-  w.chat('Tuesday soccer', '2026-02-24', [say('soccer', 'I play soccer on Tuesdays at 7.', { kind: 'event', imp: 3 }), say('soccer', 'Our rec team is called the Tide Pools.', { imp: 2 })])
-  w.thing('climbing', 'Climbing', 'topic', 'hobbies/Sports/Outdoor and mountain sports', 3)
-  w.chat('Climbing goals', '2026-05-09', [say('climbing', 'I climb at Berkeley Ironworks.', { imp: 2 }), say('climbing', 'I am working on V4 boulder problems.', { imp: 2 })])
+  w.thing('sql', 'SQL', 'topic', 'tech', 3)
+  w.thing('react', 'React', 'topic', 'tech', 3)
+  w.thing('git', 'Git', 'topic', 'tech', 3)
+  place(w, 'self@sql', [
+    ['SQL at Kestrel', [['I write most of my Kestrel queries in SQL.', { imp: 3 }]], '2026-02-10'],
+    ['SQL window functions', [['I saved a cheat sheet on SQL window functions.', { imp: 2 }], ['I still look up the difference between RANK and DENSE_RANK.', { imp: 2 }]], [60, 250]],
+    ['Cleaner queries', [['I use CTEs instead of nested subqueries.', { kind: 'preference', imp: 2 }], ['I format SQL with one clause per line.', { kind: 'preference', imp: 2 }]], [80, 280]],
+    ['BigQuery costs', [['BigQuery charges by bytes scanned, so I select only the columns I need.', { imp: 2 }], ['QUALIFY in BigQuery saves me a subquery.', { imp: 2 }]], [100, 290]],
+    ['dbt tests', [['I test dbt models with unique and not null checks.', { imp: 2 }]], [120, 290]],
+  ])
+  place(w, 'self@react', [
+    ['Expo routes', [['I build SkipDoodle screens as Expo routes.', { imp: 2 }], ['I keep React state in one hook per screen.', { kind: 'preference', imp: 2 }]], [232, 299]],
+    ['TypeScript setup', [['I write TypeScript with strict mode on.', { kind: 'preference', imp: 3 }], ['I test with Vitest.', { kind: 'preference', imp: 2 }]], [100, 280]],
+    ['Styling React Native', [['I style React Native with plain StyleSheet objects.', { imp: 2 }], ['Supabase auth handles SkipDoodle sign in.', { imp: 2 }]], [240, 299]],
+    ['Astro islands', [['My personal website uses Astro with a few React islands.', { imp: 2 }]], [60, 290]],
+  ])
+  place(w, 'self@git', [
+    ['GitHub handles for the team', [say('git', "The team's GitHub handles are in the shared doc.", { imp: 2 }), say('git', 'Iris is irissato on GitHub.', { imp: 2 })], '2026-10-25', 'chatgpt'],
+    ['Branches for Tidepool', [['Tidepool uses one branch per feature and squash merges.', { imp: 2 }], ['I rebase my branches before opening a pull request.', { imp: 2 }]], [100, 290]],
+    ['Commit messages', [['I write commit messages in the present tense.', { kind: 'preference', imp: 2 }], ['I keep a .gitignore template for Python projects.', { imp: 2 }]], [60, 280]],
+  ])
+
+  const rule = (text: string, imp = 3): Line => [text, { kind: 'instruction', imp }]
+  place(w, 'folder:preferences/How you want answers', [
+    ['How I like answers', [rule('Keep answers short unless I ask for detail.', 5), rule('Start with the answer, then explain.', 4)], [20, 120]],
+    ['Shorter please', [rule('Keep answers short unless I ask for detail.', 5)], '2026-06-11', 'claude'],
+    ['Settings for this chat', [rule('Use a table when you compare options.'), rule('Give code examples in Python unless I say TypeScript.')], [60, 250]],
+    ['Please remember', [rule('Write dates like Oct 29, not 10/29.', 2), rule('Use miles for running and Celsius for cooking.', 2)], [80, 280]],
+    ['From now on', [rule('Show me the formula before the number.', 2), rule('Ask one question at a time when you need more from me.', 2)], [120, 290]],
+  ])
+  place(w, 'folder:preferences/Tone of answers', [
+    ['One more rule', [rule('Keep a calm, direct tone.', 4), rule('Skip the praise and get to the point.')], [40, 260]],
+    ['No emojis', [rule('Do not use emojis in answers.', 2), rule('Tell me when you are not sure.', 3)], [100, 290]],
+  ])
+  place(w, 'folder:preferences', [
+    ['Tools I use', [['I keep my notes in Notion and my tasks in Things.', { kind: 'preference', imp: 2 }]], [30, 200]],
+    ['Focus time', [['I do my best focused work before noon.', { kind: 'preference', imp: 3 }]], [30, 250]],
+  ])
+
+  // Her hobbies sit loose on their section: a few small things, no folders.
+  w.thing('soccer', 'Tuesday soccer', 'group', 'hobbies', 2)
+  w.thing('climbing', 'Climbing', 'topic', 'hobbies', 2)
+  w.thing('book_club', 'Book club', 'group', 'hobbies', 2)
+  w.thing('pottery', 'Pottery class', 'event', 'hobbies', 2)
+  place(w, 'soccer', [['Tuesday soccer', [['I play soccer on Tuesdays at 7.', { kind: 'event' }], ['Our rec team is called the Tide Pools.', { imp: 2 }]], '2026-02-24']])
+  place(w, 'climbing', [['Climbing goals', [['I climb at Berkeley Ironworks.', { imp: 2 }], ['I am working on V4 boulder problems.', { imp: 2 }]], '2026-05-09']])
+  place(w, 'book_club', [['Book club pick', [['My book club meets the last Sunday of the month.', { kind: 'event' }], ["November's book club pick is Pachinko.", { imp: 2 }]], '2026-10-10']])
+  place(w, 'pottery', [['Pottery class', [['My pottery class is on Thursday nights.', { kind: 'event', imp: 2 }], ['I made a set of four mugs in pottery.', { imp: 2 }]], '2026-09-10']])
   const books = ['Tomorrow, and Tomorrow, and Tomorrow', 'The Overstory', 'Klara and the Sun', 'Educated', 'Project Hail Mary', 'Pachinko', 'The Remains of the Day', 'Braiding Sweetgrass']
-  for (const book of books) {
-    const key = `book_${slug(book)}`
-    w.thing(key, book, 'product', 'hobbies/Reading/Books read', 2)
-    w.chat(w.pick([`Thoughts on ${book}`, `${book} discussion`, `What to read after ${book}`]), iso(w.int(5, 299)), [say(key, `I ${w.pick(['loved', 'liked', 'finished', 'could not put down'])} ${book}.`, { imp: 2 })])
-  }
-  w.thing('book_club', 'Book club', 'group', 'hobbies/Reading', 3)
-  w.chat('Book club pick', '2026-10-10', [say('book_club', 'My book club meets the last Sunday of the month.', { kind: 'event', imp: 3 }), say('book_club', 'November\'s book club pick is Pachinko.', { imp: 2 })])
-  const shows: Array<[string, string]> = [['Severance', 'I am rewatching Severance.'], ['The Bear', 'The Bear is my favorite show this year.'], ['Abbott Elementary', 'I watch Abbott Elementary with Jess.']]
-  for (const [show, line] of shows) {
-    const key = `show_${slug(show)}`
-    w.thing(key, show, 'product', 'hobbies/Movies and TV/TV shows', 2)
-    w.chat(`${show} theories`, iso(w.int(5, 299)), [say(key, line, { imp: 2 })])
-  }
-  w.chat('Music for focus', '2026-03-17', [mine('hobbies/Music/Music taste', 'I listen to Japanese Breakfast and Phoebe Bridgers.', { kind: 'preference', imp: 2 })])
-  w.thing('tesselcrest', 'Tesselcrest', 'product', 'hobbies/Games/Board games', 2)
-  w.chat('Board game night', '2026-06-26', [say('tesselcrest', 'Tesselcrest is a board game Iris likes.', { imp: 2 }), mine('hobbies/Games/Board games', 'Wingspan is my favorite board game.', { kind: 'preference', imp: 2 })])
-  w.thing('pottery', 'Pottery class', 'event', 'hobbies/Crafts/Pottery and ceramics', 2)
-  w.chat('Pottery class', '2026-09-10', [say('pottery', 'My pottery class is on Thursday nights.', { kind: 'event', imp: 2 }), say('pottery', 'I made a set of four mugs in pottery.', { imp: 2 })])
+  place(w, 'folder:hobbies', [
+    ...books.map((book): Talk => [w.pick([`Thoughts on ${book}`, `${book} discussion`, `What to read after ${book}`]), [[`I ${w.pick(['loved', 'liked', 'finished', 'could not put down'])} ${book}.`, { imp: 2 }]]]),
+    ['Severance theories', [['I am rewatching Severance.', { imp: 2 }]]],
+    ['The Bear theories', [['The Bear is my favorite show this year.', { imp: 2 }]]],
+    ['Music for focus', [['I listen to Japanese Breakfast and Phoebe Bridgers.', { kind: 'preference', imp: 2 }]], '2026-03-17'],
+    ['Board game night', [['Wingspan is my favorite board game.', { kind: 'preference', imp: 2 }]], '2026-06-26'],
+  ])
+}
 
-  const recipes: Array<[string, string]> = [
-    ['Pear tart', 'The pear tart for Sunday needs four pears.'],
-    ['Lentil soup', 'My lentil soup uses smoked paprika and lemon.'],
-    ['Shakshuka', 'Shakshuka is my go to Sunday breakfast.'],
-    ['Chickpea curry', 'The chickpea curry freezes well for a week.'],
-    ['Banana bread', 'My banana bread uses brown butter.'],
-    ['Pesto pasta', 'I make pesto with the basil from the balcony.'],
-    ['Overnight oats', 'Overnight oats are my weekday breakfast.'],
-  ]
-  for (const [name, line] of recipes) {
-    const key = `recipe_${slug(name)}`
-    w.thing(key, name, 'document', 'food/Recipes', 2)
-    w.chat(w.pick([`${name} recipe`, `Fixing my ${lower(name)}`, `${name} for four`]), iso(w.int(5, 299)), [say(key, line, { imp: 2 })], name === 'Pear tart' ? 'gemini' : undefined)
-  }
-  const food: Array<[string, string]> = [
-    ['food', 'I cook vegetarian on weeknights.'],
-    ['food/Cooking/Meal prep', 'I meal prep on Sunday afternoons.'],
-    ['food', 'My coffee order is an oat milk cortado.'],
-    ['food', 'I do not like cilantro.'],
-    ['food', 'Cheese Board Pizza is my favorite place in Berkeley.'],
-  ]
-  for (const [where, line] of food) w.chat(w.pick(['Dinner ideas', 'Food question', 'Grocery list', 'Where to eat', 'Meal plan for the week']), iso(w.int(5, 299)), [mine(where, line, { kind: 'preference', imp: 2 })])
+// ---------------------------------------------------------------- the rest of a year of chats
 
-  const prefs: Array<[string, string, FactKind, number]> = [
-    ['preferences/How you want answers', 'Keep answers short unless I ask for detail.', 'instruction', 5],
-    ['preferences/How you want answers', 'Start with the answer, then explain.', 'instruction', 4],
-    ['preferences/How you want answers', 'Use a table when you compare options.', 'instruction', 3],
-    ['preferences/How you want answers', 'Give code examples in Python unless I say TypeScript.', 'instruction', 3],
-    ['preferences/Tone of answers', 'Keep a calm, direct tone.', 'instruction', 4],
-    ['preferences/Tone of answers', 'Skip the praise and get to the point.', 'instruction', 3],
-    ['preferences/Coding instructions', 'I write TypeScript with strict mode on.', 'preference', 3],
-    ['preferences/Coding instructions', 'I test with Vitest.', 'preference', 2],
-    ['preferences/Units and formats', 'Write dates like Oct 29, not 10/29.', 'instruction', 2],
-    ['preferences/Units and formats', 'Use miles for running and Celsius for cooking.', 'preference', 2],
-    ['preferences/Tools and apps you prefer', 'I keep my notes in Notion and my tasks in Things.', 'preference', 2],
-    ['preferences/How you like to work', 'I do my best focused work before noon.', 'preference', 3],
-    ['tone/With teachers and professors', 'With professors I write short, formal emails.', 'style', 2],
-    ['tone/With your manager', 'With Nadia I am direct and lead with the numbers.', 'style', 2],
-    ['style/Greetings and sign offs', 'I start emails with Hi, never Hey.', 'style', 2],
-  ]
-  for (const [where, line, kind, imp] of prefs) w.chat(w.pick(['How I like answers', 'Settings for this chat', 'From now on', 'One more rule', 'Writing preferences', 'Please remember']), iso(w.int(5, 299)), [mine(where, line, { kind, imp })])
-  w.chat('Shorter please', '2026-06-11', [mine('preferences/How you want answers', 'Keep answers short unless I ask for detail.', { kind: 'instruction', imp: 5 })], 'claude')
-
-  const info: Array<[string, string, ThingKind, string]> = [
-    ['knowledge/Topics you follow', 'Health tech', 'topic', 'I follow health tech news for Tidepool.'],
-    ['knowledge/Topics you follow', 'Urban transit', 'topic', 'I follow BART and AC Transit budget news.'],
-    ['knowledge/Topics you follow', "Women's soccer", 'topic', 'I follow Bay FC.'],
-    ['knowledge/Saved answers', 'SQL window functions', 'document', 'I saved a cheat sheet on SQL window functions.'],
-    ['knowledge/Saved answers', 'Pandas groupby notes', 'document', 'I saved notes on pandas groupby and agg.'],
-    ['knowledge/Saved answers', 'Cover letter template', 'document', 'My cover letter template has three short paragraphs.'],
-    ['knowledge/How to guides', 'Changing a bike tube', 'document', 'I saved the steps for changing a bike tube.'],
-    ['knowledge/How to guides', 'Filing a 1098-T', 'document', 'The 1098-T goes in the education credits part of my taxes.'],
-    ['knowledge/Reading notes', 'Notes on The Mom Test', 'document', 'The Mom Test says to ask about past behavior, not opinions.'],
-    ['knowledge/Language learning', 'Portuguese', 'topic', 'I practice Portuguese on Duolingo for ten minutes a day.'],
-  ]
-  for (const [where, name, kind, line] of info) {
-    const key = `info_${slug(name)}`
-    w.thing(key, name, kind, where, 2)
-    w.chat(w.pick([name, `Quick question on ${lower(name)}`, `${name} notes`]), iso(w.int(5, 299)), [say(key, line, { imp: 2 })])
-  }
+/** More of what she told her AIs over the year, in the same places: a course's textbook, a project's stack, a friend's dog. */
+function more(w: Builder): void {
+  const two = (text: string): Line => [text, { imp: 2 }]
+  place(w, 'cs162', [
+    ['Pintos setup', [two('Pintos needs Linux, so I use the lab machines in Soda.'), two('CS 162 projects go in through Gradescope.')], [232, 260]],
+    ['CS 162 final topics', [two('The CS 162 final covers file systems and networking.'), two('I have three CS 162 slip days left.')], [280, 300]],
+    ['Late night lab', [two('Sam Lee and I meet late for CS 162 labs, since he is a night owl.')], [240, 290]],
+  ])
+  place(w, 'math54', [
+    ['MATH 54 textbook', [two("MATH 54 uses Lay's Linear Algebra book."), two('I check my MATH 54 answers with Wolfram Alpha.')], [232, 280]],
+    ['MATH 54 final rules', [two('The MATH 54 final allows one page of notes.')], [270, 300]],
+  ])
+  place(w, 'phys137', [
+    ['PHYS 137 textbook', [two('PHYS 137 uses the Griffiths quantum book.')], [232, 260]],
+    ['PHYS 137 final review', [two('The PHYS 137 final allows a formula sheet.'), two('Prof. Alvarez holds a review session the week before the PHYS 137 final.')], [280, 300]],
+  ])
+  place(w, 'data100', [
+    ['DATA 100 setup', [two('DATA 100 uses pandas and scikit-learn in Jupyter.'), two('DATA 100 lets us drop two labs.')], [232, 260]],
+    ['Where I study for DATA 100', [two('I work on DATA 100 labs at Moffitt Library.')], [240, 300]],
+  ])
+  place(w, 'folder:school', [
+    ['Getting to campus', [two('I bike to campus in ten minutes.'), two('My student ID works as an AC Transit pass.')], [10, 290]],
+    ['GPA check', [two('My GPA is 3.7.')], [150, 250]],
+  ])
+  place(w, 'self@kestrel', [
+    ['Kestrel perks', [two('Kestrel pays for one conference a year.'), two('Kestrel closes between Christmas and New Year.')], [20, 290]],
+    ['Sharing studies with clients', [two('Kestrel shares each study with its client as a Tableau workbook.'), two('I sit with the survey team on Tuesdays.')], [60, 290]],
+  ])
+  place(w, 'folder:work/Job applications', [
+    ['What internships want', [two('Most data internships ask for SQL and Python.'), two('I apply to five roles a week in the fall.')], [240, 290]],
+    ['Cover letter reader', [two('Elena reads each cover letter before I send it.')], [245, 295]],
+  ])
+  place(w, 'folder:work', [
+    ['Interview stories', [two('I keep a list of stories for behavioral questions.'), two('I send a thank you note within a day of an interview.')], [250, 295]],
+  ])
+  place(w, 'tidepool', [
+    ['Tidepool stack', [two('Tidepool runs on Next.js and Postgres.')], [100, 290]],
+    ['Tidepool waitlist', [two('Tidepool has a waitlist of eleven clinics.'), two('Clinics sign a three month pilot agreement with Tidepool.')], [200, 295]],
+    ['Tidepool team call', [two('The Tidepool team call is on Monday mornings.')], [100, 290]],
+    ['Logo price', [two('Jordan Ellis charges a flat 600 dollars for the Tidepool logo.')], [240, 280]],
+  ])
+  place(w, 'skipdoodle', [
+    ['SkipDoodle pricing', [two('SkipDoodle is free with one paid sticker pack.'), two('SkipDoodle has no ads and no chat.')], [240, 300]],
+    ['Saving SkipDoodle drawings', [two('SkipDoodle can save a drawing to the photo album.')], [240, 300]],
+  ])
+  place(w, 'sparrowhawk', [
+    ['Sparrowhawk stack', [two('Sparrowhawk is built with Django.'), two('I fix Sparrowhawk bugs on the first Sunday of each month.')], [100, 290]],
+    ['Bird rescue season', [two('The bird rescue cares for about 200 birds each spring.')], [60, 160]],
+  ])
+  place(w, 'lena', [['Lena visit', [two("Lena's dog is a corgi named Biscuit."), two('Lena taught me to make croissants.')], [100, 290]]])
+  place(w, 'caleb', [['How I met Caleb', [two('Caleb and I met at Tuesday soccer last year.')], [40, 120]]])
+  place(w, 'priya_raman', [['Exam prep with Priya', [two('Priya draws great system diagrams.'), two('Priya and I swap notes before CS 162 exams.')], [270, 300]]])
+  place(w, 'folder:people/Family', [
+    ['Family news', [two('Theo plays trumpet in the school band.'), two('My parents visit Berkeley in early December.')], [200, 298]],
+    ['Grandma Rose', [two('My grandma Rose loves crossword puzzles.')], [30, 250]],
+  ])
+  place(w, 'folder:plans/Events', [
+    ['Race day', [['The Oakland half marathon is on March 22.', { kind: 'event', imp: 3, due: '2027-03-22' }]], [250, 298]],
+    ['Open studio night', [['Open studio night at my pottery class is December 10.', { kind: 'event', imp: 2, due: '2026-12-10' }]], [280, 298]],
+  ])
+  place(w, 'folder:plans/Deadlines', [
+    ['Quick note', [['Rent is due on the 1st of each month.', { kind: 'task', imp: 3 }], ['My library card expires in January.', { kind: 'task', imp: 2 }]], [30, 280]],
+    ['Sabletide renewal', [['I need to send the Sabletide renewal notes by December 15.', { kind: 'task', imp: 3, due: '2026-12-15' }]], [285, 298]],
+  ])
+  place(w, 'folder:plans/Goals', [
+    ['Climbing goal', [['I want to climb a V5 by summer.', { kind: 'goal', imp: 2 }]], [120, 250]],
+    ['Bigger goals', [['I want to visit Kyoto before I graduate.', { kind: 'goal', imp: 2 }], ['I want to write one blog post a month.', { kind: 'goal', imp: 2 }]], [30, 290]],
+  ])
+  place(w, 'folder:style/Emails', [['Email habits', [['I never send an email after 10 pm.', { kind: 'style', imp: 2 }], ['I bold the one date that matters in an email.', { kind: 'style', imp: 2 }]], [100, 290]]])
+  place(w, 'folder:style/Cover letters', [['Tailoring a cover letter', [two('I tailor the second paragraph of a cover letter to each company.'), two('I name a product I use in every cover letter.')], [240, 290]]])
+  place(w, 'folder:health/Fitness', [
+    ['Running shoes', [two('I run in Hoka Clifton shoes.'), two('My best 10k time is 52 minutes.')], [60, 280]],
+    ['Sunday yoga', [two('I do a 20 minute yoga video on Sundays.')], [30, 290]],
+  ])
+  place(w, 'folder:health/Sleep', [['Weekday mornings', [two('I wake up at 7:15 on weekdays.'), two('I take a 20 minute nap on long days.')], [60, 290]]])
+  place(w, 'folder:health', [['Winter vitamins', [['I take vitamin D in winter.', { sens: 'health' }]], [10, 60]]])
+  place(w, 'folder:money/Budget', [
+    ['Cutting costs', [two('Cooking at home keeps my food under budget.'), two('My phone plan is 25 dollars a month with Mint.')], [40, 290]],
+    ['Textbooks', [two('I buy textbooks used or rent them.')], [225, 240]],
+  ])
+  place(w, 'folder:money/Investing', [['Opening a Roth IRA', [two('I opened my Roth IRA at Fidelity.'), two('I never sell investments to pay for trips.')], [20, 120]]])
+  place(w, 'folder:money', [['Credit score', [['My credit score is 742.', { sens: 'finance' }]], [60, 250]]])
+  place(w, 'lisbon', [['Getting around Lisbon', [two('I want to ride tram 28 in Lisbon.'), two('I am learning to order coffee in Portuguese for Lisbon.')], [240, 298]]])
+  place(w, 'kyoto', [['Kyoto gardens', [two('I want to see the moss garden at Saiho ji in Kyoto.')], [220, 298]]])
+  place(w, 'folder:travel', [['Booking flights', [two('I book trips on Google Flights with price alerts.'), two('I keep my passport in my desk drawer.')], [30, 290]]])
+  place(w, 'apartment', [['Apartment details', [two('The apartment has a small balcony facing west.'), two('Laundry is in the basement and takes quarters.')], [10, 250]]])
+  place(w, 'folder:personal/Cooking', [
+    ['Winter soup', [two('I make a big pot of soup every Sunday in winter.')], [10, 60]],
+    ['Cookbook question', [two('My favorite cookbook is Salt Fat Acid Heat.'), two('I use a cast iron pan for most dinners.')], [40, 290]],
+  ])
+  place(w, 'folder:personal/Gifts and occasions', [['Wrapping gifts', [two('I wrap gifts in brown paper and twine.'), two('My dad wants a history book about the Gold Rush.')], [250, 298]]])
+  place(w, 'self@sql', [['Joins question', [two('I use LEFT JOIN more than any other join.'), two('I keep my saved queries in a GitHub repo.')], [60, 290]]])
+  place(w, 'self@react', [['SkipDoodle state', [two('I use Zustand for shared state in SkipDoodle.'), two('I learned React from the official docs tutorial.')], [232, 299]]])
+  place(w, 'self@git', [['Big merges', [two('I use GitHub Desktop for big merges.'), two('Tidepool runs its tests on every pull request with GitHub Actions.')], [120, 295]]])
+  place(w, 'folder:preferences/How you want answers', [['Formatting answers', [['Do not repeat my question back to me.', { kind: 'instruction', imp: 2 }], ['Use numbered steps for how to answers.', { kind: 'instruction', imp: 3 }]], [60, 290]]])
+  place(w, 'folder:preferences/Tone of answers', [['Honest feedback', [['Be honest when my idea has a problem.', { kind: 'instruction', imp: 3 }]], [100, 290]]])
+  place(w, 'folder:hobbies', [
+    ['Learning ukulele', [two('I want to learn to play the ukulele.')]],
+    ['Shows with Jess', [two('I watch Abbott Elementary with Jess.')]],
+  ])
 }
 
 // ---------------------------------------------------------------- putting it together
 
+/**
+ * The memories whose chats the strip counts: the films' own lines, said
+ * before anything else is made, which include the lines her About me is
+ * made from. Nothing below adds a chat to them.
+ */
+const KEPT = new Set<string>()
+const kept = (f: Fact): boolean => KEPT.has(f.key) || Boolean(f.core)
+
 /** Chats about things she already told an AI, made until her chats come to TOTAL: she comes back to a topic. */
 function revisits(w: Builder): void {
   const titles = ['More on', 'Back to', 'Quick question about', 'Notes on', 'Following up on', 'Help with']
-  const facts = [...w.facts.values()].filter((f) => f.subject !== 'self' && f.importance >= 3)
+  const facts = [...w.facts.values()].filter((f) => !kept(f) && f.importance >= 3 && !f.value && !f.sensitivity && !f.under.startsWith('folder:') && w.things.get(f.under)!.kind !== 'person')
+  /** What a memory is filed on, as a chat's title names it. */
+  const placeOf = (f: Fact): string => {
+    const thing = w.things.get(f.under)!
+    const up = thing.parent ? w.things.get(thing.parent)! : null
+    // A part of something reads with what it is part of: "Notes on Tidepool launch day talk".
+    return up && thing.kind !== 'person' && !thing.name.includes(up.name) ? `${up.name} ${lower(thing.name)}` : thing.name
+  }
   while (w.chats.length < TOTAL) {
     const f = w.pick(facts)
-    const thing = w.things.get(f.subject)!
-    const up = thing.parent ? w.things.get(thing.parent)! : null
-    // A part of something reads with what it is part of: "Notes on Tidepool pricing", "Help with DATA 100 lab 3".
-    const name = up && thing.kind !== 'person' && !thing.name.includes(up.name) ? `${up.name} ${lower(thing.name)}` : thing.name
-    w.chat(`${w.pick(titles)} ${name}`, iso(w.int(5, 300)), [say(f.subject, f.text)])
+    const at = placeOf(f)
+    w.chat(`${w.pick(titles)} ${at}`, iso(w.int(5, 300)), [{ s: f.subject, text: f.text }])
   }
 }
 
@@ -894,15 +917,13 @@ function revisits(w: Builder): void {
  */
 function fold(w: Builder, target: number): void {
   const fixed = (c: Chat) => Boolean(c.platform) || !/^c\d{3}$/.test(c.key)
-  const subjects = (c: Chat) => new Set(c.says.map((k) => [...w.facts.values()].find((f) => f.key === k)!.subject))
-  const sectionOf = (key: string) => (key === 'self' ? 'self' : w.things.get(key)!.section)
+  const places = (c: Chat) => new Set(c.says.map((k) => [...w.facts.values()].find((f) => f.key === k)!.under))
   while (w.chats.length > target) {
     const open = w.chats.filter((c) => !fixed(c))
     const a = w.pick(open)
-    const mine = subjects(a)
-    const same = open.filter((b) => b !== a && [...subjects(b)].some((s) => mine.has(s)))
-    const near = same.length ? same : open.filter((b) => b !== a && [...subjects(b)].some((s) => [...mine].some((m) => sectionOf(m) === sectionOf(s))))
-    const b = near.length ? w.pick(near) : null
+    const mine = places(a)
+    const same = open.filter((b) => b !== a && [...places(b)].some((s) => mine.has(s)))
+    const b = same.length ? w.pick(same) : null
     if (!b) continue
     const [first, later] = a.at <= b.at ? [a, b] : [b, a]
     for (const k of later.says) {
@@ -932,12 +953,18 @@ const PINNED = [
 export function mayaWorld(seed = 0x3a7a2026): World {
   const w = new Builder(seed)
   filmed(w)
+  KEPT.clear()
+  for (const f of w.facts.values()) KEPT.add(f.key)
   school(w)
-  people(w)
   work(w)
   projects(w)
+  people(w)
+  plans(w)
   life(w)
   interests(w)
+  more(w)
+  // The strip's memories are said only in chats the film names, with their AIs.
+  for (const f of w.facts.values()) if (kept(f)) for (const c of f.chats) if (!w.chats.find((x) => x.key === c)!.platform) throw new Error(`"${f.text}" is said in a chat with no AI`)
   fold(w, TOTAL - 20)
   revisits(w)
   platforms(w)
