@@ -89,14 +89,6 @@ export const industries: Industry[] = [
     photo: photo("manufacturing", "Robot arms on a factory assembly line", "Simon Kadula"),
   },
   {
-    slug: "healthcare",
-    name: "Healthcare",
-    icon: "pulse",
-    summary: "Care teams that start from the full picture.",
-    uses: ["Care team context", "Research memory"],
-    photo: photo("healthcare", "Surgeons at work in an operating room", "Rodrigo Porto"),
-  },
-  {
     slug: "energy",
     name: "Energy",
     icon: "bolt",

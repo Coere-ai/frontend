@@ -1,6 +1,6 @@
 import type { IndustryPage } from "./types";
 
-/** Commerce, consumer, manufacturing, healthcare, energy and education. Each story matches the demo it names. */
+/** Commerce, consumer, manufacturing, energy and education. Each story matches the demo it names. */
 export const partTwo: Record<string, IndustryPage> = {
   commerce: {
     line: "Deals, partners and promises stay with the company across every market and every handoff.",
@@ -27,15 +27,6 @@ export const partTwo: Record<string, IndustryPage> = {
       { product: "solutions", demo: "graph", title: "Every customer and line in one memory", text: "Each customer keeps its lines, contacts, quality promises and shipments, built from the plant's chats.", checks: ["Lines under each customer", "Quality promises", "Shipment dates"] },
       { product: "solutions", demo: "confidential", title: "Updates that stay with the customer", text: "A report to one customer carries only that customer's memory, and Cori lists what is owed to them.", checks: ["One customer per send", "Answers with sources", "Nothing from other programs"] },
       { product: "forge", demo: "app", title: "Line tools that remember", text: "A line assistant built on Forge reads a line's fault history before a technician starts.", checks: ["The person allows it", "Section limits", "Revoke at any time"] },
-    ],
-  },
-  healthcare: {
-    line: "Run studies and partner sites from the full picture, with no patient details in memory.",
-    stories: [
-      { product: "connect", demo: "context", title: "Site visits prepared in minutes", text: "Ask for help with a monitoring visit and Coere brings the site's enrollment, open queries and training gaps.", checks: ["Enrollment status", "Open queries by age", "Training still owed"] },
-      { product: "solutions", demo: "graph", title: "Every site and study in one memory", text: "Each site keeps its investigators, studies, promises and deadlines, built from the team's chats.", checks: ["Studies under each site", "Promises with dates", "IRB and enrollment deadlines"] },
-      { product: "solutions", demo: "confidential", title: "One site per message", text: "An email to one site carries only that site's memory, and Cori lists what the site still owes.", checks: ["One site per send", "Answers with sources", "Sensitive memory stays back"] },
-      { product: "forge", demo: "app", title: "Monitoring tools with context", text: "A site monitoring app built on Forge asks what to check before a visit.", checks: ["memory:sensitive is off by default", "Section limits per token", "Apps never write memory"] },
     ],
   },
   energy: {
