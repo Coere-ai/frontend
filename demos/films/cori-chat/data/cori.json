@@ -1,0 +1,370 @@
+{
+ "calls": [
+  {
+   "method": "memory.search",
+   "args": {
+    "q": "cs 162 project"
+   },
+   "answer": {
+    "stage": 2,
+    "intent": {
+     "deadline": false,
+     "history": false,
+     "people": false,
+     "window": null
+    },
+    "open": null,
+    "hits": [
+     {
+      "node": {
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000040",
+       "kind": "course",
+       "name": "CS 162",
+       "path": [
+        {
+         "id": "sec_school",
+         "name": "School",
+         "kind": "section"
+        },
+        {
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000040",
+         "name": "CS 162",
+         "kind": "course"
+        }
+       ]
+      },
+      "facts": [],
+      "score": 1.5600000000000003
+     },
+     {
+      "node": {
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000041",
+       "kind": "project",
+       "name": "CS 162 project 3",
+       "path": [
+        {
+         "id": "sec_school",
+         "name": "School",
+         "kind": "section"
+        },
+        {
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000040",
+         "name": "CS 162",
+         "kind": "course"
+        },
+        {
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000041",
+         "name": "CS 162 project 3",
+         "kind": "project"
+        }
+       ]
+      },
+      "facts": [
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000140",
+        "kind": "task",
+        "key": "due",
+        "text": "CS 162 project 3 is due November 13.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          0,
+          2
+         ],
+         [
+          3,
+          6
+         ],
+         [
+          7,
+          14
+         ]
+        ],
+        "specifics": [
+         [
+          24,
+          35
+         ]
+        ],
+        "importance": 4,
+        "urgency": "later",
+        "urgencyLabel": "Due Nov 13",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 1.4034548396749793,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000140#e0",
+         "platform": "claude",
+         "convId": "claude:maya-school",
+         "title": "CS 162 deadlines",
+         "msg": 1,
+         "at": "2026-10-14T18:00:00Z",
+         "stale": false
+        }
+       }
+      ],
+      "score": 1.4034548396749793
+     }
+    ],
+    "library": [],
+    "total": 1,
+    "capped": false
+   }
+  },
+  {
+   "method": "memory.search",
+   "args": {
+    "q": "priya raman"
+   },
+   "answer": {
+    "stage": 3,
+    "intent": {
+     "deadline": false,
+     "history": false,
+     "people": false,
+     "window": null
+    },
+    "open": {
+     "node": {
+      "id": "ent_0199a5c1-8a00-7000-8000-000000000021",
+      "kind": "person",
+      "name": "Priya Raman",
+      "path": [
+       {
+        "id": "sec_people",
+        "name": "People",
+        "kind": "section"
+       },
+       {
+        "id": "ent_0199a5c1-8a00-7000-8000-000000000021",
+        "name": "Priya Raman",
+        "kind": "person"
+       }
+      ]
+     },
+     "children": [],
+     "facts": [
+      {
+       "id": "fact_0199a5c1-8a00-7000-8000-000000000101",
+       "kind": "attribute",
+       "key": "email",
+       "text": "Priya Raman's email is priya.raman@northfield.edu.",
+       "status": "active",
+       "progress": null,
+       "highlights": [
+        [
+         0,
+         5
+        ],
+        [
+         6,
+         13
+        ],
+        [
+         23,
+         28
+        ],
+        [
+         29,
+         34
+        ]
+       ],
+       "specifics": [
+        [
+         23,
+         49
+        ]
+       ],
+       "importance": 3,
+       "urgency": "none",
+       "urgencyLabel": null,
+       "basis": "user_stated",
+       "sensitivity": null,
+       "score": 3,
+       "evidence": {
+        "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000101#e0",
+        "platform": "chatgpt",
+        "convId": "chatgpt:maya-people",
+        "title": "People I email",
+        "msg": 2,
+        "at": "2026-10-12T16:03:00Z",
+        "stale": false
+       }
+      }
+     ],
+     "related": []
+    },
+    "hits": [
+     {
+      "node": {
+       "id": "ent_0199a5c1-8a00-7000-8000-000000000021",
+       "kind": "person",
+       "name": "Priya Raman",
+       "path": [
+        {
+         "id": "sec_people",
+         "name": "People",
+         "kind": "section"
+        },
+        {
+         "id": "ent_0199a5c1-8a00-7000-8000-000000000021",
+         "name": "Priya Raman",
+         "kind": "person"
+        }
+       ]
+      },
+      "facts": [
+       {
+        "id": "fact_0199a5c1-8a00-7000-8000-000000000101",
+        "kind": "attribute",
+        "key": "email",
+        "text": "Priya Raman's email is priya.raman@northfield.edu.",
+        "status": "active",
+        "progress": null,
+        "highlights": [
+         [
+          0,
+          5
+         ],
+         [
+          6,
+          13
+         ],
+         [
+          23,
+          28
+         ],
+         [
+          29,
+          34
+         ]
+        ],
+        "specifics": [
+         [
+          23,
+          49
+         ]
+        ],
+        "importance": 3,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "basis": "user_stated",
+        "sensitivity": null,
+        "score": 1.3973534330369242,
+        "evidence": {
+         "evidenceId": "fact_0199a5c1-8a00-7000-8000-000000000101#e0",
+         "platform": "chatgpt",
+         "convId": "chatgpt:maya-people",
+         "title": "People I email",
+         "msg": 2,
+         "at": "2026-10-12T16:03:00Z",
+         "stale": false
+        }
+       }
+      ],
+      "score": 1.4300000000000002
+     }
+    ],
+    "library": [],
+    "total": 1,
+    "capped": false
+   }
+  },
+  {
+   "method": "recall.memory",
+   "args": {
+    "q": "cs 162",
+    "limit": 2
+   },
+   "answer": {
+    "rows": [
+     {
+      "factId": "fact_0199a5c1-8a00-7000-8000-000000000140",
+      "text": "CS 162 project 3 is due November 13.",
+      "path": [
+       "School",
+       "CS 162",
+       "CS 162 project 3"
+      ],
+      "highlights": [
+       [
+        0,
+        2
+       ],
+       [
+        3,
+        6
+       ]
+      ],
+      "urgency": "later",
+      "urgencyLabel": "Due Nov 13",
+      "platform": "claude",
+      "convId": "claude:maya-school",
+      "title": "CS 162 deadlines",
+      "msg": 1,
+      "date": 1792000800000,
+      "score": 1.4223958641063519
+     }
+    ],
+    "late": false
+   }
+  }
+ ],
+ "now": {
+  "fact_0199a5c1-8a00-7000-8000-000000000140": {
+   "text": "CS 162 project 3 is due November 13.",
+   "source": {
+    "platform": "claude",
+    "convId": "claude:maya-school",
+    "title": "CS 162 deadlines",
+    "date": 1792000800000
+   }
+  },
+  "fact_0199a5c1-8a00-7000-8000-000000000101": {
+   "text": "Priya Raman's email is priya.raman@northfield.edu.",
+   "source": {
+    "platform": "chatgpt",
+    "convId": "chatgpt:maya-people",
+    "title": "People I email",
+    "date": 1791820980000
+   }
+  }
+ },
+ "status": {
+  "state": "ready",
+  "models": {
+   "extract": "claude-sonnet-5-5",
+   "consolidate": "claude-sonnet-5-5",
+   "short": "claude-haiku-5-5"
+  },
+  "until": null,
+  "stopClass": null,
+  "set": null,
+  "held": null,
+  "counts": {
+   "memories": 12,
+   "dueSoon": 0,
+   "review": 0,
+   "sourceChats": 3,
+   "sourceChatsBy": {
+    "chatgpt": 1,
+    "claude": 2
+   },
+   "held": 0,
+   "chatsRead": 0,
+   "chatsInLibrary": 0,
+   "failedJobs": 0,
+   "refusedJobs": 0
+  },
+  "spend": {
+   "monthMicros": 0,
+   "capMicros": 200000000
+  },
+  "poolSlots": {
+   "used": 0,
+   "capacity": 0
+  },
+  "lastVerify": null
+ }
+}
