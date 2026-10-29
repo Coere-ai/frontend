@@ -10,6 +10,11 @@ import type { FilmKey } from "./films";
 const at = (cut: string, n: string) => `/preview/screens/${cut}/${n}.html`;
 
 export const scenes = {
+  email: [
+    { src: at("actions-gmail", "007"), view: { x: 560, y: 160, w: 860 } },
+    { src: at("actions-gmail", "011"), view: { x: 0, y: 0, w: 900 }, hold: 3600 },
+    { src: at("actions-gmail", "012"), view: { x: 560, y: 330, w: 860 } },
+  ],
   teams: [
     { src: at("teams", "014"), view: { x: 200, y: 60, w: 1100 } },
     { src: at("teams", "018"), view: { x: 440, y: 80, w: 1000 } },
@@ -42,4 +47,5 @@ export const sceneOfFilm: Partial<Record<FilmKey, SceneKey>> = {
   coriRewrite: "writing",
   smartContext: "context",
   teams: "teams",
+  actionsGmail: "email",
 };
