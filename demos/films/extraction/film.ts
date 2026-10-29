@@ -34,12 +34,15 @@ function dates(): Dates {
   return (conv) => (conv.platformConvId === data.changed.id && conv.messages.length >= data.changed.messages.length ? changed : byId.get(conv.platformConvId));
 }
 
+/** How many chats each AI holds on install day: 148, 102 and 74 (gen-data.mts). */
+const COUNT = data.install.reduce<Record<string, number>>((n, c) => ((n[c.platform] = (n[c.platform] ?? 0) + 1), n), {});
+
 /** Memory's settings as the build step reads them: every AI Maya chose, read in full. */
 const SETTINGS = {
   readFrom: [
-    { platform: "chatgpt", on: true, chats: 14, projectsOff: [] },
-    { platform: "claude", on: true, chats: 28, projectsOff: [] },
-    { platform: "gemini", on: true, chats: 21, projectsOff: [] },
+    { platform: "chatgpt", on: true, chats: COUNT.chatgpt, projectsOff: [] },
+    { platform: "claude", on: true, chats: COUNT.claude, projectsOff: [] },
+    { platform: "gemini", on: true, chats: COUNT.gemini, projectsOff: [] },
   ],
   recall: true,
   backfillMode: "direct",
@@ -50,20 +53,50 @@ const SETTINGS = {
   extractScope: { v: 1, all: true },
 };
 
+/**
+ * coere-v2's FakeDataServer, which serves each replica site's data API in
+ * the page, writes its list cursors with Node's Buffer, which a page has
+ * not, so a site with more chats than one page of its list (100) could not
+ * be read past the first page. Each site tab gets the two Buffer calls the
+ * cursors make, before its content script starts (stage/tab/site.ts asks
+ * the host for its site first).
+ */
+function cursorsInSites(): void {
+  const host = (window as unknown as { __demo?: { site: (tab: string) => unknown; __buffer?: true } }).__demo;
+  if (!host || host.__buffer) return;
+  host.__buffer = true;
+  const site = host.site;
+  host.site = (tab: string) => {
+    const win = document.querySelector<HTMLIFrameElement>(`iframe[data-tab="${tab}"]`)?.contentWindow as (Window & { Buffer?: unknown }) | null;
+    if (win && !win.Buffer) win.Buffer = { from: (text: string, encoding?: string) => cursorBytes(win, text, encoding) };
+    return site(tab);
+  };
+}
+function cursorBytes(win: Window, text: string, encoding?: string): { toString: (encoding?: string) => string } {
+  if (encoding === "base64url") {
+    const b64 = text.replace(/-/g, "+").replace(/_/g, "/");
+    const bytes = Uint8Array.from(win.atob(b64 + "===".slice((b64.length + 3) % 4)), (c) => c.charCodeAt(0));
+    return { toString: () => new TextDecoder().decode(bytes) };
+  }
+  const bytes = new TextEncoder().encode(text);
+  return { toString: () => win.btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") };
+}
+
 function setup(world: World): void {
+  cursorsInSites();
   // Memory's quiet methods from the dashboard's own fixture, then Maya's memory over them.
   const fixture = fakeMemoryDeps().deps.api as unknown as Record<string, (a: unknown) => unknown>;
   for (const [method, fn] of Object.entries(fixture)) world.engine(method, (m) => fn(m.args));
   const memory = new Memory(world, () => worker?.stage?.fast ?? false);
   memory.install();
   world.engine("memory.settings", () => SETTINGS);
-  world.engine("memory.buildEstimate", () => ({ chats: 63, seconds: 540, measured: false, progress: null }));
+  world.engine("memory.buildEstimate", () => ({ chats: data.install.length, seconds: Math.round(data.install.length * 8.5), measured: false, progress: null }));
   // Voice mode asks whether its models are on this computer; they are not.
   world.on("", () => null);
   worker = new Worker(world, dates());
   worker.install();
   worker.onSaved = (id, messages) => memory.saved(id, messages);
-  worker.latency = { "chatgpt.com": 420, "claude.ai": 560, "gemini.google.com": 520 };
+  worker.latency = { "chatgpt.com": 330, "claude.ai": 470, "gemini.google.com": 560 };
   worker.site = (platform) => ({ name: `bg-${platform}`, src: `sites/${platform}.html`, host: HOSTS[platform] });
 }
 
@@ -242,11 +275,11 @@ play(
   {
     title: "Coere Extraction",
     chapters: [
-      { id: "choose", title: "Choose your AIs" },
-      { id: "extract", title: "Extract all" },
-      { id: "new", title: "New chats come in" },
-      { id: "change", title: "A chat changes" },
-      { id: "library", title: "Your library" },
+      { id: "choose", title: "Choose your AIs", seconds: 9 },
+      { id: "extract", title: "Extract all", seconds: 15 },
+      { id: "new", title: "New chats come in", seconds: 16 },
+      { id: "change", title: "A chat changes", seconds: 17 },
+      { id: "library", title: "Your library", seconds: 8 },
     ],
   },
   film,

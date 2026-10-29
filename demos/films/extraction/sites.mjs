@@ -8,7 +8,9 @@ import { readFileSync } from "node:fs";
 
 const data = JSON.parse(readFileSync(new URL("./data.json", import.meta.url), "utf8"));
 const newest = (list) => [...list].sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
-const on = (platform, list) => newest(list.filter((c) => c.platform === platform)).map(({ id, title, messages }) => ({ id, title, messages }));
+// Each chat keeps its dates, so the site lists the newest first and Coere sees the lab chat changed by its update time.
+const on = (platform, list) =>
+  newest(list.filter((c) => c.platform === platform)).map(({ id, title, createdAt, updatedAt, messages }) => ({ id, title, createdAt, updatedAt, messages: messages.map(({ role, text, at }) => (at ? { role, text, createdAt: at } : { role, text })) }));
 const withLater = [...data.install, ...data.later];
 const withChange = [...withLater.filter((c) => c.id !== data.changed.id), data.changed];
 

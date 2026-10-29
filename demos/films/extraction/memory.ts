@@ -19,6 +19,8 @@ type Fact = (typeof data.memory.facts)[number];
 const M = data.memory;
 const ZONE = M.zone;
 const SELF = "ent_self";
+/** Every chat in her library once the later ones came in: memory has read them all. */
+const LIBRARY = data.install.length + data.later.length;
 const titles = new Map([...data.install, ...data.later].map((c) => [`${c.platform}:${c.id}`, c.title]));
 const sectionOf = new Map(M.sections.map((s) => [s.id, s]));
 const thingOf = new Map(M.things.map((t) => [t.id, t]));
@@ -94,9 +96,17 @@ export class Memory {
 
   overview(): GraphSlice {
     const now = Date.now();
-    const views = this.current(now);
-    const mine = (id: string) => views.filter((v) => this.facts().find((f) => f.id === v.id)?.owner === id);
-    const under = (id: string): string[] => [id, ...M.things.filter((t) => t.parent === id).flatMap((t) => under(t.id))];
+    // Every current memory by the thing it is filed on, and every thing by its parent, read once: her memory holds hundreds.
+    const ownerOf = new Map(this.facts().map((f) => [f.id, f.owner]));
+    const byOwner = new Map<string, FactView[]>();
+    for (const v of this.current(now)) {
+      const owner = ownerOf.get(v.id)!;
+      byOwner.set(owner, [...(byOwner.get(owner) ?? []), v]);
+    }
+    const kids = new Map<string, string[]>();
+    for (const t of M.things) if (t.parent) kids.set(t.parent, [...(kids.get(t.parent) ?? []), t.id]);
+    const mine = (id: string) => byOwner.get(id) ?? [];
+    const under = (id: string): string[] => [id, ...(kids.get(id) ?? []).flatMap(under)];
     const urgent = (id: string) => {
       const levels = under(id).flatMap((x) => mine(x).filter((v) => v.freshness !== "history").map((v) => v.urgency));
       return (levels.sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b))[0] ?? "none") as GraphNode["urgency"];
@@ -163,7 +173,7 @@ export class Memory {
         ? { id: "ws_lab", origin: "capture", mode: "direct", state: "running", byPlatform: { claude: { chats: 1, read: 0, failed: 0, refused: 0, batched: 0 } }, linking: { queued: 0, done: 0 }, factsFound: 0, spentMicros: 0, etaSec: null }
         : null,
       held: null,
-      counts: { memories: views.length, dueSoon: this.dueSoon(99).length, review: 0, sourceChats: chats.size, sourceChatsBy: by, held: 0, chatsRead: chats.size, chatsInLibrary: chats.size, failedJobs: 0, refusedJobs: 0 },
+      counts: { memories: views.length, dueSoon: this.dueSoon(99).length, review: 0, sourceChats: chats.size, sourceChatsBy: by, held: 0, chatsRead: LIBRARY, chatsInLibrary: LIBRARY, failedJobs: 0, refusedJobs: 0 },
       spend: { monthMicros: 410_000, capMicros: 20_000_000 },
       poolSlots: { used: 0, capacity: 6 },
       lastVerify: null,
