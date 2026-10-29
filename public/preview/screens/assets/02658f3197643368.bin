@@ -1,0 +1,524 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Google Calendar</title><style>
+*{box-sizing:border-box}[hidden]{display:none!important}html,body{margin:0;height:100%}
+body{font:14px/20px Roboto,"Helvetica Neue",Arial,sans-serif;color:#3c4043;background:#fff}
+button{font:inherit}
+.frame{display:flex;flex-direction:column;height:100vh}
+.gb{display:flex;align-items:center;gap:8px;height:64px;padding:8px 16px 8px 12px;border-bottom:1px solid #dadce0;flex:none}
+.brand{display:flex;align-items:center;gap:8px;color:#3c4043;text-decoration:none;font-size:22px;width:200px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:0;border-radius:50%;background:none;color:#5f6368;cursor:pointer}
+.icon-btn:hover{background:rgba(60,64,67,.08)}
+.pill{height:36px;padding:0 16px;border:1px solid #dadce0;border-radius:18px;background:#fff;color:#3c4043;cursor:pointer;font-weight:500}
+.week-nav{display:flex;align-items:center;gap:4px}
+.month{font-size:22px;font-weight:400;margin:0 0 0 12px;color:#3c4043}
+.gb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#7b5ea7;color:#fff;text-decoration:none;font-weight:500}
+.app{display:flex;flex:1;min-height:0}
+.side{width:256px;flex:none;padding:16px 8px}
+.create{display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 24px 0 16px;border:0;border-radius:16px;background:#fff;box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15);cursor:pointer;color:#3c4043;font-weight:500}
+.cals{margin-top:32px;padding:0 16px;display:flex;flex-direction:column;gap:6px}
+.cals-head{font-weight:500;margin-bottom:4px}
+.main{flex:1;min-width:0;overflow:auto;position:relative}
+.days{display:grid;grid-template-columns:64px repeat(7,1fr);position:sticky;top:0;background:#fff;z-index:3;border-bottom:1px solid #dadce0}
+.dayhead{text-align:center;padding:8px 0}
+.dayhead .dow{font-size:11px;font-weight:500;color:#70757a;letter-spacing:.8px}
+.dayhead .num{font-size:26px;line-height:46px;width:46px;height:46px;margin:0 auto;border-radius:50%}
+.dayhead.today .num{background:#1a73e8;color:#fff}
+.grid{display:grid;grid-template-columns:64px repeat(7,1fr);position:relative}
+.hours{display:flex;flex-direction:column}
+.hour{height:48px;font-size:10px;color:#70757a;text-align:right;padding-right:8px;transform:translateY(-7px)}
+.col{position:relative;border-left:1px solid #dadce0;background:repeating-linear-gradient(#fff 0 47px,#dadce0 47px 48px)}
+.ev{position:absolute;left:2px;right:6px;border-radius:6px;background:#039be5;color:#fff;padding:2px 6px;font-size:12px;line-height:16px;overflow:hidden;cursor:pointer;border:1px solid #fff}
+.ev.mine{background:#7986cb}
+.ev .t{font-weight:500;display:block}
+.allday{grid-column:2/9;display:grid;grid-template-columns:repeat(7,1fr);min-height:4px}
+.allday .ev{position:static;margin:2px 4px}
+#snack-root{position:fixed;left:24px;bottom:24px;z-index:30}
+.snack{display:flex;align-items:center;gap:24px;min-width:300px;padding:14px 16px;border-radius:4px;background:#323232;color:#fff;box-shadow:0 3px 5px rgba(0,0,0,.2)}
+.snack a{color:#8ab4f8;font-weight:500;text-decoration:none}
+.pop{position:absolute;z-index:10;width:420px;background:#fff;border-radius:8px;box-shadow:0 24px 38px 3px rgba(0,0,0,.14),0 9px 46px 8px rgba(0,0,0,.12);padding:8px 8px 24px}
+.pop .tools{display:flex;justify-content:flex-end}
+.pop h2{font-size:22px;font-weight:400;margin:4px 24px}
+.pop p{margin:4px 24px;color:#3c4043}
+.editor{display:flex;flex-direction:column;height:100%}
+.ed-top{display:flex;align-items:center;gap:12px;padding:8px 16px;border-bottom:1px solid #dadce0}
+.ed-title{flex:1;max-width:760px;height:52px;border:0;border-bottom:1px solid #dadce0;font-size:22px;background:#f1f3f4;padding:0 12px;outline:none;border-radius:4px 4px 0 0}
+.save{height:36px;padding:0 24px;border:0;border-radius:4px;background:#1a73e8;color:#fff;cursor:pointer;font-weight:500}
+.ed-body{display:flex;gap:32px;padding:16px 56px;overflow:auto}
+.ed-left{flex:1;max-width:760px;display:flex;flex-direction:column;gap:14px}
+.ed-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ed-row input[type=text]{height:36px;border:0;background:#f1f3f4;border-radius:4px;padding:0 10px;font:inherit;color:#3c4043}
+.ed-row .wide{flex:1}
+.ed-row input[aria-label$=date]{width:132px}.ed-row input[aria-label$=time]{width:92px}
+.zone{color:#1a73e8;cursor:pointer;background:none;border:0;padding:0}
+.tabs{display:flex;gap:24px;border-bottom:1px solid #dadce0}
+.tabs span{padding:8px 0;color:#5f6368;font-weight:500}
+.tabs span.on{color:#1a73e8;box-shadow:inset 0 -3px 0 #1a73e8}
+.desc{min-height:160px;background:#f1f3f4;border-radius:4px;padding:10px;outline:none;white-space:pre-wrap}
+.ed-right{width:340px;flex:none}
+.ed-right h3{font-size:16px;font-weight:500;margin:10px 0}
+.guest-in{width:100%;height:36px;border:0;background:#f1f3f4;border-radius:4px;padding:0 10px;font:inherit}
+.suggest{position:absolute;width:340px;background:#fff;border-radius:8px;box-shadow:0 2px 6px 2px rgba(60,64,67,.15);padding:6px 0;z-index:5}
+.suggest [role=option]{padding:6px 16px;cursor:pointer;display:flex;flex-direction:column}
+.suggest [role=option][aria-selected=true],.suggest [role=option]:hover{background:#e8eaed}
+.suggest .em{font-size:12px;color:#5f6368}
+.guest{display:flex;align-items:center;gap:10px;padding:8px 0}
+.guest .av{width:28px;height:28px;border-radius:50%;background:#e8f0fe;color:#1967d2;display:flex;align-items:center;justify-content:center;font-weight:500}
+.guest .nm{flex:1;display:flex;flex-direction:column}
+.guest .em{font-size:12px;color:#5f6368}
+.perms{margin-top:16px;display:flex;flex-direction:column;gap:6px;color:#3c4043}
+.dialog-back{position:fixed;inset:0;background:rgba(32,33,36,.6);display:flex;align-items:center;justify-content:center;z-index:40}
+.dialog{background:#fff;border-radius:8px;padding:24px;width:460px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.dialog .row{display:flex;justify-content:flex-end;gap:8px;margin-top:24px}
+.dialog .row button{border:0;background:none;color:#1a73e8;font-weight:500;height:36px;padding:0 12px;cursor:pointer;border-radius:4px}
+.missing{padding:48px;color:#5f6368}
+</style></head><body><div class="frame" id="frame"><header class="gb" role="banner"><button class="icon-btn" aria-label="Main drawer"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="brand" href="/calendar/u/0/r" aria-label="Google Calendar"><svg viewBox="0 0 32 32" width="34" height="34" aria-hidden="true"><rect x="3" y="5" width="26" height="24" rx="3" fill="#fff" stroke="#1a73e8" stroke-width="2"/><path d="M3 11h26" stroke="#1a73e8" stroke-width="2"/><text x="16" y="25" font-size="11" text-anchor="middle" fill="#1a73e8" font-family="Arial" font-weight="700">31</text></svg><span>Calendar</span></a><div class="week-nav"><button class="pill" id="today">Today</button><button class="icon-btn" id="prev" aria-label="Previous week"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M14.5 6.5L9 12l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" id="next" aria-label="Next week"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9.5 6.5L15 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h1 class="month" id="month"></h1></div><div class="gb-right"><button class="pill view">Week</button><a class="avatar" href="#" aria-label="Google Account: Maya Collins (maya.collins@gmail.com)" title="Google Account: Maya Collins (maya.collins@gmail.com)">M</a></div></header><div class="app"><aside class="side"><button class="create" id="create" aria-label="Create"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Create</span></button><div class="cals"><div class="cals-head">My calendars</div><label><input type="checkbox" checked> Maya Collins</label><label><input type="checkbox" checked> Tasks</label><label><input type="checkbox"> Birthdays</label></div></aside><main id="main" class="main" role="main"></main></div></div><div id="snack-root"></div><script type="application/json" id="boot">{"account":0,"me":{"name":"Maya Collins","address":"maya.collins@gmail.com"},"accounts":["maya.collins@gmail.com","mcollins@northfield.edu"],"zone":"America/Los_Angeles","contacts":[{"name":"Sam Lee","address":"sam.lee@northfield.edu"},{"name":"Sam Okafor","address":"sam.okafor@gmail.com"},{"name":"Priya Raman","address":"priya.raman@northfield.edu"},{"name":"Jordan Ellis","address":"jordan@ellisstudio.co"},{"name":"Daniel Reyes","address":"dreyes@northfield.edu"},{"name":"Alex Kim","address":"alex.kim@gmail.com"},{"name":"Nora Patel","address":"nora.patel@harborclinic.org"}],"events":[{"id":"uo4hojcq0bdjgd1lr3jr8a6h1t","account":0,"title":"Design review","startUtc":"2026-11-19T19:00:00Z","endUtc":"2026-11-19T20:00:00Z","zone":"America/New_York","allDay":false,"where":"","guests":["sam.lee@northfield.edu","priya.raman@northfield.edu"],"details":"","invitationsSent":true,"deletedAt":null}],"weekly":[{"weekday":1,"start":"14:00","end":"15:00","title":"MATH 54 discussion","where":"Evans 71"},{"weekday":2,"start":"11:00","end":"12:30","title":"CS 162 lecture","where":"Soda 306"},{"weekday":3,"start":"14:00","end":"15:00","title":"MATH 54 discussion","where":"Evans 71"},{"weekday":4,"start":"11:00","end":"12:30","title":"CS 162 lecture","where":"Soda 306"},{"weekday":4,"start":"16:00","end":"17:00","title":"Lab hours","where":"Soda 275"},{"weekday":5,"start":"10:00","end":"11:00","title":"Office hours with Prof. Reyes","where":"Soda 711"}],"day":"2026-10-29","editor":null,"missing":false}</script><script>"use strict";
+(() => {
+  // tests/fake-google/client-dom.ts
+  function h(tag, attrs = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [name, value] of Object.entries(attrs)) {
+      if (value === null || value === void 0 || value === false) continue;
+      node.setAttribute(name, value === true ? "" : value);
+    }
+    for (const c of children) if (c !== null && c !== false && c !== void 0) node.append(c);
+    return node;
+  }
+  function svgIcon(path, size = 20) {
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("width", String(size));
+    svg.setAttribute("height", String(size));
+    svg.setAttribute("aria-hidden", "true");
+    const p = document.createElementNS(ns, "path");
+    p.setAttribute("d", path);
+    p.setAttribute("fill", "none");
+    p.setAttribute("stroke", "currentColor");
+    p.setAttribute("stroke-width", "1.8");
+    p.setAttribute("stroke-linecap", "round");
+    p.setAttribute("stroke-linejoin", "round");
+    svg.append(p);
+    return svg;
+  }
+  function readBoot() {
+    return JSON.parse(document.getElementById("boot")?.textContent ?? "{}");
+  }
+  async function post(path, data) {
+    const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) });
+    return await r.json();
+  }
+
+  // tests/fake-google/calendar/zone.ts
+  var pad = (n, w = 2) => String(n).padStart(w, "0");
+  function offsetAt(ms, zone) {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: zone,
+      hourCycle: "h23",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    }).formatToParts(new Date(ms));
+    const get = (t) => Number(parts.find((p) => p.type === t)?.value ?? 0);
+    const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+    return Math.round((asUtc - Math.floor(ms / 1e3) * 1e3) / 6e4);
+  }
+  function parseLocal(local) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(local);
+    if (!m) return null;
+    return { y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]), h: Number(m[4]), mi: Number(m[5]) };
+  }
+  function zonedToUtc(local, zone) {
+    const p = parseLocal(local);
+    if (!p) throw new Error("not a local time");
+    const naive = Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi);
+    let ms = naive - offsetAt(naive, zone) * 6e4;
+    ms = naive - offsetAt(ms, zone) * 6e4;
+    return new Date(ms).toISOString().replace(".000Z", "Z");
+  }
+  function utcToZoned(utc, zone) {
+    const ms = Date.parse(utc);
+    const d = new Date(ms + offsetAt(ms, zone) * 6e4);
+    return `${pad(d.getUTCFullYear(), 4)}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+  }
+  function zoneLabel(zone, atUtc) {
+    const off = offsetAt(Date.parse(atUtc), zone);
+    const sign = off < 0 ? "-" : "+";
+    const abs = Math.abs(off);
+    const city = (zone.split("/").pop() ?? zone).replace(/_/g, " ");
+    const long = new Intl.DateTimeFormat("en-US", { timeZone: zone, timeZoneName: "longGeneric" }).formatToParts(new Date(atUtc)).find((p) => p.type === "timeZoneName")?.value;
+    return `(GMT${sign}${pad(Math.floor(abs / 60))}:${pad(abs % 60)}) ${long ?? zone}, ${city}`;
+  }
+  function addDays(day, n) {
+    const d = /* @__PURE__ */ new Date(`${day}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+
+  // tests/fake-google/calendar/when.ts
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function showDate(local) {
+    const [y, mo, d] = local.slice(0, 10).split("-").map(Number);
+    return `${MONTHS[(mo ?? 1) - 1] ?? ""} ${String(d)}, ${String(y)}`;
+  }
+  function showTime(local) {
+    const h2 = Number(local.slice(11, 13));
+    const mi = local.slice(14, 16);
+    return `${String(h2 % 12 || 12)}:${mi}${h2 < 12 ? "am" : "pm"}`;
+  }
+  function readDate(text) {
+    const m = /^([A-Za-z]{3})[a-z]*\.? (\d{1,2}), (\d{4})$/.exec(text.trim());
+    const mo = m ? MONTHS.indexOf(`${m[1]?.[0]?.toUpperCase() ?? ""}${m[1]?.slice(1).toLowerCase() ?? ""}`) : -1;
+    if (!m || mo < 0) return null;
+    return `${m[3] ?? ""}-${String(mo + 1).padStart(2, "0")}-${(m[2] ?? "").padStart(2, "0")}`;
+  }
+  function readTime(text) {
+    const m = /^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?$/i.exec(text.trim());
+    if (!m) return null;
+    let h2 = Number(m[1]);
+    const mi = Number(m[2] ?? 0);
+    const half = m[3]?.toLowerCase();
+    if (half) {
+      if (h2 < 1 || h2 > 12) return null;
+      h2 = h2 % 12 + (half === "pm" ? 12 : 0);
+    }
+    if (h2 > 23 || mi > 59) return null;
+    return `${String(h2).padStart(2, "0")}:${String(mi).padStart(2, "0")}`;
+  }
+
+  // tests/fake-google/calendar/client/state.ts
+  var boot = readBoot();
+  var base = `/calendar/u/${String(boot.account)}/`;
+  var cal = { events: boot.events, day: boot.day };
+  var sync = (call, data) => post(`${base}sync/${call}`, data);
+  var weekPath = (day) => `${base}r/week/${day.replace(/-0?/g, "/")}`;
+  function upsertEvent(e) {
+    const i = cal.events.findIndex((x) => x.id === e.id);
+    if (i >= 0) cal.events[i] = e;
+    else cal.events.push(e);
+  }
+  var timer = null;
+  function snack(text, link) {
+    const root = document.getElementById("snack-root");
+    if (!root) return;
+    if (timer) clearTimeout(timer);
+    const box = h("div", { class: "snack", role: "alert" }, h("span", {}, text), link ? h("a", { href: link.href }, link.label) : null);
+    root.replaceChildren(box);
+    timer = setTimeout(() => root.replaceChildren(), 8e3);
+  }
+  function ask(label, text, buttons) {
+    return new Promise((done) => {
+      const back = h("div", { class: "dialog-back" });
+      const row = h("div", { class: "row" });
+      for (const b of buttons) {
+        const btn = h("button", { type: "button" }, b);
+        btn.addEventListener("click", () => {
+          back.remove();
+          done(b);
+        });
+        row.append(btn);
+      }
+      back.append(h("div", { class: "dialog", role: "dialog", "aria-modal": "true", "aria-label": label }, h("div", {}, text), row));
+      document.body.append(back);
+      row.lastElementChild?.focus();
+    });
+  }
+
+  // tests/fake-google/calendar/client/guests.ts
+  var ADDRESS = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
+  function guestsPanel(initial2) {
+    const input = h("input", { class: "guest-in", type: "text", "aria-label": "Guests", placeholder: "Add guests", autocomplete: "off", "aria-autocomplete": "list" });
+    const suggest = h("div", { class: "suggest", role: "listbox", "aria-label": "Suggestions", hidden: true });
+    const items = h("div", { role: "list", "aria-label": "Guest list" });
+    let shown = [];
+    let picked = 0;
+    const emails = () => [...items.querySelectorAll("[data-email]")].map((g) => g.getAttribute("data-email") ?? "");
+    function add(address) {
+      const a = address.trim();
+      if (!ADDRESS.test(a) || emails().includes(a)) return;
+      const name = boot.contacts.find((c) => c.address === a)?.name ?? a;
+      const remove = h("button", { class: "icon-btn", type: "button", "aria-label": `Remove ${name}` }, "x");
+      const item = h(
+        "div",
+        { class: "guest", role: "listitem", "data-email": a },
+        h("span", { class: "av" }, name[0]?.toUpperCase() ?? "?"),
+        h("span", { class: "nm" }, h("span", {}, name), name === a ? null : h("span", { class: "em" }, a)),
+        remove
+      );
+      remove.addEventListener("click", () => item.remove());
+      items.append(item);
+    }
+    function hide() {
+      suggest.hidden = true;
+      shown = [];
+    }
+    function draw2() {
+      const q = input.value.trim().toLowerCase();
+      shown = q ? boot.contacts.filter((c) => `${c.name} ${c.address}`.toLowerCase().includes(q)).slice(0, 6) : [];
+      picked = 0;
+      suggest.replaceChildren(
+        ...shown.map((c, i) => {
+          const o = h("div", { role: "option", "aria-selected": i === 0 ? "true" : "false", "data-address": c.address }, h("span", {}, c.name), h("span", { class: "em" }, c.address));
+          o.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            choose(i);
+          });
+          return o;
+        })
+      );
+      suggest.hidden = shown.length === 0;
+    }
+    function choose(i) {
+      const c = shown[i];
+      if (c) add(c.address);
+      input.value = "";
+      hide();
+    }
+    function commit() {
+      if (ADDRESS.test(input.value.trim())) {
+        add(input.value);
+        input.value = "";
+      }
+      hide();
+    }
+    input.addEventListener("input", draw2);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === "Tab") {
+        if (shown.length && !ADDRESS.test(input.value.trim())) {
+          e.preventDefault();
+          choose(picked);
+        } else if (input.value.trim()) {
+          e.preventDefault();
+          commit();
+        }
+      } else if (e.key === "ArrowDown" && shown.length) {
+        e.preventDefault();
+        picked = (picked + 1) % shown.length;
+        suggest.querySelectorAll("[role=option]").forEach((o, i) => o.setAttribute("aria-selected", i === picked ? "true" : "false"));
+      } else if (e.key === "Escape") hide();
+    });
+    input.addEventListener("blur", commit);
+    for (const g of initial2) add(g);
+    const panel = h(
+      "div",
+      { class: "ed-right" },
+      h("div", { class: "tabs" }, h("span", { class: "on" }, "Guests"), h("span", {}, "Rooms")),
+      h("div", { style: "position:relative;margin-top:12px" }, input, suggest),
+      items,
+      h("div", { class: "perms" }, h("h3", {}, "Guest permissions"), h("label", {}, h("input", { type: "checkbox" }), " Modify event"), h("label", {}, h("input", { type: "checkbox", checked: true }), " Invite others"), h("label", {}, h("input", { type: "checkbox", checked: true }), " See guest list"))
+    );
+    return {
+      panel,
+      list() {
+        commit();
+        return emails();
+      }
+    };
+  }
+
+  // tests/fake-google/calendar/client/editor.ts
+  function drawEditor(main2, seed, show2) {
+    const title = h("input", { class: "ed-title", type: "text", "aria-label": "Title", placeholder: "Add title" });
+    title.value = seed.title;
+    const field = (label, value) => {
+      const i = h("input", { type: "text", "aria-label": label });
+      i.value = value;
+      return i;
+    };
+    const startDate = field("Start date", showDate(seed.start));
+    const startTime = field("Start time", showTime(seed.start));
+    const endTime = field("End time", showTime(seed.end));
+    const endDate = field("End date", showDate(seed.end));
+    const allDay = h("input", { type: "checkbox", "aria-label": "All day", checked: seed.allDay });
+    const setTimes = () => {
+      startTime.hidden = allDay.checked;
+      endTime.hidden = allDay.checked;
+    };
+    setTimes();
+    allDay.addEventListener("change", setTimes);
+    const zone = h("button", { class: "zone", type: "button", "aria-label": "Time zone", "data-zone": seed.zone }, zoneLabel(seed.zone, zonedToUtc(seed.start, seed.zone)));
+    const where = field("Add location", seed.where);
+    where.classList.add("wide");
+    where.placeholder = "Add location";
+    const details = h("div", { class: "desc", role: "textbox", contenteditable: "true", "aria-label": "Description", "aria-multiline": "true" }, seed.details);
+    const guests = guestsPanel(seed.guests);
+    const save = h("button", { class: "save", type: "button", "aria-label": "Save" }, "Save");
+    const close = h("a", { class: "icon-btn", href: weekPath(cal.day), "aria-label": "Close" }, svgIcon("M6 6l12 12M18 6L6 18"));
+    const del = seed.id ? h("button", { class: "icon-btn", type: "button", "aria-label": "Delete event" }, svgIcon("M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3")) : null;
+    main2.replaceChildren(
+      h(
+        "div",
+        { class: "editor", role: "form", "aria-label": "Event details" },
+        h("div", { class: "ed-top" }, close, title, del, save),
+        h(
+          "div",
+          { class: "ed-body" },
+          h(
+            "div",
+            { class: "ed-left" },
+            h("div", { class: "ed-row" }, startDate, startTime, h("span", {}, "to"), endTime, endDate),
+            h("div", { class: "ed-row" }, h("label", {}, allDay, " All day"), zone, h("span", {}, "Does not repeat")),
+            h("div", { class: "tabs" }, h("span", { class: "on" }, "Event details"), h("span", {}, "Find a time")),
+            h("div", { class: "ed-row" }, where),
+            h("div", { class: "ed-row" }, h("span", {}, "Notification: 30 minutes before")),
+            details
+          ),
+          guests.panel
+        )
+      )
+    );
+    title.focus();
+    const when = () => {
+      const sd = readDate(startDate.value);
+      const ed = readDate(endDate.value);
+      const st = allDay.checked ? "00:00" : readTime(startTime.value);
+      const et = allDay.checked ? "00:00" : readTime(endTime.value);
+      return sd && ed && st && et ? { start: `${sd}T${st}`, end: `${ed}T${et}` } : null;
+    };
+    save.addEventListener("click", () => {
+      const w = when();
+      if (!w) {
+        snack("Enter a valid date and time");
+        return;
+      }
+      const list = guests.list();
+      const go = async () => {
+        const invite = list.length ? await ask("Send invitations", "Would you like to send invitation emails to Google Calendar guests?", ["Back", "Don't send", "Send"]) : "Don't send";
+        if (invite === "Back") return;
+        const saved = await sync("save", {
+          id: seed.id ?? "",
+          title: title.value,
+          start: w.start,
+          end: w.end,
+          allDay: allDay.checked,
+          zone: seed.zone,
+          where: where.value,
+          details: details.innerText.replace(/\n+$/, ""),
+          guests: list,
+          invitationsSent: invite === "Send"
+        });
+        upsertEvent(saved);
+        cal.day = utcToZoned(saved.startUtc, seed.zone).slice(0, 10);
+        show2(weekPath(cal.day));
+        snack("Event saved", { label: "View event", href: `${base}r/eventedit/${saved.id}` });
+      };
+      void go();
+    });
+    del?.addEventListener("click", () => {
+      void sync("delete", { id: seed.id }).then(() => {
+        cal.events = cal.events.filter((x) => x.id !== seed.id);
+        show2(weekPath(cal.day));
+        snack("Event deleted");
+      });
+    });
+  }
+
+  // tests/fake-google/calendar/client/week.ts
+  var HOUR = 48;
+  var DOW = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  var weekStart = (day) => addDays(day, -(/* @__PURE__ */ new Date(`${day}T00:00:00Z`)).getUTCDay());
+  function blocksFor(days) {
+    const out = [];
+    for (const day of days) {
+      const wd = (/* @__PURE__ */ new Date(`${day}T00:00:00Z`)).getUTCDay();
+      for (const w of boot.weekly.filter((x) => x.weekday === wd)) out.push({ day, start: w.start, end: w.end, title: w.title, where: w.where, event: null });
+    }
+    for (const e of cal.events) {
+      const s = utcToZoned(e.startUtc, boot.zone);
+      const en = utcToZoned(e.endUtc, boot.zone);
+      if (days.includes(s.slice(0, 10))) out.push({ day: s.slice(0, 10), start: e.allDay ? "" : s.slice(11), end: en.slice(11), title: e.title || "(No title)", where: e.where, event: e });
+    }
+    return out;
+  }
+  var minutes = (hm) => Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3, 5));
+  function card(b, at, main2, redraw) {
+    main2.querySelector(".pop")?.remove();
+    const e = b.event;
+    const close = h("button", { class: "icon-btn", "aria-label": "Close" }, "x");
+    const edit = e ? h("a", { class: "icon-btn", href: `${base}r/eventedit/${e.id}`, "aria-label": "Edit event" }, "Edit") : null;
+    const del = e ? h("button", { class: "icon-btn", "aria-label": "Delete event" }, "Delete") : null;
+    const when = b.start ? `${showTime(`${b.day}T${b.start}`)} to ${showTime(`${b.day}T${b.end}`)}` : "All day";
+    const pop = h(
+      "div",
+      { class: "pop", role: "dialog", "aria-label": b.title },
+      h("div", { class: "tools" }, edit, del, close),
+      h("h2", {}, b.title),
+      h("p", {}, `${(/* @__PURE__ */ new Date(`${b.day}T12:00:00Z`)).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" })}, ${when}`),
+      b.where ? h("p", {}, b.where) : null,
+      e?.guests.length ? h("p", {}, `${String(e.guests.length)} guests`) : null
+    );
+    pop.style.top = `${String(at.offsetTop)}px`;
+    pop.style.left = `${String(Math.min(at.parentElement?.offsetLeft ?? 0, main2.clientWidth - 440))}px`;
+    close.addEventListener("click", () => pop.remove());
+    del?.addEventListener("click", () => {
+      if (!e) return;
+      void sync("delete", { id: e.id }).then(() => {
+        cal.events = cal.events.filter((x) => x.id !== e.id);
+        redraw();
+        snack("Event deleted");
+      });
+    });
+    main2.append(pop);
+  }
+  function drawWeek(main2) {
+    const first = weekStart(cal.day);
+    const days = Array.from({ length: 7 }, (_, i) => addDays(first, i));
+    const today = utcToZoned((/* @__PURE__ */ new Date()).toISOString(), boot.zone).slice(0, 10);
+    const month = document.getElementById("month");
+    if (month) month.textContent = (/* @__PURE__ */ new Date(`${cal.day}T12:00:00Z`)).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+    const head = h("div", { class: "days" }, h("div"), ...days.map((d, i) => h("div", { class: `dayhead${d === today ? " today" : ""}` }, h("div", { class: "dow" }, DOW[i] ?? ""), h("div", { class: "num" }, String(Number(d.slice(8)))))));
+    const allDay = h("div", { class: "allday" }, ...days.map(() => h("div")));
+    const cols = days.map((d) => h("div", { class: "col", "data-day": d, role: "gridcell", style: `height:${String(24 * HOUR)}px` }));
+    const hours = h("div", { class: "hours" }, ...Array.from({ length: 24 }, (_, i) => h("div", { class: "hour" }, i ? showTime(`2000-01-01T${String(i).padStart(2, "0")}:00`).replace(":00", "") : "")));
+    const redraw = () => drawWeek(main2);
+    for (const b of blocksFor(days)) {
+      const col = cols[days.indexOf(b.day)];
+      const el = h(
+        "div",
+        { class: `ev${b.event ? " mine" : ""}`, role: "button", tabindex: "0", "data-eventid": b.event?.id, "aria-label": `${b.title}, ${b.start ? showTime(`${b.day}T${b.start}`) : "all day"}` },
+        h("span", { class: "t" }, b.title),
+        b.start ? h("span", {}, `${showTime(`${b.day}T${b.start}`)}${b.where ? `, ${b.where}` : ""}`) : null
+      );
+      if (b.start) {
+        el.style.top = `${String(minutes(b.start) / 60 * HOUR)}px`;
+        el.style.height = `${String(Math.max(20, (minutes(b.end) - minutes(b.start)) / 60 * HOUR - 2))}px`;
+        col?.append(el);
+      } else allDay.children[days.indexOf(b.day)]?.append(el);
+      el.addEventListener("click", () => card(b, el, main2, redraw));
+    }
+    main2.replaceChildren(head, h("div", { class: "grid" }, h("div"), allDay), h("div", { class: "grid", role: "grid", "aria-label": "Week" }, hours, ...cols));
+    main2.scrollTop = 7 * HOUR;
+  }
+
+  // tests/fake-google/calendar/client/main.ts
+  var main = document.getElementById("main");
+  function show(path) {
+    history.pushState(null, "", path);
+    draw();
+  }
+  function draw() {
+    const editing = /\/r\/eventedit/.test(location.pathname);
+    document.title = editing ? "Google Calendar - Event details" : "Google Calendar - Week";
+    if (editing && boot.editor && location.pathname === initial) drawEditor(main, boot.editor, show);
+    else if (editing && boot.missing) main.replaceChildren(h("div", { class: "missing", role: "status" }, "Could not find the requested event."));
+    else if (editing) location.reload();
+    else drawWeek(main);
+  }
+  var initial = location.pathname;
+  draw();
+  window.addEventListener("popstate", draw);
+  var move = (days) => {
+    cal.day = addDays(cal.day, days);
+    show(weekPath(cal.day));
+  };
+  document.getElementById("prev")?.addEventListener("click", () => move(-7));
+  document.getElementById("next")?.addEventListener("click", () => move(7));
+  document.getElementById("today")?.addEventListener("click", () => {
+    cal.day = utcToZoned((/* @__PURE__ */ new Date()).toISOString(), boot.zone).slice(0, 10);
+    show(weekPath(cal.day));
+  });
+  document.getElementById("create")?.addEventListener("click", () => location.assign(`${base}r/eventedit`));
+})();
+</script></body></html>

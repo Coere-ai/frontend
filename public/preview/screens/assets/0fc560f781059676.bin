@@ -1,0 +1,105 @@
+<!doctype html><html lang="en" data-fake-platform="chatgpt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ChatGPT (fake)</title><style>
+.fake-upload-chip{display:inline-flex;align-items:center;gap:8px;max-width:260px;margin:0 0 8px;padding:8px 12px 8px 8px;border:1px solid var(--border);border-radius:12px;background:var(--surface);font-size:13px;position:relative;overflow:hidden}
+.fake-upload-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:#e8eaf6;color:#3949ab;font-size:10px;font-weight:700}
+.fake-upload-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fake-upload-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--hover)}
+.fake-upload-bar span{display:block;height:100%;width:40%;background:var(--accent);animation:fake-upload 1s linear infinite}
+@keyframes fake-upload{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
+.fake-upload-error{color:#c62828;font-size:12px}
+.fake-upload-remove{margin-left:4px;width:22px;height:22px;border:0;border-radius:50%;background:var(--hover);cursor:pointer;line-height:1}
+[data-fake-upload=failed]{border-color:#e57373}
+.fake-signin{position:fixed;inset:30% auto auto 50%;transform:translateX(-50%);padding:24px 28px;border-radius:16px;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.2);z-index:10}
+:root{--font:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;--bg:#fff;--surface:#fff;
+--sidebar-bg:#f9f9f9;--sidebar-w:260px;--text:#0d0d0d;--muted:#6e6e80;--border:#e5e5e5;--hover:#ececec;
+--accent:#0d0d0d;--accent-text:#fff;--send-off:#d7d7d7;--bubble:#f4f4f4;--placeholder:#8e8ea0;
+--thread-w:768px;--composer-radius:28px;--code-bg:#f9f9f9;--code-head:#f0f0f0}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:var(--font);color:var(--text);background:var(--bg);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+a{color:inherit}
+.fake-app{display:flex;height:100vh;overflow:hidden}
+.fake-sidebar{width:var(--sidebar-w);flex:none;display:flex;flex-direction:column;background:var(--sidebar-bg);border-right:1px solid var(--sidebar-border,transparent)}
+.fake-sidebar-top{padding:8px 10px 4px;display:flex;flex-direction:column;gap:1px}
+.fake-brand{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 6px 0 10px;font-weight:600;font-size:17px}
+.fake-side-link{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;border-radius:10px;color:inherit;text-decoration:none;font-size:14px;background:none;border:0;cursor:pointer;width:100%;text-align:left}
+.fake-side-link:hover,.fake-chat-link:hover{background:var(--hover)}
+.fake-sidebar-scroll{flex:1;overflow-y:auto;padding:4px 10px 12px;mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent)}
+.fake-sidebar-heading{font-size:12px;font-weight:500;color:var(--muted);margin:16px 10px 6px}
+.fake-chat-link{display:block;padding:7px 10px;border-radius:10px;text-decoration:none;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fake-chat-link[aria-current=page]{background:var(--active,var(--hover))}
+[data-fake-sidebar-state=loading]::after{content:"Loading chats";display:block;padding:8px 10px;color:var(--muted);font-size:13px}
+.fake-sidebar-bottom{padding:10px 12px;display:flex;align-items:center;gap:10px;font-size:14px}
+.fake-sidebar-bottom small{display:block;color:var(--muted);font-size:12px;line-height:1.2}
+.fake-avatar{width:32px;height:32px;flex:none;border-radius:50%;background:var(--avatar,#d9d9e3);color:var(--avatar-text,#3c3c48);display:grid;place-items:center;font-size:12px;font-weight:600}
+.fake-main{flex:1;min-width:0;display:flex;flex-direction:column;position:relative}
+.fake-header{height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 14px;position:relative}
+.fake-header-center{position:absolute;left:50%;transform:translateX(-50%)}
+.fake-header-side{display:flex;align-items:center;gap:6px}
+.fake-model{display:inline-flex;align-items:center;gap:4px;font-size:17px;font-weight:500;padding:6px 10px;border-radius:10px;border:0;background:none;cursor:pointer}
+.fake-model:hover{background:var(--hover)}
+.fake-scroller{flex:1;overflow-y:auto;min-height:0}
+.fake-thread{max-width:var(--thread-w);margin:0 auto;padding:16px 24px 40px;display:flex;flex-direction:column;gap:var(--turn-gap,28px)}
+.fake-dock{flex:none;width:100%;max-width:calc(var(--thread-w) + 48px);margin:0 auto;padding:0 24px}
+.fake-footnote{font-size:12px;color:var(--muted);text-align:center;margin:0;padding:8px 24px 12px}
+.fake-spacer{display:none}
+.fake-new_chat .fake-scroller{display:flex;flex-direction:column;justify-content:flex-end;overflow:visible}
+.fake-new_chat .fake-spacer{display:block;flex:1.2}
+.fake-hero{text-align:center;padding:0 24px 28px}
+.fake-hero h1{font-size:28px;font-weight:500;margin:0;letter-spacing:-.01em}
+.fake-hero p{color:var(--muted);margin:8px 0 0}
+.fake-turn-user{display:flex;flex-direction:column;align-items:flex-end}
+.fake-bubble{background:var(--bubble);border-radius:var(--bubble-radius,20px);padding:10px 16px;max-width:72%;white-space:pre-wrap;overflow-wrap:anywhere}
+.fake-md p{margin:0 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.fake-md>:last-child{margin-bottom:0}
+.fake-code{border-radius:12px;overflow:hidden;margin:0 0 14px;background:var(--code-bg);border:1px solid var(--border)}
+.fake-code-chrome{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;font-size:12px;color:var(--muted);background:var(--code-head)}
+.fake-code-copy{background:none;border:0;font-size:12px;color:var(--muted);cursor:pointer}
+.fake-code pre{margin:0;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--mono)}
+.fake-table{overflow-x:auto;margin:0 0 14px}
+.fake-table table{border-collapse:collapse;font-size:14px}
+.fake-table th,.fake-table td{border-bottom:1px solid var(--border);padding:7px 14px 7px 0;text-align:left}
+.fake-turn-files{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:6px}
+.fake-turn-file{font-size:12px;border:1px solid var(--border);border-radius:8px;padding:3px 8px;background:var(--surface)}
+.fake-sources{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px;counter-reset:src}
+.fake-sources li{counter-increment:src}
+.fake-source{display:block;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:4px 10px;background:var(--surface)}
+.fake-source::before{content:counter(src) ". ";color:var(--muted)}
+.fake-shell{background:var(--surface);border:1px solid var(--shell-border,var(--border));border-radius:var(--composer-radius);box-shadow:var(--shell-shadow,0 2px 12px rgba(0,0,0,.05));padding:10px 10px 10px 14px}
+.fake-row{display:flex;align-items:flex-end;gap:6px}
+.fake-grow{flex:1;min-width:0;align-self:center}
+.fake-banner{background:#fff6e0;border:1px solid #f0d9a0;color:#6b4e00;border-radius:12px;padding:10px 14px;font-size:14px;margin:0 0 10px}
+.fake-temp-pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;border:1px solid var(--border);border-radius:999px;padding:4px 12px;background:var(--surface)}
+.fake-icon-btn{display:inline-grid;place-items:center;width:36px;height:36px;flex:none;border-radius:50%;border:0;background:none;cursor:pointer;color:var(--icon,var(--text))}
+.fake-icon-btn:hover{background:var(--hover)}
+.fake-send{width:36px;height:36px;flex:none;border-radius:50%;border:0;display:grid;place-items:center;background:var(--accent);color:var(--accent-text);cursor:pointer}
+.fake-send:disabled,.fake-send[aria-disabled=true]{background:var(--send-off);color:var(--send-off-text,#fff);cursor:default}
+.fake-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.fake-history-loader{position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:5;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:4px 14px;font-size:12px;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.fake-history-loader[hidden]{display:none}
+.fake-notfound{max-width:420px;margin:18vh auto 0;text-align:center;color:var(--muted)}
+.fake-wall{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
+.fake-wall-card{width:360px;text-align:center;padding:32px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.fake-wall-card h1{font-size:22px;font-weight:600;margin:0 0 8px}
+.fake-wall-card p{color:var(--muted);margin:0 0 20px}
+.fake-wall-card button{display:block;width:100%;height:44px;border-radius:999px;margin-top:10px;cursor:pointer;border:1px solid var(--border);background:var(--surface)}
+.fake-wall-card button.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.ProseMirror{outline:none;white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow-y:auto}
+.ProseMirror p{margin:0}
+.ProseMirror p.placeholder::before{content:attr(data-placeholder);color:var(--placeholder);pointer-events:none;float:left;height:0}
+.fake-reflow{outline:none;max-height:220px;overflow-y:auto;position:relative;overflow-wrap:anywhere;white-space:pre-wrap}
+.fake-reflow p{margin:0}
+.fake-reflow.is-empty::before{content:attr(data-placeholder);position:absolute;color:var(--placeholder);pointer-events:none}
+.fake-textarea{display:block;border:0;outline:none;resize:none;background:transparent;font:inherit;color:inherit;width:100%;line-height:1.5;padding:6px 0;height:36px}
+.fake-textarea::placeholder{color:var(--placeholder)}
+/* Bottom left of the main column: Coere's button sits in the chat box, the Cori agent and the popup sit in the bottom right corner, and Recall can rise to the top center. */
+.fake-label{position:fixed;left:calc(var(--sidebar-w) + 16px);bottom:12px;z-index:2147483000;background:#fff7d6;color:#6b5200;border:1px solid #e6cf7a;border-radius:999px;padding:5px 11px;font:600 11px/1.2 var(--font);pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+.fake-cg-composer{padding:8px 10px}
+.fake-cg-composer .fake-row{align-items:center}
+.fake-cg-composer .ProseMirror{padding:6px 4px;font-size:16px}
+.fake-cg-turn-user .fake-bubble{max-width:70%}
+.fake-md{font-size:16px;line-height:1.7}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style><script type="application/json" id="__coere_fake_boot__">{"platform":"chatgpt","name":"ChatGPT","page":"chat","conversation":{"id":"chatgpt-sample-28","title":"Debugging a race condition","messages":[{"role":"user","text":"Can you help me with this: debugging a race condition?"},{"role":"assistant","text":"Write down what you expect before you try it, so you can tell when it goes wrong. Keep notes as you go, because the details fade faster than you think.\n\nMeasure once before changing anything, then measure again after. Most of the effort goes into the first step; after that it gets easier."},{"role":"user","text":"Is there a simpler way to do this?"},{"role":"assistant","text":"If two options look equal, pick the one that is easier to undo later. Measure once before changing anything, then measure again after.\n\nWrite down what you expect before you try it, so you can tell when it goes wrong. Keep notes as you go, because the details fade faster than you think."}]},"sidebar":[{"id":"chatgpt-sample-29","title":"Organizing old photos","href":"/c/chatgpt-sample-29"},{"id":"chatgpt-sample-28","title":"Debugging a race condition","href":"/c/chatgpt-sample-28"},{"id":"chatgpt-sample-27","title":"Morning stretch routine","href":"/c/chatgpt-sample-27"},{"id":"chatgpt-sample-26","title":"Making a travel checklist","href":"/c/chatgpt-sample-26"},{"id":"chatgpt-sample-25","title":"Picking a board game","href":"/c/chatgpt-sample-25"},{"id":"chatgpt-sample-24","title":"Summarizing a long email","href":"/c/chatgpt-sample-24"},{"id":"chatgpt-sample-23","title":"A haiku about rain","href":"/c/chatgpt-sample-23"},{"id":"chatgpt-sample-22","title":"Setting up a home server","href":"/c/chatgpt-sample-22"},{"id":"chatgpt-sample-21","title":"Regex for ISO dates","href":"/c/chatgpt-sample-21"},{"id":"chatgpt-sample-20","title":"Keeping basil alive indoors","href":"/c/chatgpt-sample-20"},{"id":"chatgpt-sample-19","title":"Drafting a cover letter","href":"/c/chatgpt-sample-19"},{"id":"chatgpt-sample-18","title":"Explaining recursion simply","href":"/c/chatgpt-sample-18"},{"id":"chatgpt-sample-17","title":"Budget for a road trip","href":"/c/chatgpt-sample-17"},{"id":"chatgpt-sample-16","title":"Practicing Spanish verbs","href":"/c/chatgpt-sample-16"},{"id":"chatgpt-sample-15","title":"A birthday quiz for kids","href":"/c/chatgpt-sample-15"},{"id":"chatgpt-sample-14","title":"Indexing a large SQL table","href":"/c/chatgpt-sample-14"},{"id":"chatgpt-sample-13","title":"Tuning a bike chain","href":"/c/chatgpt-sample-13"},{"id":"chatgpt-sample-12","title":"Writing a polite reminder","href":"/c/chatgpt-sample-12"},{"id":"chatgpt-sample-11","title":"Naming a small side project","href":"/c/chatgpt-sample-11"},{"id":"chatgpt-sample-09","title":"Packing for a rainy trip","href":"/c/chatgpt-sample-09"},{"id":"chatgpt-sample-08","title":"Learning chess openings","href":"/c/chatgpt-sample-08"},{"id":"chatgpt-sample-07","title":"Comparing two laptops","href":"/c/chatgpt-sample-07"},{"id":"chatgpt-sample-06","title":"Notes for a short talk","href":"/c/chatgpt-sample-06"},{"id":"chatgpt-sample-05","title":"Fixing a flaky login test","href":"/c/chatgpt-sample-05"},{"id":"chatgpt-sample-04","title":"Choosing a tent for two","href":"/c/chatgpt-sample-04"},{"id":"chatgpt-sample-03","title":"Reading a CSV file in chunks","href":"/c/chatgpt-sample-03"},{"id":"chatgpt-sample-02","title":"Planning a raised garden bed","href":"/c/chatgpt-sample-02"},{"id":"chatgpt-sample-01","title":"Weekend bread recipe","href":"/c/chatgpt-sample-01"},{"id":"chatgpt-sample-00","title":"Sorting a list in place","href":"/c/chatgpt-sample-00"}],"currentId":"chatgpt-sample-28","templates":{"user":{"tag":"article","attrs":{"class":"fake-turn","data-testid":"conversation-turn-{i}"},"children":[{"tag":"h2","attrs":{"class":"sr-only"},"children":["You said:"]},{"tag":"div","attrs":{"class":"fake-turn-user fake-cg-turn-user","data-message-author-role":"{role}","data-message-id":"fake-{i}"},"children":[{"tag":"div","slot":"attachments","attrs":{"class":"fake-turn-files"}},{"tag":"div","slot":"plain","attrs":{"class":"fake-bubble whitespace-pre-wrap"}}]}]},"assistant":{"tag":"article","attrs":{"class":"fake-turn","data-testid":"conversation-turn-{i}"},"children":[{"tag":"h2","attrs":{"class":"sr-only"},"children":["ChatGPT said:"]},{"tag":"div","attrs":{"data-message-author-role":"{role}","data-message-id":"fake-{i}"},"children":[{"tag":"div","slot":"markdown","attrs":{"class":"markdown prose fake-md"}}]}]},"sidebarItem":{"tag":"a","attrs":{"class":"fake-chat-link","href":"{href}"},"children":[{"tag":"span","slot":"plain"}]}},"editor":{"kind":"prosemirror","mount":"form[data-type=\"unified-composer\"] .fake-pm-host","attrs":{"id":"prompt-textarea","translate":"no"},"placeholder":"Ask anything"},"selectors":{"sendButton":"button[data-testid=\"send-button\"]"},"options":{"preDraft":"","historyPageSize":30,"historyDelayMs":150,"sidebarPageSize":28,"sidebarDelayMs":0,"ignoreProgrammaticInput":false,"pasteFileOver":800,"upload":"take","uploadMs":1800,"uploadLimitBytes":null}}</script></head><body class="fake-page fake-chat"><div class="fake-app"><aside class="fake-sidebar" aria-label="Sidebar"><div class="fake-sidebar-top"><div class="fake-brand">ChatGPT<button type="button" aria-label="Close sidebar" class="fake-icon-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM9.5 5v14"></path></svg></button></div><a class="fake-side-link" href="/"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>New chat</a><button class="fake-side-link" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20.5 20.5l-4.2-4.2"></path></svg>Search chats</button><button class="fake-side-link" type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 16l5-5 4 4 2-2 5 5M15.5 9.5h.01"></path></svg>Library</button></div><div class="fake-sidebar-scroll" data-fake-sidebar=""><nav aria-label="Chat history"><h2 class="fake-sidebar-heading">Chats</h2><div class="fake-chat-list" data-fake-sidebar-list=""></div></nav></div><div class="fake-sidebar-bottom"><span class="fake-avatar">TU</span><span>Test User<small>Fake Plus plan</small></span></div></aside><main class="fake-main"><h1 class="fake-sr-only">Fake ChatGPT</h1><header class="fake-header"><button type="button" class="fake-model">ChatGPT<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"></path></svg></button><div class="fake-header-side"><button type="button" aria-label="Conversation options" class="fake-icon-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01"></path></svg></button></div></header><div class="fake-scroller" data-fake-scroller=""><div class="fake-thread" data-fake-thread=""></div></div><div class="fake-history-loader" data-fake-history-loader="" hidden="">Loading older messages</div><div class="fake-dock"><form class="fake-shell fake-cg-composer" data-type="unified-composer"><div class="fake-row"><button type="button" aria-label="Add photos and files" class="fake-icon-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button><div class="fake-grow fake-pm-host"></div><button type="button" aria-label="Dictate" class="fake-icon-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM19 11a7 7 0 0 1-14 0M12 18v3"></path></svg></button><button type="button" id="composer-submit-button" data-testid="send-button" aria-label="Send prompt" class="fake-send"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"></path></svg></button></div></form></div><div class="fake-spacer"></div><p class="fake-footnote">Fake ChatGPT for tests. Every answer here is synthetic.</p></main></div><div class="fake-label" data-fake-label="" role="complementary" aria-label="Fake site notice">Fake ChatGPT for tests</div><script src="/__coere_fake__/static/editor-prosemirror.js"></script></body></html>
