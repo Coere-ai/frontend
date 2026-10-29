@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { StorySection } from "@/site/about/story-section";
+import { StoryDiagram } from "@/site/about/story-diagram";
 import { TeamSection } from "@/site/about/team-section";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { Container } from "@/site/ui/container";
@@ -23,7 +23,7 @@ export default function AboutPage() {
           />
         </Container>
       </section>
-      <StorySection />
+      <StoryDiagram />
       <TeamSection />
       <ClosingCta title="Help us put people back together." text="We're hiring a founding team, and we'd love to hear from you." />
     </>
