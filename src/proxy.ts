@@ -24,7 +24,11 @@ export async function proxy(request: NextRequest) {
       clean.pathname = pathname.slice(PREVIEW_PREFIX.length) || "/";
       return NextResponse.redirect(clean);
     }
-    return keepPrivate(NextResponse.next());
+    // A private file may be kept by the viewer's browser for the length of a
+    // pass, never by a shared cache.
+    const response = keepPrivate(NextResponse.next());
+    response.headers.set("Cache-Control", "private, max-age=3600");
+    return response;
   }
 
   if (!granted || !isPage(pathname) || isOwnRoute(pathname)) {
