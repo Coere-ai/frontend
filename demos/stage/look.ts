@@ -29,6 +29,7 @@ html,body{margin:0;height:100%;background:#fff;overflow:hidden}
 #pointer.down{transform:scale(1.06)}
 #caption{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);max-width:1000px;padding:12px 20px;border-radius:14px;background:rgba(8,14,36,.82);color:#fff;font:500 22px/1.4 Geist,system-ui,sans-serif;text-align:center;z-index:11;display:none}
 #caption.on{display:block}
+#caption.on:empty{display:none}
 #cover{position:absolute;inset:0;background:#fff;z-index:12;opacity:1;transition:opacity .5s ease;pointer-events:none}
 #cover.off{opacity:0}
 `;

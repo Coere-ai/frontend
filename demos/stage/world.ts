@@ -70,7 +70,7 @@ export class World {
   tell(message: unknown, tab?: string): void {
     for (const [name, set] of this.listeners) {
       if (tab && name !== tab) continue;
-      for (const listener of set) listener(message, { id: "coere" }, () => undefined);
+      for (const listener of set) safely(() => listener(message, { id: "coere" }, () => undefined));
     }
   }
 
@@ -82,7 +82,7 @@ export class World {
       changes[key] = { oldValue: store[key], newValue: value };
       store[key] = value;
     }
-    for (const listener of this.storageListeners.keys()) listener(changes, area);
+    for (const listener of this.storageListeners.keys()) safely(() => listener(changes, area));
   }
 
   remove(area: string, keys: string[]): void {
@@ -92,7 +92,7 @@ export class World {
       changes[key] = { oldValue: store[key] };
       delete store[key];
     }
-    for (const listener of this.storageListeners.keys()) listener(changes, area);
+    for (const listener of this.storageListeners.keys()) safely(() => listener(changes, area));
   }
 
   /** A chrome.storage.onChanged listener, with the tab it belongs to when known. */
@@ -111,5 +111,14 @@ export class World {
   reset(): void {
     this.listeners.clear();
     this.storageListeners.clear();
+  }
+}
+
+/** Calls a tab's listener; a tab whose page is gone throws, and that must not stop the others. */
+function safely(call: () => unknown): void {
+  try {
+    call();
+  } catch {
+    // The listener's page has gone away.
   }
 }

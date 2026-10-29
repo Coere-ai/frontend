@@ -82,9 +82,12 @@ export class Stage {
   }
 
   close(tab: Tab): void {
-    this.world.forget(tab.name);
     tab.frame.remove();
-    this.tabs.delete(tab.name);
+    // A newer tab may have been opened under the same name; only this one goes.
+    if (this.tabs.get(tab.name)?.frame === tab.frame) {
+      this.world.forget(tab.name);
+      this.tabs.delete(tab.name);
+    }
     if (this.on === tab) this.on = null;
   }
 
