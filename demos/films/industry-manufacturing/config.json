@@ -1,0 +1,9 @@
+{
+  "title": "Coere for manufacturing",
+  "version": 2,
+  "edition": "solution",
+  "bundles": {
+    "console.js": { "from": "console.ts", "version": 2, "edition": "solution", "title": "Coere dashboard" },
+    "terminal.js": { "from": "terminal.ts", "version": 3, "title": "line-assistant" }
+  }
+}
