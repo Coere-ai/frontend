@@ -7,6 +7,7 @@ import { CheckList } from "./check-list";
  * A page opening on a full photo: the name, a line and what it does over
  * the photo on the left, and the app itself on the right, running off the
  * edge of the screen as if the window were set down on the scene.
+ * `contained` keeps the app whole instead, for code that must be read.
  */
 export function PhotoHero({
   photo,
@@ -18,6 +19,7 @@ export function PhotoHero({
   primary,
   secondary,
   app,
+  appFit = "bleed",
 }: {
   photo: string;
   alt?: string;
@@ -28,6 +30,7 @@ export function PhotoHero({
   primary: { href: string; label: string };
   secondary?: { href: string; label: string };
   app: ReactNode;
+  appFit?: "bleed" | "contained";
 }) {
   return (
     <section className="relative isolate overflow-hidden bg-neutral-950">
@@ -50,9 +53,13 @@ export function PhotoHero({
             ) : null}
           </div>
         </div>
-        <div className="self-end lg:-mr-[12vw] lg:translate-y-6">
-          <div className="overflow-hidden rounded-t-2xl shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/15">{app}</div>
-        </div>
+        {appFit === "bleed" ? (
+          <div className="self-end lg:-mr-[12vw] lg:translate-y-6">
+            <div className="overflow-hidden rounded-t-2xl shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/15">{app}</div>
+          </div>
+        ) : (
+          <div className="pb-14 lg:self-center lg:pb-0">{app}</div>
+        )}
       </div>
     </section>
   );
