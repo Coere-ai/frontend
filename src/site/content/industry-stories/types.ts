@@ -15,5 +15,5 @@ export type DemoKey = "context" | "graph" | "confidential" | "app";
  */
 export type IndustryStory = { product: Product["slug"]; demo: DemoKey; title: string; text: string; checks: string[] };
 
-/** An industry page's own words: its opening line and a story per demo. */
-export type IndustryPage = { line: string; stories: IndustryStory[] };
+/** An industry page's own words: three short highlights for the top (one line), its opening line and a story per demo. */
+export type IndustryPage = { highlights: [string, string, string]; line: string; stories: IndustryStory[] };

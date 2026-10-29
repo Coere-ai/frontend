@@ -41,7 +41,7 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
         eyebrow="Industries"
         title={`Coere for ${industry.name.toLowerCase()}`}
         line={content.line}
-        checks={content.stories.map((story) => story.title)}
+        checks={content.highlights}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "See how" }}
         appFit="centered"

@@ -3,6 +3,7 @@ import type { IndustryPage } from "./types";
 /** Commerce, consumer, manufacturing, energy and education. Each story matches the demo it names. */
 export const partTwo: Record<string, IndustryPage> = {
   commerce: {
+    highlights: ["Renewal calls, prepared", "Every partner, every market", "Terms stay with the partner"],
     line: "Deals, partners and promises stay with the company across every market and every handoff.",
     stories: [
       { product: "connect", demo: "context", title: "Renewal calls that start prepared", text: "Ask for help with a renewal and Coere brings the contract terms, the pricing history and the partner's last asks.", checks: ["Terms and end dates", "Price floors and history", "What the partner asked for"] },
@@ -12,6 +13,7 @@ export const partTwo: Record<string, IndustryPage> = {
     ],
   },
   consumer: {
+    highlights: ["Promotions from what worked", "Every retail partner", "One partner per message"],
     line: "Know every retail partner and its shoppers, and plan from what worked before.",
     stories: [
       { product: "connect", demo: "context", title: "Promotions planned from what worked", text: "Ask for a holiday plan and Coere brings the partner's shelf, last year's results and its shoppers' habits.", checks: ["Last year's winning offer", "The ad dates", "Shopper habits"] },
@@ -21,6 +23,7 @@ export const partTwo: Record<string, IndustryPage> = {
     ],
   },
   manufacturing: {
+    highlights: ["What the last shift learned", "Every customer and line", "Updates per customer"],
     line: "What the line learned stays with the plant, not with one shift.",
     stories: [
       { product: "connect", demo: "context", title: "Faults fixed with what the last shift learned", text: "Ask about a fault and Coere brings what caused it last time, what night shift noticed and where the spares are.", checks: ["Past root causes", "Shift notes", "Equipment and spares"] },
@@ -30,6 +33,7 @@ export const partTwo: Record<string, IndustryPage> = {
     ],
   },
   energy: {
+    highlights: ["Plans from the site's history", "Every site in one memory", "Plans stay with the site"],
     line: "Field knowledge stays with the company when crews move between sites.",
     stories: [
       { product: "connect", demo: "context", title: "Work plans built on the site's history", text: "Ask for a work plan and Coere brings the oil sample, the last repair, the crane booking and the site's wind limits.", checks: ["Last findings", "Equipment history", "Access and safety limits"] },
@@ -39,6 +43,7 @@ export const partTwo: Record<string, IndustryPage> = {
     ],
   },
   education: {
+    highlights: ["Lessons from the last class", "Every class in one memory", "One class per message"],
     line: "Plan every class from what it already covered, in whichever AI you open.",
     stories: [
       { product: "connect", demo: "context", title: "Lessons planned from where the class is", text: "Ask for next week's lessons and Coere brings what the class finished, the quiz results and how it learns best.", checks: ["What the class finished", "Where it struggled", "Supports it needs"] },

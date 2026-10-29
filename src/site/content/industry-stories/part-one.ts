@@ -3,6 +3,7 @@ import type { IndustryPage } from "./types";
 /** Legal, finance and technology. Each story matches the demo it names. */
 export const partOne: Record<string, IndustryPage> = {
   legal: {
+    highlights: ["Prep from the record", "Every client and matter", "Confidential by design"],
     line: "Prepare every matter from everything you already worked out, with each client's memory kept to that client.",
     stories: [
       { product: "connect", demo: "context", title: "Deposition prep that starts from the record", text: "Ask for help with a deposition and Coere brings your outline, the key witness and the exhibit that matters into the chat.", checks: ["Your outline from last week", "The witness and the exhibits", "Shown on the line before you send"] },
@@ -12,6 +13,7 @@ export const partOne: Record<string, IndustryPage> = {
     ],
   },
   finance: {
+    highlights: ["Review prep from history", "Every household in one place", "One client at a time"],
     line: "Every advisor starts from the client's full history, not a blank page.",
     stories: [
       { product: "connect", demo: "context", title: "Review prep from a year of conversations", text: "Ask for help with a client review and Coere brings the client's goals, worries and accounts into the chat.", checks: ["Goals in the client's words", "Allocation and drift", "What changed since last time"] },
@@ -21,6 +23,7 @@ export const partOne: Record<string, IndustryPage> = {
     ],
   },
   technology: {
+    highlights: ["Switch AIs, keep the stack", "Every project in one memory", "Answers with sources"],
     line: "Your stack and decisions follow you from Claude to ChatGPT to your own tools, so nobody explains them twice.",
     stories: [
       { product: "connect", demo: "context", title: "Switch AIs without losing the stack", text: "Debug in Claude, then ask ChatGPT. Coere carries the Claude chat, the tech stack and the decisions over before you send.", checks: ["The chat you had in Claude", "Go, Postgres, NATS and where it runs", "Decisions like idempotent handlers"] },
