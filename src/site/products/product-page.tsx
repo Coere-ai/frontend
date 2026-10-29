@@ -1,4 +1,5 @@
 import { featureBySlug } from "@/site/content/features";
+import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
 import type { Product } from "@/site/content/products";
 import { ClosingCta } from "@/site/home/closing-cta";
@@ -18,7 +19,7 @@ export function ProductPage({ product }: { product: Product }) {
       <ProductHero product={product} />
       <section id="film" className="scroll-mt-24">
         <Container>
-          <FilmShowcase film={films[product.film]} backdrop={product.image} />
+          <FilmShowcase film={films[product.film]} backdrop={backgrounds.waves} />
         </Container>
       </section>
       <ProductHighlights product={product} />
