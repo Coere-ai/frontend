@@ -7,7 +7,6 @@ import { SCREEN, ScreenFrame } from "@/site/ui/screen-frame";
 
 const W = SCREEN.width;
 const H = SCREEN.height;
-const pct = (value: number, of: number) => `${(value / of) * 100}%`;
 
 /** A round arrow button on the side of the screen. */
 function Arrow({ direction, onClick, disabled }: { direction: "back" | "next"; onClick: () => void; disabled: boolean }) {
@@ -27,14 +26,13 @@ function Arrow({ direction, onClick, disabled }: { direction: "back" | "next"; o
 /**
  * Coere Forge, step by step on full screens of the real product, saved as
  * HTML so they stay sharp. Arrows
- * (or the arrow keys) move through the steps, and the part that matters
- * is lit while the rest of the screen dims. Meant to sit on artwork.
+ * (or the arrow keys) move through the steps, each shown whole. Meant to
+ * sit on artwork.
  */
 export function ForgeWalkthrough() {
   const [index, setIndex] = useState(0);
   const step = walkSteps[index];
   const go = (by: number) => setIndex((i) => Math.min(walkSteps.length - 1, Math.max(0, i + by)));
-  const { x, y, w, h } = step.focus;
 
   return (
     <div
@@ -56,11 +54,6 @@ export function ForgeWalkthrough() {
               <ScreenFrame src={s.screen} title={s.alt} />
             </div>
           ))}
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute rounded-xl ring-2 ring-brand-500 transition-all duration-500 ease-out"
-            style={{ left: pct(x, W), top: pct(y, H), width: pct(w, W), height: pct(h, H), boxShadow: "0 0 0 9999px rgba(8,14,36,0.38)" }}
-          />
         </div>
         <span className="hidden md:block">
           <Arrow direction="next" onClick={() => go(1)} disabled={index === walkSteps.length - 1} />
