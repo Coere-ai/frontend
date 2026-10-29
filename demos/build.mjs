@@ -113,6 +113,9 @@ function copyLib() {
     execFileSync(tsx, ["-e", `import('${join(V2, "tests/fake-sites/bundle.ts")}').then((m) => m.bundleFakeEditors())`], { cwd: V2, stdio: "inherit" });
   mkdirSync(LIB, { recursive: true });
   for (const file of readdirSync(cache)) cpSync(join(cache, file), join(LIB, file));
+  // Fake Gemini's editor loads Quill from the static folder, as coere-v2's router serves it.
+  const quill = join(V2, "node_modules/quill/dist");
+  if (existsSync(quill)) cpSync(quill, join(LIB, "quill"), { recursive: true });
   for (const dir of ["fonts", "icon", "voice-fake"]) {
     const from = join(V2, "apps/extension/public", dir);
     if (existsSync(from)) cpSync(from, join(LIB, "ext", dir), { recursive: true });

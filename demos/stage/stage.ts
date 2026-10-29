@@ -82,6 +82,7 @@ export class Stage {
   }
 
   close(tab: Tab): void {
+    this.world.forget(tab.name);
     tab.frame.remove();
     this.tabs.delete(tab.name);
     if (this.on === tab) this.on = null;
@@ -191,7 +192,12 @@ export class Stage {
 
   /** Types into what has the focus, one key at a time, with a person's small unevenness. */
   async type(tab: Tab, value: string, delay = 55): Promise<void> {
-    if (this.fast) return insert(tab.doc, value);
+    // Skipping ahead puts the text in at once, with the last letter as a real key, since pages and Coere read a box on a key.
+    if (this.fast) {
+      if (value.length > 1) insert(tab.doc, value.slice(0, -1));
+      if (value) key(tab.doc, value.slice(-1));
+      return;
+    }
     for (const ch of value) {
       await this.hooks.gate();
       key(tab.doc, ch);

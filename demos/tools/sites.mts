@@ -11,7 +11,7 @@ import { readFileSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
 type Message = { role: 'user' | 'assistant'; text: string }
-type Chat = { id: string; title: string; messages?: Message[] }
+type Chat = { id: string; title: string; messages?: Message[]; createdAt?: string; updatedAt?: string }
 
 /** One page to write: a site, the chats in its sidebar, and the chat it opens on, if any. */
 type SitePage = {
@@ -37,7 +37,10 @@ const conversation = (platform: string, chat: Chat) => ({
   platformConvId: chat.id,
   title: chat.title,
   archived: false,
-  messages: (chat.messages ?? []).map((m) => ({ ...m, createdAt: '2026-10-20T10:00:00Z' })),
+  // A chat keeps its own dates, so the site's API lists the newest first, as coere-v2's data server does.
+  createdAt: chat.createdAt ?? chat.updatedAt ?? '2026-10-20T10:00:00Z',
+  updatedAt: chat.updatedAt ?? chat.createdAt ?? '2026-10-20T10:00:00Z',
+  messages: (chat.messages ?? []).map((m) => ({ createdAt: chat.updatedAt ?? '2026-10-20T10:00:00Z', ...m })),
   alternateBranches: 0,
   hiddenCount: 0,
   adapter: 'demo',

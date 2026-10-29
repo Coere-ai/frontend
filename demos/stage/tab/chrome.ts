@@ -34,7 +34,7 @@ export function installChrome(world: World, tab: string, assets: string): void {
       world.remove(name, Object.keys(world.stores[name] ?? {}));
       return Promise.resolve();
     },
-    onChanged: event<(changes: unknown) => void>((fn) => world.watchStorage((changes, where) => where === name && fn(copy(changes)))),
+    onChanged: event<(changes: unknown) => void>((fn) => world.watchStorage((changes, where) => where === name && fn(copy(changes)), tab)),
   });
 
   const chrome = {
@@ -54,7 +54,7 @@ export function installChrome(world: World, tab: string, assets: string): void {
       local: area("local"),
       session: area("session"),
       sync: area("sync"),
-      onChanged: event<(changes: unknown, area: string) => void>((fn) => world.watchStorage((changes, where) => fn(copy(changes), where))),
+      onChanged: event<(changes: unknown, area: string) => void>((fn) => world.watchStorage((changes, where) => fn(copy(changes), where), tab)),
     },
     i18n: { getUILanguage: () => "en-US", getMessage: () => "" },
     tabs: { sendMessage: (_tab: number, message: unknown) => world.tell(copy(message)), query: async () => [], create: async () => ({}) },

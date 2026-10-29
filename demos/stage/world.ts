@@ -19,7 +19,7 @@ export class World {
   private readonly types = new Map<string, Handler>();
   private readonly methods = new Map<string, Handler>();
   private readonly listeners = new Map<string, Set<Listener>>();
-  private readonly storageListeners = new Set<StorageListener>();
+  private readonly storageListeners = new Map<StorageListener, string>();
   readonly stores: Record<string, Record<string, unknown>> = { local: {}, session: {}, sync: {} };
   /** Messages nothing answered, with the tab that sent them, for whoever builds a film. */
   readonly unanswered: { tab: string; type: string }[] = [];
@@ -82,7 +82,7 @@ export class World {
       changes[key] = { oldValue: store[key], newValue: value };
       store[key] = value;
     }
-    for (const listener of this.storageListeners) listener(changes, area);
+    for (const listener of this.storageListeners.keys()) listener(changes, area);
   }
 
   remove(area: string, keys: string[]): void {
@@ -92,12 +92,19 @@ export class World {
       changes[key] = { oldValue: store[key] };
       delete store[key];
     }
-    for (const listener of this.storageListeners) listener(changes, area);
+    for (const listener of this.storageListeners.keys()) listener(changes, area);
   }
 
-  watchStorage(listener: StorageListener): () => void {
-    this.storageListeners.add(listener);
+  /** A chrome.storage.onChanged listener, with the tab it belongs to when known. */
+  watchStorage(listener: StorageListener, tab = ""): () => void {
+    this.storageListeners.set(listener, tab);
     return () => this.storageListeners.delete(listener);
+  }
+
+  /** Drops a closed tab's listeners, so nothing calls into a page that is gone. */
+  forget(tab: string): void {
+    this.listeners.delete(tab);
+    for (const [listener, owner] of this.storageListeners) if (owner === tab) this.storageListeners.delete(listener);
   }
 
   /** Forgets every tab's listeners, before a film starts over. */

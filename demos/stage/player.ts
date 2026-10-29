@@ -30,6 +30,14 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
   const $ = (id: string) => document.getElementById(id)!;
   if (params.get("captions") === "1") $("caption").classList.add("on");
 
+  // A tab scrolling something into view must not move the stage around it.
+  for (const id of ["view", "stage", "camera", "tabs"])
+    $(id).addEventListener("scroll", (event) => {
+      const el = event.currentTarget as HTMLElement;
+      el.scrollTop = 0;
+      el.scrollLeft = 0;
+    });
+
   const fit = () => {
     const scale = Math.min(innerWidth / STAGE.width, innerHeight / STAGE.height);
     $("stage").style.transform = `scale(${scale})`;
@@ -94,7 +102,11 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
 
   async function go(mine: number): Promise<void> {
     for (;;) {
+      // The cover is up at once when a run starts over, so the last frame never shows through.
+      $("cover").style.transition = "none";
       $("cover").classList.remove("off");
+      void $("cover").offsetWidth;
+      $("cover").style.transition = "";
       $("tabs").replaceChildren();
       $("card").classList.remove("on");
       $("camera").style.transform = "";

@@ -60,6 +60,8 @@ export class Hover {
 function focusFor(el: Element): void {
   const target = (el as HTMLElement).closest?.('input, textarea, select, button, a[href], [tabindex], [contenteditable="true"], [contenteditable=""]') as HTMLElement | null;
   if (target) target.focus({ preventScroll: true });
+  // A press on a bare part of the page takes the focus away from the field that had it.
+  else (focused(el.ownerDocument) as HTMLElement | null)?.blur?.();
 }
 
 export function down(doc: Document, p: Point, button = 0, count = 1): Element | null {
