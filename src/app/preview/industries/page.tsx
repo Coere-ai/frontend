@@ -19,13 +19,13 @@ export default function IndustriesPage() {
             as="h1"
             eyebrow="Industries"
             title="Memory for every industry"
-            description="Coere gives people, teams and apps a memory they control. Start with how you want to use it, then see it in your field."
+            description="Coere gives people, teams and apps a memory they control. Start with who it is for, then open your field."
           />
         </Container>
       </section>
       <section className="border-t border-neutral-100 bg-neutral-50 py-24">
         <Container>
-          <p className="text-sm font-medium text-neutral-500">Applications</p>
+          <p className="text-sm font-medium text-neutral-500">Who it&apos;s for</p>
           <div className="mt-6">
             <ApplicationsGrid />
           </div>
