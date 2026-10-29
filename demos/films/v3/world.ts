@@ -82,7 +82,7 @@ const after = (method: string, args?: unknown) => AFTER.get(keyOf(method, args ?
 /**
  * When each entry of the build plays back, in ms after Build my memory:
  * sorting the chats (which draws no graph) takes a second and a half, and
- * the graph's growth, which took Node most of two minutes over her 324
+ * the graph's growth, which took Node about a minute over her 324
  * chats, plays in GROW_MS, as long as the film's own build of fewer chats
  * grew on camera, so the shot sees the same share of it.
  */

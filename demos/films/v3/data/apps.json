@@ -3,8 +3,8 @@
   "paired": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:38413",
-    "lastOkAt": "2026-10-29T18:43:09.644Z",
+    "url": "http://127.0.0.1:34271",
+    "lastOkAt": "2026-10-29T22:10:40.101Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -18,44 +18,44 @@
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 7,
+     "ms": 3,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
      "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
-     "app": null,
-     "op": "sync.inbox",
-     "status": 200,
-     "ms": 4,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -63,39 +63,39 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:08Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:39Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 1342,
-     "items": 1885
+     "ms": 748,
+     "items": 1377
     },
     {
-     "at": "2026-10-29T18:43:07Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:38Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 7,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 7,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 12,
+     "ms": 8,
      "items": null
     }
    ]
@@ -103,8 +103,8 @@
   "asked": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:38413",
-    "lastOkAt": "2026-10-29T18:43:11.062Z",
+    "url": "http://127.0.0.1:34271",
+    "lastOkAt": "2026-10-29T22:10:41.538Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -117,23 +117,23 @@
    "log": [],
    "connects": [
     {
-     "id": "con_01M64FJ8HXKKEHFM6H2VR02DYG",
+     "id": "con_01M64VE770NKDM7NFGF6S2R1CV",
      "name": "planner",
-     "code": "4EKH-F9Q1",
+     "code": "0PWJ-N1BD",
      "scopes": [
       "memory:read",
       "memory:identity",
       "memory:suggest"
      ],
      "sections": null,
-     "createdAt": "2026-10-29T18:43:11Z",
-     "expiresAt": "2026-10-29T18:53:11Z"
+     "createdAt": "2026-10-29T22:10:41Z",
+     "expiresAt": "2026-10-29T22:20:41Z"
     }
    ],
    "requests": [
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -141,8 +141,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -150,8 +150,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -159,26 +159,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
+     "at": "2026-10-29T22:10:41Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -186,44 +186,44 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 7,
+     "ms": 3,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
      "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
-     "app": null,
-     "op": "sync.inbox",
-     "status": 200,
-     "ms": 4,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -231,39 +231,39 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:08Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:39Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 1342,
-     "items": 1885
+     "ms": 748,
+     "items": 1377
     },
     {
-     "at": "2026-10-29T18:43:07Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:38Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 7,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 7,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 12,
+     "ms": 8,
      "items": null
     }
    ]
@@ -271,8 +271,8 @@
   "allowed": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:38413",
-    "lastOkAt": "2026-10-29T18:43:13.352Z",
+    "url": "http://127.0.0.1:34271",
+    "lastOkAt": "2026-10-29T22:10:43.835Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -283,15 +283,15 @@
    },
    "tokens": [
     {
-     "id": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "id": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "name": "planner",
      "scopes": [
       "memory:read",
       "memory:suggest"
      ],
      "sections": null,
-     "hint": "O5TD",
-     "createdAt": "2026-10-29T18:43:11Z",
+     "hint": "MOGF",
+     "createdAt": "2026-10-29T22:10:41Z",
      "lastUsedAt": null,
      "expiresAt": null
     }
@@ -300,17 +300,17 @@
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -318,8 +318,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:43Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -327,8 +327,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:43Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -336,26 +336,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
+     "at": "2026-10-29T22:10:43Z",
      "actor": null,
      "app": null,
      "op": "connect.token",
      "status": 200,
-     "ms": 6,
+     "ms": 9,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.create",
      "status": 201,
-     "ms": 5,
+     "ms": 4,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -363,8 +363,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -372,8 +372,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -381,8 +381,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -390,26 +390,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
+     "at": "2026-10-29T22:10:41Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -417,44 +417,44 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 7,
+     "ms": 3,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
      "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
-     "app": null,
-     "op": "sync.inbox",
-     "status": 200,
-     "ms": 4,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -462,39 +462,39 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:08Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:39Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 1342,
-     "items": 1885
+     "ms": 748,
+     "items": 1377
     },
     {
-     "at": "2026-10-29T18:43:07Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:38Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 7,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 7,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 12,
+     "ms": 8,
      "items": null
     }
    ]
@@ -502,8 +502,8 @@
   "used": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:38413",
-    "lastOkAt": "2026-10-29T18:43:25.717Z",
+    "url": "http://127.0.0.1:34271",
+    "lastOkAt": "2026-10-29T22:10:53.982Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -514,44 +514,72 @@
    },
    "tokens": [
     {
-     "id": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "id": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "name": "planner",
      "scopes": [
       "memory:read",
       "memory:suggest"
      ],
      "sections": null,
-     "hint": "O5TD",
-     "createdAt": "2026-10-29T18:43:11Z",
-     "lastUsedAt": "2026-10-29T18:43:13Z",
+     "hint": "MOGF",
+     "createdAt": "2026-10-29T22:10:41Z",
+     "lastUsedAt": "2026-10-29T22:10:44Z",
      "expiresAt": null
     }
    ],
    "log": [
     {
-     "at": "2026-10-29T18:43:17Z",
-     "token": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:47Z",
+     "token": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "target": "claude",
-     "chat": "c1ddb69a08258f3a43f9bfc76b2cbde3d0f8e8ef4f6737fa42df5976bd3875d2",
+     "chat": "a163a0ee6a073c683f849993eeaefa84108289b582ac1ed25e821a6417bd0ba9",
      "first": true,
      "client": null,
      "items": [
       {
        "id": "core",
        "records": [
-        "core:fact_01a1851f-e992-7001-989b-a5657d49563c",
-        "core:fact_01a18519-ff46-7000-9c83-89729b84d223",
-        "core:fact_01a1851f-e992-7002-9eeb-b90c166519f1",
-        "core:ent_01a1851f-b026-7000-9b38-5399fb4911d3"
+        "core:fact_01a18511-a1ca-7001-8bdf-42eb3d9fa826",
+        "core:fact_01a18511-a1ca-7000-b242-32428f91c6ad",
+        "core:fact_01a18512-0bba-7000-8357-84e14046e329",
+        "core:ent_01a1850e-5f10-7000-8c4a-c617439d68c3",
+        "core:ent_01a18513-82f6-7000-8efb-4e210eb0ffc3",
+        "core:ent_01a1850d-2d70-7000-8479-b0c02e978151"
+       ]
+      },
+      {
+       "id": "ent_01a1850d-372a-7000-9e53-f8eb630699b8",
+       "records": [
+        "fact_01a18510-76f6-7001-8ba0-c506201d9b5b",
+        "fact_01a18510-76f6-7000-bddd-b46d72fa6495",
+        "fact_01a18517-2406-7001-9aec-35d29d970447",
+        "fact_01a18517-2406-7000-b43c-eaf79370a48f",
+        "fact_01a18510-1b34-7001-bc9e-ea85f1dfdeb8",
+        "fact_01a18510-1b34-7000-8a9d-5627760875c6",
+        "fact_01a18513-6a5a-7001-ad60-f6a5410e9d78",
+        "fact_01a18513-6a5a-7000-9bc6-df6a9a755828"
+       ]
+      },
+      {
+       "id": "ent_01a18512-697a-7000-8897-35aea0e557e3",
+       "records": [
+        "doc_01a18519-bb8a-7001-86b7-6d943dd892ff",
+        "fact_01a18516-b566-7000-af0a-e65052845b1d",
+        "fact_01a18516-b548-7000-bc22-aaa896c250af",
+        "fact_01a18518-3fda-7000-bdfd-a8a5a13934c6",
+        "fact_01a18518-3fbc-7000-8e69-bb72ac658306",
+        "fact_01a18516-b386-7000-a261-a466d41177d0",
+        "fact_01a18516-b3a4-7000-850b-feddc6c1faa7",
+        "fact_01a18512-69b6-7000-8d73-b57b6fdeb94b"
        ]
       }
      ],
-     "tokens": 68,
+     "tokens": 425,
      "recorded": true
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "token": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:44Z",
+     "token": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "target": null,
      "chat": null,
      "first": true,
@@ -560,66 +588,68 @@
       {
        "id": "core",
        "records": [
-        "core:fact_01a1851f-e992-7001-989b-a5657d49563c",
-        "core:fact_01a18519-ff46-7000-9c83-89729b84d223",
-        "core:fact_01a1851f-e992-7002-9eeb-b90c166519f1",
-        "core:ent_01a1851f-b026-7000-9b38-5399fb4911d3"
+        "core:fact_01a18511-a1ca-7001-8bdf-42eb3d9fa826",
+        "core:fact_01a18511-a1ca-7000-b242-32428f91c6ad",
+        "core:fact_01a18512-0bba-7000-8357-84e14046e329",
+        "core:ent_01a1850e-5f10-7000-8c4a-c617439d68c3",
+        "core:ent_01a18513-82f6-7000-8efb-4e210eb0ffc3",
+        "core:ent_01a1850d-2d70-7000-8479-b0c02e978151"
        ]
       },
       {
-       "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
+       "id": "ent_01a1850e-cafe-7000-aa7e-5bbccf963d12",
        "records": [
-        "fact_01a18524-310a-7001-bbb9-12ec79f8116f",
-        "fact_01a18515-40dc-7002-af8f-015e81498729",
-        "fact_01a18515-40dc-7001-b51e-f914845fad0a",
-        "fact_01a18524-3128-7001-8c67-8724169b8a1c",
-        "fact_01a18524-3128-7000-acd5-b6a3d64aa4c6",
-        "fact_01a18524-310a-7000-8eb8-4a0d8331ec45"
+        "fact_01a18519-6b26-7001-a6d7-bb6f78992920",
+        "fact_01a1850e-cafe-7002-9fa1-fb72889d109f",
+        "fact_01a1850e-cafe-7001-a17e-ec2701d40966",
+        "fact_01a18519-6b44-7000-ba37-42d71a7d05da",
+        "fact_01a18519-6b26-7002-b577-a51b8e2d0213",
+        "fact_01a18519-6b26-7000-9b01-7bdd298ce6ec"
        ]
       },
       {
-       "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
+       "id": "ent_01a18513-82f6-7000-8efb-4e210eb0ffc3",
        "records": [
-        "fact_01a1851b-a544-7001-ab44-6af95f5fb643"
+        "fact_01a18513-82f6-7001-9b77-30487f972791"
        ]
       }
      ],
-     "tokens": 275,
+     "tokens": 290,
      "recorded": false
     }
    ],
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 7,
+     "ms": 11,
      "items": 2
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 8,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inboxAck",
      "status": 204,
-     "ms": 19,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -627,8 +657,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -636,8 +666,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "people.identity",
      "status": 200,
@@ -645,107 +675,98 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:18Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "search",
      "status": 200,
-     "ms": 6828,
+     "ms": 5057,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:18Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "nodes.get",
      "status": 200,
-     "ms": 34,
+     "ms": 10,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:18Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "entities.list",
      "status": 200,
-     "ms": 34,
-     "items": 4
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "upcoming",
-     "status": 200,
-     "ms": 209,
-     "items": 50
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "upcoming",
-     "status": 200,
-     "ms": 207,
-     "items": 50
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "profile",
-     "status": 200,
-     "ms": 79,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "context.draft",
-     "status": 200,
-     "ms": 11,
+     "ms": 5,
      "items": 1
     },
     {
-     "at": "2026-10-29T18:43:16Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
-     "op": "profile",
+     "op": "upcoming",
      "status": 200,
-     "ms": 87,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "context.draft",
-     "status": 200,
-     "ms": 565,
+     "ms": 7,
      "items": 3
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
-     "app": null,
-     "op": "requests.list",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "profile",
      "status": 200,
-     "ms": 2,
+     "ms": 17,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:47Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "context.draft",
+     "status": 200,
+     "ms": 15,
+     "items": 3
+    },
+    {
+     "at": "2026-10-29T22:10:47Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "profile",
+     "status": 200,
+     "ms": 22,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "context.draft",
+     "status": 200,
+     "ms": 422,
+     "items": 3
+    },
+    {
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
+     "app": null,
+     "op": "requests.list",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -753,8 +774,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:43Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -762,8 +783,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:43Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -771,26 +792,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
+     "at": "2026-10-29T22:10:43Z",
      "actor": null,
      "app": null,
      "op": "connect.token",
      "status": 200,
-     "ms": 6,
+     "ms": 9,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.create",
      "status": 201,
-     "ms": 5,
+     "ms": 4,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -798,8 +819,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -807,8 +828,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -816,8 +837,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -825,26 +846,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
+     "at": "2026-10-29T22:10:41Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -852,44 +873,44 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 7,
+     "ms": 3,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
      "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
-     "app": null,
-     "op": "sync.inbox",
-     "status": 200,
-     "ms": 4,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -897,39 +918,39 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:08Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:39Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 1342,
-     "items": 1885
+     "ms": 748,
+     "items": 1377
     },
     {
-     "at": "2026-10-29T18:43:07Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:38Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 7,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 7,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 12,
+     "ms": 8,
      "items": null
     }
    ]
@@ -937,8 +958,8 @@
   "revoked": {
    "status": {
     "state": "ok",
-    "url": "http://127.0.0.1:38413",
-    "lastOkAt": "2026-10-29T18:43:26.026Z",
+    "url": "http://127.0.0.1:34271",
+    "lastOkAt": "2026-10-29T22:10:54.280Z",
     "nextTryAt": null,
     "pending": 0,
     "shareSensitive": false,
@@ -952,17 +973,17 @@
    "connects": [],
    "requests": [
     {
-     "at": "2026-10-29T18:43:26Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:26Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -970,8 +991,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:26Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -979,62 +1000,62 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:26Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.revoke",
      "status": 204,
-     "ms": 7,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
-     "ms": 8,
+     "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 7,
+     "ms": 11,
      "items": 2
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:54Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
-     "ms": 8,
+     "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inboxAck",
      "status": 204,
-     "ms": 19,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -1042,8 +1063,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -1051,8 +1072,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:25Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:53Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "people.identity",
      "status": 200,
@@ -1060,107 +1081,98 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:18Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "search",
      "status": 200,
-     "ms": 6828,
+     "ms": 5057,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:18Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "nodes.get",
      "status": 200,
-     "ms": 34,
+     "ms": 10,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:18Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
      "op": "entities.list",
      "status": 200,
-     "ms": 34,
-     "items": 4
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "upcoming",
-     "status": 200,
-     "ms": 209,
-     "items": 50
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "upcoming",
-     "status": 200,
-     "ms": 207,
-     "items": 50
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "profile",
-     "status": 200,
-     "ms": 79,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:17Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "context.draft",
-     "status": 200,
-     "ms": 11,
+     "ms": 5,
      "items": 1
     },
     {
-     "at": "2026-10-29T18:43:16Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
      "app": "planner",
-     "op": "profile",
+     "op": "upcoming",
      "status": 200,
-     "ms": 87,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ",
-     "app": "planner",
-     "op": "context.draft",
-     "status": 200,
-     "ms": 565,
+     "ms": 7,
      "items": 3
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
-     "app": null,
-     "op": "requests.list",
+     "at": "2026-10-29T22:10:48Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "profile",
      "status": 200,
-     "ms": 2,
+     "ms": 17,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:47Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "context.draft",
+     "status": 200,
+     "ms": 15,
+     "items": 3
+    },
+    {
+     "at": "2026-10-29T22:10:47Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "profile",
+     "status": 200,
+     "ms": 22,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y",
+     "app": "planner",
+     "op": "context.draft",
+     "status": 200,
+     "ms": 422,
+     "items": 3
+    },
+    {
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
+     "app": null,
+     "op": "requests.list",
+     "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 3,
+     "ms": 2,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:44Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -1168,8 +1180,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:43Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -1177,8 +1189,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:43Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
@@ -1186,26 +1198,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:13Z",
+     "at": "2026-10-29T22:10:43Z",
      "actor": null,
      "app": null,
      "op": "connect.token",
      "status": 200,
-     "ms": 6,
+     "ms": 9,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.create",
      "status": 201,
-     "ms": 5,
+     "ms": 4,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -1213,8 +1225,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
@@ -1222,8 +1234,8 @@
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
@@ -1231,8 +1243,8 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -1240,26 +1252,26 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:41Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:11Z",
+     "at": "2026-10-29T22:10:41Z",
      "actor": null,
      "app": null,
      "op": "connect.start",
      "status": 201,
-     "ms": 5,
+     "ms": 7,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "requests.list",
      "status": 200,
@@ -1267,44 +1279,44 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "contextLog.list",
      "status": 200,
-     "ms": 7,
+     "ms": 3,
      "items": 0
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "tokens.list",
      "status": 200,
+     "ms": 3,
+     "items": null
+    },
+    {
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
+     "app": null,
+     "op": "sync.inbox",
+     "status": 200,
      "ms": 2,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
-     "app": null,
-     "op": "sync.inbox",
-     "status": 200,
-     "ms": 4,
-     "items": null
-    },
-    {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 2,
+     "ms": 3,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:09Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:40Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.inbox",
      "status": 200,
@@ -1312,95 +1324,1290 @@
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:08Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:39Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.push",
      "status": 200,
-     "ms": 1342,
-     "items": 1885
+     "ms": 748,
+     "items": 1377
     },
     {
-     "at": "2026-10-29T18:43:07Z",
-     "actor": "dev_01M64FJ502MVQ4CSG21HFEN0BJ",
+     "at": "2026-10-29T22:10:38Z",
+     "actor": "dev_01M64VE4G87376C8T5T5S3FZTN",
      "app": null,
      "op": "sync.state",
      "status": 200,
-     "ms": 7,
+     "ms": 6,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.finish",
      "status": 200,
-     "ms": 7,
+     "ms": 5,
      "items": null
     },
     {
-     "at": "2026-10-29T18:43:07Z",
+     "at": "2026-10-29T22:10:38Z",
      "actor": null,
      "app": null,
      "op": "pair.hello",
      "status": 200,
-     "ms": 12,
+     "ms": 8,
      "items": null
     }
    ]
   }
  },
  "decided": {
-  "tokenId": "tok_01M64FJ8TQNV9YSKWGW95PQNAZ"
+  "tokenId": "tok_01M64VE7FRYFG72PQ8KSC61Z4Y"
  },
  "sent": [
   {
    "method": "memory.corePack",
    "answer": {
-    "version": "86f4aa36073a8850",
+    "version": "969e2630c64b4274",
     "lines": [
      {
-      "id": "fact_01a1851f-e992-7001-989b-a5657d49563c",
+      "id": "fact_01a18511-a1ca-7001-8bdf-42eb3d9fa826",
       "group": "identity",
-      "text": "You work at Kestrel Analytics as a lead research assistant."
+      "text": "My employer is Kestrel Analytics."
      },
      {
-      "id": "fact_01a18519-ff46-7000-9c83-89729b84d223",
+      "id": "fact_01a18511-a1ca-7000-b242-32428f91c6ad",
+      "group": "identity",
+      "text": "I work at Kestrel Analytics as a lead research assistant."
+     },
+     {
+      "id": "fact_01a18510-df06-7000-bcca-ba57bd9254da",
+      "group": "identity",
+      "text": "I live in Madison."
+     },
+     {
+      "id": "fact_01a18512-0bba-7000-8357-84e14046e329",
       "group": "identity",
       "text": "My name is Maya Collins."
      },
      {
-      "id": "fact_01a1851f-e992-7002-9eeb-b90c166519f1",
-      "group": "identity",
-      "text": "Your employer is Kestrel Analytics."
-     },
-     {
-      "id": "fact_01a18521-c956-7000-8773-a190e71e7726",
-      "group": "identity",
-      "text": "You live in Madison."
-     },
-     {
-      "id": "ent_01a1851f-b026-7000-9b38-5399fb4911d3",
+      "id": "ent_01a1850e-5f10-7000-8c4a-c617439d68c3",
       "group": "projects",
       "text": "Working on Tidepool."
+     },
+     {
+      "id": "ent_01a18513-82f6-7000-8efb-4e210eb0ffc3",
+      "group": "projects",
+      "text": "Working on Kitchen remodel."
+     },
+     {
+      "id": "ent_01a1850d-2d70-7000-8479-b0c02e978151",
+      "group": "projects",
+      "text": "Working on SkipDoodle."
      }
     ],
-    "chats": 4,
+    "chats": 7,
     "hidden": []
    }
   },
   {
    "method": "memory.node",
    "args": {
-    "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8"
+    "id": "ent_01a1850d-372a-7000-9e53-f8eb630699b8"
+   },
+   "answer": {
+    "identity": [],
+    "node": {
+     "id": "ent_01a1850d-372a-7000-9e53-f8eb630699b8",
+     "kind": "person",
+     "label": "Caleb Moreau",
+     "section": "sec_people",
+     "parent": "ent_01a1850d-36b2-7001-94eb-56836faf8f10",
+     "importance": 4,
+     "pinned": false,
+     "urgency": "none",
+     "facts": 16,
+     "history": false,
+     "aliases": [],
+     "summary": null,
+     "path": [
+      {
+       "id": "sec_people",
+       "label": "People"
+      },
+      {
+       "id": "ent_01a1850d-36b2-7001-94eb-56836faf8f10",
+       "label": "Friends"
+      },
+      {
+       "id": "ent_01a1850d-372a-7000-9e53-f8eb630699b8",
+       "label": "Caleb Moreau"
+      }
+     ]
+    },
+    "due": [],
+    "groups": [
+     {
+      "name": "facts",
+      "facts": [
+       {
+        "id": "fact_01a1850d-372a-7001-a275-56150ae58865",
+        "kind": "note",
+        "key": "caleb.n15",
+        "text": "Caleb Moreau proofreads my cover letters.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a1850d-372a-7001-a275-56150ae58865#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:0df53c16-31ba-1ff0-fb80-2473449e8f7c",
+          "title": "Caleb proofreading",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-08-25T18:53:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a1850d-372a-7002-8179-53f5658b97cf",
+        "kind": "note",
+        "key": "caleb.n16",
+        "text": "Caleb Moreau drives a gray Honda Fit.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a1850d-372a-7002-8179-53f5658b97cf#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:0df53c16-31ba-1ff0-fb80-2473449e8f7c",
+          "title": "Caleb proofreading",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-08-25T18:55:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a1850f-2a62-7000-8d7f-24e978db3ea5",
+        "kind": "note",
+        "key": "caleb.n1",
+        "text": "Caleb Moreau is my roommate.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a1850f-2a62-7000-8d7f-24e978db3ea5#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:74dcc8c1-6904-107a-6f2c-62b1ecdc55ae",
+          "title": "My roommate Caleb",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-08-08T11:35:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a1850f-2a62-7001-b757-7cee4f3dec00",
+        "kind": "note",
+        "key": "caleb.n2",
+        "text": "Caleb Moreau works at Northwind Clinic.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a1850f-2a62-7001-b757-7cee4f3dec00#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:74dcc8c1-6904-107a-6f2c-62b1ecdc55ae",
+          "title": "My roommate Caleb",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-08-08T11:37:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18510-1b34-7000-8a9d-5627760875c6",
+        "kind": "note",
+        "key": "caleb.n3",
+        "text": "Caleb Moreau is vegetarian.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18510-1b34-7000-8a9d-5627760875c6#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:aa98ecf2-c988-14e1-1c17-fd3f2dc8c15a",
+          "title": "Rent split with Caleb",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-17T09:18:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18510-1b34-7001-bc9e-ea85f1dfdeb8",
+        "kind": "note",
+        "key": "caleb.n4",
+        "text": "Caleb Moreau and I split rent 50 50.",
+        "specifics": [
+         [
+          30,
+          32
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18510-1b34-7001-bc9e-ea85f1dfdeb8#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:aa98ecf2-c988-14e1-1c17-fd3f2dc8c15a",
+          "title": "Rent split with Caleb",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-10-17T09:20:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18510-76f6-7000-bddd-b46d72fa6495",
+        "kind": "note",
+        "key": "caleb.n11",
+        "text": "Caleb Moreau is from Lyon and speaks French at home.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18510-76f6-7000-bddd-b46d72fa6495#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:b484b7de-1231-7a97-9f36-954dc536999e",
+          "title": "Cashew allergy",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-19T09:22:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18510-76f6-7001-8ba0-c506201d9b5b",
+        "kind": "note",
+        "key": "caleb.n12",
+        "text": "Caleb Moreau is allergic to cashews.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18510-76f6-7001-8ba0-c506201d9b5b#e0",
+          "platform": "chatgpt",
+          "convId": "chatgpt:b484b7de-1231-7a97-9f36-954dc536999e",
+          "title": "Cashew allergy",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-10-19T09:24:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18513-6a5a-7000-9bc6-df6a9a755828",
+        "kind": "note",
+        "key": "caleb.n13",
+        "text": "Caleb Moreau is saving for a trip to Japan.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18513-6a5a-7000-9bc6-df6a9a755828#e0",
+          "platform": "claude",
+          "convId": "claude:7737d6db-c451-f834-ffcf-71b985142699",
+          "title": "Caleb saving for Japan",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-06T15:00:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18513-6a5a-7001-ad60-f6a5410e9d78",
+        "kind": "note",
+        "key": "caleb.n14",
+        "text": "Caleb Moreau likes board game nights on Fridays.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18513-6a5a-7001-ad60-f6a5410e9d78#e0",
+          "platform": "claude",
+          "convId": "claude:7737d6db-c451-f834-ffcf-71b985142699",
+          "title": "Caleb saving for Japan",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-10-06T15:02:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18515-3a4c-7000-a8cd-d54d1295a745",
+        "kind": "note",
+        "key": "caleb.n7",
+        "text": "The birthday of Caleb Moreau is January 14.",
+        "specifics": [
+         [
+          32,
+          42
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18515-3a4c-7000-a8cd-d54d1295a745#e0",
+          "platform": "claude",
+          "convId": "claude:e7b9cbd5-f5bf-50b7-58ca-f966b357679c",
+          "title": "Caleb birthday",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-09-29T12:14:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18515-3a4c-7001-bf9b-20fd5402434e",
+        "kind": "note",
+        "key": "caleb.n8",
+        "text": "Caleb Moreau owns our cat, Miso.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18515-3a4c-7001-bf9b-20fd5402434e#e0",
+          "platform": "claude",
+          "convId": "claude:e7b9cbd5-f5bf-50b7-58ca-f966b357679c",
+          "title": "Caleb birthday",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-09-29T12:14:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18516-1e1c-7000-afae-fef41ed62e89",
+        "kind": "note",
+        "key": "caleb.n5",
+        "text": "Caleb Moreau works night shifts on weekends.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18516-1e1c-7000-afae-fef41ed62e89#e0",
+          "platform": "gemini",
+          "convId": "gemini:2c1200a6936515d6",
+          "title": "Caleb and Thai food",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-09-10T16:15:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18516-1e1c-7001-9398-0485bea155da",
+        "kind": "note",
+        "key": "caleb.n6",
+        "text": "Caleb Moreau loves Thai food and spicy noodles.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18516-1e1c-7001-9398-0485bea155da#e0",
+          "platform": "gemini",
+          "convId": "gemini:2c1200a6936515d6",
+          "title": "Caleb and Thai food",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-09-10T16:15:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18517-2406-7000-b43c-eaf79370a48f",
+        "kind": "note",
+        "key": "caleb.n9",
+        "text": "Caleb Moreau does the dishes, and I do the laundry.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18517-2406-7000-b43c-eaf79370a48f#e0",
+          "platform": "gemini",
+          "convId": "gemini:60ad7b858a576a1b",
+          "title": "Caleb climbing",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-17T18:07:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18517-2406-7001-9aec-35d29d970447",
+        "kind": "note",
+        "key": "caleb.n10",
+        "text": "Caleb Moreau climbs at Boulders gym on Tuesdays.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18517-2406-7001-9aec-35d29d970447#e0",
+          "platform": "gemini",
+          "convId": "gemini:60ad7b858a576a1b",
+          "title": "Caleb climbing",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-10-17T18:09:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       }
+      ]
+     }
+    ],
+    "earlier": [],
+    "relations": [
+     {
+      "type": "related_to",
+      "label": "connected through the same story",
+      "direction": "out",
+      "other": {
+       "id": "ent_01a18512-697a-7000-8897-35aea0e557e3",
+       "label": "Cover letters",
+       "kind": "folder"
+      }
+     }
+    ],
+    "review": []
+   }
+  },
+  {
+   "method": "memory.documents",
+   "args": {
+    "id": "ent_01a1850d-372a-7000-9e53-f8eb630699b8"
+   },
+   "answer": []
+  },
+  {
+   "method": "memory.node",
+   "args": {
+    "id": "ent_01a18512-697a-7000-8897-35aea0e557e3"
    },
    "answer": {
     "node": {
-     "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
+     "id": "ent_01a18512-697a-7000-8897-35aea0e557e3",
+     "kind": "folder",
+     "label": "Cover letters",
+     "section": "sec_work",
+     "parent": "ent_01a1850e-d896-7001-a6d6-ca496c676ce4",
+     "importance": 2,
+     "pinned": false,
+     "urgency": "none",
+     "facts": 11,
+     "history": false,
+     "aliases": [],
+     "summary": null,
+     "path": [
+      {
+       "id": "sec_work",
+       "label": "Work"
+      },
+      {
+       "id": "ent_01a1850e-d896-7001-a6d6-ca496c676ce4",
+       "label": "Job search"
+      },
+      {
+       "id": "ent_01a18512-697a-7000-8897-35aea0e557e3",
+       "label": "Cover letters"
+      }
+     ]
+    },
+    "due": [],
+    "groups": [
+     {
+      "name": "preferences",
+      "facts": [
+       {
+        "id": "fact_01a18512-69b6-7000-8d73-b57b6fdeb94b",
+        "kind": "preference",
+        "key": "cover_letter.n8",
+        "text": "My cover letter for Notion went out on October 12.",
+        "specifics": [
+         [
+          39,
+          49
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18512-69b6-7000-8d73-b57b6fdeb94b#e0",
+          "platform": "claude",
+          "convId": "claude:41b818e9-471b-2e3f-a0e8-8fcf08106365",
+          "title": "Notion letter",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-04T14:35:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18512-69d4-7000-8d61-9dbe55a4729a",
+        "kind": "preference",
+        "key": "cover_letter.n9",
+        "text": "I ask Caleb to proofread every cover letter before I send it.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18512-69d4-7000-8d61-9dbe55a4729a#e0",
+          "platform": "claude",
+          "convId": "claude:41b818e9-471b-2e3f-a0e8-8fcf08106365",
+          "title": "Notion letter",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-04T14:35:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18513-919c-7000-8ac2-3fe68dd02942",
+        "kind": "preference",
+        "key": "cover_letter.n1",
+        "text": "My cover letters stay under 300 words.",
+        "specifics": [
+         [
+          28,
+          31
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18513-919c-7000-8ac2-3fe68dd02942#e0",
+          "platform": "claude",
+          "convId": "claude:7b944927-091f-d28e-52ef-0ce882111582",
+          "title": "How I open cover letters",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-07-31T10:23:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18513-919c-7001-b742-d95a64f25c4f",
+        "kind": "preference",
+        "key": "cover_letter.n2",
+        "text": "I open every cover letter with the product I use most at that company.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18513-919c-7001-b742-d95a64f25c4f#e0",
+          "platform": "claude",
+          "convId": "claude:7b944927-091f-d28e-52ef-0ce882111582",
+          "title": "How I open cover letters",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-07-31T10:25:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18513-919c-7002-8e14-de4f123cfc46",
+        "kind": "preference",
+        "key": "cover_letter.n3",
+        "text": "I keep one cover letter template in Google Docs and copy it for each job.",
+        "specifics": [
+         [
+          7,
+          10
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18513-919c-7002-8e14-de4f123cfc46#e0",
+          "platform": "claude",
+          "convId": "claude:7b944927-091f-d28e-52ef-0ce882111582",
+          "title": "How I open cover letters",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-07-31T10:25:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18516-b386-7000-a261-a466d41177d0",
+        "kind": "preference",
+        "key": "cover_letter.n4",
+        "text": "My cover letter for Ramp is due November 14.",
+        "specifics": [
+         [
+          32,
+          43
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18516-b386-7000-a261-a466d41177d0#e0",
+          "platform": "gemini",
+          "convId": "gemini:4e28bf87bb4d87b0",
+          "title": "Ramp cover letter",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-04T17:57:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18516-b3a4-7000-850b-feddc6c1faa7",
+        "kind": "preference",
+        "key": "cover_letter.n5",
+        "text": "My cover letter for Figma is drafted and waiting for Priya to read it.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18516-b3a4-7000-850b-feddc6c1faa7#e0",
+          "platform": "gemini",
+          "convId": "gemini:4e28bf87bb4d87b0",
+          "title": "Ramp cover letter",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-04T17:57:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18516-b548-7000-bc22-aaa896c250af",
+        "kind": "preference",
+        "key": "cover_letter.n6",
+        "text": "My cover letters always name one shipped project with a number.",
+        "specifics": [
+         [
+          29,
+          32
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18516-b548-7000-bc22-aaa896c250af#e0",
+          "platform": "gemini",
+          "convId": "gemini:5062f04f62b7ae43",
+          "title": "Notion letter sent",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-20T12:36:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18516-b566-7000-af0a-e65052845b1d",
+        "kind": "preference",
+        "key": "cover_letter.n7",
+        "text": "I sent cover letters to 7 companies this fall.",
+        "specifics": [
+         [
+          24,
+          25
+         ]
+        ],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18516-b566-7000-af0a-e65052845b1d#e0",
+          "platform": "gemini",
+          "convId": "gemini:5062f04f62b7ae43",
+          "title": "Notion letter sent",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-10-20T12:38:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18518-3fbc-7000-8e69-bb72ac658306",
+        "kind": "preference",
+        "key": "cover_letter.n10",
+        "text": "My cover letters mention Tidepool customers by number, not by name.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18518-3fbc-7000-8e69-bb72ac658306#e0",
+          "platform": "gemini",
+          "convId": "gemini:a02e3772c2bbdf24",
+          "title": "Tidepool numbers in letters",
+          "msg": 1,
+          "role": "user",
+          "at": "2026-10-13T18:29:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       },
+       {
+        "id": "fact_01a18518-3fda-7000-bdfd-a8a5a13934c6",
+        "kind": "preference",
+        "key": "cover_letter.n11",
+        "text": "I save every cover letter as a PDF named with the company and date.",
+        "specifics": [],
+        "importance": 4,
+        "urgency": "none",
+        "urgencyLabel": null,
+        "due": null,
+        "progress": null,
+        "status": "active",
+        "disagree": false,
+        "held": false,
+        "pinned": false,
+        "origin": "extracted",
+        "basis": "user_stated",
+        "sensitivity": null,
+        "sources": [
+         {
+          "evidenceId": "fact_01a18518-3fda-7000-bdfd-a8a5a13934c6#e0",
+          "platform": "gemini",
+          "convId": "gemini:a02e3772c2bbdf24",
+          "title": "Tidepool numbers in letters",
+          "msg": 3,
+          "role": "user",
+          "at": "2026-10-13T18:31:00Z",
+          "url": null,
+          "stale": false
+         }
+        ],
+        "supersededBy": null,
+        "replacedOn": null,
+        "changedBy": null,
+        "freshness": "current",
+        "mentions": 1
+       }
+      ]
+     }
+    ],
+    "earlier": [],
+    "relations": [
+     {
+      "type": "related_to",
+      "label": "connected through the same story",
+      "direction": "in",
+      "other": {
+       "id": "ent_01a1850d-372a-7000-9e53-f8eb630699b8",
+       "label": "Caleb Moreau",
+       "kind": "person"
+      }
+     }
+    ],
+    "review": []
+   }
+  },
+  {
+   "method": "memory.documents",
+   "args": {
+    "id": "ent_01a18512-697a-7000-8897-35aea0e557e3"
+   },
+   "answer": [
+    {
+     "id": "doc_01a18519-bb8a-7001-86b7-6d943dd892ff",
+     "title": "Notes",
+     "kind": "notes",
+     "basis": "compiled",
+     "version": 1,
+     "at": "2026-10-29T00:40:11.040Z",
+     "body": "## Notes\n\n- Quick note.\n\n- My cover letters stay under 300 words.\n\n- Quick note.\n\n- I open every cover letter with the product I use most at that company.\n\n- I keep one cover letter template in Google Docs and copy it for each job.\n\n- My cover letter for Notion went out on October 12.\n\n- I ask Caleb to proofread every cover letter before I send it.\n\n- Writing this down.\n\n- My cover letter for Ramp is due November 14.\n\n- My cover letter for Figma is drafted and waiting for Priya to read it.\n\n- My cover letters mention Tidepool customers by number, not by name.\n\n- Writing this down.\n\n- I save every cover letter as a PDF named with the company and date.\n\n- Okay.\n\n- My cover letters always name one shipped project with a number.\n\n- Quick note.\n\n- I sent cover letters to 7 companies this fall.\n",
+     "platforms": [
+      "gemini",
+      "claude"
+     ],
+     "chats": 5
+    }
+   ]
+  },
+  {
+   "method": "memory.node",
+   "args": {
+    "id": "ent_01a1850e-cafe-7000-aa7e-5bbccf963d12"
+   },
+   "answer": {
+    "node": {
+     "id": "ent_01a1850e-cafe-7000-aa7e-5bbccf963d12",
      "kind": "event",
      "label": "PearX interview",
      "section": "sec_projects",
-     "parent": "ent_01a18515-4064-7001-b3d1-2042324e244a",
+     "parent": "ent_01a1850e-5e98-7001-8112-dd91ad1e3611",
      "importance": 4,
      "pinned": false,
      "urgency": "upcoming",
@@ -1414,18 +2621,18 @@
        "label": "Projects"
       },
       {
-       "id": "ent_01a18515-4064-7001-b3d1-2042324e244a",
+       "id": "ent_01a1850e-5e98-7001-8112-dd91ad1e3611",
        "label": "Startups and businesses"
       },
       {
-       "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
+       "id": "ent_01a1850e-cafe-7000-aa7e-5bbccf963d12",
        "label": "PearX interview"
       }
      ]
     },
     "due": [
      {
-      "id": "fact_01a18524-310a-7001-bbb9-12ec79f8116f",
+      "id": "fact_01a18519-6b26-7001-a6d7-bb6f78992920",
       "kind": "event",
       "key": "start",
       "text": "The PearX interview is on November 4 at 2 pm over video.",
@@ -1453,7 +2660,7 @@
       "sensitivity": null,
       "sources": [
        {
-        "evidenceId": "fact_01a18524-310a-7001-bbb9-12ec79f8116f#e0",
+        "evidenceId": "fact_01a18519-6b26-7001-a6d7-bb6f78992920#e0",
         "platform": "claude",
         "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
         "title": "Big news about PearX",
@@ -1476,7 +2683,7 @@
       "name": "facts",
       "facts": [
        {
-        "id": "fact_01a18515-40dc-7001-b51e-f914845fad0a",
+        "id": "fact_01a1850e-cafe-7001-a17e-ec2701d40966",
         "kind": "goal",
         "key": "answer.traction",
         "text": "My PearX interview answer on traction should lead with the 1,200 weekly users.",
@@ -1500,7 +2707,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a18515-40dc-7001-b51e-f914845fad0a#e0",
+          "evidenceId": "fact_01a1850e-cafe-7001-a17e-ec2701d40966#e0",
           "platform": "chatgpt",
           "convId": "chatgpt:5e91a20c-5fe4-2cd8-cee0-1fc3efb0180d",
           "title": "PearX interview prep",
@@ -1518,7 +2725,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a18515-40dc-7002-af8f-015e81498729",
+        "id": "fact_01a1850e-cafe-7002-9fa1-fb72889d109f",
         "kind": "goal",
         "key": "answer.why_now",
         "text": "I want my PearX interview answer on why now to mention the records move.",
@@ -1537,7 +2744,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a18515-40dc-7002-af8f-015e81498729#e0",
+          "evidenceId": "fact_01a1850e-cafe-7002-9fa1-fb72889d109f#e0",
           "platform": "chatgpt",
           "convId": "chatgpt:5e91a20c-5fe4-2cd8-cee0-1fc3efb0180d",
           "title": "PearX interview prep",
@@ -1555,7 +2762,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a18524-310a-7000-8eb8-4a0d8331ec45",
+        "id": "fact_01a18519-6b26-7000-9b01-7bdd298ce6ec",
         "kind": "event",
         "key": "purpose",
         "text": "My PearX interview is for Tidepool, my startup.",
@@ -1574,7 +2781,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a18524-310a-7000-8eb8-4a0d8331ec45#e0",
+          "evidenceId": "fact_01a18519-6b26-7000-9b01-7bdd298ce6ec#e0",
           "platform": "claude",
           "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
           "title": "Big news about PearX",
@@ -1592,7 +2799,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a18524-3128-7000-acd5-b6a3d64aa4c6",
+        "id": "fact_01a18519-6b26-7002-b577-a51b8e2d0213",
         "kind": "note",
         "key": "stage",
         "text": "The PearX interview is the partner round with two partners.",
@@ -1616,7 +2823,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a18524-3128-7000-acd5-b6a3d64aa4c6#e0",
+          "evidenceId": "fact_01a18519-6b26-7002-b577-a51b8e2d0213#e0",
           "platform": "claude",
           "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
           "title": "Big news about PearX",
@@ -1634,7 +2841,7 @@
         "mentions": 1
        },
        {
-        "id": "fact_01a18524-3128-7001-8c67-8724169b8a1c",
+        "id": "fact_01a18519-6b44-7000-ba37-42d71a7d05da",
         "kind": "note",
         "key": "topics",
         "text": "They told me the PearX interview will cover traction, the team and why now.",
@@ -1653,7 +2860,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a18524-3128-7001-8c67-8724169b8a1c#e0",
+          "evidenceId": "fact_01a18519-6b44-7000-ba37-42d71a7d05da#e0",
           "platform": "claude",
           "convId": "claude:d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
           "title": "Big news about PearX",
@@ -1680,7 +2887,7 @@
       "label": "for",
       "direction": "out",
       "other": {
-       "id": "ent_01a1851f-b026-7000-9b38-5399fb4911d3",
+       "id": "ent_01a1850e-5f10-7000-8c4a-c617439d68c3",
        "label": "Tidepool",
        "kind": "project"
       }
@@ -1692,18 +2899,18 @@
   {
    "method": "memory.documents",
    "args": {
-    "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8"
+    "id": "ent_01a1850e-cafe-7000-aa7e-5bbccf963d12"
    },
    "answer": []
   },
   {
    "method": "memory.node",
    "args": {
-    "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482"
+    "id": "ent_01a18513-82f6-7000-8efb-4e210eb0ffc3"
    },
    "answer": {
     "node": {
-     "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
+     "id": "ent_01a18513-82f6-7000-8efb-4e210eb0ffc3",
      "kind": "project",
      "label": "Kitchen remodel",
      "section": "sec_home",
@@ -1721,7 +2928,7 @@
        "label": "Home and living"
       },
       {
-       "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
+       "id": "ent_01a18513-82f6-7000-8efb-4e210eb0ffc3",
        "label": "Kitchen remodel"
       }
      ]
@@ -1732,7 +2939,7 @@
       "name": "facts",
       "facts": [
        {
-        "id": "fact_01a1851b-a544-7001-ab44-6af95f5fb643",
+        "id": "fact_01a18513-82f6-7001-9b77-30487f972791",
         "kind": "note",
         "key": "next_step",
         "text": "I have an interview with a contractor on Friday about the Kitchen remodel and new counters.",
@@ -1751,7 +2958,7 @@
         "sensitivity": null,
         "sources": [
          {
-          "evidenceId": "fact_01a1851b-a544-7001-ab44-6af95f5fb643#e0",
+          "evidenceId": "fact_01a18513-82f6-7001-9b77-30487f972791#e0",
           "platform": "claude",
           "convId": "claude:7aa7bd3c-00fb-2343-e2c1-b5a04e0b0d3f",
           "title": "Kitchen counters",
@@ -1779,7 +2986,7 @@
   {
    "method": "memory.documents",
    "args": {
-    "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482"
+    "id": "ent_01a18513-82f6-7000-8efb-4e210eb0ffc3"
    },
    "answer": []
   }
@@ -1815,24 +3022,27 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "a2a871fcb8ba3045",
+       "58d94138fa453362",
+       "6d2d0cfd5e9a83e1",
        "498ffe2eac95c620",
-       "8ab76ed3b06fa590",
-       "1103493e4669debe"
+       "4138c5ede839e758",
+       "e2c5b20abbc7aaf2",
+       "f2d15ac167069af2",
+       "ef3de3831846ee92"
       ],
-      "tokens": 49,
+      "tokens": 65,
       "changedOnly": false,
-      "version": "1f7da6d228e12f74"
+      "version": "717e6f94d582bdd2"
      }
     ],
     "also": [],
     "topic": [
      "About me"
     ],
-    "tokens": 74,
+    "tokens": 89,
     "sources": [],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- My employer is Kestrel Analytics.\n- I work at Kestrel Analytics as a lead research assistant.\n- I live in Madison.\n- My name is Maya Collins.\n- Working on Tidepool.\n- Working on Kitchen remodel.\n- Working on SkipDoodle.\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -1866,24 +3076,27 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "a2a871fcb8ba3045",
+       "58d94138fa453362",
+       "6d2d0cfd5e9a83e1",
        "498ffe2eac95c620",
-       "8ab76ed3b06fa590",
-       "1103493e4669debe"
+       "4138c5ede839e758",
+       "e2c5b20abbc7aaf2",
+       "f2d15ac167069af2",
+       "ef3de3831846ee92"
       ],
-      "tokens": 49,
+      "tokens": 65,
       "changedOnly": false,
-      "version": "1f7da6d228e12f74"
+      "version": "717e6f94d582bdd2"
      }
     ],
     "also": [],
     "topic": [
      "About me"
     ],
-    "tokens": 74,
+    "tokens": 89,
     "sources": [],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- My employer is Kestrel Analytics.\n- I work at Kestrel Analytics as a lead research assistant.\n- I live in Madison.\n- My name is Maya Collins.\n- Working on Tidepool.\n- Working on Kitchen remodel.\n- Working on SkipDoodle.\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -1918,17 +3131,20 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "a2a871fcb8ba3045",
+       "58d94138fa453362",
+       "6d2d0cfd5e9a83e1",
        "498ffe2eac95c620",
-       "8ab76ed3b06fa590",
-       "1103493e4669debe"
+       "4138c5ede839e758",
+       "e2c5b20abbc7aaf2",
+       "f2d15ac167069af2",
+       "ef3de3831846ee92"
       ],
-      "tokens": 49,
+      "tokens": 65,
       "changedOnly": false,
-      "version": "1f7da6d228e12f74"
+      "version": "717e6f94d582bdd2"
      },
      {
-      "id": "ent_01a1851a-1da0-7000-80a2-05bd5bcf5cb6",
+      "id": "ent_01a18512-1b32-7000-b6b2-f56d4a06405f",
       "path": [
        "School",
        "Studying",
@@ -1946,21 +3162,64 @@
       ],
       "tokens": 89,
       "changedOnly": false,
-      "version": "82cdbc7b90bacbf7"
+      "version": "1a54b358fe9ed45c"
      }
     ],
-    "also": [],
+    "also": [
+     {
+      "id": "ent_01a1850d-0f8e-7000-a4f3-97a2f373c6a4",
+      "path": [
+       "School",
+       "Academic life"
+      ],
+      "reason": "vector",
+      "sources": [
+       "chatgpt",
+       "claude"
+      ],
+      "chats": [
+       "a728c07bc2307e3b",
+       "976737f67b75d356",
+       "f5719f3d6e9031ba",
+       "fd8946b5325b1ea8"
+      ],
+      "tokens": 171,
+      "changedOnly": false,
+      "version": "b7f5690d2f746510"
+     },
+     {
+      "id": "ent_01a18510-05fe-7001-95cb-fda6ed9d098b",
+      "path": [
+       "Plans and deadlines",
+       "Goals"
+      ],
+      "reason": "vector",
+      "sources": [
+       "claude",
+       "chatgpt"
+      ],
+      "chats": [
+       "82665cb0a13ddd43",
+       "3047a98e5070e70b",
+       "d04db69416a6b82b",
+       "d4356898dbe0a042"
+      ],
+      "tokens": 176,
+      "changedOnly": false,
+      "version": "ab78e68aaae316ca"
+     }
+    ],
     "topic": [
      "About me",
      "MATH 54 midterm"
     ],
-    "tokens": 162,
+    "tokens": 177,
     "sources": [
      "claude",
      "gemini"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- My employer is Kestrel Analytics.\n- I work at Kestrel Analytics as a lead research assistant.\n- I live in Madison.\n- My name is Maya Collins.\n- Working on Tidepool.\n- Working on Kitchen remodel.\n- Working on SkipDoodle.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -1996,17 +3255,20 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "a2a871fcb8ba3045",
+       "58d94138fa453362",
+       "6d2d0cfd5e9a83e1",
        "498ffe2eac95c620",
-       "8ab76ed3b06fa590",
-       "1103493e4669debe"
+       "4138c5ede839e758",
+       "e2c5b20abbc7aaf2",
+       "f2d15ac167069af2",
+       "ef3de3831846ee92"
       ],
-      "tokens": 49,
+      "tokens": 65,
       "changedOnly": false,
-      "version": "1f7da6d228e12f74"
+      "version": "717e6f94d582bdd2"
      },
      {
-      "id": "ent_01a1851a-1da0-7000-80a2-05bd5bcf5cb6",
+      "id": "ent_01a18512-1b32-7000-b6b2-f56d4a06405f",
       "path": [
        "School",
        "Studying",
@@ -2024,21 +3286,64 @@
       ],
       "tokens": 89,
       "changedOnly": false,
-      "version": "82cdbc7b90bacbf7"
+      "version": "1a54b358fe9ed45c"
      }
     ],
-    "also": [],
+    "also": [
+     {
+      "id": "ent_01a1850d-0f8e-7000-a4f3-97a2f373c6a4",
+      "path": [
+       "School",
+       "Academic life"
+      ],
+      "reason": "vector",
+      "sources": [
+       "chatgpt",
+       "claude"
+      ],
+      "chats": [
+       "a728c07bc2307e3b",
+       "976737f67b75d356",
+       "f5719f3d6e9031ba",
+       "fd8946b5325b1ea8"
+      ],
+      "tokens": 171,
+      "changedOnly": false,
+      "version": "b7f5690d2f746510"
+     },
+     {
+      "id": "ent_01a18510-05fe-7001-95cb-fda6ed9d098b",
+      "path": [
+       "Plans and deadlines",
+       "Goals"
+      ],
+      "reason": "vector",
+      "sources": [
+       "claude",
+       "chatgpt"
+      ],
+      "chats": [
+       "82665cb0a13ddd43",
+       "3047a98e5070e70b",
+       "d04db69416a6b82b",
+       "d4356898dbe0a042"
+      ],
+      "tokens": 176,
+      "changedOnly": false,
+      "version": "ab78e68aaae316ca"
+     }
+    ],
     "topic": [
      "About me",
      "MATH 54 midterm"
     ],
-    "tokens": 162,
+    "tokens": 177,
     "sources": [
      "claude",
      "gemini"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- My employer is Kestrel Analytics.\n- I work at Kestrel Analytics as a lead research assistant.\n- I live in Madison.\n- My name is Maya Collins.\n- Working on Tidepool.\n- Working on Kitchen remodel.\n- Working on SkipDoodle.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -2075,17 +3380,20 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "a2a871fcb8ba3045",
+       "58d94138fa453362",
+       "6d2d0cfd5e9a83e1",
        "498ffe2eac95c620",
-       "8ab76ed3b06fa590",
-       "1103493e4669debe"
+       "4138c5ede839e758",
+       "e2c5b20abbc7aaf2",
+       "f2d15ac167069af2",
+       "ef3de3831846ee92"
       ],
-      "tokens": 49,
+      "tokens": 65,
       "changedOnly": false,
-      "version": "1f7da6d228e12f74"
+      "version": "717e6f94d582bdd2"
      },
      {
-      "id": "ent_01a1851a-1da0-7000-80a2-05bd5bcf5cb6",
+      "id": "ent_01a18512-1b32-7000-b6b2-f56d4a06405f",
       "path": [
        "School",
        "Studying",
@@ -2103,12 +3411,12 @@
       ],
       "tokens": 89,
       "changedOnly": false,
-      "version": "82cdbc7b90bacbf7"
+      "version": "1a54b358fe9ed45c"
      }
     ],
     "also": [
      {
-      "id": "ent_01a1851a-1d0a-7000-81ab-7a2ad41f4a1a",
+      "id": "ent_01a18512-1aba-7001-9beb-99712e1cf081",
       "path": [
        "School",
        "Studying"
@@ -2119,19 +3427,40 @@
       "tokens": 5,
       "changedOnly": false,
       "version": "cbf29ce484222325"
+     },
+     {
+      "id": "ent_01a1850d-0f8e-7000-a4f3-97a2f373c6a4",
+      "path": [
+       "School",
+       "Academic life"
+      ],
+      "reason": "vector",
+      "sources": [
+       "chatgpt",
+       "claude"
+      ],
+      "chats": [
+       "a728c07bc2307e3b",
+       "976737f67b75d356",
+       "f5719f3d6e9031ba",
+       "fd8946b5325b1ea8"
+      ],
+      "tokens": 171,
+      "changedOnly": false,
+      "version": "b7f5690d2f746510"
      }
     ],
     "topic": [
      "About me",
      "MATH 54 midterm"
     ],
-    "tokens": 162,
+    "tokens": 177,
     "sources": [
      "claude",
      "gemini"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- My employer is Kestrel Analytics.\n- I work at Kestrel Analytics as a lead research assistant.\n- I live in Madison.\n- My name is Maya Collins.\n- Working on Tidepool.\n- Working on Kitchen remodel.\n- Working on SkipDoodle.\nSchool / Studying / Exam prep / MATH 54 midterm\n- The MATH 54 midterm is on November 6 in Evans Hall. (Gemini, Sep 19, 2026)\n- I keep mixing up eigenvalues and determinants for the MATH 54 midterm. (Claude, Oct 21, 2026)\n- The MATH 54 midterm is part of MATH 54 and covers chapters one to four. (Gemini, Sep 19, 2026)\n[End of context from Coere]\n\n"
    }
   },
   {
@@ -2169,17 +3498,20 @@
       "reason": "standing",
       "sources": [],
       "chats": [
-       "a2a871fcb8ba3045",
+       "58d94138fa453362",
+       "6d2d0cfd5e9a83e1",
        "498ffe2eac95c620",
-       "8ab76ed3b06fa590",
-       "1103493e4669debe"
+       "4138c5ede839e758",
+       "e2c5b20abbc7aaf2",
+       "f2d15ac167069af2",
+       "ef3de3831846ee92"
       ],
-      "tokens": 49,
+      "tokens": 65,
       "changedOnly": false,
-      "version": "1f7da6d228e12f74"
+      "version": "717e6f94d582bdd2"
      },
      {
-      "id": "ent_01a18515-40dc-7000-b792-3b77b9af4fb8",
+      "id": "ent_01a1850e-cafe-7000-aa7e-5bbccf963d12",
       "path": [
        "Projects",
        "Startups and businesses",
@@ -2196,10 +3528,10 @@
       ],
       "tokens": 165,
       "changedOnly": false,
-      "version": "1812e40b3ee6e7ba"
+      "version": "fd308ee583676a6d"
      },
      {
-      "id": "ent_01a1851b-a544-7000-852f-1067ff7ae482",
+      "id": "ent_01a18513-82f6-7000-8efb-4e210eb0ffc3",
       "path": [
        "Home and living",
        "Kitchen remodel"
@@ -2213,12 +3545,12 @@
       ],
       "tokens": 42,
       "changedOnly": false,
-      "version": "90bf013d47dadfb9"
+      "version": "1305737c43745f24"
      }
     ],
     "also": [
      {
-      "id": "ent_01a1851a-1d0a-7001-8236-64dff13ea3e0",
+      "id": "ent_01a18512-1aba-7002-bc89-ce3d75e6513a",
       "path": [
        "School",
        "Studying",
@@ -2237,29 +3569,29 @@
      "PearX interview",
      "Kitchen remodel"
     ],
-    "tokens": 281,
+    "tokens": 296,
     "sources": [
      "chatgpt",
      "claude"
     ],
     "chats": [],
-    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- I live in Madison.\n- Working on Tidepool.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\n"
+    "block": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- My employer is Kestrel Analytics.\n- I work at Kestrel Analytics as a lead research assistant.\n- I live in Madison.\n- My name is Maya Collins.\n- Working on Tidepool.\n- Working on Kitchen remodel.\n- Working on SkipDoodle.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\n"
    }
   }
  ],
  "terminal": {
   "connect": {
    "command": "uv run planner --connect",
-   "asked": "Open Apps in Coere and allow planner. Code 4EKH-F9Q1.",
+   "asked": "Open Apps in Coere and allow planner. Code 0PWJ-N1BD.",
    "allowed": "Allowed. The token is saved in ~/event-planner/.env."
   },
   "context": {
    "command": "uv run context.py \"Help me prepare for this interview\"",
-   "out": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- My employer is Kestrel Analytics.\n- Working on Tidepool.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\nFrom 6 chats\n  About me: Goes with the first message of every chat\n  Projects / Startups and businesses / PearX interview: Shares words with the draft\n  Home and living / Kitchen remodel: Shares words with the draft"
+   "out": "[Context from Coere, my saved memory. Use it if it helps.]\nAbout me\n- My employer is Kestrel Analytics.\n- I work at Kestrel Analytics as a lead research assistant.\n- My name is Maya Collins.\n- Working on Tidepool.\n- Working on Kitchen remodel.\n- Working on SkipDoodle.\nProjects / Startups and businesses / PearX interview\n- The PearX interview is on November 4 at 2 pm over video. (Claude, Oct 9, 2026)\n- I want my PearX interview answer on why now to mention the records move. (ChatGPT, Oct 19, 2026)\n- My PearX interview answer on traction should lead with the 1,200 weekly users. (ChatGPT, Oct 19, 2026)\n- They told me the PearX interview will cover traction, the team and why now. (Claude, Oct 9, 2026)\n- The PearX interview is the partner round with two partners. (Claude, Oct 9, 2026)\n- My PearX interview is for Tidepool, my startup. (Claude, Oct 9, 2026)\nHome and living / Kitchen remodel\n- I have an interview with a contractor on Friday about the Kitchen remodel and new counters. (Claude, Oct 11, 2026)\n[End of context from Coere]\n\nFrom 8 chats\n  About me: Goes with the first message of every chat\n  Projects / Startups and businesses / PearX interview: Shares words with the draft\n  Home and living / Kitchen remodel: Shares words with the draft"
   },
   "plan": {
    "command": "uv run planner \"Plan a dinner with Caleb next Friday\"",
-   "out": "Dinner with Caleb Moreau\nFriday, November 6, 7:30 PM to 9:30 PM (America/Los_Angeles)\nWith Caleb Moreau\nPlace idea: A restaurant near home\nWhy\n  Caleb Moreau works at Northwind Clinic.  fact_01a1851a-da6a-7001-b3c9-acd719fd305a\nStill open\n  Which restaurant should be booked?\nSaved ~/event-planner/plan.ics"
+   "out": "Dinner with Caleb Moreau\nThursday, November 5, 7:30 PM to 9:30 PM (America/Los_Angeles)\nWith Caleb Moreau\nPlace idea: A vegetarian friendly restaurant near home\nWhy\n  Caleb Moreau is allergic to cashews.                      fact_01a18510-76f6-7001-8ba0-c506201d9b5b\n  Caleb Moreau is vegetarian.                               fact_01a18510-1b34-7000-8a9d-5627760875c6\n  I cook vegetarian at home because Caleb is vegetarian.    fact_01a1850e-340e-7000-8db3-1f5718b507b8\n  My cooking never uses peanuts because of my allergy.      fact_01a18510-a48c-7000-9167-6a8ec6e5baab\nChecked\n  The PearX interview is on November 4 at 2 pm over video.  fact_01a18519-6b26-7001-a6d7-bb6f78992920\n  The MATH 54 midterm is on November 6 in Evans Hall.       fact_01a18519-76a2-7000-b945-f4c35c90d034\nStill open\n  Which restaurant should be booked?\nSaved ~/event-planner/plan.ics"
   }
  }
 }

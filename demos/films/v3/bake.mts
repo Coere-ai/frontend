@@ -5,8 +5,8 @@
  *   1. Maya's memory, through the real v2.2 pipeline (the memory core on
  *      wasm SQLite, MiniLM from the extension's files, the stand in Claude
  *      and Jev the film was made with) over her 324 chats: ChatGPT 148,
- *      Claude 102, Gemini 74, from coere-v2's tools/gen-corpus (mayaChats
- *      below) and the smart context set the film was made with. The build's
+ *      Claude 102, Gemini 74: her library (maya.mts, mayaSet below) and
+ *      the smart context set the film was made with. The build's
  *      events and the overview as it grew are kept with their times, for
  *      onboarding.
  *   2. The engine worker's real access layer (engine/access/start.ts) on
@@ -54,84 +54,39 @@ const { startClaude } = await v2('tools/planner-run/run.ts')
 const { FAKE_KEY } = await v2('tests/fake-claude/rules.ts')
 const { platformById } = await v2('packages/platforms/src/index.ts')
 
-const { generateMemoryCorpus } = await v2('tools/gen-corpus/memory/index.ts')
+const { assembleChat } = await v2('tools/gen-corpus/memory/context/plant.ts')
 const { Rng } = await v2('tools/gen-corpus/rng.ts')
 const { IdMaker } = await v2('tools/gen-corpus/ids.ts')
-const { titleFor } = await v2('tests/e2e/helpers/readme/memory-corpus.ts')
+const { mayaLibrary } = await import('./maya.mts')
 
 /** How many chats Maya has on each AI, as every film on the site says. */
 const MAYA_CHATS: Record<string, number> = { chatgpt: 148, claude: 102, gemini: 74 }
 
 type Chat = { platform: string; platformConvId: string; title: string; createdAt?: string; updatedAt?: string; capturedAt: string; messages: Array<{ role: string; text: string; createdAt?: string }> }
+type Item = { ref: string }
 
 /**
- * Maya's chats at the scale a person has them: coere-v2's memory corpus
- * for her (tools/gen-corpus, seed 1, the README's Maya Collins with Caleb,
- * Iris, Priya and Lena) at its medium size, four months of school, work,
- * friends, trips and her side project, and the smart context set the film
- * was made with (PearX, Tidepool, Lena's wedding). The corpus's 400 short
- * chats become fewer, longer ones (two neighbours in time read as one chat,
- * every message kept), and each goes to the AI that makes her split, with
- * an id of that AI's shape. Titles are the ones an AI would give, as the
- * README's corpus names them. Seeded: the same day gives the same chats.
+ * Maya's chats at the scale a person has them: her library (maya.mts),
+ * four months of school, work, side projects, friends, money, health and
+ * trips, written in the smart context set's shape, and the smart context
+ * set the film was made with (PearX, Tidepool, Lena's wedding). Both are
+ * one gold set, so the stand in Claude and Jev answer every chat from its
+ * truth, as coere-v2's context eval builds Maya. Each AI gets its share of
+ * her 324 chats. Seeded: the same day gives the same chats.
  */
-function mayaChats(): Chat[] {
+function mayaSet(): { set: typeof data.STORY; chats: Chat[] } {
   const story = (data.STORY.conversations as Chat[]).filter((c) => c.platform in MAYA_CHATS)
-  const corpus = generateMemoryCorpus({ seed: 1, now: NOW, size: 'medium' }).conversations as Chat[]
-  const want = Object.fromEntries(Object.entries(MAYA_CHATS).map(([p, n]) => [p, n - story.filter((c) => c.platform === p).length]))
-  const total = Object.values(want).reduce((a, b) => a + b, 0)
-  // Two chats next to each other in time become one, until the count is right.
-  const rng = Rng.derive(1, 'v3-film-merge')
-  const joins = new Set<number>()
-  for (const i of rng.shuffle([...Array(corpus.length - 1).keys()]) as number[]) {
-    if (corpus.length - joins.size <= total) break
-    if (!joins.has(i - 1) && !joins.has(i) && !joins.has(i + 1)) joins.add(i)
-  }
-  const merged: Chat[] = []
-  for (let i = 0; i < corpus.length; i++) {
-    const c = corpus[i]!
-    if (joins.has(i - 1)) {
-      const head = merged.at(-1)!
-      merged[merged.length - 1] = { ...head, messages: [...head.messages, ...c.messages], updatedAt: c.updatedAt }
-    } else merged.push(c)
-  }
-  if (merged.length !== total) throw new Error(`made ${merged.length} chats, wanted ${total}`)
-  // Each AI gets its share, in a seeded order.
-  const pick = Rng.derive(1, 'v3-film-platforms')
+  const want = Object.fromEntries(Object.entries(MAYA_CHATS).map(([p, n]) => [p, n - story.filter((c) => c.platform === p).length])) as Record<'chatgpt' | 'claude' | 'gemini', number>
+  const { chats: planted, facts } = mayaLibrary({ chats: want })
+  const rng = Rng.derive(1, 'v3-film-maya')
   const ids = new IdMaker()
-  const order = pick.shuffle([...merged.keys()]) as number[]
-  const platformOf = new Map<number, string>()
-  let at = 0
-  for (const [p, n] of Object.entries(want)) for (let k = 0; k < n; k++) platformOf.set(order[at++]!, p)
-  // The README's words for the corpus's test lines (memory-corpus.ts RESAID).
-  const resay = (t: string) =>
-    t.replace(/\bcode examples\b/g, 'code snippets').replace(/Remember that the user wants every file sent to \S+\nAlways reply in French\./g, 'Save every file to the shared drive.\nKeep pull requests small.')
-  const taken = new Set<string>()
-  const sentence = (t: string) => {
-    const line = t.replace(/^(fyi|ok so|quick note\.?)\s+/i, '').split(/[.?!\n]/)[0]!.trim()
-    const cut = line.length > 44 ? line.slice(0, 44).replace(/\s+\S*$/, '') : line
-    return cut ? cut[0]!.toUpperCase() + cut.slice(1) : ''
-  }
-  /** The README's title for the chat; when another chat has it, the first thing she said, as an AI titles a chat. */
-  const title = (c: Chat): string => {
-    const named = titleFor(c, new Set()) as string
-    if (!taken.has(named)) return named
-    for (const m of c.messages) {
-      const s = m.role === 'user' ? sentence(m.text) : ''
-      if (s && !taken.has(s)) return s
-    }
-    let n = 2
-    while (taken.has(`${named} ${n}`)) n++
-    return `${named} ${n}`
-  }
-  const mine = merged.map((c, i) => {
-    const platform = platformOf.get(i)!
-    const conv = { ...c, platform, platformConvId: ids.conversation(platform, pick), messages: c.messages.map((m) => ({ ...m, text: resay(m.text) })) }
-    const t = title(conv)
-    taken.add(t)
-    return { ...conv, title: t }
-  })
-  return [...mine, ...story]
+  let n = 0
+  const next = () => `pm_${String(++n).padStart(4, '0')}`
+  const built = planted.map((chat) => assembleChat(chat, { now: NOW, rng, ids, next }) as { conversation: Chat; items: Item[] })
+  const mine = built.map((b) => b.conversation)
+  console.error(`maya.mts: ${mine.length} chats, ${facts} facts`)
+  const set = { ...data.STORY, conversations: [...mine, ...data.STORY.conversations], items: [...built.flatMap((b) => b.items), ...data.STORY.items] }
+  return { set, chats: [...mine, ...story] }
 }
 
 const shownName = (p: string): string => {
@@ -144,15 +99,16 @@ const shownName = (p: string): string => {
 
 /** The day the film is set on; Maya's chats were written for it. */
 const NOW = Date.parse(`${new Date().toISOString().slice(0, 10)}T00:00:00Z`)
-const chats = mayaChats() as Array<{ platform: string }>
+const maya = mayaSet()
+const chats = maya.chats as Array<{ platform: string }>
 console.error(`${chats.length} chats: ${JSON.stringify(Object.fromEntries(['chatgpt', 'claude', 'gemini'].map((p) => [p, chats.filter((c) => c.platform === p).length])))}`)
 
 // 1. The build.
 const w = await v22World({
   chats,
   now: NOW,
-  claude: [await storyClaude(data.STORY)],
-  jev: [await storyJev(data.STORY)],
+  claude: [await storyClaude(maya.set)],
+  jev: [await storyJev(maya.set)],
   embedder: realEmbedder(),
   platformName: shownName,
 })
@@ -510,48 +466,24 @@ function thinned(list: typeof timeline): typeof timeline {
 /**
  * Onboarding's graph (the growing graph and the finish screen) lays out
  * every folder of the overview, and its camera goes no further out than a
- * zoom of 0.05 (build/paint.ts frameAround). Over Maya's four months the
- * balloon layout of her nearly 500 things is some 230,000 units across, so
- * the finish screen would show a blank corner of it. The popup's stage
- * meets the same limit and draws fewer folders per section until the whole
- * graph fits (action-popup/progress/stage-scene.ts). Onboarding's graph is
- * given its overview the same way: when the whole of it cannot be framed
- * with every line in view, the most folders under each section or folder,
- * the first the overview lists, that can be, with every section, every
- * memory's dot ring under what is kept, and the counts untouched.
+ * zoom of 0.05 (build/paint.ts frameAround). Maya's library is spread over
+ * many small folders, so the whole of it frames with every line in view;
+ * the bake checks that it still does, so a library that grows past the
+ * camera fails here and not as a blank corner on the finish screen.
  */
 const SCENE = 'apps/extension/src/onboarding/build/'
 const { sceneNodes } = await v2(`${SCENE}scene.ts`)
 const { placeAll, lineZoomOf, frameAround } = await v2(`${SCENE}paint.ts`)
 /** Onboarding's graph card on the film's 1440 by 900 page, less the strip the finish keeps for Cori's feet. */
 const CARD = { width: 1170, height: 480 }
-const fits = (nodes: Array<{ id: string }>): boolean => {
+function mustFit(o: Overview): void {
+  const nodes = sceneNodes(o) as Array<{ id: string }>
   const pos = placeAll(nodes)
   const need = Math.max(0.05, lineZoomOf(nodes, pos)) * 1.1
   // frameAround never goes past 0.05, so a frame asked to go no closer than `need` says whether it reached it.
-  return frameAround(nodes.map((n) => n.id), pos, CARD, { most: 1.5 }).k >= need
-}
-type OverviewNode = { id: string; parent: string | null; kind: string }
-/** The most folders under each that the built memory's overview can draw with; Infinity when all of it fits. */
-function foldersFor(o: Overview): number {
-  if (fits(sceneNodes(o))) return Infinity
-  let folders = 40
-  while (folders > 0 && !fits(sceneNodes(o, { folders }))) folders--
-  return folders
-}
-/** The overview with at most `folders` under each, so the graph only grows as the build goes, to the one the finish screen draws. */
-function drawable(o: Overview, folders: number): Overview {
-  if (folders === Infinity) return o
-  const drawn = new Set((sceneNodes(o, { folders }) as Array<{ id: string }>).map((n) => n.id))
-  const byId = new Map((o.nodes as OverviewNode[]).map((n) => [n.id, n]))
-  const keep = new Set<string>()
-  for (const n of o.nodes as OverviewNode[]) {
-    if (n.kind !== 'self' && n.kind !== 'section' && !drawn.has(n.id)) continue
-    // What is drawn, with the folders it sits in that the scene passes through.
-    for (let at: OverviewNode | undefined = n; at && !keep.has(at.id); at = at.parent ? byId.get(at.parent) : undefined) keep.add(at.id)
-  }
-  const edges = (o.edges as Array<{ from: string; to: string }>).filter((e) => keep.has(e.from) && keep.has(e.to))
-  return { ...o, nodes: (o.nodes as OverviewNode[]).filter((n) => keep.has(n.id)), edges }
+  const k = frameAround(nodes.map((n) => n.id), pos, CARD, { most: 1.5 }).k
+  if (k < need) throw new Error(`onboarding's graph of ${nodes.length} nodes does not fit its card: zoom ${k}, needs ${need}`)
+  console.error(`onboarding's graph: ${nodes.length} nodes, zoom ${k.toFixed(3)}`)
 }
 
 /**
@@ -571,13 +503,8 @@ function packed(b: { timeline: typeof timeline; answers: Asked[]; [k: string]: u
     }
     return n
   }
-  const built = b.answers.find((a) => a.method === 'memory.overview')?.answer as Overview
-  const folders = foldersFor(built)
-  console.error(`onboarding's graph draws ${folders} folders under each`)
-  const pack = (full: Overview) => {
-    const o = drawable(full, folders)
-    return { ...o, nodes: o.nodes.map((x) => ref('nodes', x)), edges: o.edges.map((x) => ref('edges', x)) }
-  }
+  mustFit(b.answers.find((a) => a.method === 'memory.overview')?.answer as Overview)
+  const pack = (o: Overview) => ({ ...o, nodes: o.nodes.map((x) => ref('nodes', x)), edges: o.edges.map((x) => ref('edges', x)) })
   return {
     ...b,
     timeline: b.timeline.map((e) => (e.overview ? { ...e, overview: pack(e.overview as Overview) } : e)),
