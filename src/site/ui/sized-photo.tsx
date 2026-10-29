@@ -22,6 +22,6 @@ const sizedPhotoLoader: ImageLoader = ({ src, width }) => {
  * loader is a function, so it lives in this client file: a server
  * component can't hand one to Image.
  */
-export function SizedPhoto(props: Omit<ImageProps, "loader">) {
-  return <Image {...props} loader={sizedPhotoLoader} />;
+export function SizedPhoto({ alt, ...props }: Omit<ImageProps, "loader">) {
+  return <Image alt={alt} {...props} loader={sizedPhotoLoader} />;
 }
