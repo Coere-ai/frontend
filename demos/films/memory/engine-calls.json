@@ -1,0 +1,10 @@
+[
+  { "method": "stats" },
+  { "method": "listConversations", "args": { "sort": "updated", "dir": "desc", "limit": 8 } },
+  { "method": "search", "args": { "query": "M", "limit": 5 } },
+  { "method": "search", "args": { "query": "MA", "limit": 5 } },
+  { "method": "search", "args": { "query": "MAT", "limit": 5 } },
+  { "method": "search", "args": { "query": "MATH", "limit": 5 } },
+  { "method": "search", "args": { "query": "MATH 5", "limit": 5 } },
+  { "method": "search", "args": { "query": "MATH 54", "limit": 5 } }
+]

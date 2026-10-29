@@ -1,0 +1,1 @@
+{ "title": "Coere Memory", "version": 2, "bundles": { "console.js": { "from": "console.ts", "version": 2 } } }

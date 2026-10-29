@@ -1,0 +1,20 @@
+[
+  { "method": "memory.status" },
+  { "method": "memory.settings" },
+  { "method": "memory.overview", "args": {} },
+  { "method": "memory.overview", "args": { "history": false } },
+  { "method": "memory.node", "args": {}, "each": "node" },
+  { "method": "memory.children", "args": { "id": null } },
+  { "method": "memory.dueSoon", "args": { "limit": 5 } },
+  { "method": "memory.review" },
+  { "method": "memory.buildEstimate", "args": { "chats": null } },
+  { "method": "memory.learned" },
+  { "method": "memory.corePack" },
+  { "method": "memory.stats" },
+  { "method": "memory.search", "args": { "q": "M", "limit": 8, "history": false } },
+  { "method": "memory.search", "args": { "q": "MA", "limit": 8, "history": false } },
+  { "method": "memory.search", "args": { "q": "MAT", "limit": 8, "history": false } },
+  { "method": "memory.search", "args": { "q": "MATH", "limit": 8, "history": false } },
+  { "method": "memory.search", "args": { "q": "MATH 5", "limit": 8, "history": false } },
+  { "method": "memory.search", "args": { "q": "MATH 54", "limit": 8, "history": false } }
+]
