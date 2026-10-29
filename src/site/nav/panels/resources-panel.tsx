@@ -1,45 +1,38 @@
-import Image from "next/image";
 import Link from "next/link";
-import { films } from "@/site/content/films";
-import { PlayIcon } from "@/site/ui/icons/player-icons";
-import { PanelLabel, PanelLink } from "./panel-parts";
+import { contextSamples } from "@/site/content/code/context-api";
+import { docPages } from "@/site/content/docs";
+import { hoverUnderline } from "@/site/ui/hover-underline";
+import { PanelLabel, PanelLink, PanelMore } from "./panel-parts";
 
-const links = [
-  { href: "/#demo", title: "Product demo", summary: "Coere v2 from install to a finished memory." },
-  { href: "/resources#films", title: "Feature films", summary: "A short film of each feature." },
-  { href: "/resources#privacy", title: "Privacy", summary: "Where your chats and memory live." },
-  { href: "/resources#faq", title: "Questions", summary: "Short answers about how Coere works." },
-];
+const shown = ["overview", "authentication", "endpoints", "sdks", "mcp", "examples"];
+const python = contextSamples.find((sample) => sample.label === "Python");
 
-/** Resources menu: the learning links, and a card that jumps to the demo. */
+/** Resources menu: the docs pages, and a card with the first call that opens the quickstart. */
 export function ResourcesPanel() {
-  const demo = films.v2;
+  const pages = docPages.filter((page) => shown.includes(page.slug));
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12">
+    <div className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] gap-12">
       <div>
-        <PanelLabel>Learn</PanelLabel>
+        <div className="flex items-baseline justify-between">
+          <PanelLabel>Developer docs</PanelLabel>
+          <PanelMore href="/resources">All docs</PanelMore>
+        </div>
         <ul className="mt-3 grid grid-cols-2 gap-x-8 gap-y-1">
-          {links.map((link) => (
-            <li key={link.href}>
-              <PanelLink {...link} />
+          {pages.map((page) => (
+            <li key={page.slug}>
+              <PanelLink href={page.slug === "overview" ? "/resources" : `/resources/${page.slug}`} title={page.title} summary={page.summary} />
             </li>
           ))}
         </ul>
       </div>
 
-      <Link href="/#demo" className="group grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-6 rounded-2xl bg-neutral-50 p-4">
-        <div className="relative overflow-hidden rounded-xl">
-          <Image src={demo.poster} alt="" width={1440} height={900} unoptimized className="aspect-[1440/900] w-full object-cover" />
-          <span className="absolute inset-0 grid place-items-center">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-white/90 text-neutral-950 shadow-lg transition-transform group-hover:scale-105">
-              <PlayIcon size={20} />
-            </span>
-          </span>
-        </div>
-        <div>
-          <p className="text-[13px] font-medium text-neutral-500">Watch</p>
-          <p className="mt-1 text-xl font-medium tracking-[-0.02em] text-neutral-950">The full Coere v2 demo</p>
-          <p className="mt-1 text-[14px] text-neutral-500">Three and a half minutes, with chapters.</p>
+      <Link href="/resources#quickstart" className="group flex flex-col justify-between rounded-2xl bg-[#0b1020] p-6 text-white">
+        <pre className="overflow-hidden font-mono text-[12px] leading-relaxed text-white/80">
+          <code>{python?.code}</code>
+        </pre>
+        <div className="mt-6">
+          <p className="text-[13px] text-white/60">Quickstart</p>
+          <p className={`mt-1 text-lg font-medium tracking-[-0.02em] decoration-white ${hoverUnderline}`}>From a server to your first context</p>
         </div>
       </Link>
     </div>
