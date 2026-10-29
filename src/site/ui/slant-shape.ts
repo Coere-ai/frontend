@@ -23,7 +23,7 @@ export function slantPath({ column, columns, height, slant = 9, radius = 7 }: { 
  * corner starts `radius` before the point and ends `radius` after it, with
  * a quadratic curve through the point itself.
  */
-function roundedPolygon(points: [number, number][], radius: number): string {
+export function roundedPolygon(points: [number, number][], radius: number): string {
   const n = points.length;
   const toward = (from: [number, number], to: [number, number]) => {
     const dx = to[0] - from[0];
