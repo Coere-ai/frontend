@@ -1,4 +1,5 @@
 import type { World } from "../../stage/world";
+import maya from "./data/maya.json";
 import {
   ABOUT_ME,
   blockOf,
@@ -6,16 +7,12 @@ import {
   PEARX,
   PREP_CHAT,
   PREP_CHAT_TEXT,
-  SECTION_OF,
-  SECTIONS,
   SKIPDOODLE,
   STRIPE,
-  THINGS,
   TIDEPOOL,
   type Answer,
   type Chat,
   type Node,
-  type Thing,
 } from "./data";
 
 /**
@@ -24,6 +21,8 @@ import {
  * interview draft brings her earlier prep chat, who she is, the interview
  * and Tidepool; her SkipDoodle chat brings who she is and the project, a
  * follow up brings nothing new, and the stack brings the project back.
+ * The memory search's graph and what it finds as she types are her memory
+ * core's own answers over her whole memory (bake.mts, data/maya.json).
  */
 
 type Memory = { node: Node; lines: string[] };
@@ -57,74 +56,35 @@ function contextFor(args: { tail?: string; keywords?: string[] }): Answer {
 
 /** Ask Cori, or Add on a row: the memories her words or the ids name. */
 function contextAsk(args: { request?: string; ids?: string[] }): Answer {
-  const all = [LAUNCH_TALK, STRIPE, TIDEPOOL, PEARX, SKIPDOODLE];
-  if (args.ids?.length) return answer(all.filter((m) => args.ids!.includes(m.node.id)).map((m) => ({ ...m, node: { ...m.node, reason: "asked" as const } })));
+  if (args.ids?.length) return answer(ALL.filter((m) => args.ids!.includes(m.node.id)).map((m) => ({ ...m, node: { ...m.node, reason: "asked" as const } })));
   const request = (args.request ?? "").toLowerCase();
   if (/launch|talk/.test(request)) return answer([{ ...LAUNCH_TALK, node: { ...LAUNCH_TALK.node, reason: "asked" } }]);
   if (/stripe/.test(request)) return answer([{ ...STRIPE, node: { ...STRIPE.node, reason: "asked" } }]);
   return NOTHING;
 }
 
-/** Her graph for the memory search: the person, the sections, the folders and every thing (smart/graph.ts). */
-function contextGraph() {
-  const nodes: { id: string; kind: string; label: string; section: string; parent: string | null; importance: number; facts: number; memories: number[]; chats: number }[] = [];
-  nodes.push({ id: "self", kind: "self", label: "Maya Collins", section: "personal", parent: null, importance: 1, facts: 7, memories: [], chats: 0 });
-  for (const [id, label] of Object.entries(SECTIONS)) nodes.push({ id, kind: "section", label, section: id, parent: null, importance: 0.5, facts: 0, memories: [], chats: 0 });
-  const ids = new Map(THINGS.map((x) => [x.path.join("/"), x.id]));
-  const folders = new Set<string>();
-  const parentOf = (path: string[]): string => {
-    const section = SECTION_OF[path[0]!]!;
-    if (path.length <= 2) return section;
-    const up = path.slice(0, -1);
-    const known = ids.get(up.join("/"));
-    if (known) return known;
-    const folder = `f:${up.join("/")}`;
-    if (!folders.has(folder)) {
-      folders.add(folder);
-      nodes.push({ id: folder, kind: "folder", label: up.at(-1)!, section, parent: parentOf(up), importance: 0.3, facts: 0, memories: [], chats: 0 });
-    }
-    return folder;
-  };
-  for (const x of THINGS) {
-    const memories = Array.from({ length: x.facts }, (_, i) => Math.max(0.2, x.importance - i * 0.12));
-    nodes.push({ id: x.id, kind: x.kind, label: x.path.at(-1)!, section: SECTION_OF[x.path[0]!]!, parent: parentOf(x.path), importance: x.importance, facts: x.facts, memories, chats: x.chats });
-  }
-  return { nodes, more: 0 };
-}
+type Found = { results: (Node & { line?: string })[]; lit: string[] };
+const BAKED = maya as unknown as { graph: { nodes: { id: string }[]; more: number }; find: Record<string, Found> };
+const ALL = [PEARX, TIDEPOOL, LAUNCH_TALK, STRIPE, SKIPDOODLE];
 
-const nodeOf = (x: Thing): Node => ({
-  id: x.id,
-  path: x.path,
-  reason: "keyword",
-  sources: x.sources,
-  chats: Array.from({ length: x.chats }, (_, i) => `${x.id}-c${i}`),
-  tokens: 40,
-  changedOnly: false,
-  version: `v1-${x.id}`,
-});
-
-/** The memory search as she types: what her words start, best first, the top four as rows (smart/find.ts). */
-function contextFind(args: { query?: string; skip?: string[] }) {
+/**
+ * The memory search as she types, as her memory core answered each step of
+ * the word (smart/find.ts): what her words start, best first, the top rows
+ * and every match to light. What already goes with the message is the
+ * tab's to skip, so it comes off here, as the engine leaves it out.
+ */
+function contextFind(args: { query?: string; skip?: string[] }): Found {
   const skip = new Set(args.skip ?? []);
-  const words = (args.query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
-  const open = THINGS.filter((x) => !skip.has(x.id));
-  if (words.length === 0) {
-    const ranked = ["ent_launch", "ent_stripe", "ent_iris", "ent_skipdoodle"].map((id) => open.find((x) => x.id === id)).filter((x): x is Thing => Boolean(x));
-    return { results: ranked.map((x) => ({ ...nodeOf(x), line: x.line })), lit: [] };
-  }
-  const starts = (text: string, w: string) => text.toLowerCase().split(/[^a-z0-9']+/).some((part) => part.startsWith(w));
-  const hit = (x: Thing) => words.every((w) => starts(x.path.join(" "), w) || starts(x.line, w));
-  const found = open.filter(hit).sort((a, b) => b.importance - a.importance);
-  // A folder stands for what it holds, so a thing inside a listed folder is not listed again.
-  const rows = found.filter((x) => !found.some((f) => f.kind === "folder" && f !== x && x.path.join("/").startsWith(f.path.join("/") + "/") && x.id !== "ent_dana_wedding"));
-  return { results: rows.slice(0, 4).map((x) => ({ ...nodeOf(x), line: x.line })), lit: found.map((x) => x.id) };
+  let query = (args.query ?? "").toLowerCase();
+  while (!(query in BAKED.find) && query) query = query.slice(0, -1);
+  const found = BAKED.find[query] ?? { results: [], lit: [] };
+  return { results: found.results.filter((r) => !skip.has(r.id)), lit: found.lit.filter((id) => !skip.has(id)) };
 }
 
 /** A pick in the memory search: that memory, as one that goes. */
 function contextRelated(args: { id?: string }): Answer {
-  const x = THINGS.find((t) => t.id === args.id);
-  if (!x) return NOTHING;
-  return answer([{ node: { ...nodeOf(x), reason: "asked" }, lines: [x.line] }]);
+  const m = ALL.find((x) => x.node.id === args.id);
+  return m ? answer([{ ...m, node: { ...m.node, reason: "asked" } }]) : NOTHING;
 }
 
 export function setupMemory(world: World): void {
@@ -134,7 +94,8 @@ export function setupMemory(world: World): void {
     // Ask Cori's wider pass finds nothing past what already goes; her words bring the rest.
     .engine("memory.contextDeeper", () => NOTHING)
     .engine("memory.contextMore", () => ({ chats: [], nodes: [] }))
-    .engine("memory.contextGraph", () => contextGraph())
+    // Her whole memory as the widget draws it: every live thing with its dots, from her memory core.
+    .engine("memory.contextGraph", () => structuredClone(BAKED.graph))
     .engine("memory.contextFind", (m) => contextFind((m.args ?? {}) as never))
     .engine("memory.contextRelated", (m) => contextRelated((m.args ?? {}) as never))
     .engine("memory.contextChat", (m) => ((m.args as { key?: string })?.key === PREP_CHAT.key ? { text: PREP_CHAT_TEXT } : null))

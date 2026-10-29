@@ -15,18 +15,23 @@ import { setupConsole } from "./console";
  * Ask Cori adds the notes she meant, and one Enter puts it in front of the
  * draft and sends. Then her SkipDoodle chat with its follow ups, and last
  * File Upload (beta) sending a long context as a file.
+ *
+ * Her memory is the whole of it: 532 memories from 324 chats (ChatGPT 148,
+ * Claude 102, Gemini 74), written by maya-world.mts and maya-memory.mts
+ * through coere-v2's own write path and read back by its memory core
+ * (bake.mts), so the memory search draws her real, dense graph.
  */
 
 const MAYA = { name: "Maya Collins", first: "Maya", initials: "MC" };
 const DRAFT = "Help me prepare for this interview";
 
 const CHAPTERS = [
-  { id: "type", title: "Type a message" },
-  { id: "goes", title: "What goes with it" },
-  { id: "add", title: "Add more" },
-  { id: "enter", title: "One Enter" },
-  { id: "chat", title: "In one chat" },
-  { id: "upload", title: "File Upload (beta)" },
+  { id: "type", title: "Type a message", seconds: 10 },
+  { id: "goes", title: "What goes with it", seconds: 10 },
+  { id: "add", title: "Add more", seconds: 17 },
+  { id: "enter", title: "One Enter", seconds: 5 },
+  { id: "chat", title: "In one chat", seconds: 39 },
+  { id: "upload", title: "File Upload (beta)", seconds: 29 },
 ];
 
 /** The chat box of the replica ChatGPT, its ProseMirror editor. */
@@ -169,7 +174,7 @@ async function smartContext(s: Stage): Promise<void> {
   await boxFocused(site);
   await typeText(s, site, "plan", 90);
   await s.rest();
-  await s.waitFor(site, text(/^4 matches$/, "[aria-live]", { within: memorySearch }), 8000).catch(() => null);
+  await s.waitFor(site, text(/^\d+ match(es)?$/, "[aria-live]", { within: memorySearch }), 8000).catch(() => null);
   await s.wait(3800);
   await s.press(site, "Escape");
   await s.wait(600);
