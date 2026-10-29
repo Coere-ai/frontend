@@ -46,6 +46,14 @@ const paths = {
   plug: <path d="M9 3.5v4M15 3.5v4M6.5 7.5h11v3a5.5 5.5 0 0 1-11 0v-3ZM12 16v4.5" />,
   shield: <path d="M12 3.5 19 6v5.5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-2.5Z" />,
   people: <path d="M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4.3a3.5 3.5 0 0 1 0 6.4M18 14.5c1.8.9 3 2.9 3 5.5" />,
+  megaphone: <path d="M4 10v4h3l7 4V6l-7 4H4ZM17.5 9.5a3.5 3.5 0 0 1 0 5M7 14l1 5h2.5" />,
+  briefcase: (
+    <>
+      <rect x="3.5" y="7.5" width="17" height="12" rx="2" />
+      <path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5M3.5 12.5h17" />
+    </>
+  ),
+  cap: <path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5ZM6.5 11.5v4c3 2.5 8 2.5 11 0v-4M21.5 9.5v5" />,
 } satisfies Record<string, ReactNode>;
 
 export type FeatureIconName = keyof typeof paths;
