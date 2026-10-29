@@ -22,6 +22,12 @@ export type View = { x: number; y: number; w: number };
 export type StageHooks = {
   fast(): boolean;
   chapter(id: string): void;
+  /** The script spent this long (or would have, while skipping), for starting partway into a chapter. */
+  spend(ms: number): void;
+  /** Whether title cards show: a part played alone has none. */
+  cards(): boolean;
+  /** A tab was put on screen. */
+  filmed(): void;
   gate(): Promise<void>;
 };
 
@@ -43,6 +49,11 @@ export class Stage {
     private readonly el: { tabs: HTMLElement; card: HTMLElement; pointer: HTMLElement; caption: HTMLElement; camera: HTMLElement },
     private readonly hooks: StageHooks,
   ) {}
+
+  /** Whether a tab is on screen now. */
+  get filming(): boolean {
+    return this.on !== null;
+  }
 
   get fast(): boolean {
     return this.hooks.fast();
@@ -77,6 +88,7 @@ export class Stage {
     this.el.card.classList.remove("on");
     for (const t of this.tabs.values()) t.frame.classList.toggle("on", t === tab);
     this.on = tab;
+    this.hooks.filmed();
     await this.rest();
     await this.wait(300);
   }
@@ -93,6 +105,7 @@ export class Stage {
 
   /** A title card on screen for `ms`. */
   async card(title: string, line?: string, ms = 3000): Promise<void> {
+    if (!this.hooks.cards()) return;
     this.el.card.innerHTML = cardHtml(title, line);
     this.el.card.classList.add("on");
     this.pointer(false);
@@ -111,6 +124,7 @@ export class Stage {
 
   async wait(ms: number): Promise<void> {
     await this.hooks.gate();
+    this.hooks.spend(ms);
     if (this.fast) return frame();
     await new Promise((r) => setTimeout(r, ms));
   }
@@ -146,8 +160,9 @@ export class Stage {
     const dy = to.y - from.y;
     const d = Math.hypot(dx, dy);
     this.pointer(true);
-    if (this.fast || d < 1) return this.place(to);
     const ms = o.ms ?? Math.min(900, 240 + d * 0.5);
+    if (d >= 1) this.hooks.spend(ms);
+    if (this.fast || d < 1) return this.place(to);
     const bow = o.straight ? 0 : Math.min(36, d * 0.04) * (dx >= 0 ? 1 : -1);
     const start = performance.now();
     for (;;) {
@@ -195,6 +210,7 @@ export class Stage {
 
   /** Types into what has the focus, one key at a time, with a person's small unevenness. */
   async type(tab: Tab, value: string, delay = 55): Promise<void> {
+    this.hooks.spend(delay * value.length);
     // Skipping ahead puts the text in at once, with the last letter as a real key, since pages and Coere read a box on a key.
     if (this.fast) {
       if (value.length > 1) insert(tab.doc, value.slice(0, -1));

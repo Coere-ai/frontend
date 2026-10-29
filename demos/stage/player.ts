@@ -6,16 +6,25 @@ import { World } from "./world";
 /**
  * Plays one film's script live in its page, over and over. The address
  * picks what plays: `from` and `to` name chapters (the site's short
- * showcases play one part this way, skipping to it unseen), `captions=1`
- * shows the caption line, `controls=1` adds chapter buttons and pause for
- * the full film, and `loop=0` stops at the end. The stage is the films'
- * 1440 by 900 window, scaled to fit whatever frame the page sits in.
+ * showcases play one part this way, skipping to it unseen), `at` starts
+ * that many seconds into `from`, `captions=1` shows the caption line, and
+ * `loop=0` stops at the end. The stage is the films' 1440 by 900 window,
+ * scaled to fit whatever frame the page sits in.
+ *
+ * The page tells the site around it how it is doing, by message: which
+ * chapter plays and how far in, whether it is paused, and whether the cover
+ * is up (loading or skipping ahead), so the site can draw a play bar below
+ * it and show a still of the film over it until it plays. The site sends
+ * back pause and play.
  */
-export type Chapter = { id: string; title: string };
+export type Chapter = { id: string; title: string; seconds?: number };
 export type FilmMeta = { title: string; chapters: Chapter[] };
 export type Film = (stage: Stage) => Promise<void>;
 /** Fills the World with the film's answers; runs before every play, on a fresh World. */
 export type Setup = (world: World) => void;
+
+/** What the page tells the site around it, a few times a second. */
+export type DemoState = { coereDemo: "state"; chapters: Chapter[]; chapter: string | null; at: number; paused: boolean; covered: boolean };
 
 /** Thrown to end a run at the `to` chapter. */
 class Stop extends Error {}
@@ -27,6 +36,7 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
   document.head.append(style);
   document.title = meta.title;
   document.body.innerHTML = stageHtml();
+  Object.assign(window, { __demoMeta: meta });
   const $ = (id: string) => document.getElementById(id)!;
   if (params.get("captions") === "1") $("caption").classList.add("on");
 
@@ -46,11 +56,17 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
   fit();
 
   let from = params.get("from");
+  let startAt = Math.max(0, Number(params.get("at") ?? 0)) * 1000;
   const to = params.get("to");
   const loop = params.get("loop") !== "0";
   let skipping = Boolean(from);
+  let waitingFor = 0;
+  let reached = false;
   let paused = false;
   let resume: (() => void) | null = null;
+  let chapter: string | null = null;
+  let elapsed = 0;
+  let spent = 0;
   const world = { now: new World() };
 
   const host: DemoHost = {
@@ -64,41 +80,74 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
   };
   Object.assign(window, { __demo: host });
 
+  /** Lifts the cover: the run has reached what should be seen. */
+  const reveal = () => {
+    skipping = false;
+    waitingFor = 0;
+    reached = false;
+    $("cover").classList.add("off");
+    tell();
+  };
+  /** Reveals a part played alone once it is really there: its chapter reached, a tab on screen, `at` spent. */
+  const settle = () => {
+    if (skipping && reached && spent >= waitingFor && stage?.filming) {
+      // One frame later, so the tab has drawn.
+      requestAnimationFrame(() => skipping && reveal());
+    }
+  };
+
   let stage = makeStage();
   function makeStage(): Stage {
     return new Stage(world.now, { tabs: $("tabs"), card: $("card"), pointer: $("pointer"), caption: $("caption"), camera: $("camera") }, {
       fast: () => skipping,
       chapter(id) {
         if (to && id === to && !skipping) throw new Stop();
+        chapter = id;
+        elapsed = 0;
+        spent = 0;
         if (skipping && id === from) {
-          skipping = false;
-          $("cover").classList.add("off");
+          // A part played alone shows once a tab is on screen and the script has spent `at` in it, never on a blank stage.
+          reached = true;
+          waitingFor = startAt;
+          elapsed = startAt / 1000;
+          settle();
         }
-        controls?.mark(id);
+        tell();
+      },
+      spend(ms) {
+        spent += ms;
+        settle();
+      },
+      cards: () => !from,
+      filmed() {
+        settle();
       },
       gate: () => (paused ? new Promise<void>((done) => (resume = done)) : Promise.resolve()),
     });
   }
 
-  const controls = params.get("controls") === "1" ? makeControls(meta, {
-    jump(id) {
-      from = id;
-      restart();
-    },
-    toggle() {
-      paused = !paused;
-      if (!paused) resume?.();
-      return paused;
-    },
-  }) : null;
-
-  let run = 0;
-  function restart(): void {
-    run++;
-    paused = false;
-    resume?.();
-    void go(run);
+  /** Sends the site the film's state. */
+  function tell(): void {
+    if (parent === window) return;
+    const state: DemoState = { coereDemo: "state", chapters: meta.chapters, chapter, at: elapsed, paused, covered: skipping || !$("cover").classList.contains("off") };
+    parent.postMessage(state, location.origin);
   }
+  setInterval(() => {
+    if (!paused && !skipping) elapsed += 0.25;
+    tell();
+  }, 250);
+  addEventListener("message", (event) => {
+    if (event.origin !== location.origin || event.source !== parent) return;
+    const ask = (event.data as { coereDemo?: string })?.coereDemo;
+    if (ask === "pause") paused = true;
+    if (ask === "play") {
+      paused = false;
+      resume?.();
+    }
+    tell();
+  });
+
+  const run = 0;
 
   async function go(mine: number): Promise<void> {
     for (;;) {
@@ -120,7 +169,11 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
       setup(world.now);
       stage = makeStage();
       skipping = Boolean(from);
-      if (!skipping) setTimeout(() => $("cover").classList.add("off"), 50);
+      waitingFor = 0;
+      reached = false;
+      chapter = null;
+      tell();
+      if (!skipping) setTimeout(reveal, 50);
       try {
         await film(stage);
       } catch (error) {
@@ -129,42 +182,18 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
       if (mine !== run) return;
       await new Promise((r) => setTimeout(r, 900));
       if (!loop || mine !== run) return;
-      // A full film jumped to a chapter plays from the start when it comes round again.
-      if (controls) from = null;
+      // A film started partway (a seek on its play bar) plays from the start when it comes round again;
+      // a short showcase (`to` set) keeps looping its own part.
+      if (!to && from) {
+        from = null;
+        startAt = 0;
+        const url = new URL(location.href);
+        url.searchParams.delete("from");
+        url.searchParams.delete("at");
+        history.replaceState(null, "", url);
+      }
     }
   }
 
   void go(run);
-}
-
-/** The full film's bar: pause, and a button per chapter that plays from there. */
-function makeControls(meta: FilmMeta, on: { jump(id: string): void; toggle(): boolean }) {
-  const bar = document.createElement("nav");
-  bar.setAttribute("aria-label", "Chapters");
-  bar.style.cssText = "position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;padding:6px;border-radius:999px;background:rgba(8,14,36,.78);backdrop-filter:blur(10px);font:500 13px/1 Geist,system-ui,sans-serif;z-index:20;max-width:calc(100% - 28px);overflow-x:auto;opacity:0;transition:opacity .25s";
-  const button = (label: string, onClick: () => void) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.textContent = label;
-    b.style.cssText = "flex:none;border:0;border-radius:999px;padding:8px 12px;background:transparent;color:rgba(255,255,255,.75);font:inherit;cursor:pointer;white-space:nowrap";
-    b.addEventListener("click", onClick);
-    bar.append(b);
-    return b;
-  };
-  const pause = button("Pause", () => (pause.textContent = on.toggle() ? "Play" : "Pause"));
-  const marks = new Map(meta.chapters.map((c) => [c.id, button(c.title, () => on.jump(c.id))]));
-  document.body.append(bar);
-  addEventListener("mousemove", () => {
-    bar.style.opacity = "1";
-    clearTimeout((bar as unknown as { t?: number }).t);
-    (bar as unknown as { t?: number }).t = window.setTimeout(() => (bar.style.opacity = "0"), 2500);
-  });
-  return {
-    mark(id: string) {
-      for (const [key, b] of marks) {
-        b.style.background = key === id ? "#fff" : "transparent";
-        b.style.color = key === id ? "#080e24" : "rgba(255,255,255,.75)";
-      }
-    },
-  };
 }
