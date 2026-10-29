@@ -11,4 +11,8 @@ export type LivePart = { from?: string; to?: string };
 export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePart }>> = {
   memory: { slug: "memory", showcase: { from: "grow" } },
   coriRewrite: { slug: "cori-rewrite", showcase: { from: "select", to: "docs" } },
+  smartContext: { slug: "smart-context", showcase: { from: "type", to: "chat" } },
+  extraction: { slug: "extraction", showcase: { from: "extract", to: "change" } },
+  voiceMode: { slug: "voice-mode", showcase: { from: "hold", to: "cancel" } },
+  actionsGmail: { slug: "actions-gmail", showcase: { from: "ask", to: "send" } },
 };
