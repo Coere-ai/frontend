@@ -32,6 +32,8 @@ export type Film = {
   still: string;
   chapters: Cue[];
   captions: Cue[];
+  /** Where silent previews start, when the opening isn't what the site should show. */
+  previewFrom?: number;
 };
 
 /** Films live under the private prefix, so only pass holders can load them. */
@@ -51,7 +53,8 @@ function film(slug: string, title: string, cues: { chapters: Cue[]; captions: Cu
 export const films = {
   v2: film("v2", "Coere v2: memory", v2),
   v3: film("v3", "Coere v3: apps", v3),
-  teams: film("teams", "Coere for Teams", teams),
+  // Previews skip the company card, where the first clients are typed in by hand.
+  teams: { ...film("teams", "Coere for Teams", teams), previewFrom: 25 },
   memory: film("memory", "Memory", memory),
   extraction: film("extraction", "Extraction", extraction),
   smartContext: film("smart-context", "Smart context", smartContext),

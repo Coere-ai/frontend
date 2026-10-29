@@ -17,7 +17,7 @@ import { ProductSection } from "./product-section";
 export function SolutionsPage() {
   return (
     <>
-      <ProductHero copy={solutionsHero} background={backgrounds.glass} app={<FilmFrame film={films.teams} />} secondary={{ href: "#how", label: "How it works" }} />
+      <ProductHero copy={solutionsHero} background={backgrounds.glass} app={<FilmFrame film={films.teams} preview />} secondary={{ href: "#how", label: "How it works" }} />
       <ProductSection id="how" title="How your team shares one memory" line="Built from the chats your team already has, sorted into the company and each client.">
         <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.waves} />
       </ProductSection>

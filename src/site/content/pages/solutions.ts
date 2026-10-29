@@ -17,7 +17,7 @@ export const solutionsCases: FilmCase[] = [
     key: "company",
     label: "Company and clients",
     title: "Company and clients",
-    text: "The first run asks for the company once, with its clients. Extract all saves every chat, and the graph grows into Company and Clients.",
+    text: "Extract all saves every chat from the AIs your team uses, and the graph grows into Company and Clients as Coere reads them.",
     checks: ["Each client's contacts, promises and decisions", "A client the chats found waits in Review", "Ask Cori what the team promised a client"],
     film: "teams",
   },

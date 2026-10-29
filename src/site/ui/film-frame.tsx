@@ -11,7 +11,7 @@ import { PREVIEW_START_SECONDS, type Film } from "@/site/content/films";
  * `from` and `to` loop just one part of a film, in seconds, for a film
  * that shows two things.
  */
-export function FilmFrame({ film, preview = false, from = PREVIEW_START_SECONDS, to, className }: { film: Film; preview?: boolean; from?: number; to?: number; className?: string }) {
+export function FilmFrame({ film, preview = false, from = film.previewFrom ?? PREVIEW_START_SECONDS, to, className }: { film: Film; preview?: boolean; from?: number; to?: number; className?: string }) {
   const src = preview ? `${film.page}?preview&start=${from}${to ? `&end=${to}` : ""}` : film.page;
   return (
     <iframe
