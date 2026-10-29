@@ -14,6 +14,8 @@ export type Feature = {
   film: FilmKey;
   /** Its place in Capabilities on the Agents page. */
   href: string;
+  /** False keeps it out of the products menu, which lists only the main ones; Capabilities still shows it. */
+  menu?: false;
 };
 
 /** Capabilities on the Agents page: every feature in one place, linked from wherever a few are shown. */
@@ -91,6 +93,7 @@ export const features: Feature[] = [
       "On any page Cori works step by step from your memory, asks before it submits, and stops when a page tries to give it orders.",
     film: "actionsAnywhere",
     href: "/products/agents#capability-any-site",
+    menu: false,
   },
   {
     slug: "workers",
@@ -109,6 +112,7 @@ export const features: Feature[] = [
       "Coere scores its memory on LoCoMo and on its own checks from the dashboard, and says what each run cost.",
     film: "benchmarksEvals",
     href: "/products/agents#capability-benchmarks",
+    menu: false,
   },
 ];
 

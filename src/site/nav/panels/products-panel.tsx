@@ -30,7 +30,7 @@ export function ProductsPanel() {
       <div className="row-span-4 border-l border-neutral-200 pl-7">
         <PanelLabel>Features</PanelLabel>
         <ul className="mt-3 space-y-0.5">
-          {features.map((feature) => (
+          {features.filter((feature) => feature.menu !== false).map((feature) => (
             <li key={feature.slug}>
               <Link href={feature.href} className="group block py-1.5 text-[15px] text-neutral-600 hover:text-neutral-950">
                 <Underlined>{feature.name}</Underlined>
