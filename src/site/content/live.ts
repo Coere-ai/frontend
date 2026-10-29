@@ -9,6 +9,7 @@ import type { FilmKey } from "./films";
 export type LivePart = { from?: string; to?: string };
 
 export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePart }>> = {
+  v2: { slug: "v2", showcase: { from: "context-as-you-type", to: "voice-mode" } },
   memory: { slug: "memory", showcase: { from: "grow" } },
   coriRewrite: { slug: "cori-rewrite", showcase: { from: "select", to: "docs" } },
   smartContext: { slug: "smart-context", showcase: { from: "type", to: "chat" } },
