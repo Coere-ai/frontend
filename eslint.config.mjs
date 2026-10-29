@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // The live demos build on their own from coere-v2's source (demos/build.mjs).
+    "demos/**",
+    "public/preview/live/**",
   ]),
 ]);
 
