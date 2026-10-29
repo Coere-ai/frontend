@@ -1,5 +1,6 @@
 import { PAGE_PORT, type Snapshot } from "@coere/actions";
 import { overlay as copy } from "@coere/actions/copy";
+import { createFormEngine } from "@coere/actions/forms";
 import { createLayer, createPageKit, watchPerson, type Layer } from "@coere/actions/page";
 import { pageEnv, recipeRunner } from "@coere/actions/recipes";
 import { startHost } from "@v2/apps/extension/src/actions/page/host";
@@ -146,6 +147,8 @@ function start(): void {
     alive: () => layer !== null,
   };
   const recipes = recipeRunner(pageEnv(docAt(document), pick, (n) => kit.session.element(n), preview));
+  // The form engine reads and fills the page's form (20.1), on the kit's own view of the page.
+  const forms = createFormEngine(kit.env);
   const pageHost = startHost({
     connect: () => connect({ name: PAGE_PORT }) as never,
     kit: {
@@ -158,6 +161,7 @@ function start(): void {
     },
     overlay: (onPress) => mountOverlay(layerOnce().root, /Mac/i.test(navigator.platform), onPress, chromeBarPlace(at.host)),
     recipes,
+    forms: (call) => forms.handle(call),
     watchPerson: (on) => watchPerson(document, on, { trusted: () => false }),
   });
 }

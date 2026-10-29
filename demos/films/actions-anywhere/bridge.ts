@@ -2,6 +2,13 @@ import { PAGE_PORT } from "@coere/actions";
 import type { ActContext } from "@coere/memory/actions";
 import { codePick } from "@v2/packages/memory/src/actions/pick";
 import { readStep, stepTurn } from "@v2/packages/memory/src/actions/step";
+import { planForm } from "@v2/packages/memory/src/actions/forms/handler";
+import { ACT_FIELD } from "@v2/packages/memory/src/actions/forms/jev";
+import type { ActCaller } from "@v2/packages/memory/src/actions/models";
+import { coriReader, type MemoryAccess } from "@v2/packages/memory/src/access/port";
+import type { ClassifyRequest, ClassifyResult } from "@v2/packages/memory/src/classify/types";
+import type { EntityRecord, FactRecord } from "@v2/packages/memory/src/model/records";
+import { pickOf } from "@v2/tests/fake-jev/scenarios/actions-pick";
 import { FakeRouterChrome } from "@v2/apps/extension/src/background/router-fake-chrome";
 import type { StorageAreaLike } from "@v2/apps/extension/src/background/transfer-store";
 import type { ActBrain } from "@v2/apps/extension/src/actions/run/brain";
@@ -77,6 +84,8 @@ export interface ActionsWorld {
   active: string | null;
   /** How long the thinking model takes over a step at the film's pace. */
   stepMs: number;
+  /** How long a form field takes to fill at the film's pace. */
+  fillMs: number;
   /** While set, the next step waits until the film lets it go, so a chapter starts where it should. */
   hold: Promise<void> | null;
   /** True while the model believes what pages say (the film's last task). */
@@ -162,6 +171,72 @@ function contextFor(kind: string): ActContext {
   return { person: { name: "Maya Collins", timeZone: "America/Los_Angeles", today }, style: [], facts: [], people: [], form };
 }
 
+/**
+ * Maya's memory as a form run reads it through Cori's MemoryAccess
+ * (packages/memory/src/actions/forms/profile.ts), the same details
+ * coere-v2's tools/gen-fake-memory/maya writes for a form: her name on
+ * her self, her email and phone as identity, and the birth date and
+ * street address facts she said in her clinic chat.
+ */
+function mayaAccess(): MemoryAccess {
+  const p = MAYA_PROFILE;
+  const self = { id: "ent_self", name: "Maya Collins", kind: "self" } as EntityRecord;
+  const fact = (id: string, key: string, text: string, value?: FactRecord["value"]) => ({ id, key, text, status: "active", ...(value ? { value } : {}) }) as FactRecord;
+  const email = fact("fact_email", "email", `Maya's email is ${p.email}.`, { type: "email", email: p.email } as FactRecord["value"]);
+  const phone = fact("fact_phone", "phone", `Maya's phone is ${p.phone}.`, { type: "phone", phone: p.phone } as FactRecord["value"]);
+  const facts = [
+    email,
+    phone,
+    fact("fact_birth", "birth_date", `Maya's date of birth is ${p.birthDate}.`),
+    fact("fact_street", "street_address", `Maya's street address is ${p.street}, ${p.city}, ${p.state} ${p.zip}.`),
+  ];
+  const style = { writing: [], tone: [], answers: [], snapshots: [] };
+  return {
+    reader: coriReader({ sensitive: false }),
+    profile: () => ({ self, timeZone: "America/Los_Angeles", bySection: [{ section: "sec_personal", facts }], style, dueSoon: [] }),
+    style: () => style,
+    corePack: () => ({ lines: [], about: "", tokens: 0 }),
+    search: () => [],
+    context: async () => ({ lines: [], records: [], tokens: 0 }),
+    identity: (id) => ({
+      person: { id, name: self.name },
+      values: [
+        { fact: email.id, key: "email", kind: "email", label: null, value: p.email },
+        { fact: phone.id, key: "phone", kind: "phone", label: null, value: p.phone },
+      ],
+    }),
+    upcoming: () => [],
+    resolve: () => [],
+  } as MemoryAccess;
+}
+
+/**
+ * Jev's pick of a form field's detail (20.3 step 3), as coere-v2's fake
+ * Jev answers `act_field`: the key whose words the question shares most,
+ * with that share as the confidence, so a question about none of her
+ * details stays blank.
+ */
+function fieldPicks(req: ClassifyRequest): ClassifyResult {
+  const labels = (req.tasks as Record<string, { labels: Array<{ id: string; description: string }> }>)[ACT_FIELD]?.labels ?? [];
+  const criteria = Object.fromEntries(labels.map((l) => [l.id, l.description]));
+  return {
+    decisions: req.items.map((item) => {
+      const best = pickOf(item.text.split(". Options:")[0] ?? item.text, criteria);
+      const probs = Object.fromEntries(labels.map((l) => [l.id, l.id === best.label ? best.share : 0]));
+      return { itemId: item.id, answers: { [ACT_FIELD]: { probs, picked: [best.label], confidence: best.share } }, calibrated: true };
+    }),
+    missing: [],
+    usage: { provider: "jev", model: "jev", requests: 1, inputTokens: 0, outputTokens: 0, cacheRead: 0, cacheWrite: 0 },
+  } as ClassifyResult;
+}
+
+/** The form planner's model calls: Jev's field pick, and no writing call, since a plain form writes nothing of its own (20.5). */
+const formCaller = {
+  askJev: async (_role: string, _a: unknown, req: ClassifyRequest) => ({ result: fieldPicks(req), usd: 30 }),
+  ask: async () => ({ ok: false, failure: "no_tool", usdMicros: 0 }),
+  abort: () => undefined,
+} as unknown as ActCaller;
+
 export function actionsWorld(world: World, pace: () => boolean): ActionsWorld {
   const router = new DemoRouter(world);
   const ids = new Map<string, number>();
@@ -186,6 +261,7 @@ export function actionsWorld(world: World, pace: () => boolean): ActionsWorld {
     extractMs: 450,
     paceScale: 0.1,
     stepMs: 480,
+    fillMs: 420,
     hold: null,
     gullible: false,
     status: () => {
@@ -243,6 +319,11 @@ export function actionsWorld(world: World, pace: () => boolean): ActionsWorld {
       return { ok: true, verdict: held ? "held" : "unsure", p: held ? 1 : null, usdMicros: 0 };
     },
     "memory.act.context": async (a) => contextFor(a.kind),
+    // A page of a form planned from memory by the engine's own planner (20.3): code first, then Jev.
+    "memory.act.form": async (a) => {
+      await wait(self.stepMs);
+      return planForm(mayaAccess(), formCaller, a, false);
+    },
     "memory.act.abort": async () => undefined,
     "memory.act.log": async () => undefined,
   } as ActBrain;
@@ -309,7 +390,9 @@ export function actionsWorld(world: World, pace: () => boolean): ActionsWorld {
         postMessage(m) {
           if (!open) return;
           const copy = structuredClone(m);
-          setTimeout(() => open && page.deliver(copy), 0);
+          // A field is filled at a person's pace in the film, as each quiz step is; the engine itself fills at once.
+          const call = (copy as { type?: string; call?: { op?: string } }).type === "form" ? (copy as { call: { op?: string } }).call : null;
+          setTimeout(() => open && page.deliver(copy), call?.op === "fill" && pace() ? self.fillMs : 0);
         },
         disconnect() {
           if (!open) return;
