@@ -1,7 +1,6 @@
 import { applications, industries } from "@/site/content/industries";
 import { productBySlug } from "@/site/content/products";
 import { IndustryIcon } from "@/site/ui/icons/industry-icons";
-import { AiTiles } from "@/site/products/ai-tiles";
 import { PanelLabel, PanelLink, PanelMore } from "./panel-parts";
 
 /**
@@ -28,9 +27,6 @@ export function IndustriesPanel() {
             );
           })}
         </ul>
-        <div className="mt-6 max-w-[360px]">
-          <AiTiles columns={3} limit={6} />
-        </div>
       </div>
 
       <div className="border-l border-neutral-200 pl-12">
