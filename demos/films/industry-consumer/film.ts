@@ -245,7 +245,7 @@ async function graph(s: Stage): Promise<void> {
   await new Promise((r) => setTimeout(r, 600));
   await s.film(page);
   retire(s, [page]);
-  s.say("Fieldhouse Pantry's memory: the company above Olivia, its grocery partners below, how she writes plans to one side.");
+  s.say("Fieldhouse Pantry's memory: the company, its grocery partners, and a section for each part of the work.");
   await s.wait(3600);
   s.say("Clients holds a folder for each partner, with its buyers and its promotions.");
   await s.click(page, groupButton("Show", "Clients", "Clients"), { after: 300 });

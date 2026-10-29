@@ -371,6 +371,8 @@ export function answerTeams(world: World, mem: Mem): void {
     .engine("memory.documents", () => [])
     .engine("memory.quote", () => null)
     .engine("search", (m) => ({ hits: [], totalMatches: 0, ms: 4, stage: 1, queryTokens: String(args(m).query ?? "").toLowerCase().split(/\s+/).filter(Boolean) }))
+    // The Library lists no projects, only the chats.
+    .engine("listProjects", () => [])
     .engine("listConversations", () => ({ rows: [], total: libraryChats(mem) }))
     .engine("stats", () => ({ conversations: libraryChats(mem), chunks: libraryChats(mem) * 12, projects: 0, textBytes: libraryChats(mem) * 16_500, dbBytes: libraryChats(mem) * 120_000, byPlatform: Object.fromEntries(settings(mem).readFrom.map((r) => [r.platform, r.chats])) }));
 }

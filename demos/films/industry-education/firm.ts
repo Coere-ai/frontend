@@ -8,15 +8,17 @@ import { growTeam, type Grown } from "./scale";
 
 /**
  * Westbrook High School's memory as Coere for Teams files it from Priya's
- * chats: Company with the school's own rules and calendar, Clients with a
- * folder per class holding its co-teachers, its units and its facts by
- * slot, and Tone and voice. The same shapes the teams film builds from
+ * chats: Company with the department, lab safety, grading and rubrics;
+ * Clients with a folder per class holding its co-teachers, its units and
+ * its facts by slot; then Labs, Assessment, Student support, Families,
+ * Trips and events, Writing, and Plans and deadlines, each with a few
+ * folders (corpus.ts). The same shapes the teams film builds from
  * coere-v2's agency corpus (memory.ts there), here written for a biology
  * teacher from the field's data (demos/industries/fields/education.mjs).
  * Made up. The lines below are the ones the film shows; the rest of the
- * department's year and a half of chats (about 370 across its staff and
- * AIs, and some 460 memories) grows from a seed in corpus.ts and scale.ts
- * and is filed beside them, so every count the dashboard gives is real.
+ * department's year and a half of chats grows from a seed in corpus.ts and
+ * scale.ts and is filed beside them, to the 464 memories from 368 chats the
+ * film has always shown, so every count the dashboard gives is real.
  */
 
 type UrgencyKind = Parameters<typeof describeUrgency>[0]["kind"];
@@ -39,7 +41,8 @@ export interface Mem {
   nodes: Map<string, Node>;
   facts: Map<string, Fact>;
   self: string;
-  sections: { company: string; clients: string; tone: string };
+  /** Company and Clients, then the field's own sections in ring order. */
+  sections: { company: string; clients: string; more: string[] };
   clientIds: Map<string, string>;
   chats: number;
   /** While a build runs, how many memories it has written; null once memory is built (always, in this film). */
@@ -98,33 +101,6 @@ type F = { text: string; chat: string; on: string; kind?: FactView["kind"]; key?
 
 /** Something in memory: a folder, a class, a co-teacher or a unit, its memories and what it holds. */
 type T = { label: string; kind: GraphNode["kind"]; facts?: F[]; kids?: T[]; client?: string; aliases?: string[]; values?: Array<[IdentityValueView["field"], string]>; key?: string };
-
-/** The rest of the department's chats and memories, grown from a seed (corpus.ts, scale.ts). */
-const GROWN = growTeam(FIELD, FILM_NOW, Object.keys(CHATS), ["Priya", "Alvarez", "Chen", "Dana", "Omar", "Leah", "Brooks", "Haddad", "Kim", "Raman"]);
-
-/** Every chat memory came from, with its AI: the ones written here and the grown ones. */
-const AI = new Map<string, PlatformId>([...(Object.entries(CHATS) as Array<[string, PlatformId]>), ...[...GROWN.g.chats].map(([title, c]) => [title, c.ai] as [string, PlatformId])]);
-
-/** A grown thing as this file writes one. */
-const toT = (t: Grown): T => ({
-  label: t.label,
-  kind: t.kind,
-  facts: t.facts.map((f) => ({ text: f.text, chat: f.chat, on: f.on, kind: f.kind, key: f.key, slot: f.slot, due: f.due, basis: f.basis })),
-  kids: t.kids.map(toT),
-  ...(t.client ? { client: t.client } : {}),
-  ...(t.aliases ? { aliases: t.aliases } : {}),
-  ...(t.values ? { values: t.values } : {}),
-  ...(t.key ? { key: t.key } : {}),
-});
-
-/** Priya's classes and programs, as Settings lists them for Coere for Teams: the four the film names and the grown ones. */
-export const CLIENTS = [
-  ...HAND_CLIENTS,
-  ...GROWN.clients.map((c) => ({ key: c.client!, name: c.label, aliases: (c.aliases ?? []).filter((a) => !a.includes(".")), domains: (c.aliases ?? []).filter((a) => a.includes(".")), status: "active" as const })),
-];
-
-/** The staff memory knows: the three the film names and the rest of the school. */
-export const WORKERS = [...HAND_WORKERS, ...TEAM.map(([name, team, role]) => ({ key: name.split(" ")[0]!.toLowerCase(), name, team, role }))];
 
 const k = field.client;
 
@@ -313,6 +289,44 @@ const TONE: T = {
   ],
 };
 
+/** What the whole memory holds: the totals the dashboard, Settings and the Library give. */
+const SIZE = { memories: 464, chats: 368 };
+
+/** Every memory written above, and what hangs under it. */
+const handFacts = (ts: T[]): F[] => ts.flatMap((t) => [...(t.facts ?? []), ...handFacts(t.kids ?? [])]);
+const HAND = handFacts([PERIOD3, PERIOD5, APES, CLUB, ...COMPANY, TONE]);
+
+/** The rest of the department's chats and memories, grown from a seed (corpus.ts, scale.ts) to the totals above. */
+const GROWN = growTeam(FIELD, FILM_NOW, Object.keys(CHATS), ["Priya", "Alvarez", "Chen", "Dana", "Omar", "Leah", "Brooks", "Haddad", "Kim", "Raman"], {
+  memories: SIZE.memories - HAND.length,
+  chats: SIZE.chats - new Set(HAND.map((f) => f.chat)).size,
+});
+
+/** Every chat memory came from, with its AI: the ones written here and the grown ones. */
+const AI = new Map<string, PlatformId>([...(Object.entries(CHATS) as Array<[string, PlatformId]>), ...[...GROWN.g.chats].map(([title, c]) => [title, c.ai] as [string, PlatformId])]);
+
+/** A grown thing as this file writes one. */
+const toT = (t: Grown): T => ({
+  label: t.label,
+  kind: t.kind,
+  facts: t.facts.map((f) => ({ text: f.text, chat: f.chat, on: f.on, kind: f.kind, key: f.key, slot: f.slot, due: f.due, basis: f.basis })),
+  kids: t.kids.map(toT),
+  ...(t.client ? { client: t.client } : {}),
+  ...(t.aliases ? { aliases: t.aliases } : {}),
+  ...(t.values ? { values: t.values } : {}),
+  ...(t.key ? { key: t.key } : {}),
+});
+
+/** Priya's classes and programs, as Settings lists them for Coere for Teams: the four the film names and the grown ones. */
+export const CLIENTS = [
+  ...HAND_CLIENTS,
+  ...GROWN.clients.map((c) => ({ key: c.client!, name: c.label, aliases: (c.aliases ?? []).filter((a) => !a.includes(".")), domains: (c.aliases ?? []).filter((a) => a.includes(".")), status: "active" as const })),
+];
+
+/** The staff memory knows: the three the film names and the rest of the school. */
+export const WORKERS = [...HAND_WORKERS, ...TEAM.map(([name, team, role]) => ({ key: name.split(" ")[0]!.toLowerCase(), name, team, role }))];
+
+
 /** Ids as the engine makes them: a prefix and a UUIDv7 from the record's time, with seeded bits after (as the teams film makes them). */
 function idMaker() {
   let n = 0;
@@ -351,10 +365,19 @@ export function buildFirm(): Mem {
   };
 
   const self = node({ id: id("ent", start), kind: "self", label: "You", section: "", importance: 5 });
-  const sections = { company: "sec_company", clients: "sec_clients", tone: "sec_tone" };
+  // Company and Clients first, then the field's sections, each with its own id as memory makes one from a name.
+  const slug = (label: string) => `sec_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")}`;
+  const sections = { company: "sec_company", clients: "sec_clients", more: FIELD.sections.map((x) => slug(x.label)) };
   node({ id: sections.company, kind: "section", label: "Company", section: sections.company });
   node({ id: sections.clients, kind: "section", label: "Clients", section: sections.clients });
-  node({ id: sections.tone, kind: "section", label: "Tone and voice", section: sections.tone });
+  FIELD.sections.forEach((x, i) => node({ id: sections.more[i]!, kind: "section", label: x.label, section: sections.more[i]! }));
+  /** The section a folder of that name is filed in. */
+  const home = (label: string): string => {
+    if (FIELD.company.some((x) => x.label === label)) return sections.company;
+    const i = FIELD.sections.findIndex((x) => x.folders.some((y) => y.label === label));
+    if (i < 0) throw new Error(`No section files ${label}`);
+    return sections.more[i]!;
+  };
 
   const sourceOf = (f: F, fid: string): FactSource => {
     const convId = chatIds.get(f.chat)!;
@@ -437,31 +460,30 @@ export function buildFirm(): Mem {
     return n;
   };
 
-  const company = nodes.get(sections.company)!;
   const clients = nodes.get(sections.clients)!;
-  const tone = nodes.get(sections.tone)!;
-  for (const t of COMPANY) place(t, company, sections.company, null);
-  // The rest of the department's chats, grown from a seed (corpus.ts): the school's own folders, more classes and
-  // programs and more on the three the film names, each line in the chat that said it. Period 3 Biology stays as written above.
+  // The film's own folders, each in its section, then the ways Priya writes for students.
+  for (const t of [...COMPANY, TONE]) place(t, nodes.get(home(t.label))!, home(t.label), null);
+  // The rest of the department's chats, grown from a seed (corpus.ts): the school's folders in every section, two more
+  // classes and more on two the film names, each line in the chat that said it. Period 3 Biology stays as written above.
   const kid = (parent: Node, label: string) => parent.kids.map((x) => nodes.get(x)!).find((x) => x.label === label);
   const fill = (n: Node, t: T, section: string, client: string | null) => {
     for (const f of t.facts ?? []) addFact(f, n, client);
     for (const k of t.kids ?? []) place(k, n, section, client);
   };
-  for (const t of GROWN.company.map(toT)) {
-    const known = kid(company, t.label);
-    if (known) fill(known, t, sections.company, null);
-    else place(t, company, sections.company, null);
-  }
-  for (const [label, t] of GROWN.more) {
-    const known = kid(company, label);
-    if (known) fill(known, toT(t), sections.company, null);
-  }
+  // Each grown folder joins the one written above of the same name, or is placed in its section.
+  const folder = (t: T, section: string) => {
+    const known = kid(nodes.get(section)!, t.label);
+    if (known) fill(known, t, section, null);
+    else place(t, nodes.get(section)!, section, null);
+  };
+  for (const t of GROWN.company) folder(toT(t), sections.company);
+  GROWN.sections.forEach((x, i) => {
+    for (const t of x.folders) folder(toT(t), sections.more[i]!);
+    for (const f of toT(x.loose).facts ?? []) addFact(f, nodes.get(sections.more[i]!)!, null);
+  });
   for (const t of [PERIOD3, PERIOD5, APES, CLUB]) place(t, clients, sections.clients, null);
   for (const t of GROWN.clients) place(toT(t), clients, sections.clients, null);
   for (const [key, t] of GROWN.grown) fill(nodes.get(clientIds.get(key)!)!, toT(t), sections.clients, key);
-  const own = place(TONE, tone, sections.tone, null);
-  fill(own, toT(GROWN.tone), sections.tone, null);
 
   // Counts and urgency roll up the tree, as the overview's node stats do.
   const rank = ["none", "later", "upcoming", "soon", "today", "overdue"];
@@ -477,7 +499,7 @@ export function buildFirm(): Mem {
     if (n.values.length) n.identity = n.values.length;
     n.urgency = urgency;
   };
-  for (const s of Object.values(sections)) for (const kid of nodes.get(s)!.kids) roll(nodes.get(kid)!);
+  for (const s of [sections.company, sections.clients, ...sections.more]) for (const kid of nodes.get(s)!.kids) roll(nodes.get(kid)!);
 
   return { now, nodes, facts, self: self.id, sections, clientIds, chats: used.size, written: null };
 }

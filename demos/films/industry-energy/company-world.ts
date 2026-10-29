@@ -94,7 +94,11 @@ export function answerMemory(world: World, mem: Mem): void {
     })
     .engine("memory.quote", () => null)
     .engine("search", (m) => ({ hits: [], totalMatches: 0, ms: 4, stage: 1, queryTokens: String(args(m).query ?? "").toLowerCase().split(/\s+/).filter(Boolean) }))
+    // The Library lists no projects, only the chats.
+    .engine("listProjects", () => [])
     .engine("listConversations", () => ({ rows: [], total: mem.chats }))
+    // Home's library line counts the same chats Settings reads from, by AI.
+    .engine("stats", () => ({ conversations: mem.chats, chunks: mem.chats * 12, projects: 0, textBytes: mem.chats * 16_500, dbBytes: mem.chats * 120_000, byPlatform: Object.fromEntries(v.settings(mem).readFrom.map((r) => [r.platform, r.chats])) }))
     // A chat site's scan saves the chats in its sidebar; the library already holds them, so nothing is rewritten.
     .engine("upsertConversation", (m) => {
       const conv = (args(m).conv ?? {}) as { platform?: string; platformConvId?: string; messages?: unknown[] };

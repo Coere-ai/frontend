@@ -3,15 +3,17 @@ import type { FactView, GraphNode, IdentityValueView } from "@coere/memory";
 import { Rng } from "@v2/tools/gen-corpus/rng";
 
 /**
- * The seeded grower behind a team's memory at full size: the chats a team
- * has across its people and AIs over a year and a half, and every memory
- * those chats leave, filed as Coere for Teams files them (Company with its
- * own nested folders, Clients with a folder per client holding its
- * contacts, its work and its facts by slot, Tone and voice). The field's
- * words come from the film's corpus.ts; this file only knows how a chat
- * is placed, titled and dated, and how a client folder fills. Every
- * choice goes through coere-v2's corpus Rng (tools/gen-corpus/rng.ts), so
- * one seed always grows the same memory. Made up, as the field is.
+ * The seeded grower behind an organisation's memory at full size: the
+ * chats a team has across its people and AIs over a year and a half, and
+ * every memory those chats leave, filed as Coere for Teams files them:
+ * Company with three or four folders, Clients with a folder per client
+ * holding its contacts, its work and its facts by slot, and then the
+ * sections the field's work falls into, each with two to four folders.
+ * The field's words come from the film's corpus.ts; this file only knows
+ * how a chat is placed, titled and dated, how a folder and a client fill,
+ * and how the totals settle. Every choice goes through coere-v2's corpus
+ * Rng (tools/gen-corpus/rng.ts), so one seed always grows the same memory.
+ * Made up, as the field is.
  */
 
 export type Kind = FactView["kind"];
@@ -150,15 +152,23 @@ export class Grower {
    * every title is taken says nothing, so no two chats share a title.
    */
   say(titles: string | string[], on: string, said: Array<[owner: Grown, line: Line]>, rng: Rng = this.rng): string | null {
+    if (said.length === 0) return null;
+    const title = this.claim(titles);
+    if (!title) return null;
+    const ai = this.ai(rng);
+    this.chats.set(title, { ai, on });
+    for (const [owner, line] of said) owner.facts.push({ ...line, text: tidy(line.text), chat: title, ai, on });
+    return title;
+  }
+
+  /** The first of `titles` no chat has yet, or one of them as a follow up ("Promo calendar follow up"), now taken; null when all are. */
+  claim(titles: string | string[]): string | null {
     const named = (Array.isArray(titles) ? titles : [titles]).map(tidy).filter(Boolean);
     // A title the team used before comes back as a follow up, as people title a second chat on the same thing.
     const options = [...named, ...AGAIN.flatMap((more) => named.map((t) => `${t}${more}`))];
     const title = options.find((t) => !this.taken.has(t.toLowerCase()));
-    if (!title || said.length === 0) return null;
+    if (!title) return null;
     this.taken.add(title.toLowerCase());
-    const ai = this.ai(rng);
-    this.chats.set(title, { ai, on });
-    for (const [owner, line] of said) owner.facts.push({ ...line, text: tidy(line.text), chat: title, ai, on });
     return title;
   }
 }
@@ -344,7 +354,7 @@ export function growClient(g: Grower, c: Seed, book: Book, o: { account?: boolea
   }
   plain(book.preference, "preferences", rng.int(0, 1));
   plain(book.decision, "decisions", rng.int(0, c.size - 1));
-  plain(book.billing, "billing", rng.int(1, 2));
+  plain(book.billing, "billing", rng.int(1, Math.min(2, c.size)));
   plain(book.document, "documents", rng.int(0, 1));
   return folder;
 }
@@ -368,14 +378,39 @@ export function spread(g: Grower, owner: Grown, lines: Array<string | Line>, tit
   }
 }
 
-/* ---------- a whole team ---------- */
+
+/* ---------- a whole organisation ---------- */
 
 /** A coworker: name, team, role, what they own, what to ask them about. */
 export type Mate = [name: string, team: string, role: string, owns: string, ask: string];
 /** A vendor or partner: name, what it does for the company, the notice it needs, how it bills, the contact there. */
 export type Vendor = [name: string, does: string, notice: string, bills: string, contact: string];
 
-/** Everything a field says about its team, its clients and how it works, which `growTeam` grows into memory. */
+/** What a folder's template gets: the grower for dates, the folder's stream, the chat's day, and one of a list never twice in a row. */
+export type MakeCtx = { g: Grower; rng: Rng; on: string; one<V>(list: readonly V[]): V };
+/** A template for one chat in a folder: its possible titles and the lines it leaves. */
+export type Make = (x: MakeCtx) => [titles: string[], lines: Array<string | Line>];
+
+/**
+ * One folder of the organisation's memory outside its clients, in the
+ * field's own words: lines the team said, a few to a chat, and chats made
+ * from templates for what comes round again (a weekly report, an order).
+ */
+export type Folder = {
+  label: string;
+  kind?: GraphNode["kind"];
+  /** Lines in the team's words, each part said over one to three chats titled from `titles`. */
+  parts?: Array<[titles: string[], lines: Array<string | Line>]>;
+  /** `n` chats from `from`, each template used once before any comes round again. */
+  make?: { n: number; from: Make[] };
+  /** Said in the last few months rather than across the year and a half. */
+  recent?: boolean;
+};
+
+/** A section of memory with its folders, and a few loose lines filed on the section itself. */
+export type Section = { label: string; folders: Folder[]; loose?: Array<[titles: string[], lines: Array<string | Line>]> };
+
+/** Everything a field says about its organisation, which `growTeam` grows into memory. */
 export type Field = {
   seed: number;
   book: Book;
@@ -393,44 +428,33 @@ export type Field = {
   /** The new clients: key, name, short name, what it is, its pieces of work, its size (1 to 3). */
   clients: Array<[key: string, name: string, short: string, about: string, works: string[], size: number]>;
   domainOf?: (key: string) => string | undefined;
-  /** Clients the film names already: key, name, short name, more pieces of work. */
-  extend: Array<[key: string, name: string, short: string, works: string[]]>;
+  /** Clients the film names already: key, name, short name, more pieces of work, how much more (1 to 3, default 1). */
+  extend: Array<[key: string, name: string, short: string, works: string[], size?: number]>;
   /** The person whose memory it is, by first name. */
   self: string;
   team: Mate[];
-  /** The folder the team sits in, by team ("Teams and org chart"; a school says "Staff and departments"). */
-  teamsLabel?: string;
-  emailDomain: string;
-  vendors: Vendor[];
-  vendorsLabel?: string;
-  /** The vendor's chats: what was said about it, in which chats. */
-  vendorLines?: (v: Vendor) => Array<[titles: string[], lines: string[]]>;
-  procedures: Array<[string, string[]]>;
-  policies: Array<[string, string[]]>;
-  decisions: Array<[folder: string, title: string, text: string]>;
-  tools: Array<[tool: string, holds: string, owner: string]>;
-  rituals: string[];
-  goals: string[];
-  /** More lines for the folders the film writes by hand, by their label. */
-  topics: Record<string, string[]>;
-  tone: { label: string; lines: string[]; titles: string[] };
+  /** The Company folder the coworkers are written up in ("Team"). */
+  teamFolder: string;
+  /** Company's folders, three or four. */
+  company: Folder[];
+  /** The sections after Company and Clients, each with two to four folders. */
+  sections: Section[];
 };
 
 export interface Team {
   g: Grower;
-  /** Folders to file under Company. */
+  /** Company's folders. */
   company: Grown[];
-  /** Lines to add to the Company folders the film writes by hand, by label. */
-  more: Map<string, Grown>;
+  /** The sections after Company and Clients, with their folders and the lines filed on the section itself. */
+  sections: Array<{ label: string; folders: Grown[]; loose: Grown }>;
   /** New clients, each a whole folder. */
   clients: Grown[];
   /** More for the clients the film already names, by key. */
   grown: Map<string, Grown>;
-  /** More on how the person writes, for the Tone and voice folder the film names. */
-  tone: Grown;
 }
 
-const VENDOR_LINES = ([name, does, notice, bills, contact]: Vendor): Array<[string[], string[]]> => {
+/** The chats about a vendor: who it is and who to call, the notice it needs, how it bills. */
+export const vendorParts = ([name, does, notice, bills, contact]: Vendor): Array<[string[], string[]]> => {
   const short = name.split(" ")[0]!;
   return [
     [[`${name} intro`, `Call with ${short}`], [`${name} ${does}.`, `Our contact at ${short} is ${contact}.`]],
@@ -439,13 +463,42 @@ const VENDOR_LINES = ([name, does, notice, bills, contact]: Vendor): Array<[stri
   ];
 };
 
+/** The chats about the coworkers: what each one owns and what to ask them. */
+const mateParts = (team: readonly Mate[]): Array<[string[], string[]]> =>
+  team.map(([name, , role, owns, ask]) => {
+    const who = name.split(" ")[0]!;
+    return [[`${who}'s role`, `Handover with ${who}`, `Who owns ${owns.replace(/^the /, "")}`], [`${name} is our ${role.toLowerCase()} and owns ${owns}.`, `${who} is the person to ask about ${ask}.`]];
+  });
+
+/** Grows one folder: its parts over a few chats each, then its templated chats. */
+function growFolder(g: Grower, f: Folder, owner: Grown = node(f.label, f.kind ?? "folder")): Grown {
+  const rng = g.part("folder", f.label);
+  for (const [titles, lines] of f.parts ?? []) spread(g, owner, lines, () => titles, { rng, recent: f.recent });
+  if (f.make) {
+    const decks = new Map<unknown, unknown[]>();
+    const one = <V>(list: readonly V[]): V => {
+      let deck = decks.get(list) as V[] | undefined;
+      if (!deck?.length) decks.set(list, (deck = rng.shuffle([...list])));
+      return deck.pop()!;
+    };
+    for (let n = 0; n < f.make.n; n++) {
+      const on = f.recent ? g.past(3, 160, rng) : g.past(6, 540, rng);
+      const [titles, lines] = one(f.make.from)({ g, rng, on, one });
+      g.say(titles, on, lines.map((l) => [owner, typeof l === "string" ? { text: l, kind: "note" as Kind } : l]), rng);
+    }
+  }
+  return owner;
+}
+
 /**
- * Grows a team's memory from its field. `now` is the film's day; `taken`
- * the titles of the chats the film writes by hand; `reserved` the first
- * names the film's people use, which a grown contact never takes, so a
- * draft that names one of them still names the client the film follows.
+ * Grows an organisation's memory from its field. `now` is the film's day;
+ * `taken` the titles of the chats the film writes by hand; `reserved` the
+ * first names the film's people use, which a grown contact never takes,
+ * so a draft that names one of them still names the client the film
+ * follows. `want`, when given, is how many memories and chats the grown
+ * part holds, which `settle` makes exact.
  */
-export function growTeam(f: Field, now: number, taken: Iterable<string>, reserved: Iterable<string>): Team {
+export function growTeam(f: Field, now: number, taken: Iterable<string>, reserved: Iterable<string>, want?: { memories: number; chats: number }): Team {
   const g = new Grower(f.seed, now, taken, undefined, f.quiet, f.breaks);
   const used = new Set([...reserved, ...f.team.map((t) => t[0].split(" ")[0]!)]);
   const contactsFor = (key: string, n: number): Contact[] => {
@@ -473,85 +526,73 @@ export function growTeam(f: Field, now: number, taken: Iterable<string>, reserve
   });
   // The clients the film names already get the rest of their history: more people, more work, more lines in each slot.
   const grown = new Map<string, Grown>();
-  for (const [key, name, short, works] of f.extend) {
+  for (const [key, name, short, works, size] of f.extend) {
     const domain = domainOf(key);
-    grown.set(key, growClient(g, { key, name, short, aliases: [short], ...(domain ? { domain } : {}), about: "", contacts: contactsFor(key, 2), works, size: 2 }, f.book, { account: false }));
+    grown.set(key, growClient(g, { key, name, short, aliases: [short], ...(domain ? { domain } : {}), about: "", contacts: contactsFor(key, 1), works, size: size ?? 1 }, f.book, { account: false }));
   }
 
-  // Company: the team by team, the vendors, how things are done, the rules, the decisions, the tools and the goals.
-  const company: Grown[] = [];
-  const teams = node(f.teamsLabel ?? "Teams and org chart");
-  for (const team of [...new Set(f.team.map((t) => t[1]))]) {
-    const folder = node(team);
-    teams.kids.push(folder);
-    for (const [name, , role, owns, ask] of f.team.filter((t) => t[1] === team)) {
-      const person = node(name, "person", { key: name.split(" ")[0]!.toLowerCase(), values: [["role", role], ["email", `${name.toLowerCase().replace(/[^a-z ]/g, "").replace(" ", ".")}@${f.emailDomain}`]] });
-      folder.kids.push(person);
-      const who = name.split(" ")[0]!;
-      const rng = g.part("person", name);
-      const area = owns.replace(/^the /, "");
-      spread(g, person, [`${name} is our ${role.toLowerCase()} and owns ${owns}.`, `${who} is the person to ask about ${ask}.`, ...(rng.chance(0.5) ? [`${who} covers for ${f.self} on ${area} when ${f.self} is away.`] : [])], () => [`${who}'s role`, `Handover with ${who}`, `Who owns ${area}`], { rng });
-    }
-  }
-  company.push(teams);
+  // Company: the team, then how it works; the coworkers go in the team's folder.
+  const company = f.company.map((folder) => growFolder(g, folder.label === f.teamFolder ? { ...folder, parts: [...mateParts(f.team), ...(folder.parts ?? [])] } : folder));
+  const sections = f.sections.map((s) => {
+    const loose = node(s.label, "section");
+    for (const [titles, lines] of s.loose ?? []) spread(g, loose, lines, () => titles, { rng: g.part("loose", s.label) });
+    return { label: s.label, folders: s.folders.map((folder) => growFolder(g, folder)), loose };
+  });
 
-  const vendors = node(f.vendorsLabel ?? "Partners and vendors");
-  for (const v of f.vendors) {
-    const org = node(v[0], "organization", { aliases: [v[0].split(" ")[0]!] });
-    vendors.kids.push(org);
-    const rng = g.part("vendor", v[0]);
-    (f.vendorLines ?? VENDOR_LINES)(v).forEach(([titles, lines], i) => g.say(titles, i === 0 ? g.past(200, 540, rng) : g.past(10, 400, rng), lines.map((text) => [org, { text }]), rng));
-  }
-  company.push(vendors);
+  const team: Team = { g, company, sections, clients, grown };
+  if (want) settle(team, want);
+  return team;
+}
 
-  const runbooks = node("Runbooks and checklists");
-  for (const [label, steps] of f.procedures) {
-    const p = node(label);
-    runbooks.kids.push(p);
-    spread(g, p, steps, () => [`${label} checklist`, `${label} steps`, `How we do ${label.toLowerCase()}`]);
-  }
-  company.push(runbooks);
+/**
+ * Makes the grown part hold exactly `want` memories and chats, so the
+ * totals the film has always shown stay as they were: the fullest folders
+ * outside Clients give up their last lines, then a chat of one line joins
+ * another chat in its folder, or a chat of several gives one line to a
+ * follow up chat, until both counts agree. Clients keep every line.
+ */
+export function settle(t: Team, want: { memories: number; chats: number }): void {
+  const { g } = t;
+  const all = (x: Grown): Grown[] => [x, ...x.kids.flatMap(all)];
+  const trees = [...t.company, ...t.sections.flatMap((s) => [...s.folders, s.loose]), ...t.clients, ...t.grown.values()].flatMap(all);
+  // The folders that may change, fullest first; a section's loose lines are left as they are.
+  const pool = [...t.company, ...t.sections.flatMap((s) => s.folders)];
+  const memories = () => trees.reduce((n, x) => n + x.facts.length, 0);
+  const users = (title: string) => trees.filter((x) => x.facts.some((f) => f.chat === title));
+  const fullest = () => [...pool].sort((a, b) => b.facts.length - a.facts.length)[0]!;
 
-  const policies = node("Policies");
-  for (const [label, rules] of f.policies) {
-    const p = node(label);
-    policies.kids.push(p);
-    spread(g, p, rules, () => [`${label} policy`, `${label} question`, `Rules on ${label.toLowerCase()}`]);
-  }
-  company.push(policies);
-
-  const decisions = node("Decisions");
-  for (const label of [...new Set(f.decisions.map((d) => d[0]))]) {
-    const d = node(label);
-    decisions.kids.push(d);
-    for (const [, title, text] of f.decisions.filter((x) => x[0] === label)) g.say([title, `${label} log`], g.past(20, 500, g.part("decision", title)), [[d, { text, kind: "decision" }]]);
-  }
-  company.push(decisions);
-
-  const tools = node("Tools and systems");
-  for (const [tool, holds, owner] of f.tools) {
-    const t = node(tool.charAt(0).toUpperCase() + tool.slice(1));
-    tools.kids.push(t);
-    spread(g, t, [`We keep ${holds} in the ${tool}.`, `${owner} runs the ${tool}.`], () => [`${t.label} setup`, `Where is the ${tool}`, `${t.label} access`]);
-  }
-  company.push(tools);
-
-  const rituals = node("Meetings and rituals");
-  spread(g, rituals, f.rituals, () => ["Team rhythm", "Meeting schedule", "Weekly meetings", "Month end routine", "Quarterly reviews", "Team calendar", "Standing meetings"]);
-  company.push(rituals);
-  const goals = node("Goals and strategy");
-  spread(g, goals, f.goals, () => ["2027 goals", "Strategy offsite notes", "Yearly plan", "Growth plan", "Planning for next year", "Goals review"]);
-  company.push(goals);
-
-  const more = new Map<string, Grown>();
-  for (const [label, lines] of Object.entries(f.topics)) {
-    const t = node(label, "topic");
-    spread(g, t, lines, () => [`${label} notes`, `${label} questions`, `${label} review`, `More on ${label.toLowerCase()}`]);
-    more.set(label, t);
+  let have = memories();
+  if (have < want.memories) throw new Error(`settle: the field grows ${have} memories, fewer than the ${want.memories} it must hold`);
+  for (; have > want.memories; have--) {
+    const folder = fullest();
+    const gone = folder.facts.pop()!;
+    if (users(gone.chat).length === 0) g.chats.delete(gone.chat);
   }
 
-  const tone = node(f.tone.label);
-  spread(g, tone, f.tone.lines.map((text) => ({ text, kind: "style" as Kind })), () => f.tone.titles);
-
-  return { g, company, more, clients, grown, tone };
+  const chatsOf = (x: Grown) => [...new Set(x.facts.map((f) => f.chat))];
+  const only = (title: string, x: Grown) => users(title).length === 1 && users(title)[0] === x;
+  while (g.chats.size > want.chats) {
+    // A one line chat joins the smallest other chat of its folder.
+    const folder = [...pool].sort((a, b) => chatsOf(b).length - chatsOf(a).length).find((x) => chatsOf(x).some((c) => only(c, x) && x.facts.filter((f) => f.chat === c).length === 1) && chatsOf(x).length > 1);
+    if (!folder) throw new Error("settle: no chat left to join another");
+    const lone = chatsOf(folder).find((c) => only(c, folder) && folder.facts.filter((f) => f.chat === c).length === 1)!;
+    const into = chatsOf(folder).filter((c) => c !== lone).sort((a, b) => folder.facts.filter((f) => f.chat === a).length - folder.facts.filter((f) => f.chat === b).length)[0]!;
+    const at = g.chats.get(into)!;
+    const i = folder.facts.findIndex((f) => f.chat === lone);
+    folder.facts[i] = { ...folder.facts[i]!, chat: into, ai: at.ai, on: at.on };
+    g.chats.delete(lone);
+  }
+  while (g.chats.size < want.chats) {
+    // A chat of several lines in one folder gives its last line to a follow up chat a few days on.
+    const folder = [...pool].sort((a, b) => b.facts.length / Math.max(1, chatsOf(b).length) - a.facts.length / Math.max(1, chatsOf(a).length)).find((x) => chatsOf(x).some((c) => only(c, x) && x.facts.filter((f) => f.chat === c).length > 1));
+    if (!folder) throw new Error("settle: no chat left to split");
+    const big = chatsOf(folder).filter((c) => only(c, folder)).sort((a, b) => folder.facts.filter((f) => f.chat === b).length - folder.facts.filter((f) => f.chat === a).length)[0]!;
+    const title = g.claim(big);
+    if (!title) throw new Error(`settle: no follow up title left for ${big}`);
+    const from = g.chats.get(big)!;
+    const on = new Date(Math.min(Date.parse(`${from.on}T12:00:00Z`) + 3 * DAY, g.now - DAY)).toISOString().slice(0, 10);
+    g.chats.set(title, { ai: from.ai, on });
+    const i = folder.facts.map((f) => f.chat).lastIndexOf(big);
+    folder.facts[i] = { ...folder.facts[i]!, chat: title, on };
+  }
 }

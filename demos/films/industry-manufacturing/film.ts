@@ -248,7 +248,7 @@ async function graph(s: Stage): Promise<void> {
   await new Promise((r) => setTimeout(r, 600));
   await s.film(page);
   retire(s, [page]);
-  s.say("Brightwater's memory: the plant above Luis, its customers below, how he writes procedures to one side.");
+  s.say("Brightwater's memory: the plant, its customers, and a section for each part of the work.");
   await s.wait(3600);
   s.say("Clients holds a folder for each customer, with its contacts and its lines.");
   await s.click(page, groupButton("Show", "Clients", "Clients"), { after: 300 });

@@ -8,23 +8,27 @@ import { growTeam, type Grown } from "./scale";
 
 /**
  * Brightwater Components' memory as Coere for Teams files it from Luis
- * Moreno's chats: Company with what the plant knows (preventive
- * maintenance, safety rules, shift handover notes, suppliers, the quality
- * system, spare parts), Clients with a folder per customer holding its
- * contacts, its line or program and its facts by slot, and Tone and
- * voice. Every fact names the chat it came from. The people, customers
+ * Moreno's chats: Company with the plant team, the shift handover notes,
+ * preventive maintenance and the rules; Clients with a folder per
+ * customer holding its contacts, its line or program and its facts by
+ * slot; then Production, Quality, Equipment, Safety, Supply chain,
+ * Writing, and Plans and deadlines, each with a few folders (corpus.ts).
+ * Every fact names the chat it came from. The people, customers
  * and dates are the manufacturing page's
  * (demos/industries/fields/manufacturing.mjs), made up for the demo. The
  * lines below are the ones the film shows; the rest of the plant's year
- * and a half of chats (about 400 across its people and AIs, and some 500
- * memories) grows from a seed in corpus.ts and scale.ts and is filed
- * beside them, so every count the dashboard gives is real.
+ * and a half of chats grows from a seed in corpus.ts and scale.ts and is
+ * filed beside them, to the 507 memories from 406 chats the film has
+ * always shown, so every count the dashboard gives is real.
  */
 
 /** Luis works at the plant in Monterrey; the film's day is clock.ts's. */
 export const ZONE = CLOCK_ZONE;
 /** Three days before the root cause report is due: 08:40 in Monterrey on October 28, 2026. */
 export const NOW = FILM_NOW;
+
+/** What the whole memory holds: the totals the dashboard, Settings and the Library give. */
+const SIZE = { memories: 507, chats: 406 };
 const DAY = 86_400_000;
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -53,7 +57,8 @@ export interface Mem {
   facts: Map<string, Fact>;
   chats: Map<string, Chat>;
   self: string;
-  sections: { company: string; clients: string; tone: string };
+  /** Company and Clients, then the field's own sections in ring order. */
+  sections: { company: string; clients: string; more: string[] };
   /** Client key to its folder id. */
   clientIds: Map<string, string>;
 }
@@ -159,7 +164,7 @@ const KESSLER: Said[] = [
   f("The Kessler quote goes out by November 9.", "deadlines", "2026-10-09", "chatgpt", "Kessler Pumps quote", "2026-11-09"),
 ];
 
-/** Company: what the plant knows, by topic (field.graph's company). */
+/** What the plant knows, by folder (field.graph's company); each sits in the section corpus.ts files it under. */
 const COMPANY: Array<[string, Said[]]> = [
   ["Preventive maintenance", [
     f("Nutrunner spindles on Line 3 are checked for wear every 500 hours.", undefined, "2026-06-12", "gemini", "Preventive maintenance plan", undefined, "note"),
@@ -280,14 +285,23 @@ export function buildMemory(): Mem {
   };
 
   const self = node({ id: id("ent", start), kind: "self", label: "You", section: "", importance: 5 });
-  const sections = { company: "sec_company", clients: "sec_clients", tone: "sec_tone" };
+  // Company and Clients first, then the field's sections, each with its own id as memory makes one from a name.
+  const slug = (label: string) => `sec_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")}`;
+  const sections = { company: "sec_company", clients: "sec_clients", more: FIELD.sections.map((x) => slug(x.label)) };
   node({ id: sections.company, kind: "section", label: "Company", section: sections.company });
   node({ id: sections.clients, kind: "section", label: "Clients", section: sections.clients });
-  node({ id: sections.tone, kind: "section", label: "Tone and voice", section: sections.tone });
+  FIELD.sections.forEach((x, i) => node({ id: sections.more[i]!, kind: "section", label: x.label, section: sections.more[i]! }));
+  /** The section a folder of that name is filed in. */
+  const home = (label: string): string => {
+    if (FIELD.company.some((x) => x.label === label)) return sections.company;
+    const i = FIELD.sections.findIndex((x) => x.folders.some((y) => y.label === label));
+    if (i < 0) throw new Error(`No section files ${label}`);
+    return sections.more[i]!;
+  };
 
-  // Company, a topic each, with the memories behind it the graph draws.
+  // What the plant knows, a folder each in its section, with the memories behind it the graph draws.
   for (const [label, list] of COMPANY) {
-    const topic = node({ id: id("ent", start + DAY), kind: "topic", label, section: sections.company, parent: sections.company });
+    const topic = node({ id: id("ent", start + DAY), kind: "topic", label, section: home(label), parent: home(label) });
     for (const said of list) add(topic, said, null);
   }
 
@@ -328,13 +342,15 @@ export function buildMemory(): Mem {
   client("pell", "Pell Agritech", ["Pell"], PELL, ["PPAP approval", PPAP]);
   client("kessler", "Kessler Pumps", ["Kessler"], KESSLER, null);
 
-  const tone = node({ id: id("ent", start + 2 * DAY), kind: "folder", label: field.graph.hubs[2].children[0].label, section: sections.tone, parent: sections.tone });
+  const toneLabel = field.graph.hubs[2]!.children[0]!.label as string;
+  const tone = node({ id: id("ent", start + 2 * DAY), kind: "folder", label: toneLabel, section: home(toneLabel), parent: home(toneLabel) });
   for (const said of TONE) add(tone, said, null);
 
-  // The rest of the plant's chats, grown from a seed (corpus.ts): its own folders, fourteen more customers and more on
-  // the three the film names, each line in the chat that said it. Corvane Motors stays as written above.
+  // The rest of the plant's chats, grown from a seed (corpus.ts): its folders in every section, two more customers and
+  // more on the three the film names, each line in the chat that said it, to the totals above. Corvane Motors stays as
+  // written above.
   const handTitles = [...chats.values()].map((c) => c.title);
-  const grown = growTeam(FIELD, NOW, handTitles, ["Luis", "Hannah", "Nils", "Weiss", "Berg"]);
+  const grown = growTeam(FIELD, NOW, handTitles, ["Luis", "Hannah", "Nils", "Weiss", "Berg"], { memories: SIZE.memories - facts.size, chats: SIZE.chats - chats.size });
   const firstOn = (t: Grown): number => Math.min(...[t, ...t.kids].flatMap((x) => x.facts.map((f) => Date.parse(`${f.on}T15:00:00Z`))), NOW - 30 * DAY);
   const place = (t: Grown, parent: Node, section: string, client: string | null): Node => {
     const n = node({ id: id("ent", firstOn(t)), kind: t.kind, label: t.label, section, parent: parent.id, importance: t.kind === "organization" && t.client ? 4 : 3, aliases: t.aliases ?? [], ...(t.client ? { client: t.client } : {}) });
@@ -370,15 +386,20 @@ export function buildMemory(): Mem {
       if (kid.kind === "project" && n.kind === "organization") n.relations.unshift({ type: "for", label: `${k.label} is for this`, direction: "in", other: { id: k.id, label: k.label, kind: "project" } });
     }
   };
-  const company = nodes.get(sections.company)!;
-  for (const t of grown.company) place(t, company, sections.company, null);
-  for (const n of [...nodes.values()].filter((x) => x.parent === sections.company)) {
-    const more = grown.more.get(n.label);
-    if (more) fill(n, more, sections.company, null);
-  }
+  // Each grown folder joins the one the film writes by hand of the same name, or is placed in its section.
+  const folder = (t: Grown, section: string) => {
+    const known = nodes.get(section)!.kids.map((k) => nodes.get(k)!).find((n) => n.label === t.label);
+    if (known) fill(known, t, section, null);
+    else place(t, nodes.get(section)!, section, null);
+  };
+  for (const t of grown.company) folder(t, sections.company);
+  grown.sections.forEach((x, i) => {
+    const section = nodes.get(sections.more[i]!)!;
+    for (const t of x.folders) folder(t, section.id);
+    for (const said of x.loose.facts) add(section, said, null);
+  });
   for (const t of grown.clients) place(t, nodes.get(sections.clients)!, sections.clients, null);
   for (const [key, more] of grown.grown) fill(nodes.get(clientIds.get(key)!)!, more, sections.clients, key);
-  fill(tone, grown.tone, sections.tone, null);
 
   // Counts and urgency roll up the tree, as the overview's node stats do.
   const rank = ["none", "later", "upcoming", "soon", "today", "overdue"];
