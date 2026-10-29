@@ -1,0 +1,8 @@
+{
+  "title": "Coere for consumer brands",
+  "version": 2,
+  "edition": "solution",
+  "bundles": {
+    "terminal.js": { "from": "terminal.ts", "version": 3, "title": "promo-planner" }
+  }
+}
