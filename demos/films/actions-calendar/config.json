@@ -1,0 +1,1 @@
+{ "title": "Coere Actions: Calendar", "version": 2, "bundles": { "calendar-tab.js": { "from": "calendar-tab.ts" } } }
