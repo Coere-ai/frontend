@@ -10,6 +10,15 @@ import type { FilmKey } from "./films";
 const at = (cut: string, n: string) => `/preview/screens/${cut}/${n}.html`;
 
 export const scenes = {
+  calendar: [
+    { src: at("actions-calendar", "004"), view: { x: 560, y: 120, w: 880 } },
+    { src: at("actions-calendar", "006"), view: { x: 0, y: 0, w: 1440 }, hold: 3600 },
+    { src: at("actions-calendar", "009"), view: { x: 560, y: 320, w: 880 } },
+  ],
+  voice: [
+    { src: at("voice-mode", "004"), view: { x: 640, y: 280, w: 800 } },
+    { src: at("voice-mode", "005"), view: { x: 640, y: 280, w: 800 }, hold: 3600 },
+  ],
   email: [
     { src: at("actions-gmail", "007"), view: { x: 560, y: 160, w: 860 } },
     { src: at("actions-gmail", "011"), view: { x: 0, y: 0, w: 900 }, hold: 3600 },
@@ -48,4 +57,6 @@ export const sceneOfFilm: Partial<Record<FilmKey, SceneKey>> = {
   smartContext: "context",
   teams: "teams",
   actionsGmail: "email",
+  actionsCalendar: "calendar",
+  voiceMode: "voice",
 };
