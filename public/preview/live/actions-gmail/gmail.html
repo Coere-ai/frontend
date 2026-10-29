@@ -1,0 +1,735 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Inbox - maya.collins@gmail.com - Gmail</title><style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{font:14px/20px Roboto,"Helvetica Neue",Arial,sans-serif;color:#1f1f1f;background:#f6f8fc}
+button{font:inherit}
+.frame{display:flex;flex-direction:column;height:100vh}
+.frame.compose-only{display:none}
+.gb{display:flex;align-items:center;gap:8px;height:64px;padding:8px 16px 8px 12px;flex:none}
+.gb-left{display:flex;align-items:center;gap:4px;width:232px}
+.brand{display:flex;align-items:center;gap:8px;color:#444746;text-decoration:none;font-size:22px;padding-left:4px}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:0;border-radius:50%;background:none;color:#444746;cursor:pointer}
+.icon-btn:hover{background:rgba(68,71,70,.08)}
+.search{flex:1;max-width:720px;display:flex;align-items:center;height:48px;background:#e9eef6;border-radius:24px;padding:0 8px}
+.search:focus-within{background:#fff;box-shadow:0 1px 3px rgba(32,33,36,.28)}
+.search input{flex:1;border:0;background:none;font-size:16px;outline:none;height:100%}
+.gb-right{margin-left:auto;display:flex;align-items:center;gap:4px}
+.avatar{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;margin-left:8px;border-radius:50%;background:#7b5ea7;color:#fff;text-decoration:none;font-weight:500}
+.app{display:flex;flex:1;min-height:0}
+.rail{width:256px;flex:none;padding:8px 0;overflow:auto}
+.compose-btn{display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 24px 0 16px;margin:0 0 16px 8px;border-radius:16px;background:#c2e7ff;color:#001d35;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.compose-btn:hover{box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px rgba(60,64,67,.15)}
+.nav{display:flex;align-items:center;gap:18px;height:32px;padding:0 12px 0 26px;margin-right:16px;border-radius:0 16px 16px 0;color:#202124;text-decoration:none}
+.nav:hover{background:#eaebef}
+.nav.on{background:#d3e3fd;font-weight:700;color:#001d35}
+.nav-name{flex:1}
+.nav-count{font-size:12px;font-weight:700}
+.labels-head{padding:16px 26px 4px;font-size:16px;font-weight:500;color:#1f1f1f}
+.main{flex:1;min-width:0;margin:0 16px 16px 0;background:#fff;border-radius:16px;overflow:auto}
+.toolbar{display:flex;align-items:center;gap:4px;height:48px;padding:0 16px;border-bottom:1px solid #f1f3f4;color:#5f6368}
+.toolbar .count{margin-left:auto;font-size:12px}
+.tabs{display:flex;border-bottom:1px solid #f1f3f4}
+.tab{flex:0 0 250px;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;color:#5f6368;font-weight:500}
+.tab.on{color:#0b57d0;box-shadow:inset 0 -3px 0 #0b57d0}
+table.F{width:100%;border-collapse:collapse;table-layout:fixed}
+tr.zA{height:40px;cursor:pointer;border-bottom:1px solid #f1f3f4;background:#f2f6fc}
+tr.zA.zE{background:#fff;font-weight:700}
+tr.zA:hover{box-shadow:inset 1px 0 0 #dadce0,inset -1px 0 0 #dadce0,0 1px 2px 0 rgba(60,64,67,.3);position:relative;z-index:1}
+tr.zA td{padding:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+td.oZ{width:40px;padding-left:16px!important;color:#c4c7c5}
+td.yX{width:200px}
+td.xW{width:90px;text-align:right;padding-right:16px!important;font-size:12px}
+.draft-tag{color:#c5221f;font-weight:400}
+.bog{color:#1f1f1f}
+.y2{color:#5f6368;font-weight:400}
+.empty{padding:48px;text-align:center;color:#5f6368}
+.thread{padding:16px 24px 48px 72px}
+.thread h2.hP{font-size:22px;font-weight:400;line-height:28px;margin:8px 0 20px}
+.adn{padding:12px 0 16px;border-bottom:1px solid #f1f3f4}
+.adn-head{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.gD{font-weight:700}
+.go{color:#5f6368;font-size:12px}
+.g3{margin-left:auto;color:#5f6368;font-size:12px}
+.a3s{white-space:pre-wrap}
+.gmail_quote{display:none}
+.ajR{display:inline-block;margin-top:8px;padding:0 8px;border-radius:8px;background:#e8eaed;color:#444;cursor:pointer;font-size:12px}
+.reply-row{display:flex;gap:12px;margin-top:20px}
+.pill{border:1px solid #747775;background:#fff;border-radius:18px;height:36px;padding:0 20px;color:#444746;cursor:pointer;font-weight:500}
+#compose-root{position:fixed;right:16px;bottom:0;display:flex;gap:16px;align-items:flex-end;z-index:20}
+.nH{width:560px;background:#fff;border-radius:12px 12px 0 0;box-shadow:0 8px 10px 1px rgba(0,0,0,.14),0 3px 14px 2px rgba(0,0,0,.12);display:flex;flex-direction:column;height:520px}
+.compose-only-root{position:fixed;inset:0;right:0}
+.compose-only-root .nH{width:100%;height:100vh;border-radius:0;box-shadow:none}
+.cm-head{display:flex;align-items:center;height:40px;padding:0 8px 0 16px;background:#f2f6fc;border-radius:12px 12px 0 0;font-weight:500}
+.cm-head .t{flex:1}
+.cm-head .icon-btn{width:28px;height:28px}
+.cm-row{display:flex;align-items:center;gap:6px;min-height:40px;margin:0 16px;border-bottom:1px solid #f1f3f4;flex-wrap:wrap;position:relative}
+.cm-row label{color:#5f6368}
+.cm-row input{flex:1;min-width:120px;border:0;outline:none;font:inherit;height:38px}
+.aH9{display:contents}
+.vR{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 4px 0 8px;border:1px solid #dadce0;border-radius:12px;background:#fff}
+.vR .x{border:0;background:none;color:#5f6368;cursor:pointer;width:18px;height:18px;padding:0;line-height:18px}
+.cc-link{color:#444746;cursor:pointer;margin-left:auto;padding:0 4px}
+.suggest{position:absolute;left:24px;top:38px;width:360px;background:#fff;border-radius:8px;box-shadow:0 2px 6px 2px rgba(60,64,67,.15);padding:6px 0;z-index:5}
+.suggest [role=option]{display:flex;flex-direction:column;padding:6px 16px;cursor:pointer}
+.suggest [role=option][aria-selected=true],.suggest [role=option]:hover{background:#e8eaed}
+.suggest .em{color:#5f6368;font-size:12px}
+.Am{flex:1;margin:0 16px;padding:12px 0;outline:none;overflow:auto;white-space:pre-wrap}
+.cm-foot{display:flex;align-items:center;gap:8px;padding:12px 16px}
+.T-I-atl{display:inline-flex;align-items:center;height:36px;padding:0 24px;border-radius:18px;background:#0b57d0;color:#fff;font-weight:500;cursor:pointer;user-select:none}
+.T-I-atl:hover{box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15)}
+.oG{color:#5f6368;font-size:12px;margin-left:8px}
+.og{margin-left:auto;color:#444746}
+#toast-root{position:fixed;left:24px;bottom:24px;z-index:30}
+.bAp{display:flex;align-items:center;gap:16px;min-width:288px;padding:14px 16px;border-radius:4px;background:#323232;color:#fff;box-shadow:0 3px 5px rgba(0,0,0,.2)}
+.bAp [role=link]{color:#a8c7fa;font-weight:500;cursor:pointer}
+.bAp .x{margin-left:auto;color:#fff;cursor:pointer;border:0;background:none}
+.dialog-back{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:40}
+.dialog{background:#fff;border-radius:8px;padding:24px;max-width:420px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.dialog .ok{display:flex;justify-content:flex-end;margin-top:16px}
+</style></head><body><div class="frame" id="frame"><header class="gb" role="banner"><div class="gb-left"><button class="icon-btn" aria-label="Main menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="brand" href="#inbox" aria-label="Gmail" title="Gmail"><svg viewBox="0 0 32 24" width="32" height="24" aria-hidden="true"><path d="M2 4h28v16H2z" fill="#fff" stroke="#c5221f" stroke-width="2"/><path d="M2 4l14 10L30 4" fill="none" stroke="#c5221f" stroke-width="2.4" stroke-linejoin="round"/></svg><span>Gmail</span></a></div><form class="search" role="search" id="search-form"><button type="submit" class="icon-btn" aria-label="Search mail"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM20.5 20.5l-4.2-4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><input type="text" name="q" aria-label="Search mail" placeholder="Search mail" autocomplete="off" spellcheck="false"></form><div class="gb-right"><button class="icon-btn" aria-label="Support"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5h.01M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" aria-label="Settings"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><a class="avatar" href="#" aria-label="Google Account: Maya Collins (maya.collins@gmail.com)" title="Google Account: Maya Collins (maya.collins@gmail.com)">M</a></div></header><div id="app" class="app"><nav class="rail" aria-label="Mail folders"><div class="compose-btn" role="button" tabindex="0" aria-label="Compose" gh="cm"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Compose</span></div><a class="nav" href="#inbox" data-folder="inbox" title="Inbox"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 13l2.5-8h11L20 13v6H4zM4 13h5l1 2h4l1-2h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-name">Inbox</span><span class="nav-count" data-count="inbox"></span></a><a class="nav" href="#starred" data-folder="starred" title="Starred"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-name">Starred</span><span class="nav-count" data-count="starred"></span></a><a class="nav" href="#snoozed" data-folder="snoozed" title="Snoozed"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-name">Snoozed</span><span class="nav-count" data-count="snoozed"></span></a><a class="nav" href="#sent" data-folder="sent" title="Sent"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-name">Sent</span><span class="nav-count" data-count="sent"></span></a><a class="nav" href="#drafts" data-folder="drafts" title="Drafts"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-name">Drafts</span><span class="nav-count" data-count="drafts"></span></a><div class="labels-head">Labels</div><a class="nav" href="#label/CS+162"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-name">CS 162</span></a></nav><main id="main" role="main" class="main"></main></div></div><div id="compose-root"></div><div id="toast-root"></div><script src="/preview/live/actions-gmail/gmail-tab.js"></script><script>"use strict";
+(() => {
+  // tests/fake-google/client-dom.ts
+  function h(tag, attrs = {}, ...children) {
+    const node = document.createElement(tag);
+    for (const [name, value] of Object.entries(attrs)) {
+      if (value === null || value === void 0 || value === false) continue;
+      node.setAttribute(name, value === true ? "" : value);
+    }
+    for (const c of children) if (c !== null && c !== false && c !== void 0) node.append(c);
+    return node;
+  }
+  function svgIcon(path, size = 20) {
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("width", String(size));
+    svg.setAttribute("height", String(size));
+    svg.setAttribute("aria-hidden", "true");
+    const p = document.createElementNS(ns, "path");
+    p.setAttribute("d", path);
+    p.setAttribute("fill", "none");
+    p.setAttribute("stroke", "currentColor");
+    p.setAttribute("stroke-width", "1.8");
+    p.setAttribute("stroke-linecap", "round");
+    p.setAttribute("stroke-linejoin", "round");
+    svg.append(p);
+    return svg;
+  }
+  function readBoot() {
+    return JSON.parse(document.getElementById("boot")?.textContent ?? "{}");
+  }
+  async function post(path, data) {
+    const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) });
+    return await r.json();
+  }
+  function shortWhen(at, now = Date.now()) {
+    const d = new Date(at);
+    const same = new Date(now).toDateString() === d.toDateString();
+    return same ? d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+
+  // tests/fake-google/gmail/client/body.ts
+  function readBody(body) {
+    const NBSP = String.fromCharCode(160);
+    return body.innerText.split(NBSP).join(" ").replace(/\n+$/, "");
+  }
+  function writeBody(body, text) {
+    body.replaceChildren(
+      ...text.split("\n").map((line) => {
+        const div = document.createElement("div");
+        if (line) div.textContent = line;
+        else div.append(document.createElement("br"));
+        return div;
+      })
+    );
+  }
+  function insertPlain(body, text) {
+    body.focus();
+    if (!document.execCommand("insertText", false, text)) {
+      const sel = getSelection();
+      const range = sel?.rangeCount ? sel.getRangeAt(0) : null;
+      if (!range || !body.contains(range.startContainer)) body.append(text);
+      else {
+        range.deleteContents();
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+      }
+      body.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: text }));
+    }
+  }
+  function takeScriptedInput(body) {
+    body.addEventListener("beforeinput", (e) => {
+      if (e.isTrusted || e.inputType !== "insertText" || !e.data) return;
+      e.preventDefault();
+      insertPlain(body, e.data);
+    });
+  }
+
+  // tests/fake-google/gmail/client/state.ts
+  var boot = readBoot();
+  var base = `/mail/u/${boot.account}/`;
+  var mail = {
+    threads: boot.threads,
+    drafts: boot.drafts,
+    sent: boot.sent
+  };
+  var sync = (call, data) => post(`${base}sync/${call}`, data);
+  var newDraftId = () => `r-${String(Date.now())}${String(Math.floor(Math.random() * 1e6)).padStart(6, "0")}`;
+  function nameOf(address) {
+    if (address === boot.me.address) return "me";
+    return boot.contacts.find((c) => c.address === address)?.name ?? address;
+  }
+  function sentThread(s) {
+    const message = {
+      id: s.id,
+      from: boot.me,
+      to: s.to.map((a) => ({ name: nameOf(a), address: a })),
+      cc: s.cc.map((a) => ({ name: nameOf(a), address: a })),
+      at: s.sentAt,
+      body: s.body,
+      quoted: ""
+    };
+    return { id: s.id, account: boot.account, subject: s.subject || "(no subject)", labels: ["sent"], unread: false, messages: [message] };
+  }
+  var allThreads = () => [...mail.threads, ...mail.sent.map(sentThread)];
+  function upsertDraft(d) {
+    const i = mail.drafts.findIndex((x) => x.id === d.id);
+    if (i >= 0) mail.drafts[i] = d;
+    else mail.drafts.push(d);
+  }
+  function dropDraft(id) {
+    mail.drafts = mail.drafts.filter((d) => d.id !== id);
+  }
+
+  // tests/fake-google/gmail/client/recipients.ts
+  var ADDRESS = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
+  function recipientsField(label, onChange) {
+    const chips = h("div", { class: "aH9" });
+    const input = h("input", {
+      type: "text",
+      "aria-label": label === "To" ? "To recipients" : "CC recipients",
+      "aria-autocomplete": "list",
+      "aria-haspopup": "listbox",
+      autocomplete: "off",
+      spellcheck: "false"
+    });
+    const list = h("div", { class: "suggest", role: "listbox", "aria-label": "Suggestions", hidden: true });
+    const row = h("div", { class: "cm-row" }, h("label", {}, label), chips, input, list);
+    let picked = 0;
+    let shown = [];
+    const chipAddresses = () => [...chips.querySelectorAll("[email]")].map((c) => c.getAttribute("email") ?? "");
+    function add(address) {
+      const a = address.trim().replace(/^<|>$/g, "");
+      if (!a || chipAddresses().includes(a)) return;
+      const name = nameOf(a);
+      const remove = h("button", { class: "x", type: "button", "aria-label": `Remove ${a}` }, "x");
+      const chip = h(
+        "div",
+        { class: "vR" },
+        h("span", { class: "vN", email: a, "data-hovercard-id": a, role: "option", "aria-label": `${name} (${a})`, title: a }, name === "me" ? a : name),
+        remove
+      );
+      remove.addEventListener("click", () => {
+        chip.remove();
+        onChange();
+      });
+      chips.append(chip);
+      onChange();
+    }
+    function hide() {
+      list.hidden = true;
+      shown = [];
+      input.removeAttribute("aria-activedescendant");
+    }
+    function draw() {
+      const q = input.value.trim().toLowerCase();
+      shown = q ? boot.contacts.filter((c) => `${c.name} ${c.address}`.toLowerCase().includes(q)).slice(0, 6) : [];
+      picked = 0;
+      list.replaceChildren(
+        ...shown.map((c, i) => {
+          const opt = h(
+            "div",
+            { role: "option", id: `sug-${label}-${String(i)}`, "aria-selected": i === 0 ? "true" : "false", "data-address": c.address },
+            h("span", {}, c.name),
+            h("span", { class: "em" }, c.address)
+          );
+          opt.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            choose(i);
+          });
+          return opt;
+        })
+      );
+      list.hidden = shown.length === 0;
+      if (shown.length) input.setAttribute("aria-activedescendant", `sug-${label}-0`);
+    }
+    function choose(i) {
+      const c = shown[i];
+      if (c) add(c.address);
+      input.value = "";
+      hide();
+    }
+    function commitTyped() {
+      const parts = input.value.split(/[,;]/).map((s) => s.trim()).filter(Boolean);
+      const left = parts.filter((p) => !ADDRESS.test(p.replace(/^.*<|>$/g, "")));
+      for (const p of parts) if (!left.includes(p)) add(p.replace(/^.*</, ""));
+      input.value = left.join(", ");
+      hide();
+    }
+    input.addEventListener("input", () => {
+      if (/[,;]$/.test(input.value)) commitTyped();
+      else draw();
+    });
+    input.addEventListener("keydown", (e) => {
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && shown.length) {
+        e.preventDefault();
+        picked = (picked + (e.key === "ArrowDown" ? 1 : shown.length - 1)) % shown.length;
+        list.querySelectorAll("[role=option]").forEach((o, i) => o.setAttribute("aria-selected", i === picked ? "true" : "false"));
+        input.setAttribute("aria-activedescendant", `sug-${label}-${String(picked)}`);
+      } else if (e.key === "Enter" || e.key === "Tab") {
+        if (shown.length && !ADDRESS.test(input.value.trim())) {
+          e.preventDefault();
+          choose(picked);
+        } else if (input.value.trim()) {
+          if (e.key === "Enter") e.preventDefault();
+          commitTyped();
+        }
+      } else if (e.key === "Backspace" && input.value === "") {
+        chips.lastElementChild?.remove();
+        onChange();
+      } else if (e.key === "Escape") hide();
+    });
+    input.addEventListener("blur", () => commitTyped());
+    return {
+      row,
+      input,
+      add,
+      addresses() {
+        commitTyped();
+        const typed = input.value.trim();
+        return typed ? [...chipAddresses(), typed] : chipAddresses();
+      },
+      peek() {
+        const typed = input.value.trim();
+        return typed ? [...chipAddresses(), typed] : chipAddresses();
+      }
+    };
+  }
+
+  // tests/fake-google/gmail/search-query.ts
+  function parseQuery(q) {
+    const out = { to: [], from: [], folder: null, words: [] };
+    const tokens = q.match(/"[^"]*"|\S+/g) ?? [];
+    for (const raw of tokens) {
+      const t = raw.toLowerCase();
+      const m = /^(to|from|in):(.+)$/.exec(t);
+      if (m?.[1] === "to") out.to.push(m[2] ?? "");
+      else if (m?.[1] === "from") out.from.push(m[2] ?? "");
+      else if (m?.[1] === "in" && ["sent", "inbox", "drafts"].includes(m[2] ?? "")) out.folder = m[2];
+      else out.words.push(t.replace(/^"|"$/g, ""));
+    }
+    return out;
+  }
+  function matches(q, s) {
+    if (q.folder && q.folder !== s.folder) return false;
+    const people = (who, want) => want.every((w) => who.toLowerCase().includes(w));
+    if (!people(s.to, q.to) || !people(s.from, q.from)) return false;
+    const text = s.text.toLowerCase();
+    return q.words.every((w) => text.includes(w));
+  }
+
+  // tests/fake-google/gmail/client/list.ts
+  var STAR = "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z";
+  var folderOf = (t) => t.labels.includes("inbox") ? "inbox" : "sent";
+  function threadRow(t, sentView) {
+    const last = t.messages[t.messages.length - 1];
+    const first = t.messages[0];
+    const other = t.messages.find((m) => m.from.address !== boot.me.address)?.from ?? first?.to[0];
+    const who = sentView ? `To: ${first?.to.map((a) => a.name).join(", ") ?? ""}` : t.messages.length > 1 ? `${other?.name.split(" ")[0] ?? ""}, me ${String(t.messages.length)}` : other?.name ?? "";
+    return {
+      key: t.id,
+      who,
+      whoEmail: other?.address ?? "",
+      subject: t.subject,
+      snippet: (last?.body ?? "").replace(/\s+/g, " ").slice(0, 140),
+      at: last?.at ?? 0,
+      unread: t.unread,
+      draft: false
+    };
+  }
+  function rowsFor(r) {
+    if (r.folder === "drafts") {
+      return mail.drafts.map((d) => ({
+        key: d.id,
+        who: "Draft",
+        whoEmail: d.to[0] ?? "",
+        subject: d.subject || "(no subject)",
+        snippet: d.body.replace(/\s+/g, " ").slice(0, 140),
+        at: d.savedAt,
+        unread: false,
+        draft: true
+      }));
+    }
+    let threads = allThreads();
+    if (r.folder === "search") {
+      const q = parseQuery(r.query);
+      threads = threads.filter(
+        (t) => t.messages.some(
+          (m) => matches(q, {
+            from: `${m.from.name} ${m.from.address}`,
+            to: [...m.to, ...m.cc].map((a) => `${a.name} ${a.address}`).join(" "),
+            folder: m.from.address === boot.me.address ? "sent" : folderOf(t),
+            text: `${t.subject} ${m.body}`
+          })
+        )
+      );
+    } else if (r.folder === "label") threads = threads.filter((t) => /cs 162/i.test(t.subject));
+    else threads = threads.filter((t) => t.labels.includes(r.folder));
+    return threads.map((t) => threadRow(t, r.folder === "sent")).sort((a, b) => b.at - a.at);
+  }
+  function drawList(main, r) {
+    const rows = rowsFor(r);
+    const base2 = r.folder === "search" ? `search/${encodeURIComponent(r.query).replace(/%20/g, "+")}` : r.folder === "label" ? `label/${r.query}` : r.folder;
+    const table = h("table", { class: "F", role: "grid", "aria-readonly": "true" });
+    const tbody = h("tbody");
+    for (const row of rows) {
+      const tr = h(
+        "tr",
+        { class: `zA${row.unread ? " zE" : ""}`, role: "row", tabindex: "-1", "data-thread-id": row.key, "aria-labelledby": `sub-${row.key}` },
+        h("td", { class: "oZ", role: "gridcell" }, svgIcon(STAR, 18)),
+        h("td", { class: "yX", role: "gridcell" }, row.draft ? h("span", { class: "draft-tag" }, "Draft") : h("span", { class: "yP", email: row.whoEmail, name: nameOf(row.whoEmail) }, row.who)),
+        h("td", { role: "gridcell" }, h("span", { class: "bog", id: `sub-${row.key}` }, row.subject), h("span", { class: "y2" }, `  ${row.snippet}`)),
+        h("td", { class: "xW", role: "gridcell" }, h("span", { title: new Date(row.at).toString() }, shortWhen(row.at)))
+      );
+      tr.addEventListener("click", () => {
+        if (row.draft) {
+          const draft = mail.drafts.find((d) => d.id === row.key);
+          if (draft && !document.querySelector(`[data-draft-id="${CSS.escape(draft.id)}"]`)) openCompose({ draft });
+        } else location.hash = `#${base2}/${row.key}`;
+      });
+      tbody.append(tr);
+    }
+    table.append(tbody);
+    const tabs = r.folder === "inbox" ? h("div", { class: "tabs", role: "tablist" }, h("div", { class: "tab on", role: "tab", "aria-selected": "true" }, "Primary"), h("div", { class: "tab", role: "tab" }, "Promotions"), h("div", { class: "tab", role: "tab" }, "Social")) : null;
+    const count = rows.length ? `1-${String(rows.length)} of ${String(rows.length)}` : "";
+    main.replaceChildren(
+      h("div", { class: "toolbar" }, h("span", { class: "count" }, count)),
+      ...tabs ? [tabs] : [],
+      rows.length ? table : h("div", { class: "empty", role: "status" }, r.folder === "search" ? "No messages matched your search." : "Nothing here yet.")
+    );
+  }
+
+  // tests/fake-google/gmail/client/thread.ts
+  function drawThread(main, r) {
+    const t = allThreads().find((x) => x.id === r.thread);
+    if (!t) {
+      main.replaceChildren(h("div", { class: "empty", role: "status" }, "The conversation that you requested could not be loaded."));
+      return;
+    }
+    if (t.unread) {
+      t.unread = false;
+      const seeded = mail.threads.find((x) => x.id === t.id);
+      if (seeded) seeded.unread = false;
+    }
+    const messages = t.messages.map((m) => {
+      const quote = m.quoted ? h("div", { class: "gmail_quote" }, m.quoted) : null;
+      const more = m.quoted ? h("div", { class: "ajR", role: "button", tabindex: "0", "aria-label": "Show trimmed content" }, "...") : null;
+      more?.addEventListener("click", () => quote?.classList.toggle("gmail_quote"));
+      const toLine = m.to.map((a) => a.address === boot.me.address ? "me" : a.name).join(", ");
+      return h(
+        "div",
+        { class: "adn", role: "listitem", "data-message-id": m.id },
+        h(
+          "div",
+          { class: "adn-head" },
+          h("span", { class: "gD", email: m.from.address, name: m.from.name }, m.from.address === boot.me.address ? boot.me.name : m.from.name),
+          h("span", { class: "go" }, `<${m.from.address}>`),
+          h("span", { class: "g3", title: new Date(m.at).toString() }, new Date(m.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))
+        ),
+        h("div", { class: "go", style: "margin:-8px 0 12px" }, `to ${toLine}`),
+        h("div", { class: "a3s", dir: "ltr" }, m.body),
+        more,
+        quote
+      );
+    });
+    const reply = h("button", { class: "pill", type: "button" }, "Reply");
+    const forward = h("button", { class: "pill", type: "button" }, "Forward");
+    const last = t.messages[t.messages.length - 1];
+    reply.addEventListener("click", () => {
+      const to = last && last.from.address !== boot.me.address ? [last.from.address] : last?.to.map((a) => a.address) ?? [];
+      openCompose({ to, subject: `Re: ${t.subject}` });
+    });
+    forward.addEventListener("click", () => openCompose({ subject: `Fwd: ${t.subject}` }));
+    main.replaceChildren(
+      h(
+        "div",
+        { class: "thread" },
+        h("h2", { class: "hP" }, t.subject),
+        h("div", { role: "list" }, ...messages),
+        h("div", { class: "reply-row" }, reply, forward)
+      )
+    );
+  }
+
+  // tests/fake-google/gmail/client/router.ts
+  var decode = (s) => decodeURIComponent(s.replace(/\+/g, " "));
+  function parseHash(hash) {
+    const [path = "", params = ""] = hash.replace(/^#/, "").split("?");
+    const compose2 = new URLSearchParams(params).get("compose");
+    const parts = path.split("/");
+    if (parts[0] === "search") return { folder: "search", query: decode(parts[1] ?? ""), thread: parts[2] || null, compose: compose2 };
+    if (parts[0] === "label") return { folder: "label", query: decode(parts[1] ?? ""), thread: parts[2] || null, compose: compose2 };
+    return { folder: parts[0] || "inbox", query: "", thread: parts[1] || null, compose: compose2 };
+  }
+  var searchHash = (q) => `#search/${encodeURIComponent(q.trim()).replace(/%20/g, "+")}`;
+  function route() {
+    const main = document.getElementById("main");
+    if (!main) return;
+    const r = parseHash(location.hash);
+    document.querySelectorAll(".nav").forEach((n) => n.classList.toggle("on", n.getAttribute("data-folder") === r.folder));
+    const box = document.querySelector('input[aria-label="Search mail"]');
+    if (box && document.activeElement !== box) box.value = r.folder === "search" ? r.query : "";
+    if (r.thread) drawThread(main, r);
+    else drawList(main, r);
+    counts();
+    document.title = `${r.folder === "search" ? "Search results" : r.folder[0]?.toUpperCase() + r.folder.slice(1)} - Gmail`;
+    if (r.compose && !document.querySelector(`[data-draft-id="${CSS.escape(r.compose)}"]`)) {
+      const draft = mail.drafts.find((d) => d.id === r.compose);
+      if (draft || r.compose === "new") openCompose(draft ? { draft } : {});
+    }
+  }
+  function counts() {
+    const set = (id, n) => {
+      const el = document.querySelector(`[data-count="${id}"]`);
+      if (el) el.textContent = n ? String(n) : "";
+    };
+    set("inbox", mail.threads.filter((t) => t.labels.includes("inbox") && t.unread).length);
+    set("drafts", mail.drafts.length);
+  }
+
+  // tests/fake-google/gmail/client/toast.ts
+  var timer = null;
+  function showToast(text, actions = [], ms = 8e3) {
+    const root = document.getElementById("toast-root");
+    if (!root) return;
+    if (timer) clearTimeout(timer);
+    const close = h("button", { class: "x", "aria-label": "Close" }, "x");
+    const box = h(
+      "div",
+      { class: "bAp", role: "alert", "aria-live": "assertive" },
+      h("span", { class: "bAq" }, text),
+      ...actions.map((a) => {
+        const link = h("span", { id: a.id, role: "link", tabindex: "0" }, a.label);
+        link.addEventListener("click", () => {
+          hideToast();
+          a.run();
+        });
+        return link;
+      }),
+      close
+    );
+    close.addEventListener("click", hideToast);
+    root.replaceChildren(box);
+    timer = setTimeout(hideToast, ms);
+  }
+  function hideToast() {
+    if (timer) clearTimeout(timer);
+    timer = null;
+    document.getElementById("toast-root")?.replaceChildren();
+  }
+  function alertDialog(text) {
+    const ok = h("button", { class: "pill", type: "button" }, "OK");
+    const back = h(
+      "div",
+      { class: "dialog-back" },
+      h("div", { class: "dialog", role: "alertdialog", "aria-label": "Error", "aria-modal": "true" }, h("div", {}, text), h("div", { class: "ok" }, ok))
+    );
+    ok.addEventListener("click", () => back.remove());
+    document.body.append(back);
+    ok.focus();
+  }
+
+  // tests/fake-google/gmail/client/send.ts
+  var ADDRESS2 = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
+  function send(d, close) {
+    const all = [...d.to, ...d.cc];
+    if (!all.length) {
+      alertDialog("Please specify at least one recipient.");
+      return false;
+    }
+    const bad = all.find((a) => !ADDRESS2.test(a));
+    if (bad) {
+      alertDialog(`The address "${bad}" in the "To" field was not recognized. Please make sure that all addresses are properly formed.`);
+      return false;
+    }
+    close();
+    const frame = document.getElementById("frame");
+    if (frame?.classList.contains("compose-only")) {
+      frame.classList.remove("compose-only");
+      history.replaceState(null, "", `${location.pathname}#inbox`);
+      route();
+    }
+    showToast("Sending...", [], 1e4);
+    void sync("send", d).then(({ sentAt }) => {
+      dropDraft(d.id);
+      const sent = { ...d, sentAt, undoneAt: null };
+      mail.sent.push(sent);
+      route();
+      showToast(
+        "Message sent",
+        [
+          { label: "Undo", id: "link_undo", run: () => undo(sent) },
+          { label: "View message", id: "link_vsm", run: () => location.hash = `#sent/${d.id}` }
+        ],
+        boot.undoSeconds * 1e3
+      );
+    });
+    return true;
+  }
+  function undo(sent) {
+    void sync("undo", { id: sent.id }).then(({ undone }) => {
+      if (!undone) return;
+      mail.sent = mail.sent.filter((s) => s !== sent);
+      const { sentAt: _sentAt, undoneAt: _undoneAt, ...draft } = sent;
+      upsertDraft({ ...draft, savedAt: Date.now() });
+      route();
+      showToast("Sending undone.");
+      openCompose({ draft });
+    });
+  }
+
+  // tests/fake-google/gmail/client/compose.ts
+  var TRASH = "M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3";
+  var CLOSE = "M6 6l12 12M18 6L6 18";
+  var MIN = "M6 12h12";
+  var SAVE_MS = 1200;
+  var open = 0;
+  function openCompose(seed = {}) {
+    const root = document.getElementById("compose-root");
+    if (!root) throw new Error("no compose host");
+    if (seed.full) root.classList.add("compose-only-root");
+    const id = seed.draft?.id ?? newDraftId();
+    let saved = seed.draft !== void 0;
+    let timer2 = null;
+    const title = h("span", { class: "t" }, seed.draft?.subject || "New Message");
+    const mark = h("span", { class: "oG", "aria-live": "polite" }, saved ? "Draft saved" : "");
+    const to = recipientsField("To", () => changed());
+    const cc = recipientsField("Cc", () => changed());
+    cc.row.hidden = (seed.draft?.cc.length ?? 0) === 0;
+    const ccLink = h("span", { class: "cc-link", role: "button", tabindex: "0", "aria-label": "Add Cc recipients" }, "Cc");
+    to.row.append(ccLink);
+    const subject = h("input", { name: "subjectbox", "aria-label": "Subject", placeholder: "Subject", autocomplete: "off", spellcheck: "true" });
+    const body = h("div", {
+      class: "Am",
+      role: "textbox",
+      "aria-label": "Message Body",
+      "aria-multiline": "true",
+      contenteditable: "true",
+      g_editable: "true",
+      tabindex: "1",
+      spellcheck: "true"
+    });
+    const sendBtn = h("div", { class: "T-I-atl", role: "button", tabindex: "1", "aria-label": "Send (Ctrl-Enter)", "data-tooltip": "Send (Ctrl-Enter)" }, "Send");
+    const discard = h("div", { class: "og icon-btn", role: "button", tabindex: "1", "aria-label": "Discard draft (Ctrl-Shift-D)", "data-tooltip": "Discard draft" }, svgIcon(TRASH));
+    const closeBtn = h("button", { class: "icon-btn", type: "button", "aria-label": "Save & close", title: "Save & close" }, svgIcon(CLOSE, 16));
+    const minBtn = h("button", { class: "icon-btn", type: "button", "aria-label": "Minimize", title: "Minimize" }, svgIcon(MIN, 16));
+    const win = h(
+      "div",
+      { class: "nH", role: "dialog", "aria-label": "New Message", "data-draft-id": id },
+      h("div", { class: "cm-head" }, title, minBtn, closeBtn),
+      to.row,
+      cc.row,
+      h("div", { class: "cm-row" }, subject),
+      body,
+      h("div", { class: "cm-foot" }, sendBtn, mark, discard)
+    );
+    for (const a of seed.draft?.to ?? seed.to ?? []) to.add(a);
+    for (const a of seed.draft?.cc ?? []) cc.add(a);
+    subject.value = seed.draft?.subject ?? seed.subject ?? "";
+    writeBody(body, seed.draft?.body ?? "");
+    const current = (final) => ({
+      id,
+      account: boot.account,
+      to: final ? to.addresses() : to.peek(),
+      cc: final ? cc.addresses() : cc.peek(),
+      subject: subject.value,
+      body: readBody(body),
+      savedAt: Date.now()
+    });
+    async function save() {
+      if (timer2) clearTimeout(timer2);
+      timer2 = null;
+      const d = current(false);
+      if (!saved && !d.to.length && !d.cc.length && !d.subject && !d.body) return;
+      mark.textContent = "Saving...";
+      await sync("draft", d);
+      upsertDraft(d);
+      saved = true;
+      mark.textContent = "Draft saved";
+    }
+    function changed() {
+      title.textContent = subject.value || "New Message";
+      if (timer2) clearTimeout(timer2);
+      timer2 = setTimeout(() => void save(), SAVE_MS);
+    }
+    function close() {
+      if (timer2) clearTimeout(timer2);
+      win.remove();
+      open = Math.max(0, open - 1);
+      if (!open) root?.classList.remove("compose-only-root");
+    }
+    subject.addEventListener("input", changed);
+    body.addEventListener("input", changed);
+    takeScriptedInput(body);
+    body.addEventListener("paste", (e) => {
+      const text = e.clipboardData?.getData("text/plain");
+      if (text === void 0) return;
+      e.preventDefault();
+      insertPlain(body, text);
+    });
+    ccLink.addEventListener("click", () => {
+      cc.row.hidden = false;
+      cc.input.focus();
+    });
+    closeBtn.addEventListener("click", () => void save().then(close));
+    minBtn.addEventListener("click", () => win.classList.toggle("min"));
+    discard.addEventListener("click", () => {
+      close();
+      void sync("discard", { id }).then(() => {
+        dropDraft(id);
+        showToast("Draft discarded.");
+      });
+    });
+    const go = () => {
+      if (timer2) clearTimeout(timer2);
+      if (!send(current(true), close)) changed();
+    };
+    sendBtn.addEventListener("click", go);
+    win.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        go();
+      }
+    });
+    root.append(win);
+    open += 1;
+    (seed.draft || seed.to?.length ? seed.subject || seed.draft?.subject ? body : subject : to.input).focus();
+    return win;
+  }
+
+  // tests/fake-google/gmail/client/main.ts
+  if (boot.composeOnly) openCompose({ full: true });
+  route();
+  window.addEventListener("hashchange", route);
+  var compose = document.querySelector('[gh="cm"]');
+  compose?.addEventListener("click", () => openCompose());
+  compose?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") openCompose();
+  });
+  document.getElementById("search-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const q = document.querySelector('input[aria-label="Search mail"]')?.value ?? "";
+    location.hash = q.trim() ? searchHash(q) : "#inbox";
+  });
+})();
+</script></body></html>

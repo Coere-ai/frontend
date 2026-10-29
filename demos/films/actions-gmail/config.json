@@ -1,0 +1,1 @@
+{ "title": "Coere Actions: Gmail", "version": 2, "bundles": { "gmail-tab.js": { "from": "gmail-tab.ts" } } }
