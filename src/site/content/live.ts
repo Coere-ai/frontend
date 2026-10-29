@@ -15,4 +15,5 @@ export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePa
   extraction: { slug: "extraction", showcase: { from: "extract", to: "change" } },
   voiceMode: { slug: "voice-mode", showcase: { from: "hold", to: "cancel" } },
   actionsGmail: { slug: "actions-gmail", showcase: { from: "ask", to: "send" } },
+  actionsCalendar: { slug: "actions-calendar", showcase: { from: "review", to: "memory" } },
 };
