@@ -36,8 +36,9 @@ export function PhotoHero({
     <section className="relative isolate overflow-hidden bg-neutral-950">
       <SizedPhoto src={photo} alt={alt} fill priority sizes="100vw" className="-z-20 object-cover" />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-r from-neutral-950/75 via-neutral-950/35 to-neutral-950/10" />
-      <div className="mx-auto grid min-h-[calc(100svh-73px)] max-w-[1440px] items-end gap-12 px-6 pt-24 md:px-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-        <div className="pb-14 text-white lg:pb-20">
+      <div className={`mx-auto grid min-h-[calc(100svh-73px)] max-w-[1440px] gap-12 px-6 md:px-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] ${appFit === "bleed" ? "pt-20" : "py-20"}`}>
+        {/* The words always sit in the middle of the screen's height; a bleeding app still rests on the bottom edge. */}
+        <div className="self-center text-white">
           {eyebrow ? <p className="text-[15px] font-medium text-white/80">{eyebrow}</p> : null}
           <h1 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-balance md:text-6xl md:leading-[1.02]">{title}</h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/90">{line}</p>
@@ -54,11 +55,11 @@ export function PhotoHero({
           </div>
         </div>
         {appFit === "bleed" ? (
-          <div className="self-end lg:-mr-[12vw] lg:translate-y-6">
+          <div className="self-end lg:-mr-[12vw] lg:translate-y-6 lg:pt-20">
             <div className="overflow-hidden rounded-t-2xl shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/15">{app}</div>
           </div>
         ) : (
-          <div className="pb-14 lg:self-center lg:pb-0">{app}</div>
+          <div className="self-center">{app}</div>
         )}
       </div>
     </section>
