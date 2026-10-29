@@ -22,3 +22,10 @@ export const liveFilms: Partial<Record<FilmKey, { slug: string; showcase: LivePa
   coriChat: { slug: "cori-chat", showcase: { from: "ask", to: "history" } },
   actionsCalendar: { slug: "actions-calendar", showcase: { from: "review", to: "memory" } },
 };
+
+/**
+ * Industries with a live film of their own (demos/films/industry-<slug>),
+ * whose chapters are the page's four demos in order. The others still play
+ * their saved screens.
+ */
+export const liveIndustries = new Set<string>(["commerce"]);
