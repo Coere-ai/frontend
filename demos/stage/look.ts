@@ -13,8 +13,8 @@ const ARROW = '<svg width="23" height="27" viewBox="0 0 23 27"><path d="M5 3 L5 
 export const CSS = `
 @font-face{font-family:Geist;src:url(/preview/live/lib/ext/fonts/Geist-Variable.woff2) format("woff2");font-weight:100 900}
 html,body{margin:0;height:100%;background:#fff;overflow:hidden}
-#view{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
-#stage{position:relative;width:${STAGE.width}px;height:${STAGE.height}px;flex:none;overflow:hidden;background:#fff;transform-origin:center}
+#view{position:fixed;inset:0;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:${STAGE.width}px;height:${STAGE.height}px;overflow:hidden;background:#fff;transform-origin:center;transform:translate(-50%,-50%)}
 #camera{position:absolute;inset:0;transform-origin:0 0}
 #tabs iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff;opacity:0;visibility:hidden;transition:opacity .28s ease}
 #tabs iframe.on{opacity:1;visibility:visible}

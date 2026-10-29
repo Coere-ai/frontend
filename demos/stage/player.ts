@@ -40,7 +40,7 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
 
   const fit = () => {
     const scale = Math.min(innerWidth / STAGE.width, innerHeight / STAGE.height);
-    $("stage").style.transform = `scale(${scale})`;
+    $("stage").style.transform = `translate(-50%, -50%) scale(${scale})`;
   };
   addEventListener("resize", fit);
   fit();
