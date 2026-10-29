@@ -67,7 +67,7 @@ export function Navbar() {
               aria-expanded={mobileOpen}
               aria-controls="mobile-menu"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              className="grid h-11 w-11 place-items-center rounded-full text-neutral-950 hover:bg-neutral-100 lg:hidden"
+              className="grid h-11 w-11 place-items-center rounded-full text-neutral-950 lg:hidden"
             >
               {mobileOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
