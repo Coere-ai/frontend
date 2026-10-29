@@ -1,8 +1,8 @@
 import type { FilmKey } from "./films";
 
 /**
- * A feature with the film that shows it. The products menu lists these
- * with a live preview and a link to where its product page shows it.
+ * A feature with the film that shows it. The products menu links each one
+ * to its place in Capabilities on the Agents page, where it plays live.
  */
 export type Feature = {
   slug: string;
@@ -12,9 +12,12 @@ export type Feature = {
   title: string;
   description: string;
   film: FilmKey;
-  /** Where the feature is shown in full. */
+  /** Its place in Capabilities on the Agents page. */
   href: string;
 };
+
+/** Capabilities on the Agents page: every feature in one place, linked from wherever a few are shown. */
+export const ALL_FEATURES = { href: "/products/agents#capabilities", linkLabel: "See all features" };
 
 export const features: Feature[] = [
   {
@@ -24,7 +27,7 @@ export const features: Feature[] = [
     description:
       "Coere sorts what your chats say into sections and folders and draws it around you. Every memory keeps the messages it came from.",
     film: "memory",
-    href: "/products/connect#memory",
+    href: "/products/agents#capability-memory",
   },
   {
     slug: "extraction",
@@ -33,7 +36,7 @@ export const features: Feature[] = [
     description:
       "Extract all reads ChatGPT, Claude and Gemini and saves every chat on your computer. After that, new chats come in by themselves.",
     film: "extraction",
-    href: "/products/connect#import",
+    href: "/products/agents#capability-extraction",
   },
   {
     slug: "smart-context",
@@ -42,7 +45,7 @@ export const features: Feature[] = [
     description:
       "A line above the chat box says what Coere will add and which AIs it learned it from. One Enter sends your message with the context in front.",
     film: "smartContext",
-    href: "/products/connect",
+    href: "/products/agents#capability-smart-context",
   },
   {
     slug: "voice",
@@ -51,7 +54,7 @@ export const features: Feature[] = [
     description:
       "Hold Right Option and talk. Cori shows your words as you say them and answers out loud when you let go.",
     film: "voiceMode",
-    href: "/products/connect",
+    href: "/products/agents#capability-voice",
   },
   {
     slug: "cori",
@@ -60,7 +63,7 @@ export const features: Feature[] = [
     description:
       "Cori finds your old chats in plain words and answers how Coere works, on the dashboard, in the toolbar and on any AI site.",
     film: "coriChat",
-    href: "/products/connect",
+    href: "/products/agents#capability-cori",
   },
   {
     slug: "actions",
@@ -69,7 +72,7 @@ export const features: Feature[] = [
     description:
       "Ask Cori for an email and it writes it in its own Gmail tab with what your memory knows. It asks before it sends to anyone you didn't name.",
     film: "actionsGmail",
-    href: "/products/connect#actions",
+    href: "/products/agents#capability-actions",
   },
   {
     slug: "writer",
@@ -78,7 +81,7 @@ export const features: Feature[] = [
     description:
       "Select text in Gmail, Docs or a chat box. Cori fixes or improves it and marks each change in blue until you keep it or go back.",
     film: "coriRewrite",
-    href: "/products/connect#writing",
+    href: "/products/agents#capability-writer",
   },
   {
     slug: "any-site",
@@ -87,7 +90,7 @@ export const features: Feature[] = [
     description:
       "On any page Cori works step by step from your memory, asks before it submits, and stops when a page tries to give it orders.",
     film: "actionsAnywhere",
-    href: "/products/connect#quizzes",
+    href: "/products/agents#capability-any-site",
   },
   {
     slug: "workers",
@@ -96,7 +99,7 @@ export const features: Feature[] = [
     description:
       "A big task runs in several tabs at once. What they find merges into one table, each value with the page it came from.",
     film: "workers",
-    href: "/products/agents#workers",
+    href: "/products/agents#capability-workers",
   },
   {
     slug: "benchmarks",
@@ -105,7 +108,7 @@ export const features: Feature[] = [
     description:
       "Coere scores its memory on LoCoMo and on its own checks from the dashboard, and says what each run cost.",
     film: "benchmarksEvals",
-    href: "/products/connect",
+    href: "/products/agents#capability-benchmarks",
   },
 ];
 

@@ -1,68 +1,43 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { features, type Feature } from "@/site/content/features";
+import { features } from "@/site/content/features";
 import { products } from "@/site/content/products";
 import { Underlined } from "@/site/ui/underlined";
-import { FeaturePreview } from "./feature-preview";
 import { PanelLabel } from "./panel-parts";
 
 /**
- * Products menu: the four products left to right, then the features list,
- * then a live film of a feature. Nothing in the list is marked until it is
- * clicked; the film shows the first feature until then. The film column
- * needs room, so it appears from xl screens up.
+ * Products menu: the four products left to right, large, then the features
+ * as plain links, each opening that feature in Capabilities on the Agents
+ * page, where it plays live.
  */
 export function ProductsPanel() {
-  const [picked, setPicked] = useState<Feature | null>(null);
-
   return (
-    <div className="grid grid-cols-[repeat(4,minmax(0,1fr))_160px] grid-rows-[auto_auto_auto_1fr] gap-x-6 xl:grid-cols-[repeat(4,minmax(0,1fr))_160px_minmax(0,260px)] 2xl:grid-cols-[repeat(4,minmax(0,1fr))_176px_320px] 2xl:gap-x-8">
+    <div className="grid grid-cols-[repeat(4,minmax(0,1fr))_168px] grid-rows-[auto_auto_auto_1fr] gap-x-7 2xl:grid-cols-[repeat(4,minmax(0,1fr))_184px] 2xl:gap-x-9">
       {/* Each card spans the four shared rows, so the images line up whatever the text length. */}
       {products.map((product) => (
         <Link key={product.slug} href={`/products/${product.slug}`} className="group row-span-4 grid grid-rows-subgrid">
           <p className="text-[13px] font-medium text-neutral-500">{product.kind}</p>
-          <h3 className="mt-1.5 text-[20px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[24px]">
+          <h3 className="mt-1.5 text-[24px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[28px]">
             <Underlined big>{product.name}</Underlined>
           </h3>
-          <p className="mt-2 text-[14px] leading-snug text-neutral-500">{product.description}</p>
-          <div className="mt-5 self-start overflow-hidden rounded-2xl">
-            <Image
-              src={product.image}
-              alt={`${product.name} artwork`}
-              width={754}
-              height={421}
-              unoptimized
-              className="aspect-[754/421] w-full object-cover"
-            />
+          <p className="mt-2.5 text-[15px] leading-snug text-neutral-500">{product.description}</p>
+          <div className="mt-6 self-start overflow-hidden rounded-2xl">
+            <Image src={product.image} alt={`${product.name} artwork`} width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover" />
           </div>
         </Link>
       ))}
 
-      <div className="row-span-4 border-l border-neutral-200 pl-6">
+      <div className="row-span-4 border-l border-neutral-200 pl-7">
         <PanelLabel>Features</PanelLabel>
         <ul className="mt-3 space-y-0.5">
           {features.map((feature) => (
             <li key={feature.slug}>
-              <button
-                type="button"
-                aria-pressed={picked?.slug === feature.slug}
-                onClick={() => setPicked(feature)}
-                className={`group block py-1.5 text-left text-[15px] focus-visible:outline-none ${
-                  picked?.slug === feature.slug ? "text-neutral-950" : "text-neutral-600 hover:text-neutral-950"
-                }`}
-              >
-                <Underlined on={picked?.slug === feature.slug}>{feature.name}</Underlined>
-              </button>
+              <Link href={feature.href} className="group block py-1.5 text-[15px] text-neutral-600 hover:text-neutral-950">
+                <Underlined>{feature.name}</Underlined>
+              </Link>
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className="row-span-4 hidden xl:block">
-        <FeaturePreview feature={picked ?? features[0]} />
       </div>
     </div>
   );
