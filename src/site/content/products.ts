@@ -1,6 +1,6 @@
 /** One of Coere's three products, with everything its menu card and page show. */
 export type Product = {
-  slug: "connect" | "solutions" | "forge";
+  slug: "connect" | "solutions" | "forge" | "agents";
   name: string;
   /** Who it is for, in a few words. */
   kind: string;
@@ -38,6 +38,15 @@ export const products: Product[] = [
     description:
       "The API, MCP server and SDKs that let your apps and agents use Coere as their memory layer, with the person's permission.",
     image: `${IMAGES}/forge.webp`,
+  },
+  {
+    slug: "agents",
+    name: "Coere Agents",
+    kind: "Agents for every field",
+    tagline: "An agent for every field, built on your memory.",
+    description:
+      "Cori, the helper in Coere, in a version for each field. Each one works from your memory and splits big tasks across workers.",
+    image: `${IMAGES}/agents.webp`,
   },
 ];
 

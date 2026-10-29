@@ -96,7 +96,7 @@ export const features: Feature[] = [
     description:
       "A big task runs in several tabs at once. What they find merges into one table, each value with the page it came from.",
     film: "workers",
-    href: "/products/solutions#how",
+    href: "/products/agents#workers",
   },
   {
     slug: "benchmarks",

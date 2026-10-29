@@ -10,7 +10,7 @@ import { FeaturePreview } from "./feature-preview";
 import { PanelLabel } from "./panel-parts";
 
 /**
- * Products menu: the three products left to right, then the features list,
+ * Products menu: the four products left to right, then the features list,
  * then a live film of a feature. Nothing in the list is marked until it is
  * clicked; the film shows the first feature until then. The film column
  * needs room, so it appears from xl screens up.
@@ -19,12 +19,12 @@ export function ProductsPanel() {
   const [picked, setPicked] = useState<Feature | null>(null);
 
   return (
-    <div className="grid grid-cols-[repeat(3,minmax(0,1fr))_168px] grid-rows-[auto_auto_auto_1fr] gap-x-8 xl:grid-cols-[repeat(3,minmax(0,1fr))_168px_minmax(0,300px)] 2xl:grid-cols-[repeat(3,minmax(0,1fr))_184px_340px]">
+    <div className="grid grid-cols-[repeat(4,minmax(0,1fr))_160px] grid-rows-[auto_auto_auto_1fr] gap-x-6 xl:grid-cols-[repeat(4,minmax(0,1fr))_160px_minmax(0,260px)] 2xl:grid-cols-[repeat(4,minmax(0,1fr))_176px_320px] 2xl:gap-x-8">
       {/* Each card spans the four shared rows, so the images line up whatever the text length. */}
       {products.map((product) => (
         <Link key={product.slug} href={`/products/${product.slug}`} className="group row-span-4 grid grid-rows-subgrid">
           <p className="text-[13px] font-medium text-neutral-500">{product.kind}</p>
-          <h3 className="mt-1.5 text-[22px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[26px]">
+          <h3 className="mt-1.5 text-[20px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[24px]">
             <Underlined big>{product.name}</Underlined>
           </h3>
           <p className="mt-2 text-[14px] leading-snug text-neutral-500">{product.description}</p>
@@ -41,7 +41,7 @@ export function ProductsPanel() {
         </Link>
       ))}
 
-      <div className="row-span-4 border-l border-neutral-200 pl-8">
+      <div className="row-span-4 border-l border-neutral-200 pl-6">
         <PanelLabel>Features</PanelLabel>
         <ul className="mt-3 space-y-0.5">
           {features.map((feature) => (
