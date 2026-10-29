@@ -20,7 +20,10 @@ export type Film = {
   slug: string;
   title: string;
   src: string;
+  /** The film's own first frame: a title card, right for the full player. */
   poster: string;
+  /** A frame of real footage, for previews that play without their title card. */
+  still: string;
   chapters: Cue[];
   captions: Cue[];
 };
@@ -29,7 +32,14 @@ export type Film = {
 const BASE = "/preview/films";
 
 function film(slug: string, title: string, cues: { chapters: Cue[]; captions: Cue[] }): Film {
-  return { slug, title, src: `${BASE}/${slug}.mp4`, poster: `${BASE}/${slug}-poster.jpg`, ...cues };
+  return {
+    slug,
+    title,
+    src: `${BASE}/${slug}.mp4`,
+    poster: `${BASE}/${slug}-poster.jpg`,
+    still: `${BASE}/${slug}-still.jpg`,
+    ...cues,
+  };
 }
 
 export const films = {
@@ -49,6 +59,13 @@ export const films = {
 } satisfies Record<string, Film>;
 
 export type FilmKey = keyof typeof films;
+
+/**
+ * Every film opens on a title card that lasts about two and a half seconds.
+ * Previews start here instead, and loop back here, so they always show the
+ * product.
+ */
+export const PREVIEW_START_SECONDS = 3;
 
 /** How long a film runs, read from where its last cue ends. */
 export function filmLength(film: Film): number {
