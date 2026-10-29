@@ -14,9 +14,9 @@ export const connectHero: HeroCopy = {
 };
 
 export const connectSlides: Slide[] = [
-  { label: "Every AI, one memory", text: "ChatGPT, Claude, Gemini and six more AIs feed the same memory, so a new chat anywhere starts from what you already said." },
-  { label: "Context as you type", text: "A blue line above the chat box says what Coere will add and which AIs it learned it from. What goes is always yours to change before you send." },
-  { label: "Yours to keep", text: "Every chat is saved on your computer. Coere asks what to build memory from, and nothing goes to an AI until you say yes." },
+  { label: "Every AI, one memory", text: "ChatGPT, Claude, Gemini and six more AIs feed the same memory, so a new chat anywhere starts from what you already said.", live: { film: "extraction", from: "extract", to: "new" } },
+  { label: "Context as you type", text: "A blue line above the chat box says what Coere will add and which AIs it learned it from. What goes is always yours to change before you send.", live: { film: "smart-context", from: "type", to: "enter" } },
+  { label: "Yours to keep", text: "Every chat is saved on your computer. Coere asks what to build memory from, and nothing goes to an AI until you say yes.", live: { film: "memory", from: "build", to: "memory" } },
 ];
 
 /** Keys double as anchors, so the home page can link straight to a case. */
