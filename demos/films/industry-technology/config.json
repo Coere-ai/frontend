@@ -1,0 +1,8 @@
+{
+  "title": "Coere for engineering",
+  "version": 2,
+  "edition": "solution",
+  "bundles": {
+    "terminal.js": { "from": "terminal.ts", "version": 2, "title": "dev-assistant" }
+  }
+}
