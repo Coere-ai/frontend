@@ -8,7 +8,8 @@ import { ClosingCta } from "@/site/home/closing-cta";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 import { asGrid } from "./film-cases";
-import { ForgeWalkthrough } from "./forge-walkthrough";
+import { films } from "@/site/content/films";
+import { FilmFrame } from "@/site/ui/film-frame";
 import { ProductHero } from "./hero";
 import { OtherProducts } from "./other-products";
 import { ProductSection } from "./product-section";
@@ -22,12 +23,12 @@ export function ForgePage() {
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">From a key to context, end to end</h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">Real screens from Coere, step by step. Use the arrows to move through them.</p>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">A developer makes a token, adds Coere to their app&apos;s AI call and runs it, then points it at any AI.</p>
           </div>
           <Stage background={backgrounds.light} className="mt-16">
             <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/45" />
             <div className="relative p-6 md:p-12">
-              <ForgeWalkthrough />
+              <FilmFrame film={films.forgeDev} />
             </div>
           </Stage>
         </Container>

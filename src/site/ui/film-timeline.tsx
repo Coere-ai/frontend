@@ -39,7 +39,7 @@ export function FilmTimeline({ film, spans, now, onSeek }: { film: string; spans
           style={{ left: `clamp(104px, ${(hover / total) * 100}%, calc(100% - 104px))` }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={posterOf(film, pick.id)} alt="" className="aspect-[1440/900] w-full object-cover" />
+          <img src={posterOf(film, pick.id)} alt="" onError={(e) => (e.currentTarget.style.visibility = "hidden")} className="aspect-[1440/900] w-full bg-neutral-900 object-cover" />
           <div className="flex items-baseline justify-between gap-3 px-3 py-2 text-[12px] text-white">
             <span className="truncate font-medium">{pick.title}</span>
             <span className="shrink-0 text-white/60 tabular-nums">{clock(hover)}</span>

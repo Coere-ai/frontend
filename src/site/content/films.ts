@@ -22,6 +22,7 @@ export const films = {
   coriRewrite: { slug: "cori-rewrite", title: "Cori Rewrite", showcase: { from: "select", to: "docs" } },
   actionsAnywhere: { slug: "actions-anywhere", title: "Actions on any site", showcase: { from: "answers", to: "form" } },
   workers: { slug: "workers", title: "Workers", showcase: { from: "handoff", to: "stop-all" } },
+  forgeDev: { slug: "forge-dev", title: "Coere Forge: from a token to your AI", showcase: { from: "integrate", to: "anywhere" } },
   benchmarksEvals: { slug: "benchmarks-evals", title: "Benchmarks and Evals", showcase: { from: "estimate", to: "export" } },
 } satisfies Record<string, Film>;
 

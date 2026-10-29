@@ -1,12 +1,14 @@
 import { CheckList } from "@/site/blocks/check-list";
 import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
-import { ForgeWalkthrough } from "@/site/products/forge-walkthrough";
+import { films } from "@/site/content/films";
 import { Container } from "@/site/ui/container";
+import { FilmFrame } from "@/site/ui/film-frame";
 
 /**
  * Coere Forge on the home page: one panel of artwork, like Solutions, with
- * the words on the left and the developer's side of Coere on the right.
+ * the words on the left and, on the right, a developer making a token,
+ * adding Coere to their app's AI call and running it, live with its player.
  */
 export function ForgeSection() {
   return (
@@ -29,7 +31,7 @@ export function ForgeSection() {
                 <a href="/resources" className="inline-flex h-12 items-center rounded-full px-5 text-[16px] font-medium text-white ring-1 ring-white/40">Read the docs</a>
               </div>
             </div>
-            <ForgeWalkthrough />
+            <FilmFrame film={films.forgeDev} />
           </div>
         </Stage>
       </Container>
