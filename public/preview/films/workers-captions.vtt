@@ -1,37 +1,37 @@
 WEBVTT
 
 1
-00:00:00.005 --> 00:00:02.667
+00:00:00.006 --> 00:00:02.733
 Some tasks need many pages read. Cori splits them across workers.
 
 2
-00:00:02.667 --> 00:00:09.500
+00:00:02.733 --> 00:00:11.811
 Maya asks for 20 biotech companies, each with a person to contact.
 
 3
-00:00:09.500 --> 00:00:12.511
+00:00:11.811 --> 00:00:14.825
 Cori starts four workers. Each one searches and reads company sites in a tab of its own.
 
 4
-00:00:12.511 --> 00:00:18.918
+00:00:14.825 --> 00:00:21.585
 The chat shows what each worker sees, live, with its own Stop and Take over.
 
 5
-00:00:18.918 --> 00:00:25.933
+00:00:21.585 --> 00:00:28.600
 The count climbs as rows come in.
 
 6
-00:00:25.933 --> 00:00:28.741
+00:00:28.600 --> 00:00:31.453
 Their finds merge into one table, with no company twice.
 
 7
-00:00:28.741 --> 00:00:37.905
+00:00:31.453 --> 00:00:48.946
 Each value keeps the page it came from. Export CSV and Copy take it anywhere.
 
 8
-00:00:37.905 --> 00:00:54.333
+00:00:48.946 --> 00:01:10.667
 In a new chat she starts another search. Stop all stops every worker and closes their tabs.
 
 9
-00:00:54.333 --> 00:00:56.600
+00:01:10.667 --> 00:01:13.000
 Cori never invents a value. Each one names the page it came from.
