@@ -1,11 +1,19 @@
-import type { FilmKey } from "../films";
 import type { Product } from "../products";
 
 /**
- * How one product serves one industry, told as an example of the work.
- * The examples are illustrations of what each product does, not customers.
+ * The four demos every industry page plays, each built from the real app
+ * screens with that field's own made up content (scripts/industries):
+ * context added to a new chat, the client graph and one client's sheet,
+ * one client per send with Cori's answer, and the field's own app reading
+ * memory through the API.
  */
-export type IndustryStory = { product: Product["slug"]; title: string; text: string; checks: string[]; film: FilmKey };
+export type DemoKey = "context" | "graph" | "confidential" | "app";
 
-/** An industry page's own words: its opening line and a story per product. */
+/**
+ * How one product serves one industry, told as an example of the work.
+ * The examples illustrate what each product does; they are not customers.
+ */
+export type IndustryStory = { product: Product["slug"]; demo: DemoKey; title: string; text: string; checks: string[] };
+
+/** An industry page's own words: its opening line and a story per demo. */
 export type IndustryPage = { line: string; stories: IndustryStory[] };

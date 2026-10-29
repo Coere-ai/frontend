@@ -1,37 +1,59 @@
 import type { IndustryPage } from "./types";
 
-/** Healthcare, energy, education and legal. */
+/** Commerce, consumer, manufacturing, healthcare, energy and education. Each story matches the demo it names. */
 export const partTwo: Record<string, IndustryPage> = {
-  healthcare: {
-    line: "Care and research teams start from the full picture, with sensitive memory kept back until it is allowed.",
+  commerce: {
+    line: "Deals, partners and promises stay with the company across every market and every handoff.",
     stories: [
-      { product: "solutions", title: "A shared picture for the team", text: "A research group keeps its studies, partners and decisions in one memory that every chat starts from.", checks: ["Company and client folders", "Review before anything is kept", "Delete everything about a project"], film: "teams" },
-      { product: "connect", title: "Intake forms without retyping", text: "Cori fills a clinic intake form with name, birth date and contact details from memory, and the person sends it.", checks: ["Empty where memory has nothing", "Never submits on its own", "Never types a card number"], film: "actionsAnywhere" },
-      { product: "forge", title: "Sensitive memory stays back", text: "Sensitive facts reach the server only after the person turns them on, and an app needs its own scope to read them.", checks: ["memory:sensitive is off by default", "Section limits per token", "Apps never write memory"], film: "v3" },
+      { product: "connect", demo: "context", title: "Renewal calls that start prepared", text: "Ask for help with a renewal and Coere brings the contract terms, the pricing history and the partner's last asks.", checks: ["Terms and end dates", "Price floors and history", "What the partner asked for"] },
+      { product: "solutions", demo: "graph", title: "Every partner across every market", text: "Each account keeps its contacts, contracts, shipments and promises, so a handoff loses nothing.", checks: ["Contracts under each account", "Promises with dates", "Shipping and payment terms"] },
+      { product: "solutions", demo: "confidential", title: "Terms stay with their partner", text: "A reply to one partner carries only that partner's memory, and Cori lists what the team promised them.", checks: ["One partner per send", "Answers with sources", "Nothing from other accounts"] },
+      { product: "forge", demo: "app", title: "Account briefs on demand", text: "A briefing tool built on Forge pulls an account's terms and history before every call.", checks: ["The person allows it", "Section limits", "Revoke at any time"] },
+    ],
+  },
+  consumer: {
+    line: "Know every retail partner and its shoppers, and plan from what worked before.",
+    stories: [
+      { product: "connect", demo: "context", title: "Promotions planned from what worked", text: "Ask for a holiday plan and Coere brings the partner's shelf, last year's results and its shoppers' habits.", checks: ["Last year's winning offer", "The ad dates", "Shopper habits"] },
+      { product: "solutions", demo: "graph", title: "Every retail partner in one place", text: "Each partner keeps its buyers, promotions, deadlines and scorecards, built from the team's chats.", checks: ["Buyers and contacts", "Promotion calendar", "Scorecards and deductions"] },
+      { product: "solutions", demo: "confidential", title: "One partner per message", text: "A note to one partner carries only that partner's plans, and Cori says what the team owes them.", checks: ["One partner per send", "Answers with sources", "Plans kept apart"] },
+      { product: "forge", demo: "app", title: "Planning tools with memory", text: "A promotion planner built on Forge asks what worked at a partner before it suggests a plan.", checks: ["The person allows it", "Read only", "Every send on record"] },
+    ],
+  },
+  manufacturing: {
+    line: "What the line learned stays with the plant, not with one shift.",
+    stories: [
+      { product: "connect", demo: "context", title: "Faults fixed with what the last shift learned", text: "Ask about a fault and Coere brings what caused it last time, what night shift noticed and where the spares are.", checks: ["Past root causes", "Shift notes", "Equipment and spares"] },
+      { product: "solutions", demo: "graph", title: "Every customer and line in one memory", text: "Each customer keeps its lines, contacts, quality promises and shipments, built from the plant's chats.", checks: ["Lines under each customer", "Quality promises", "Shipment dates"] },
+      { product: "solutions", demo: "confidential", title: "Updates that stay with the customer", text: "A report to one customer carries only that customer's memory, and Cori lists what is owed to them.", checks: ["One customer per send", "Answers with sources", "Nothing from other programs"] },
+      { product: "forge", demo: "app", title: "Line tools that remember", text: "A line assistant built on Forge reads a line's fault history before a technician starts.", checks: ["The person allows it", "Section limits", "Revoke at any time"] },
+    ],
+  },
+  healthcare: {
+    line: "Run studies and partner sites from the full picture, with no patient details in memory.",
+    stories: [
+      { product: "connect", demo: "context", title: "Site visits prepared in minutes", text: "Ask for help with a monitoring visit and Coere brings the site's enrollment, open queries and training gaps.", checks: ["Enrollment status", "Open queries by age", "Training still owed"] },
+      { product: "solutions", demo: "graph", title: "Every site and study in one memory", text: "Each site keeps its investigators, studies, promises and deadlines, built from the team's chats.", checks: ["Studies under each site", "Promises with dates", "IRB and enrollment deadlines"] },
+      { product: "solutions", demo: "confidential", title: "One site per message", text: "An email to one site carries only that site's memory, and Cori lists what the site still owes.", checks: ["One site per send", "Answers with sources", "Sensitive memory stays back"] },
+      { product: "forge", demo: "app", title: "Monitoring tools with context", text: "A site monitoring app built on Forge asks what to check before a visit.", checks: ["memory:sensitive is off by default", "Section limits per token", "Apps never write memory"] },
     ],
   },
   energy: {
-    line: "Field knowledge stays with the company when people move between sites and roles.",
+    line: "Field knowledge stays with the company when crews move between sites.",
     stories: [
-      { product: "solutions", title: "Site notes that outlast a handover", text: "What crews learn about each site files under the company, so the next team starts from it.", checks: ["One memory for the company", "Ask Cori what was decided", "Export a site's memory by file"], film: "teams" },
-      { product: "forge", title: "Deadlines in your own tools", text: "A planning tool reads what is due soon from memory and the facts behind each date.", checks: ["Upcoming, overdue first", "Poll changes, no webhooks", "Read only by default"], film: "v3" },
-      { product: "connect", title: "Ask out loud in the field", text: "Hold Right Option and talk. Cori shows your words as you say them and answers out loud.", checks: ["A meter while you talk", "Words as you say them", "An answer out loud"], film: "voiceMode" },
+      { product: "connect", demo: "context", title: "Work plans built on the site's history", text: "Ask for a work plan and Coere brings the oil sample, the last repair, the crane booking and the site's wind limits.", checks: ["Last findings", "Equipment history", "Access and safety limits"] },
+      { product: "solutions", demo: "graph", title: "Every site in one memory", text: "Each site keeps its turbines, contacts, promises and permits, built from the crews' chats.", checks: ["Assets under each site", "Promises with dates", "Permits and outages"] },
+      { product: "solutions", demo: "confidential", title: "Plans that stay with the site", text: "A plan for one site carries only that site's memory, and Cori lists what the team owes the operator.", checks: ["One site per send", "Answers with sources", "Nothing from other operators"] },
+      { product: "forge", demo: "app", title: "Field planners with memory", text: "A field planning app built on Forge reads a turbine's history before it builds the crew plan.", checks: ["The person allows it", "Read only", "Revoke at any time"] },
     ],
   },
   education: {
-    line: "Students and teachers pick up where they left off, in whichever AI they open.",
+    line: "Plan every class from what it already covered, in whichever AI you open.",
     stories: [
-      { product: "connect", title: "Every class in one memory", text: "A student's classes, projects and due dates sort into School, so a new chat already knows the course.", checks: ["Dates follow a chat that changes", "Search lights what it finds", "Every memory keeps its chat"], film: "memory" },
-      { product: "connect", title: "Writing help where you write", text: "Select a paragraph of an essay in Docs and pick Improve. It keeps every fact you wrote, and Go back returns your words.", checks: ["Fix grammar only keeps your words", "Changes boxed in blue", "Only on your screen"], film: "coriRewrite" },
-      { product: "forge", title: "Study apps that know the student", text: "A study app asks for the student's context with their permission and plans from what they already know.", checks: ["The student presses Allow", "Each reason names its memory", "Revoke at any time"], film: "v3" },
-    ],
-  },
-  legal: {
-    line: "Matters, clients and what was promised stay remembered across the firm.",
-    stories: [
-      { product: "solutions", title: "A folder for every matter", text: "Each client keeps its contacts, promises and decisions. A draft about one client never gets another's memory.", checks: ["One client per send", "Ask Cori for each promise and its date", "Delete a client when the work ends"], film: "teams" },
-      { product: "connect", title: "Earlier research comes back", text: "Start a new chat about a matter and the prep chat from last week goes with it, shown on the line first.", checks: ["The chat that holds your work", "Who you are", "What goes is yours to change"], film: "smartContext" },
-      { product: "forge", title: "Firm tools with the client's context", text: "A firm's tool reads a client's card over MCP: what it is, its work, contacts and open promises.", checks: ["get_client_card on a Teams library", "Same token and scopes", "Every send on record"], film: "v3" },
+      { product: "connect", demo: "context", title: "Lessons planned from where the class is", text: "Ask for next week's lessons and Coere brings what the class finished, the quiz results and how it learns best.", checks: ["What the class finished", "Where it struggled", "Supports it needs"] },
+      { product: "solutions", demo: "graph", title: "Every class and colleague in one memory", text: "Each class keeps its units, co-teachers, promises and test dates, built from the teacher's chats.", checks: ["Units under each class", "Promises to families", "Test and project dates"] },
+      { product: "solutions", demo: "confidential", title: "One class per message", text: "An update to one class's families carries only that class, and Cori lists what is owed this week.", checks: ["One class per send", "Answers with sources", "Classes kept apart"] },
+      { product: "forge", demo: "app", title: "Planning tools that know the class", text: "A lesson planner built on Forge asks where a class is before it suggests a lesson.", checks: ["The student or teacher allows it", "Section limits", "Revoke at any time"] },
     ],
   },
 };
