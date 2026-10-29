@@ -125,7 +125,11 @@ export class Stage {
   async wait(ms: number): Promise<void> {
     await this.hooks.gate();
     this.hooks.spend(ms);
-    if (this.fast) return frame();
+    if (this.fast) {
+      await frame();
+      // A wait that was skipping when the part came on screen keeps its beat, so a part never loses its first moment.
+      if (this.fast || ms <= 16) return;
+    }
     await new Promise((r) => setTimeout(r, ms));
   }
 

@@ -59,6 +59,8 @@ export function installChrome(world: World, tab: string, assets: string): void {
     i18n: { getUILanguage: () => "en-US", getMessage: () => "" },
     tabs: { sendMessage: (_tab: number, message: unknown) => world.tell(copy(message)), query: async () => [], create: async () => ({}) },
   };
+  // A frame without the clipboard permission rejects Copy; a demo's Copy only has to succeed.
+  if (navigator.clipboard) Object.defineProperty(navigator.clipboard, "writeText", { value: () => Promise.resolve(), configurable: true });
   const whole = fallback(chrome);
   Object.assign(window, { chrome: whole, browser: whole });
 }

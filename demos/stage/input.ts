@@ -92,7 +92,8 @@ const CODES: Record<string, string> = { Enter: "Enter", Escape: "Escape", Tab: "
 /** A key press on the focused element: keydown, the key's own effect unless the page stopped it, keyup. Modifiers go as "Meta+k". */
 export function key(doc: Document, combo: string): void {
   const win = doc.defaultView!;
-  const parts = combo.split("+");
+  // A single character is that key, "+" included; anything longer is a combination such as "Meta+k".
+  const parts = combo.length === 1 ? [combo] : combo.split("+");
   const name = parts.pop()!;
   const mods = { metaKey: parts.includes("Meta"), ctrlKey: parts.includes("Control"), altKey: parts.includes("Alt"), shiftKey: parts.includes("Shift") };
   const el = focused(doc) ?? doc.body;
