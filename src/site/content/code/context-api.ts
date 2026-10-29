@@ -1,9 +1,9 @@
 import type { CodeSample } from "@/site/blocks/code-tabs";
 
 /**
- * The Context API in a few lines, copied from the coere-v2 README's Context
- * API section. Keep these in step with it: they are what a developer will
- * paste first.
+ * The Context API in a few lines, from the coere-v2 README's Context API
+ * section, with its two long calls wrapped to fit a code box. Keep these in
+ * step with it: they are what a developer will paste first.
  */
 export const contextSamples: CodeSample[] = [
   {
@@ -11,11 +11,14 @@ export const contextSamples: CodeSample[] = [
     language: "ts",
     code: `import { Coere } from '@coere/client'
 
-const token = await Coere.connect({ name: 'planner', scopes: ['memory:read'] }, (code) =>
-  console.log(\`Open Apps in Coere and check the code \${code}\`),
+const token = await Coere.connect(
+  { name: 'planner', scopes: ['memory:read'] },
+  (code) => console.log(\`Open Apps in Coere and check the code \${code}\`),
 )
 const coere = new Coere({ token })
-const ctx = await coere.context.forDraft('dinner with my climbing friends friday', { chat: 'chat-1' })
+const ctx = await coere.context.forDraft('dinner with my climbing friends friday', {
+  chat: 'chat-1',
+})
 console.log(ctx.block) // put this in front of the message you send to your model
 for (const item of ctx.items) console.log(item.path.join(' / '), item.why)`,
   },
@@ -31,12 +34,16 @@ for item in ctx.items:
   },
 ];
 
-/** Connecting an agent over MCP, as the dashboard's token dialog writes it. */
+/**
+ * Connecting an agent over MCP, as the dashboard's token dialog writes it.
+ * The address is the placeholder the server's own README uses for a
+ * server behind TLS; each reader puts their own in its place.
+ */
 export const mcpSamples: CodeSample[] = [
   {
     label: "Claude Code",
     language: "bash",
-    code: `claude mcp add --transport http coere http://127.0.0.1:7337/mcp --header "Authorization: Bearer coere_app_..."`,
+    code: `claude mcp add --transport http coere https://coere.example.com/mcp --header "Authorization: Bearer coere_app_..."`,
   },
   {
     label: "MCP config",
@@ -46,7 +53,7 @@ export const mcpSamples: CodeSample[] = [
     "coere": {
       "command": "node",
       "args": ["/path/to/coere-v2/apps/server/dist/coere-server.mjs", "mcp"],
-      "env": { "COERE_URL": "http://127.0.0.1:7337", "COERE_TOKEN": "coere_app_..." }
+      "env": { "COERE_URL": "https://coere.example.com", "COERE_TOKEN": "coere_app_..." }
     }
   }
 }`,
@@ -54,7 +61,7 @@ export const mcpSamples: CodeSample[] = [
   {
     label: "curl",
     language: "bash",
-    code: `curl -s -X POST http://127.0.0.1:7337/v1/context/draft \\
+    code: `curl -s -X POST https://coere.example.com/v1/context/draft \\
   -H "Authorization: Bearer $COERE_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{"draft": "dinner with my climbing friends friday", "chat": "chat-1"}'`,

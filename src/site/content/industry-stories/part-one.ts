@@ -7,7 +7,7 @@ export const partOne: Record<string, IndustryPage> = {
     stories: [
       { product: "solutions", title: "Every client's history in one memory", text: "An advisory team keeps each client in its own folder: contacts, promises and decisions. A draft about one client never carries another's.", checks: ["A folder per client", "Ask Cori what the team promised", "Export a client for a handoff"], film: "teams" },
       { product: "connect", title: "Research that remembers", text: "An analyst works across ChatGPT, Claude and Gemini. Coere brings the earlier work into each new chat as they type.", checks: ["Prep chats come back on their own", "A line shows what goes", "Nothing new goes with a follow up"], film: "smartContext" },
-      { product: "forge", title: "Client apps that know the client", text: "A firm's own app asks for context with the client's permission and gets the memories a chat would get.", checks: ["The person presses Allow", "Every send is on record", "Runs on their own computer"], film: "v3" },
+      { product: "forge", title: "Client apps that know the client", text: "A firm's own app asks for context with the client's permission and gets the memories a chat would get.", checks: ["The person presses Allow", "Every send is on record", "Revoke stops it at once"], film: "v3" },
     ],
   },
   technology: {

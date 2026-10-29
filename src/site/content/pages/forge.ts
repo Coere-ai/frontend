@@ -2,8 +2,7 @@ import type { GridItem, HeroCopy } from "./types";
 
 /**
  * Coere Forge's page. The facts come from the coere-v2 server and SDK code:
- * the API is served by coere-server, which the person runs on their own
- * computer, and apps read with a token the person allowed.
+ * apps read memory with a token the person allowed, and nothing else.
  */
 export const forgeHero: HeroCopy = {
   eyebrow: "Coere Forge",
@@ -12,7 +11,7 @@ export const forgeHero: HeroCopy = {
   checks: [
     "Context for a draft: the memories a new chat would get, ready to put in front",
     "Permission first: the person presses Allow, and the token comes once",
-    "On their computer: memory is served by coere-server, not a cloud",
+    "Revoke any time: a token stops working at once",
   ],
 };
 
