@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { walkSteps } from "@/site/content/forge-walkthrough";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
+import { SCREEN, ScreenFrame } from "@/site/ui/screen-frame";
 
-const W = 1440;
-const H = 900;
+const W = SCREEN.width;
+const H = SCREEN.height;
 const pct = (value: number, of: number) => `${(value / of) * 100}%`;
 
 /** A round arrow button on the side of the screen. */
@@ -25,7 +25,8 @@ function Arrow({ direction, onClick, disabled }: { direction: "back" | "next"; o
 }
 
 /**
- * Coere Forge, step by step on full screens of the real product. Arrows
+ * Coere Forge, step by step on full screens of the real product, saved as
+ * HTML so they stay sharp. Arrows
  * (or the arrow keys) move through the steps, and the part that matters
  * is lit while the rest of the screen dims. Meant to sit on artwork.
  */
@@ -51,17 +52,9 @@ export function ForgeWalkthrough() {
         </span>
         <div className="relative min-w-0 flex-1 overflow-hidden rounded-2xl bg-white shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)] ring-1 ring-white/15" style={{ aspectRatio: `${W} / ${H}` }}>
           {walkSteps.map((s, i) => (
-            <Image
-              key={s.key}
-              src={s.screen}
-              alt={s.alt}
-              width={W}
-              height={H}
-              unoptimized
-              loading="eager"
-              aria-hidden={i !== index}
-              className={`absolute inset-0 h-full w-full transition-opacity duration-300 ${i === index ? "opacity-100" : "opacity-0"}`}
-            />
+            <div key={s.key} aria-hidden={i !== index} className={`absolute inset-0 transition-opacity duration-300 ${i === index ? "opacity-100" : "opacity-0"}`}>
+              <ScreenFrame src={s.screen} title={s.alt} />
+            </div>
           ))}
           <span
             aria-hidden="true"
