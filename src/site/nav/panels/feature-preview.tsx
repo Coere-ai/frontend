@@ -7,9 +7,9 @@ import { FilmFrame } from "@/site/ui/film-frame";
 import { PanelMore } from "./panel-parts";
 
 /**
- * The film beside the features list. Each feature gets its own film page,
- * keyed by slug, so switching crossfades from the old film to the new one.
- * Each starts past its title card and loops back to the same point.
+ * The film beside the features list, live on Coere's real code. Each
+ * feature gets its own, keyed by slug, so switching crossfades from the old
+ * one to the new one, each looping the part that shows the feature.
  */
 export function FeaturePreview({ feature }: { feature: Feature }) {
   const film = films[feature.film];

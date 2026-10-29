@@ -1,78 +1,28 @@
-import actionsAnywhere from "./films/actions-anywhere.json";
-import actionsCalendar from "./films/actions-calendar.json";
-import actionsGmail from "./films/actions-gmail.json";
-import benchmarksEvals from "./films/benchmarks-evals.json";
-import coriChat from "./films/cori-chat.json";
-import coriRewrite from "./films/cori-rewrite.json";
-import extraction from "./films/extraction.json";
-import memory from "./films/memory.json";
-import smartContext from "./films/smart-context.json";
-import teams from "./films/teams.json";
-import v2 from "./films/v2.json";
-import v3 from "./films/v3.json";
-import voiceMode from "./films/voice-mode.json";
-import workers from "./films/workers.json";
+import type { LivePart } from "./live";
 
-/** One timed line of text: a chapter title or a caption, in seconds. */
-export type Cue = { start: number; end: number; text: string };
-
-/** A film recorded from the real extension, with its poster and cues. */
-export type Film = {
-  slug: string;
-  title: string;
-  /**
-   * The film's own HTML page, which every film on the site plays in. It
-   * draws the film with the browser's player at full resolution, exactly as
-   * the coere-v2 demo pages do. See scripts/films/build-pages.mjs.
-   */
-  page: string;
-  /** The film's own first frame: a title card, right for the full player. */
-  poster: string;
-  /** A frame of real footage, for previews that play without their title card. */
-  still: string;
-  chapters: Cue[];
-  captions: Cue[];
-  /** Where silent previews start, when the opening isn't what the site should show. */
-  previewFrom?: number;
-};
-
-/** Films live under the private prefix, so only pass holders can load them. */
-const BASE = "/preview/films";
-
-function film(slug: string, title: string, cues: { chapters: Cue[]; captions: Cue[] }): Film {
-  return {
-    slug,
-    title,
-    page: `${BASE}/${slug}.html`,
-    poster: `${BASE}/${slug}-poster.jpg`,
-    still: `${BASE}/${slug}-still.jpg`,
-    ...cues,
-  };
-}
+/**
+ * A film of Coere, played live on Coere's real code (see demos/README.md):
+ * the folder of its live demo in public/preview/live, and the chapters a
+ * short showcase loops when a page shows the film small. Chapter ids come
+ * from that film's script in demos/films.
+ */
+export type Film = { slug: string; title: string; showcase: LivePart };
 
 export const films = {
-  v2: film("v2", "Coere v2: memory", v2),
-  v3: film("v3", "Coere v3: apps", v3),
-  // Previews skip the company card, where the first clients are typed in by hand.
-  teams: { ...film("teams", "Coere for Teams", teams), previewFrom: 25 },
-  memory: film("memory", "Memory", memory),
-  extraction: film("extraction", "Extraction", extraction),
-  smartContext: film("smart-context", "Smart context", smartContext),
-  voiceMode: film("voice-mode", "Voice mode", voiceMode),
-  coriChat: film("cori-chat", "Cori chat", coriChat),
-  actionsGmail: film("actions-gmail", "Actions in Gmail", actionsGmail),
-  actionsCalendar: film("actions-calendar", "Actions in Calendar", actionsCalendar),
-  coriRewrite: film("cori-rewrite", "Cori Rewrite", coriRewrite),
-  actionsAnywhere: film("actions-anywhere", "Actions on any site", actionsAnywhere),
-  workers: film("workers", "Workers", workers),
-  benchmarksEvals: film("benchmarks-evals", "Benchmarks and Evals", benchmarksEvals),
+  v2: { slug: "v2", title: "Coere v2: memory", showcase: { from: "context-as-you-type", to: "voice-mode" } },
+  v3: { slug: "v3", title: "Coere v3: apps", showcase: { from: "asks", to: "planner" } },
+  teams: { slug: "teams", title: "Coere for Teams", showcase: { from: "graph", to: "new-client" } },
+  memory: { slug: "memory", title: "Memory", showcase: { from: "grow" } },
+  extraction: { slug: "extraction", title: "Extraction", showcase: { from: "extract", to: "change" } },
+  smartContext: { slug: "smart-context", title: "Smart context", showcase: { from: "type", to: "chat" } },
+  voiceMode: { slug: "voice-mode", title: "Voice mode", showcase: { from: "hold", to: "cancel" } },
+  coriChat: { slug: "cori-chat", title: "Cori chat", showcase: { from: "ask", to: "history" } },
+  actionsGmail: { slug: "actions-gmail", title: "Actions in Gmail", showcase: { from: "ask", to: "send" } },
+  actionsCalendar: { slug: "actions-calendar", title: "Actions in Calendar", showcase: { from: "review", to: "memory" } },
+  coriRewrite: { slug: "cori-rewrite", title: "Cori Rewrite", showcase: { from: "select", to: "docs" } },
+  actionsAnywhere: { slug: "actions-anywhere", title: "Actions on any site", showcase: { from: "answers", to: "form" } },
+  workers: { slug: "workers", title: "Workers", showcase: { from: "handoff", to: "stop-all" } },
+  benchmarksEvals: { slug: "benchmarks-evals", title: "Benchmarks and Evals", showcase: { from: "estimate", to: "export" } },
 } satisfies Record<string, Film>;
 
 export type FilmKey = keyof typeof films;
-
-/**
- * Every film opens on a title card that lasts about two and a half seconds.
- * Previews start here instead, and loop back here, so they always show the
- * product.
- */
-export const PREVIEW_START_SECONDS = 3;
