@@ -113,8 +113,9 @@ export class Memory {
     };
     const node = (id: string, kind: string, label: string, section: string, parent: string | null, facts: number, importance = 3): GraphNode => ({ id, kind, label, section, parent, importance: IMPORTANCE(importance), pinned: false, urgency: kind === "section" || kind === "self" ? "none" : urgent(id), facts, history: false });
     const nodes: GraphNode[] = [
-      node(SELF, "self", "Maya Collins", "sec_personal_info", null, 0),
-      ...M.sections.map((s) => node(s.id, "section", s.label, s.id, null, 0)),
+      node(SELF, "self", "Maya Collins", "sec_personal", null, 0),
+      // A section counts the memories filed straight on it, as the onboarding graph draws them.
+      ...M.sections.map((s) => node(s.id, "section", s.label, s.id, null, mine(s.id).length)),
       ...M.things.map((t) => node(t.id, t.kind, t.label, t.section, t.parent, mine(t.id).length, Math.max(3, ...mine(t.id).map((v) => v.importance)))),
     ];
     const edges = M.things.filter((t) => t.parent).map((t) => ({ from: t.parent!, to: t.id, type: "parent", label: null, history: false }));

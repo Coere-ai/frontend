@@ -51,9 +51,17 @@ const after = (method: string, args?: unknown) => AFTER.get(keyOf(method, args))
  */
 const FIRST = data.timeline.find((e) => e.overview)?.t ?? 0
 const WHOLE = data.timeline.findLast((e) => e.overview && e.whole !== false)?.t ?? FIRST
+const LAST = data.timeline.findLast((e) => e.overview)?.t ?? WHOLE
 const SORT_MS = 1500
 const SHOWN_MS = 6200
-const replayAt = (t: number) => (t < FIRST ? (t / Math.max(1, FIRST)) * SORT_MS : SORT_MS + ((t - FIRST) / Math.max(1, WHOLE - FIRST)) * (SHOWN_MS - SORT_MS))
+/** When the canvas frames the whole graph, the build's last steps after it (linking, then built) take this long, so the film cuts away while the graph is still on screen, not on the finish screen starting over. */
+const TAIL_MS = 12_000
+const replayAt = (t: number) =>
+  t < FIRST
+    ? (t / Math.max(1, FIRST)) * SORT_MS
+    : WHOLE === LAST && t > WHOLE
+      ? SHOWN_MS + TAIL_MS + (t - WHOLE)
+      : SORT_MS + ((t - FIRST) / Math.max(1, WHOLE - FIRST)) * (SHOWN_MS - SORT_MS)
 
 export const AIS = ['chatgpt', 'claude', 'gemini'] as const
 

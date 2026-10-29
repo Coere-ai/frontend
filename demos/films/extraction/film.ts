@@ -165,7 +165,9 @@ async function until(s: Stage, ok: () => boolean, ms = 120_000): Promise<void> {
   await s.wait(0);
 }
 
-const LAB = ["School", "DATA 100", "Lab 1"];
+/** The DATA 100 folder, where memory files the lab's deadline beside the course's other memories. */
+const LAB = ["School", "DATA 100"];
+const LAB_SHEET = LAB.at(-1)!;
 
 /** The Memory page in its list, on the lab's sheet. */
 async function openMemory(s: Stage): Promise<Tab> {
@@ -177,7 +179,7 @@ async function openMemory(s: Stage): Promise<Tab> {
   const memory = await openExt(s, "memory", "console-v2.html?tab=memory");
   if (!s.has(memory, '[role="tree"]')) await poke(s, memory, role("button", "List", { exact: true }));
   await openPath(s, memory, LAB);
-  await s.waitFor(memory, factCard("Lab 1", FROM));
+  await s.waitFor(memory, factCard(LAB_SHEET, FROM));
   return memory;
 }
 const [, FROM, TO] = /from (\w+ \d+) to (\w+ \d+)/.exec(data.movedLine)!;
@@ -240,7 +242,7 @@ async function film(s: Stage): Promise<void> {
   const memory = await memoryOpen;
   await s.film(memory);
   s.say(`Memory says her DATA 100 lab is due ${FROM}, from a chat on Claude.`);
-  await s.glide(memory, factCard("Lab 1", FROM));
+  await s.glide(memory, factCard(LAB_SHEET, FROM));
   await s.wait(3200);
   const claude = await s.open("claude", "sites/claude-changed.html", { host: HOSTS.claude, person: MAYA, path: `/chat/${data.changed.id}` });
   await s.waitFor(claude, text("Lab 1 for DATA 100 was moved"));
@@ -248,13 +250,13 @@ async function film(s: Stage): Promise<void> {
   s.say(`Today she went back to that chat and said the lab moved to ${TO}.`);
   await s.wait(3400);
   await s.film(memory);
-  await s.waitFor(memory, factCard("Lab 1", TO), 60_000);
+  await s.waitFor(memory, factCard(LAB_SHEET, TO), 60_000);
   s.say(`Coere saved the changed chat and read it again. Memory now says ${TO}.`);
   await s.wait(600);
-  await s.glide(memory, factCard("Lab 1", TO));
+  await s.glide(memory, factCard(LAB_SHEET, TO));
   await s.wait(3000);
   s.say("The old date stays under Earlier, with the message that moved it.");
-  await s.glide(memory, factCard("Lab 1", FROM, true));
+  await s.glide(memory, factCard(LAB_SHEET, FROM, true));
   await s.wait(3000);
   await s.rest();
 

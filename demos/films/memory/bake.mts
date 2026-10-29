@@ -19,6 +19,11 @@
  *
  * Run with coere-v2's tsx:
  *   COERE_V2=/path/to/coere-v2 $COERE_V2/node_modules/.bin/tsx demos/films/memory/bake.mts
+ *
+ * Then run shape.mts, which keeps the build's clock and events and gives
+ * the memory the shape the film shows: Maya's library (maya-library.mts),
+ * twelve sections with a few folders each, in place of the corpus's
+ * hundreds of numbered assignments on three courses.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

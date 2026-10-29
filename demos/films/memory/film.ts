@@ -177,9 +177,33 @@ function sectionSpot(tab: Tab, name: string): { x: number; y: number } {
   const hex = colorOf(LIGHT_THEME, sectionHue(index))
   const c = canvasOf(tab)!
   const box = c.getBoundingClientRect()
-  const [patch] = patchesOf(c, hex, 30)
+  // Past the ninth section the colours come round again, so two hubs can share School's: the one with its folders and memories round it is School's.
+  const patches = patchesOf(c, hex, 30)
+  const big = patches.filter((p) => p.area >= (patches[0]?.area ?? 0) * 0.6)
+  const patch = big.length > 1 ? big.map((p) => ({ p, near: patches.filter((q) => Math.hypot(q.x - p.x, q.y - p.y) < 160).reduce((n, q) => n + q.area, 0) + nearby(c, hex, p, 160) })).sort((a, b) => b.near - a.near)[0]!.p : big[0]
   if (!patch) throw new Error(`no section on the graph is called ${name}`)
   return { x: box.left + patch.x, y: box.top + patch.y }
+}
+
+/** How many pixels of one colour lie within `radius` of a point on the canvas: a section's own fan is drawn in its colour. */
+function nearby(canvas: HTMLCanvasElement, hex: string, at: { x: number; y: number }, radius: number): number {
+  const ctx = canvas.getContext('2d')!
+  const ratio = canvas.width / canvas.clientWidth
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+  const [cx, cy, rr] = [at.x * ratio, at.y * ratio, radius * ratio]
+  const x0 = Math.max(0, Math.floor(cx - rr))
+  const y0 = Math.max(0, Math.floor(cy - rr))
+  const w = Math.min(canvas.width, Math.ceil(cx + rr)) - x0
+  const h = Math.min(canvas.height, Math.ceil(cy + rr)) - y0
+  if (w <= 0 || h <= 0) return 0
+  const { data } = ctx.getImageData(x0, y0, w, h)
+  let n = 0
+  for (let i = 0; i < w * h; i++) {
+    const [x, y] = [x0 + (i % w), y0 + Math.floor(i / w)]
+    if (Math.hypot(x - cx, y - cy) > rr) continue
+    if (Math.abs(data[i * 4]! - r!) + Math.abs(data[i * 4 + 1]! - g!) + Math.abs(data[i * 4 + 2]! - b!) <= 60) n++
+  }
+  return n / (ratio * ratio)
 }
 
 /** Every flat patch of one colour on the canvas, biggest first (tests/e2e/helpers/console/graph-points.ts). */
