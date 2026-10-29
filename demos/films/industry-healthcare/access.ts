@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/healthcare.mjs";
+import { field } from "../../../demos/industries/fields/healthcare.mjs";
 import type { World } from "../../stage/world";
 
 /**

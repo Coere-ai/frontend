@@ -1,7 +1,7 @@
 import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/commerce.mjs";
+import { field } from "../../../demos/industries/fields/commerce.mjs";
 
 /**
  * Harbourline Trading's memory as Coere for Teams files it from Grace
@@ -10,7 +10,7 @@ import { field } from "../../../scripts/industries/fields/commerce.mjs";
  * with a folder per partner holding its contacts, its engagement and its
  * facts by slot, and Tone and voice. Every fact names the chat it came
  * from. The people, partners and dates are the commerce page's
- * (scripts/industries/fields/commerce.mjs), made up for the demo.
+ * (demos/industries/fields/commerce.mjs), made up for the demo.
  */
 
 /** Grace works from Hong Kong. */

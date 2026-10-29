@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/energy.mjs";
+import { field } from "../../../demos/industries/fields/energy.mjs";
 import type { World } from "../../stage/world";
 import { FILM_NOW } from "./clock";
 

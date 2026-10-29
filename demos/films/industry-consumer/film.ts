@@ -3,7 +3,7 @@ import { key } from "../../stage/input";
 import { deep, deepAll, nameOf, resolve, role, shown, type Query } from "../../stage/query";
 import type { Stage, Tab } from "../../stage/stage";
 import type { World } from "../../stage/world";
-import { field } from "../../../scripts/industries/fields/consumer.mjs";
+import { field } from "../../../demos/industries/fields/consumer.mjs";
 import { Access, APP, terminalLines } from "./apps";
 import { ANSWER, CONNECT, DRAFT } from "./connect";
 import { answerCori } from "./cori";

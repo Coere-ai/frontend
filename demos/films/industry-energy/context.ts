@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/energy.mjs";
+import { field } from "../../../demos/industries/fields/energy.mjs";
 import type { World } from "../../stage/world";
 
 /**
@@ -8,7 +8,7 @@ import type { World } from "../../stage/world";
  * draft about the turbine 14 gearbox job brings her gearbox chat whole,
  * who she is, the turbine and the site's access rules, with the company's
  * lockout steps and crane bookings offered beside them. Every line is the
- * field's own (scripts/industries/fields/energy.mjs). Made up.
+ * field's own (demos/industries/fields/energy.mjs). Made up.
  */
 
 type Platform = "chatgpt" | "claude" | "gemini";

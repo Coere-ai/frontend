@@ -6,7 +6,7 @@ import { HELLO_KEY } from "@v2/apps/extension/src/console/cori/hello";
 import { HINT_KEY } from "@v2/apps/extension/src/content/agent/hint/seen";
 import type { World } from "../../stage/world";
 import { CLIENT, FIRM, NOW, PERSON, ZONE, type Fact, type Mem, type Node } from "./memory";
-import { field } from "../../../scripts/industries/fields/consumer.mjs";
+import { field } from "../../../demos/industries/fields/consumer.mjs";
 
 /**
  * What the engine answers the Teams dashboard, the Teams chat site and

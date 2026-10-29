@@ -2,7 +2,7 @@ import type { PlatformId } from "@coere/core";
 
 /**
  * Northbeam Labs, the technology field's made up firm, and Sam Whitaker, a
- * backend engineer there (scripts/industries/fields/technology.mjs): his
+ * backend engineer there (demos/industries/fields/technology.mjs): his
  * chats on Claude, ChatGPT and Gemini, and the days they were had. Every
  * date is counted from today, so a promise due tomorrow is due tomorrow
  * whenever the demo plays.

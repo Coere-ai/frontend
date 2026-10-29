@@ -1,7 +1,7 @@
 import type { FactHit, FactView, GraphEdge, GraphNode, GraphSlice, MemoryHit, MemoryNodeDetail, MemorySearchResult, MemorySettings, MemoryStatus, NodeRef, OpenNode, ReviewItem, TreeItem } from "@coere/memory";
 import type { ContextAnswer } from "@v2/packages/memory/src/import-context/types";
 import type { ClientView, OrgSettings, WorkerView } from "@coere/solution";
-import { field } from "../../../scripts/industries/fields/finance.mjs";
+import { field } from "../../../demos/industries/fields/finance.mjs";
 import { platformName, WORKERS, ZONE, type Fact, type Mem, type Node } from "./memory";
 
 /**

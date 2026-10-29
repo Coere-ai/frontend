@@ -1,16 +1,13 @@
 import { AccordionShowcase } from "@/site/blocks/accordion-showcase";
 import { PhotoHero } from "@/site/blocks/photo-hero";
 import { industries, type Industry } from "@/site/content/industries";
-import { industryScenes } from "@/site/content/industry-scenes";
 import type { DemoKey } from "@/site/content/industry-stories/types";
-import { liveIndustries } from "@/site/content/live";
 import type { IndustryPage as Content } from "@/site/content/industry-stories";
 import { contactHref, contactLabel } from "@/site/content/navigation";
 import { productBySlug } from "@/site/content/products";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { ProductSection } from "@/site/products/product-section";
 import { LiveDemo } from "@/site/ui/live-demo";
-import { ScreenScene } from "@/site/ui/screen-scene";
 import { MoreIndustries } from "./more-industries";
 
 /** The industry film's chapters, in order: each demo loops from its own to the next. */
@@ -22,10 +19,7 @@ const ORDER: DemoKey[] = ["context", "graph", "confidential", "app"];
  * with the field's own people and work, then a few other fields.
  */
 export function IndustryPage({ industry, content }: { industry: Industry; content: Content }) {
-  const scenes = industryScenes(industry.slug);
-  const live = liveIndustries.has(industry.slug);
-  const demo = (key: DemoKey, label: string) =>
-    live ? <LiveDemo film={`industry-${industry.slug}`} from={key} to={ORDER[ORDER.indexOf(key) + 1]} label={label} /> : <ScreenScene shots={scenes[key]} label={label} />;
+  const demo = (key: DemoKey, label: string) => <LiveDemo film={`industry-${industry.slug}`} from={key} to={ORDER[ORDER.indexOf(key) + 1]} label={label} />;
   const items = content.stories.map((story) => {
     const product = productBySlug(story.product);
     return {

@@ -1,5 +1,5 @@
 import "./clock";
-import { field } from "../../../scripts/industries/fields/education.mjs";
+import { field } from "../../../demos/industries/fields/education.mjs";
 import { play } from "../../stage/player";
 import { key } from "../../stage/input";
 import { deep, role, type Query } from "../../stage/query";
@@ -35,7 +35,7 @@ import { contextFor } from "./views";
  *   for its question (as the v3 film plays its planner).
  *
  * Every Coere surface is Coere's own code from coere-v2; the World answers
- * it from the field's data (scripts/industries/fields/education.mjs). Made up.
+ * it from the field's data (demos/industries/fields/education.mjs). Made up.
  */
 
 const CHAPTERS = [

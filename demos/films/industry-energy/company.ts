@@ -1,7 +1,7 @@
 import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/energy.mjs";
+import { field } from "../../../demos/industries/fields/energy.mjs";
 import { FILM_NOW, ZONE } from "./clock";
 
 /**
@@ -12,7 +12,7 @@ import { FILM_NOW, ZONE } from "./clock";
  * slot, and Tone and voice. The same shapes the teams film builds from
  * coere-v2's agency corpus (memory.ts there), here written for wind and
  * solar field maintenance from the field's data
- * (scripts/industries/fields/energy.mjs). Made up.
+ * (demos/industries/fields/energy.mjs). Made up.
  */
 
 

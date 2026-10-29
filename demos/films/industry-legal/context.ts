@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/legal.mjs";
+import { field } from "../../../demos/industries/fields/legal.mjs";
 import type { World } from "../../stage/world";
 
 /**
@@ -8,7 +8,7 @@ import type { World } from "../../stage/world";
  * about the Mendes deposition brings her outline chat whole, who she is,
  * the case and its key witnesses, with the firm's deposition practice and
  * the damages work offered beside them. Every line is the field's own
- * (scripts/industries/fields/legal.mjs). Made up.
+ * (demos/industries/fields/legal.mjs). Made up.
  */
 
 type Platform = "chatgpt" | "claude" | "gemini";

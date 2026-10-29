@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/commerce.mjs";
+import { field } from "../../../demos/industries/fields/commerce.mjs";
 
 /**
  * Coere Connect on ChatGPT for Grace (field.context): her renewal draft

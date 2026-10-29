@@ -1,5 +1,5 @@
 import type { World } from "../../stage/world";
-import { field } from "../../../scripts/industries/fields/commerce.mjs";
+import { field } from "../../../demos/industries/fields/commerce.mjs";
 
 /**
  * Coere Forge's side of the account brief app (field.app): the Apps page

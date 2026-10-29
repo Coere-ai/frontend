@@ -1,7 +1,7 @@
 import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/manufacturing.mjs";
+import { field } from "../../../demos/industries/fields/manufacturing.mjs";
 import { FILM_NOW, ZONE as CLOCK_ZONE } from "./clock";
 
 /**
@@ -12,7 +12,7 @@ import { FILM_NOW, ZONE as CLOCK_ZONE } from "./clock";
  * contacts, its line or program and its facts by slot, and Tone and
  * voice. Every fact names the chat it came from. The people, customers
  * and dates are the manufacturing page's
- * (scripts/industries/fields/manufacturing.mjs), made up for the demo.
+ * (demos/industries/fields/manufacturing.mjs), made up for the demo.
  */
 
 /** Luis works at the plant in Monterrey; the film's day is clock.ts's. */

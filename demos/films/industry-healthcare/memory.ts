@@ -2,7 +2,7 @@ import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import type { ClientStatus } from "@coere/solution";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/healthcare.mjs";
+import { field } from "../../../demos/industries/fields/healthcare.mjs";
 
 /**
  * Lakeshore Clinical Research's memory as Coere for Teams files it from
@@ -11,7 +11,7 @@ import { field } from "../../../scripts/industries/fields/healthcare.mjs";
  * the trial team's own procedures, Clients with a folder per partner site,
  * each holding its contacts, its study and its facts by slot, and Tone and
  * voice. Dunmore Cardiology is filled from the field's data
- * (scripts/industries/fields/healthcare.mjs); the rest is made up in the
+ * (demos/industries/fields/healthcare.mjs); the rest is made up in the
  * same spirit. Operations and research only: no participant's details,
  * no amounts and no logins are ever in memory.
  */

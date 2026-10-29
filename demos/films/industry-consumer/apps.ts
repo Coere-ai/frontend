@@ -1,5 +1,5 @@
 import type { World } from "../../stage/world";
-import { field } from "../../../scripts/industries/fields/consumer.mjs";
+import { field } from "../../../demos/industries/fields/consumer.mjs";
 
 /**
  * Coere Forge's side of the promotion planner (field.app): the Apps page

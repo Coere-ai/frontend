@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/healthcare.mjs";
+import { field } from "../../../demos/industries/fields/healthcare.mjs";
 import type { DemoHost } from "../../stage/host";
 import { key } from "../../stage/input";
 import { play } from "../../stage/player";
@@ -15,7 +15,7 @@ import { contextFor } from "./views";
 /**
  * Coere for clinical research: the healthcare page's four stories, played
  * live on Coere's own code with the field's people and sites
- * (scripts/industries/fields/healthcare.mjs). Amara Osei coordinates
+ * (demos/industries/fields/healthcare.mjs). Amara Osei coordinates
  * trials at Lakeshore Clinical Research, a week before the monitoring
  * visit at Dunmore Cardiology.
  *

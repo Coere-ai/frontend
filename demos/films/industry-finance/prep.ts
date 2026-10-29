@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/finance.mjs";
+import { field } from "../../../demos/industries/fields/finance.mjs";
 
 /**
  * Daniel's own memory as the Smart context strip reads it in the first
@@ -7,7 +7,7 @@ import { field } from "../../../scripts/industries/fields/finance.mjs";
  * me goes with the first message, and the Lindqvist household's goals and
  * accounts go because the draft names Elena; the firm's rebalancing rules
  * and the household's tax plan are related. The words are the field's
- * (scripts/industries/fields/finance.mjs).
+ * (demos/industries/fields/finance.mjs).
  */
 
 type Platform = "chatgpt" | "claude" | "gemini";

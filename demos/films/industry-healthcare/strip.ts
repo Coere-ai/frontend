@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/healthcare.mjs";
+import { field } from "../../../demos/industries/fields/healthcare.mjs";
 import type { World } from "../../stage/world";
 
 /**
@@ -8,7 +8,7 @@ import type { World } from "../../stage/world";
  * her earlier "Dunmore site visit prep" chat whole, who she is, and what
  * she knows about Dunmore Cardiology's HEART-2 study and its open queries,
  * with the company's monitoring procedures and amendment 3 offered beside
- * them. Words and dates are the field's (scripts/industries/fields/healthcare.mjs).
+ * them. Words and dates are the field's (demos/industries/fields/healthcare.mjs).
  * Operations only: no participant's details are ever in memory.
  */
 

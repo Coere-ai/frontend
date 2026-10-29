@@ -3,7 +3,7 @@ import { key } from "../../stage/input";
 import { deep, deepAll, nameOf, resolve, role, shown, type Query } from "../../stage/query";
 import type { Stage, Tab } from "../../stage/stage";
 import type { World } from "../../stage/world";
-import { field } from "../../../scripts/industries/fields/finance.mjs";
+import { field } from "../../../demos/industries/fields/finance.mjs";
 import { inlineMemoryCss } from "./css-fix";
 import { buildMemory, NOW, type Mem } from "./memory";
 import { PREP_REPLY } from "./prep";
@@ -30,7 +30,7 @@ import { answerCori, answerTeam, filmClock } from "./team";
  *
  * Every Coere surface is Coere's own code from coere-v2; the World answers
  * from the firm's memory (memory.ts) and the field's words
- * (scripts/industries/fields/finance.mjs). Made up people and data.
+ * (demos/industries/fields/finance.mjs). Made up people and data.
  */
 
 const CHAPTERS = [

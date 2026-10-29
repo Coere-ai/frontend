@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/consumer.mjs";
+import { field } from "../../../demos/industries/fields/consumer.mjs";
 
 /**
  * Coere Connect on ChatGPT for Olivia (field.context): her holiday draft

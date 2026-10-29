@@ -1,7 +1,7 @@
 import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/consumer.mjs";
+import { field } from "../../../demos/industries/fields/consumer.mjs";
 
 /**
  * Fieldhouse Pantry's memory as Coere for Teams files it from Olivia
@@ -10,7 +10,7 @@ import { field } from "../../../scripts/industries/fields/consumer.mjs";
  * voice), Clients with a folder per grocery partner holding its buyers,
  * its promotion and its facts by slot, and Tone and voice. Every fact
  * names the chat it came from. The people, partners and dates are the
- * consumer page's (scripts/industries/fields/consumer.mjs), made up for
+ * consumer page's (demos/industries/fields/consumer.mjs), made up for
  * the demo.
  */
 

@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/manufacturing.mjs";
+import { field } from "../../../demos/industries/fields/manufacturing.mjs";
 
 /**
  * Coere Connect on ChatGPT for Luis (field.context): his question on the

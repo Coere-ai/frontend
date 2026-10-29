@@ -1,7 +1,7 @@
 import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/finance.mjs";
+import { field } from "../../../demos/industries/fields/finance.mjs";
 
 /**
  * Ashgrove Wealth Partners' memory as Coere for Teams files it from the

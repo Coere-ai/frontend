@@ -1,7 +1,7 @@
 import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/education.mjs";
+import { field } from "../../../demos/industries/fields/education.mjs";
 import { FILM_NOW, ZONE } from "./clock";
 
 /**
@@ -10,7 +10,7 @@ import { FILM_NOW, ZONE } from "./clock";
  * folder per class holding its co-teachers, its units and its facts by
  * slot, and Tone and voice. The same shapes the teams film builds from
  * coere-v2's agency corpus (memory.ts there), here written for a biology
- * teacher from the field's data (scripts/industries/fields/education.mjs).
+ * teacher from the field's data (demos/industries/fields/education.mjs).
  * Made up.
  */
 

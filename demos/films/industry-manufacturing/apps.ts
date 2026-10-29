@@ -1,5 +1,5 @@
 import type { World } from "../../stage/world";
-import { field } from "../../../scripts/industries/fields/manufacturing.mjs";
+import { field } from "../../../demos/industries/fields/manufacturing.mjs";
 
 /**
  * Coere Forge's side of the line assistant (field.app): the Apps page

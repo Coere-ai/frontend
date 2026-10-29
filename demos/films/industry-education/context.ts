@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/education.mjs";
+import { field } from "../../../demos/industries/fields/education.mjs";
 import type { World } from "../../stage/world";
 
 /**
@@ -9,7 +9,7 @@ import type { World } from "../../stage/world";
  * Claude whole, who she is, where Period 3 is in the unit and how the
  * class learns, with the school's lab safety rules and the lab report
  * rubric offered beside them. Every line is the field's own
- * (scripts/industries/fields/education.mjs). Made up.
+ * (demos/industries/fields/education.mjs). Made up.
  */
 
 type Platform = "chatgpt" | "claude" | "gemini";

@@ -5,7 +5,7 @@
  * 800 characters becomes a file beside the box as on ChatGPT, and a new
  * chat with Coere for Teams' content script.
  */
-import { field } from "../../../scripts/industries/fields/consumer.mjs";
+import { field } from "../../../demos/industries/fields/consumer.mjs";
 
 const chats = (titles) => titles.map((title, i) => ({ id: `c${i + 1}`, title }));
 

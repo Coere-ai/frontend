@@ -1,7 +1,7 @@
 import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { field } from "../../../scripts/industries/fields/legal.mjs";
+import { field } from "../../../demos/industries/fields/legal.mjs";
 import { FILM_NOW, ZONE } from "./clock";
 
 /**
@@ -10,7 +10,7 @@ import { FILM_NOW, ZONE } from "./clock";
  * client holding its contacts, its matters and its facts by slot, and Tone
  * and voice. The same shapes the teams film builds from coere-v2's agency
  * corpus (memory.ts there), here written for a litigation practice from
- * the field's data (scripts/industries/fields/legal.mjs). Made up.
+ * the field's data (demos/industries/fields/legal.mjs). Made up.
  */
 
 type UrgencyKind = Parameters<typeof describeUrgency>[0]["kind"];

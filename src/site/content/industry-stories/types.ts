@@ -1,8 +1,8 @@
 import type { Product } from "../products";
 
 /**
- * The four demos every industry page plays, each built from the real app
- * screens with that field's own made up content (scripts/industries):
+ * The four demos every industry page plays, each a chapter of the field's
+ * live film (demos/films/industry-<slug>) with its own made up content:
  * context added to a new chat, the client graph and one client's sheet,
  * one client per send with Cori's answer, and the field's own app reading
  * memory through the API.

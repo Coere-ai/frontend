@@ -1,4 +1,4 @@
-import { field } from "../../../scripts/industries/fields/education.mjs";
+import { field } from "../../../demos/industries/fields/education.mjs";
 import type { World } from "../../stage/world";
 import { FILM_NOW } from "./clock";
 

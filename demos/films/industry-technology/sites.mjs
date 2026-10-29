@@ -2,7 +2,7 @@
  * The replica pages this film opens: Claude on Sam's chat about the Ledger
  * API retry bug, a new ChatGPT chat with his sidebar, and ChatGPT again
  * with Coere for Teams' content script for the client chapter, with the
- * chats his team keeps there (scripts/industries/fields/technology.mjs).
+ * chats his team keeps there (demos/industries/fields/technology.mjs).
  */
 import { CLAUDE_EARLIER, RETRY_CHAT_ID, RETRY_TITLE } from "./lines.mjs";
 
