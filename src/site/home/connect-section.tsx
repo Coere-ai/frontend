@@ -41,7 +41,8 @@ const items: ShowcaseItem[] = [
       "Writing: fix or improve text in Gmail, Docs and chat boxes",
       "Forms and quizzes: answers from memory, and asks before it submits",
     ],
-    href: "/products/connect#actions",
+    href: "/products/agents#capabilities",
+    linkLabel: "See all features",
     visual: <ActionsReel />,
   },
 ];

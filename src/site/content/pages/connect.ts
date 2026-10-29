@@ -1,4 +1,5 @@
 import type { Slide } from "@/site/blocks/slant-card";
+import { ALL_FEATURES } from "@/site/content/features";
 import type { FilmCase, GridItem, HeroCopy } from "./types";
 
 /** Coere Connect's page. Every claim here is shown in one of the films. */
@@ -44,6 +45,7 @@ export const connectCases: FilmCase[] = [
     text: "Ask Cori to do a quiz or fill a form. He answers from your memory, step by step, with Take over and Stop on the bar.",
     checks: ["Asks before anything that can't be undone", "Never types a password or card number", "Stops when a page tries to give him orders"],
     film: "actionsAnywhere",
+    ...ALL_FEATURES,
   },
   {
     key: "writing",
@@ -52,6 +54,7 @@ export const connectCases: FilmCase[] = [
     text: "Select text in Gmail, Docs or a chat box and pick Rewrite, Improve or Fix grammar only. Each change is boxed in blue until you keep it.",
     checks: ["Fix grammar only keeps your words", "Improve keeps every fact you wrote", "Go back returns your text exactly"],
     film: "coriRewrite",
+    ...ALL_FEATURES,
   },
   {
     key: "actions",
@@ -60,6 +63,7 @@ export const connectCases: FilmCase[] = [
     text: "Ask Cori for an email and he drafts it in its own Gmail tab with what your memory knows.",
     checks: ["Written in your style", "In a tab of its own", "Asks before writing to anyone you didn't name"],
     film: "actionsGmail",
+    ...ALL_FEATURES,
   },
 ];
 

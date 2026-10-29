@@ -2,6 +2,7 @@ import { AccordionShowcase } from "@/site/blocks/accordion-showcase";
 import { CheckList } from "@/site/blocks/check-list";
 import { FeatureGrid } from "@/site/blocks/feature-grid";
 import { backgrounds } from "@/site/content/backgrounds";
+import { ALL_FEATURES } from "@/site/content/features";
 import { films } from "@/site/content/films";
 import { solutionsCases, solutionsGrid, solutionsHero } from "@/site/content/pages/solutions";
 import { ClosingCta } from "@/site/home/closing-cta";
@@ -33,7 +34,7 @@ export function SolutionsPage() {
           </div>
         </Container>
       </section>
-      <ProductSection title="Everything in Coere Solutions" tint>
+      <ProductSection title="Everything in Coere Solutions" link={ALL_FEATURES} tint>
         <FeatureGrid items={asGrid(solutionsGrid)} />
       </ProductSection>
       <OtherProducts current="solutions" />

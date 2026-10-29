@@ -2,6 +2,7 @@ import { FeatureGrid } from "@/site/blocks/feature-grid";
 import { SlantCard } from "@/site/blocks/slant-card";
 import { UseCaseTabs } from "@/site/blocks/use-case-tabs";
 import { backgrounds } from "@/site/content/backgrounds";
+import { ALL_FEATURES } from "@/site/content/features";
 import { films } from "@/site/content/films";
 import { connectCases, connectGrid, connectHero, connectSlides } from "@/site/content/pages/connect";
 import { ClosingCta } from "@/site/home/closing-cta";
@@ -20,7 +21,7 @@ export function ConnectPage() {
       <ProductSection id="use-cases" title="Put your memory to work" line="Bring every chat in, build one memory from them, and let Cori act on it." tint>
         <UseCaseTabs cases={asUseCases(connectCases)} />
       </ProductSection>
-      <ProductSection title="Everything in Coere Connect">
+      <ProductSection title="Everything in Coere Connect" link={ALL_FEATURES}>
         <FeatureGrid items={asGrid(connectGrid)} />
       </ProductSection>
       <section className="py-28 md:py-32">

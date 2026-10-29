@@ -13,7 +13,7 @@ export function asUseCases(cases: FilmCase[]): UseCase[] {
 
 /** Content cases as accordion items, each with its film looping silently. */
 export function asShowcase(cases: FilmCase[]): ShowcaseItem[] {
-  return cases.map((c) => ({ key: c.key, title: c.title, summary: c.text, checks: c.checks, visual: <FilmFrame film={films[c.film]} preview part={c.part} /> }));
+  return cases.map((c) => ({ key: c.key, title: c.title, summary: c.text, checks: c.checks, href: c.href, linkLabel: c.linkLabel, visual: <FilmFrame film={films[c.film]} preview part={c.part} /> }));
 }
 
 /** Content grid items with their drawn icons. */

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { ArrowLink } from "@/site/ui/arrow-link";
 import { CheckList } from "./check-list";
 
-export type UseCase = { key: string; label: string; title: string; text: string; checks?: string[]; visual: ReactNode };
+export type UseCase = { key: string; label: string; title: string; text: string; checks?: string[]; href?: string; linkLabel?: string; visual: ReactNode };
 
 /**
  * One use case at a time, picked from a row of pills: the words on the
@@ -43,6 +44,7 @@ export function UseCaseTabs({ cases }: { cases: UseCase[] }) {
           <h3 className="text-3xl font-medium tracking-[-0.03em] text-neutral-950 text-balance">{active.title}</h3>
           <p className="mt-4 text-[17px] leading-relaxed text-neutral-600">{active.text}</p>
           {active.checks ? <CheckList items={active.checks} className="mt-7" /> : null}
+          {active.href ? <ArrowLink href={active.href} className="mt-7 text-neutral-950">{active.linkLabel ?? "Learn more"}</ArrowLink> : null}
         </div>
         <div key={active.key} className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.3)]">
           {active.visual}

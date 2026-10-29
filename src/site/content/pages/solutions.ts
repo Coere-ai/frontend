@@ -1,3 +1,4 @@
+import { ALL_FEATURES } from "@/site/content/features";
 import type { FilmCase, GridItem, HeroCopy } from "./types";
 
 /** Coere Solutions' page, from what the Teams film shows. */
@@ -38,6 +39,7 @@ export const solutionsCases: FilmCase[] = [
     text: "A big task goes to several workers at once, each reading pages in a tab of its own. Their finds merge into one table.",
     checks: ["Watch each worker live, with Stop and Take over", "No row twice", "Every value names the page it came from"],
     film: "workers",
+    ...ALL_FEATURES,
   },
 ];
 
