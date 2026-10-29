@@ -1,0 +1,8 @@
+{
+  "title": "Coere Actions on any site",
+  "version": 2,
+  "bundles": {
+    "page-tab.js": { "from": "page-tab.ts", "version": 2 },
+    "popup.js": { "from": "popup.ts", "version": 2 }
+  }
+}
