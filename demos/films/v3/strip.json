@@ -1,0 +1,143 @@
+[
+ {
+  "method": "memory.contextFor",
+  "args": {
+   "platform": "chatgpt",
+   "chat": {
+    "kind": "draft",
+    "session": "0000000000000000"
+   },
+   "tail": "Help",
+   "keywords": [
+    "Help"
+   ],
+   "options": {
+    "mode": "auto",
+    "budget": 1500,
+    "standing": true,
+    "sensitive": false,
+    "skipRecent": false
+   }
+  }
+ },
+ {
+  "method": "memory.contextFor",
+  "args": {
+   "platform": "chatgpt",
+   "chat": {
+    "kind": "draft",
+    "session": "0000000000000000"
+   },
+   "tail": "Help me",
+   "keywords": [
+    "Help",
+    "me"
+   ],
+   "options": {
+    "mode": "auto",
+    "budget": 1500,
+    "standing": true,
+    "sensitive": false,
+    "skipRecent": false
+   }
+  }
+ },
+ {
+  "method": "memory.contextFor",
+  "args": {
+   "platform": "chatgpt",
+   "chat": {
+    "kind": "draft",
+    "session": "0000000000000000"
+   },
+   "tail": "Help me prepare",
+   "keywords": [
+    "Help",
+    "me",
+    "prepare"
+   ],
+   "options": {
+    "mode": "auto",
+    "budget": 1500,
+    "standing": true,
+    "sensitive": false,
+    "skipRecent": false
+   }
+  }
+ },
+ {
+  "method": "memory.contextFor",
+  "args": {
+   "platform": "chatgpt",
+   "chat": {
+    "kind": "draft",
+    "session": "0000000000000000"
+   },
+   "tail": "Help me prepare for",
+   "keywords": [
+    "Help",
+    "me",
+    "prepare",
+    "for"
+   ],
+   "options": {
+    "mode": "auto",
+    "budget": 1500,
+    "standing": true,
+    "sensitive": false,
+    "skipRecent": false
+   }
+  }
+ },
+ {
+  "method": "memory.contextFor",
+  "args": {
+   "platform": "chatgpt",
+   "chat": {
+    "kind": "draft",
+    "session": "0000000000000000"
+   },
+   "tail": "Help me prepare for this",
+   "keywords": [
+    "Help",
+    "me",
+    "prepare",
+    "for",
+    "this"
+   ],
+   "options": {
+    "mode": "auto",
+    "budget": 1500,
+    "standing": true,
+    "sensitive": false,
+    "skipRecent": false
+   }
+  }
+ },
+ {
+  "method": "memory.contextFor",
+  "args": {
+   "platform": "chatgpt",
+   "chat": {
+    "kind": "draft",
+    "session": "0000000000000000"
+   },
+   "tail": "Help me prepare for this interview",
+   "keywords": [
+    "Help",
+    "me",
+    "prepare",
+    "for",
+    "this",
+    "interview"
+   ],
+   "options": {
+    "mode": "auto",
+    "budget": 1500,
+    "standing": true,
+    "sensitive": false,
+    "skipRecent": false
+   }
+  }
+ }
+]

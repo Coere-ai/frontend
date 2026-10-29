@@ -1,0 +1,13 @@
+[
+  { "method": "memory.status" },
+  { "method": "memory.settings" },
+  { "method": "memory.overview", "args": {} },
+  { "method": "memory.overview", "args": { "history": false } },
+  { "method": "memory.children", "args": { "id": null } },
+  { "method": "memory.dueSoon", "args": { "limit": 5 } },
+  { "method": "memory.review" },
+  { "method": "memory.buildEstimate", "args": { "chats": null } },
+  { "method": "memory.learned" },
+  { "method": "memory.corePack" },
+  { "method": "memory.stats" }
+]

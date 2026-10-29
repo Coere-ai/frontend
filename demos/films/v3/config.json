@@ -1,0 +1,8 @@
+{
+  "title": "Coere v3: apps",
+  "version": 3,
+  "bundles": {
+    "terminal.js": { "from": "terminal.ts", "version": 3, "title": "event-planner" },
+    "onboarding.js": { "from": "onboarding.ts", "version": 3, "title": "Welcome to Coere" }
+  }
+}
