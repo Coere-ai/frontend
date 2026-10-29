@@ -71,8 +71,3 @@ export type FilmKey = keyof typeof films;
  * product.
  */
 export const PREVIEW_START_SECONDS = 3;
-
-/** How long a film runs, read from where its last cue ends. */
-export function filmLength(film: Film): number {
-  return Math.max(...film.chapters.map((c) => c.end), ...film.captions.map((c) => c.end));
-}
