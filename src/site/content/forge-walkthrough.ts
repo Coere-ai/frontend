@@ -2,6 +2,8 @@
  * The Coere Forge walkthrough. Every screen is a full 1440 by 900 frame of
  * the real dashboard or terminal from the v3 film (Add an app is the real
  * dialog from docs/screenshots/v3, shown over the Apps page it opens on).
+ * The context frame's command line is retyped to a general request, so the
+ * page doesn't lead with one company's name.
  * `focus` is the part to light, in pixels of that 1440 by 900 frame.
  */
 export type WalkStep = {
@@ -53,7 +55,7 @@ export const walkSteps: WalkStep[] = [
     title: "Context for what the user typed",
     text: "The app sends a draft and gets back the memories Coere would add in front of it, each with the chat it came from.",
     screen: at("context"),
-    alt: "A terminal running context.py for Help me prep for PearX, printing the context block and why each part goes",
+    alt: "A terminal running context.py for Help me prepare for this interview, printing the context block and why each part goes",
     focus: { x: 140, y: 92, w: 960, h: 580 },
   },
   {
