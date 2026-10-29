@@ -170,8 +170,9 @@ async function context(s: Stage): Promise<void> {
   await until(() => /Green Valley/.test(stripText(site)), 10_000);
   await s.rest();
   s.say("The line above the box says what goes: her Green Valley reset chat, its shelf and its shoppers.");
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(2400);
+  await s.wait(1100);
   await s.click(site, role("button", "Show the memories that go in", { exact: true }), { after: 300 });
   await s.waitFor(site, stripList);
   await s.rest();
@@ -308,8 +309,9 @@ async function confidential(s: Stage, mem: Mem): Promise<void> {
   await until(() => stripText(site).includes(`on the client ${CLIENT}`), 15_000);
   await s.rest();
   s.say(`The line says Coere will add context on the client ${CLIENT}, and on no other.`);
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(2800);
+  await s.wait(1100);
   s.say("She sends it. Only Green Valley's plans and promises go with it.");
   const stop = follow(site);
   await send(s, site);

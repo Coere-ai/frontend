@@ -147,7 +147,7 @@ async function context(s: Stage, next: { graph?: Promise<Tab> }): Promise<void> 
   s.say("The line above the box says what goes: her unit chat from Claude and her context on the unit.");
   await s.wait(700);
   await s.glide(site, strip);
-  await s.wait(2600);
+  await s.wait(1100);
   await s.click(site, showList, { after: 400 });
   await s.waitFor(site, stripList);
   await s.rest();
@@ -214,7 +214,7 @@ async function confidential(s: Stage, next: { chat?: Promise<Tab>; cori?: Promis
   s.say(`The line names the class the draft is about. Only ${CLIENT} goes with it.`);
   await s.wait(600);
   await s.glide(site, strip);
-  await s.wait(2600);
+  await s.wait(1100);
   await s.click(site, showList, { after: 400 });
   await s.waitFor(site, stripList);
   await s.rest();

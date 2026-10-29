@@ -159,8 +159,9 @@ async function smartContext(s: Stage): Promise<void> {
 
   s.chapter("goes");
   s.say("The blue line says what goes with it: her earlier prep chat, and the AIs she had it with.");
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(3200);
+  await s.wait(1100);
   await s.click(site, role("button", "Show the memories that go in", { exact: true }), { after: 400 });
   await s.waitFor(site, stripList);
   await s.rest();
@@ -203,8 +204,9 @@ async function smartContext(s: Stage): Promise<void> {
   s.say("In another chat she brings up her side project.");
   await draft(s, chat, "Yo remember my project SkipDoodle");
   s.say("Coere adds who she is and what it knows about SkipDoodle.");
+  await s.wait(800);
   await s.glide(chat, strip);
-  await s.wait(3400);
+  await s.wait(1100);
   await send(s, chat);
   await s.wait(2600);
   s.say("Then she asks a follow up in the same chat.");
@@ -212,13 +214,14 @@ async function smartContext(s: Stage): Promise<void> {
     s.say("It gets only how she likes answers. Nothing else is added again.");
     await s.glide(chat, strip);
   } else s.say("Nothing new goes with it. ChatGPT already has it.");
-  await s.wait(3400);
+  await s.wait(1300);
   await send(s, chat);
   await s.wait(2400);
   const again = await draft(s, chat, "Hey remember tech stack for SkipDoodle");
   s.say(again ? "Later, asking about the stack brings SkipDoodle’s tech stack back." : "Asking about the stack later, she gets an answer from what the chat already holds.");
+  await s.wait(800);
   await s.glide(chat, strip);
-  await s.wait(3600);
+  await s.wait(1100);
   await send(s, chat);
   await s.wait(2600);
 }

@@ -221,8 +221,9 @@ async function features(s: Stage, f: Film, replies: readonly string[], memory: T
   await until(site, () => textOf(site, STRIP).includes("PearX"), 30_000);
   await s.rest();
   s.say("As she types, the blue line says what Coere will add: who she is, and her PearX interview.");
+  await s.wait(800);
   await s.glide(site, STRIP);
-  await s.wait(2600);
+  await s.wait(1100);
 
   s.say("The list shows what goes in.");
   await s.click(site, role("button", "Show the memories that go in", { within: STRIP }), { after: 300 });

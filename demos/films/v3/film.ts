@@ -270,6 +270,8 @@ async function sameContext(s: Stage, shell: Tab): Promise<Tab | null> {
     const el = deep(d, "[data-coere-context-strip] .coere-ctx-strip");
     return el && /Adding|Coere will add/.test(el.textContent ?? "") ? el : null;
   }, 30_000);
+  // Long enough for the strip to load in, which settles by 700 ms.
+  await s.wait(900);
   await s.click(site, role("button", "Show the memories that go in", { within: strip }), { after: 400 });
   await s.waitFor(site, "#coere-ctx-list");
   await s.rest();
