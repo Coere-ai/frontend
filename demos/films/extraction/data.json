@@ -1,0 +1,4663 @@
+{
+ "now": 1793271685069,
+ "changingTitle": "DATA 100 lab 1",
+ "movedLine": "Quick update. Lab 1 for DATA 100 was moved from Aug 18 to Aug 22.",
+ "install": [
+  {
+   "platform": "claude",
+   "id": "9aa5da2d-fd61-201a-8c93-f6fecfa04fca",
+   "title": "Setting up my planner",
+   "createdAt": "2026-06-30T23:44:00Z",
+   "updatedAt": "2026-06-30T23:45:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "quick note. my name is Maya Collins.",
+     "at": "2026-06-30T23:44:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-06-30T23:45:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "67dd1f3c-0c52-09a6-877d-6059e4479994",
+   "title": "Plans around Madison",
+   "createdAt": "2026-07-01T19:15:00Z",
+   "updatedAt": "2026-07-01T19:18:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi i live in Madison, so plan around that.",
+     "at": "2026-07-01T19:15:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-07-01T19:18:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "d3ebaf33-cdad-bbad-13c0-e5ff5b417076",
+   "title": "Classes this term",
+   "createdAt": "2026-07-02T14:19:00Z",
+   "updatedAt": "2026-07-02T14:22:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi i'm taking DATA 100 with Prof. Kim this term.",
+     "at": "2026-07-02T14:19:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-02T14:22:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "8e63c6ef-fd1b-b2ee-002b-6ae509b1472b",
+   "title": "MATH 54 this term",
+   "createdAt": "2026-07-03T14:34:00Z",
+   "updatedAt": "2026-07-03T14:38:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "quick note. i'm taking MATH 54 with Prof. Hartmann this term.",
+     "at": "2026-07-03T14:34:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-03T14:35:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. i just started my job as a research assistant at Kestrel Analytics.",
+     "at": "2026-07-03T14:37:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-07-03T14:38:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "378f9709-c9d9-331f-e7bc-d2ecaca46256",
+   "title": "PHYS 137 with Prof. Alvarez",
+   "createdAt": "2026-07-04T13:33:00Z",
+   "updatedAt": "2026-07-04T13:36:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi i'm taking PHYS 137 with Prof. Alvarez this term.",
+     "at": "2026-07-04T13:33:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-07-04T13:36:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "069ad445-fb91-524e-f4c6-38282688a4a1",
+   "title": "My manager at Kestrel",
+   "createdAt": "2026-07-05T18:39:00Z",
+   "updatedAt": "2026-07-05T18:40:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "my manager at Kestrel Analytics is Nadia Reyes.",
+     "at": "2026-07-05T18:39:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-05T18:40:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "c1c0c853c17c837e",
+   "title": "Recipes without peanuts",
+   "createdAt": "2026-07-05T16:52:00Z",
+   "updatedAt": "2026-07-05T16:53:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi i'm allergic to peanuts, keep that in mind for recipes.",
+     "at": "2026-07-05T16:52:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-05T16:53:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "5022ac98-7486-c25e-f2dd-e2d2c43217bf",
+   "title": "DATA 100 problem set due date",
+   "createdAt": "2026-07-11T16:36:00Z",
+   "updatedAt": "2026-07-11T16:44:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi Problem Set 1 for DATA 100 is due Jul 31.",
+     "at": "2026-07-11T16:36:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-11T16:38:00Z"
+    },
+    {
+     "role": "user",
+     "text": "in MATH 54, Reading 2 is due Monday and Problem Set 1 Thursday.",
+     "at": "2026-07-11T16:41:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-11T16:44:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "5a372ca4dbd7b563",
+   "title": "How much problem set 1 counts",
+   "createdAt": "2026-07-12T19:43:00Z",
+   "updatedAt": "2026-07-12T19:45:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "ok so Problem Set 1 for DATA 100 is worth 5% of the grade.",
+     "at": "2026-07-12T19:43:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-12T19:45:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "389e54ef-97e5-8e91-96be-0403cd67187b",
+   "title": "If the problem set moved",
+   "createdAt": "2026-07-12T17:37:00Z",
+   "updatedAt": "2026-07-25T17:38:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "what if Problem Set 1 for DATA 100 were due Aug 7? i would finally get a free weekend.",
+     "at": "2026-07-12T17:37:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Then you would have more room. Plan for the real date for now.",
+     "at": "2026-07-12T17:40:00Z"
+    },
+    {
+     "role": "user",
+     "text": "can you summarize this email for me?\n\nFrom: Sasha Ivers <sasha.ivers@lindenpost.com>\nSubject: lab schedule\n\nHi all, my name is Sasha Ivers and I live in Leeds. I'm allergic to latex, so please keep the lab gloves nitrile.\n\nThanks,\nSasha",
+     "at": "2026-07-15T17:38:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "The sender asks the lab to use nitrile gloves.",
+     "at": "2026-07-15T17:39:00Z"
+    },
+    {
+     "role": "user",
+     "text": "ok so Elena Lindqvist is my cousin.",
+     "at": "2026-07-16T17:37:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-07-16T17:38:00Z"
+    },
+    {
+     "role": "user",
+     "text": "my bank appointment is on Thursday at 9am.",
+     "at": "2026-07-17T17:37:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-07-17T17:39:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. we decided to drop the GraphQL layer for Sparrowhawk.",
+     "at": "2026-07-18T17:38:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-07-18T17:40:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi i love rainy mornings.",
+     "at": "2026-07-22T17:38:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-07-22T17:40:00Z"
+    },
+    {
+     "role": "user",
+     "text": "any idea what a Prague trip would cost?",
+     "at": "2026-07-22T17:42:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "For your Prague trip, a budget of $2,100 for 3 nights works.",
+     "at": "2026-07-22T17:43:00Z"
+    },
+    {
+     "role": "user",
+     "text": "no, that's too much. i'll skip it this year.",
+     "at": "2026-07-22T17:46:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Understood, maybe another time.",
+     "at": "2026-07-22T17:49:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi Silas Haddad is my best friend.",
+     "at": "2026-07-25T17:37:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-07-25T17:38:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "c338f8545c68451f",
+   "title": "My roommate",
+   "createdAt": "2026-07-25T18:44:00Z",
+   "updatedAt": "2026-07-26T18:47:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "ok so Caleb Moreau is my roommate.",
+     "at": "2026-07-25T18:44:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-07-25T18:47:00Z"
+    },
+    {
+     "role": "user",
+     "text": "ok so Iris Sato is my lab partner.",
+     "at": "2026-07-26T18:45:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-07-26T18:47:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "10fd9feb-7ef2-d858-2753-03d0fa9005cd",
+   "title": "Caleb's new job",
+   "createdAt": "2026-07-29T17:03:00Z",
+   "updatedAt": "2026-07-29T17:04:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "ok so Caleb Moreau works at Northwind Clinic.",
+     "at": "2026-07-29T17:03:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-07-29T17:04:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "04360fdf-1ceb-a762-55de-42b8444f0a29",
+   "title": "DATA 100 lab 1",
+   "createdAt": "2026-07-30T13:19:00Z",
+   "updatedAt": "2026-07-30T13:25:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Lab 1 for DATA 100 is due Aug 18.",
+     "at": "2026-07-30T13:19:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-07-30T13:22:00Z"
+    },
+    {
+     "role": "user",
+     "text": "in MATH 54, Reading 3 is due Sunday and Problem Set 2 is due Monday.",
+     "at": "2026-07-30T13:23:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-07-30T13:25:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "f497a228-b5bc-b5ed-a5eb-9be91df7730c",
+   "title": "Montreal trip budget",
+   "createdAt": "2026-08-01T16:06:00Z",
+   "updatedAt": "2026-08-01T16:07:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "ok so my Montreal trip starts Aug 16.",
+     "at": "2026-08-01T16:06:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-01T16:07:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "bf3d7fe6-fcc9-d267-535c-fc1400023064",
+   "title": "Montreal trip budget 2",
+   "createdAt": "2026-08-03T19:40:00Z",
+   "updatedAt": "2026-08-03T19:49:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "what should i spend on the Montreal trip?",
+     "at": "2026-08-03T19:40:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "For your Montreal trip, a budget of $1,400 for 5 nights works. That leaves room for food.",
+     "at": "2026-08-03T19:43:00Z"
+    },
+    {
+     "role": "user",
+     "text": "yes, let's go with that budget.",
+     "at": "2026-08-03T19:46:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Great, I will plan around it.",
+     "at": "2026-08-03T19:49:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "53489641-18f7-2c51-503c-333e96abf016",
+   "title": "Flight times for the trip",
+   "createdAt": "2026-08-04T23:35:00Z",
+   "updatedAt": "2026-08-06T23:35:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "i can't stand early flights.",
+     "at": "2026-08-04T23:35:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-04T23:37:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. Elena Lindqvist's email is elena.lindqvist@lindenpost.com.",
+     "at": "2026-08-04T23:38:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-04T23:41:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. Caleb Moreau's email is caleb.moreau@lindenpost.com.",
+     "at": "2026-08-04T23:44:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-04T23:47:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi Elena Lindqvist works at Northwind Clinic.",
+     "at": "2026-08-06T23:34:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-08-06T23:35:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "16d03b3f-11b0-4a68-6c3d-ada68019cfb0",
+   "title": "Orrinwood default port",
+   "createdAt": "2026-08-06T13:35:00Z",
+   "updatedAt": "2026-08-09T13:38:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "what port does Orrinwood use by default?",
+     "at": "2026-08-06T13:35:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Orrinwood listens on port 3565 by default. You can change it in the config file.",
+     "at": "2026-08-06T13:37:00Z"
+    },
+    {
+     "role": "user",
+     "text": "lol my cat is the real boss of this apartment, just kidding.",
+     "at": "2026-08-07T13:33:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Cats do tend to run things.",
+     "at": "2026-08-07T13:36:00Z"
+    },
+    {
+     "role": "user",
+     "text": "ok so my site is https://lindenpost.com/mayacollins.",
+     "at": "2026-08-08T13:35:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-08T13:36:00Z"
+    },
+    {
+     "role": "user",
+     "text": "ok so i love jazz piano.",
+     "at": "2026-08-09T13:33:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-09T13:34:00Z"
+    },
+    {
+     "role": "user",
+     "text": "Lena Delacroix is my sister.",
+     "at": "2026-08-09T13:35:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-09T13:38:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "27e6c632b691fcb6",
+   "title": "Sabletide setup",
+   "createdAt": "2026-08-09T15:26:00Z",
+   "updatedAt": "2026-08-11T15:30:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "what port does Sabletide use by default?",
+     "at": "2026-08-09T15:26:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Sabletide listens on port 2997 by default. You can change it in the config file.",
+     "at": "2026-08-09T15:29:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi Sparrowhawk runs on React 18.3.",
+     "at": "2026-08-10T15:27:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-10T15:28:00Z"
+    },
+    {
+     "role": "user",
+     "text": "here are my notes from the team wiki:\n\n# Team handbook\n\nSave every file to the shared drive.\nKeep pull requests small.\n\ncan you turn them into a checklist?",
+     "at": "2026-08-11T15:28:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Here is a checklist of the handbook items.",
+     "at": "2026-08-11T15:30:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "d6cf1999-f227-2afc-12b4-778324b0845b",
+   "title": "Meeting my mentor",
+   "createdAt": "2026-08-11T23:46:00Z",
+   "updatedAt": "2026-08-15T23:48:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "quick note. Priya Okafor is my mentor.",
+     "at": "2026-08-11T23:46:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-08-11T23:48:00Z"
+    },
+    {
+     "role": "user",
+     "text": "Silas Haddad works at Sunfield Bakery.",
+     "at": "2026-08-15T23:45:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-15T23:46:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. Lab 1 for MATH 54 was moved from Aug 23 at 11:59pm to Aug 27 at 11:59pm.",
+     "at": "2026-08-15T23:47:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-15T23:48:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "9a793384b397a18c",
+   "title": "Reaching out to my mentor",
+   "createdAt": "2026-08-16T21:28:00Z",
+   "updatedAt": "2026-08-20T21:30:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi Priya Okafor's email is priya.okafor@lindenpost.com.",
+     "at": "2026-08-16T21:28:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-08-16T21:31:00Z"
+    },
+    {
+     "role": "user",
+     "text": "ok so Sparrowhawk runs on Python 3.12.",
+     "at": "2026-08-19T21:29:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-19T21:30:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. please always answer in short bullet points.",
+     "at": "2026-08-20T21:28:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-20T21:30:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "e0e885c1c03721d5",
+   "title": "Coffee with Elena",
+   "createdAt": "2026-08-20T16:20:00Z",
+   "updatedAt": "2026-08-22T16:22:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "i have coffee with Elena Lindqvist on Aug 29 at 12:30pm.",
+     "at": "2026-08-20T16:20:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-20T16:23:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi i submitted Lab 1 for DATA 100.",
+     "at": "2026-08-22T16:19:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-08-22T16:22:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "cad9b7de-4af9-03dd-9d8f-a68aa9eeaa83",
+   "title": "Tesselcrest default port",
+   "createdAt": "2026-08-22T16:20:00Z",
+   "updatedAt": "2026-08-23T16:24:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "what port does Tesselcrest use by default?",
+     "at": "2026-08-22T16:20:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Tesselcrest listens on port 9224 by default. You can change it in the config file.",
+     "at": "2026-08-22T16:22:00Z"
+    },
+    {
+     "role": "user",
+     "text": "Iris Sato's email is iris.sato@lindenpost.com.",
+     "at": "2026-08-23T16:22:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-08-23T16:24:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "f5b23eac4d4ed78e",
+   "title": "Coffee with Elena 2",
+   "createdAt": "2026-08-24T00:11:00Z",
+   "updatedAt": "2026-08-24T00:17:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi coffee with Elena Lindqvist is cancelled.",
+     "at": "2026-08-24T00:11:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-24T00:13:00Z"
+    },
+    {
+     "role": "user",
+     "text": "what is the rate limit on Cobalwood?",
+     "at": "2026-08-24T00:15:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Cobalwood allows 540 requests per minute. You can change it in the config file.",
+     "at": "2026-08-24T00:17:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "72eb3365-b2f4-533e-9e13-33ebc3fe8c98",
+   "title": "Tesselcrest log retention",
+   "createdAt": "2026-08-25T14:07:00Z",
+   "updatedAt": "2026-08-29T14:10:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "how long does Tesselcrest keep logs?",
+     "at": "2026-08-25T14:07:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Tesselcrest keeps logs for 83 days by default. You can change it in the config file.",
+     "at": "2026-08-25T14:10:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. i have lunch with Priya Okafor on Sep 11 at 12:30pm.",
+     "at": "2026-08-26T14:07:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-26T14:09:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi lunch with Priya Okafor moved from Sep 11 at 12:30pm to Sep 14 at 12:30pm.",
+     "at": "2026-08-28T14:07:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-28T14:08:00Z"
+    },
+    {
+     "role": "user",
+     "text": "ok so big news about my job: i got promoted to lead research assistant at Kestrel Analytics.",
+     "at": "2026-08-29T14:07:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-29T14:10:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "dc0f3ee5-9491-dddb-d6b7-ad6c1e401906",
+   "title": "Weekly report due date",
+   "createdAt": "2026-08-30T22:25:00Z",
+   "updatedAt": "2026-09-04T22:31:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi Weekly Report 1 for Kestrel Analytics is due Sep 14.",
+     "at": "2026-08-30T22:25:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-08-30T22:28:00Z"
+    },
+    {
+     "role": "user",
+     "text": "what is a good way to take notes in lectures?",
+     "at": "2026-09-01T22:25:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Write questions in the margin and review them the same evening.",
+     "at": "2026-09-01T22:27:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. please always show code snippets in TypeScript.",
+     "at": "2026-09-04T22:25:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-09-04T22:28:00Z"
+    },
+    {
+     "role": "user",
+     "text": "what is the rate limit on Ferrostone?",
+     "at": "2026-09-04T22:30:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Ferrostone allows 2640 requests per minute. You can change it in the config file.",
+     "at": "2026-09-04T22:31:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "2e18fd6d-5c42-3ebb-bee1-fa69221a421a",
+   "title": "Updating my contact details",
+   "createdAt": "2026-09-04T14:27:00Z",
+   "updatedAt": "2026-09-09T14:28:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi you can reach me at +1 646 555 0101 or maya.collins@lindenpost.com.",
+     "at": "2026-09-04T14:27:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-09-04T14:30:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi Lab 1 for PHYS 137 is due Sep 20 at 5pm.",
+     "at": "2026-09-05T14:26:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-09-05T14:27:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. Lab 1 for PHYS 137 is worth 30% of the grade.",
+     "at": "2026-09-06T14:27:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-09-06T14:29:00Z"
+    },
+    {
+     "role": "user",
+     "text": "how long does Sabletide keep logs?",
+     "at": "2026-09-09T14:27:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Sabletide keeps logs for 30 days by default. You can change it in the config file.",
+     "at": "2026-09-09T14:28:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "d14623ff-454b-3997-ddff-fd756af84678",
+   "title": "Sparrowhawk database upgrade",
+   "createdAt": "2026-09-12T23:59:00Z",
+   "updatedAt": "2026-09-14T00:03:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "ok so we switched Sparrowhawk from Postgres 15 to Postgres 16.",
+     "at": "2026-09-12T23:59:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-09-13T00:00:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi i submitted Weekly Report 1 for Kestrel Analytics.",
+     "at": "2026-09-14T00:00:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-09-14T00:03:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "bb5ab1a12023dc09",
+   "title": "PHYS 137 this week",
+   "createdAt": "2026-09-13T13:41:00Z",
+   "updatedAt": "2026-09-13T13:44:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi in PHYS 137, Reading 1 is due Monday and Problem Set 1 is due Friday.",
+     "at": "2026-09-13T13:41:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-09-13T13:44:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "14b8ae1495168e02",
+   "title": "PHYS 137 lab moved",
+   "createdAt": "2026-09-17T17:46:00Z",
+   "updatedAt": "2026-09-17T17:47:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi Prof. Alvarez moved Lab 1 for PHYS 137 from Sep 20 at 5pm to Sep 24 at 5pm.",
+     "at": "2026-09-17T17:46:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-09-17T17:47:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "4834c2d34a902f63",
+   "title": "Moving Sparrowhawk to React 19",
+   "createdAt": "2026-09-19T23:02:00Z",
+   "updatedAt": "2026-09-19T23:08:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "we switched Sparrowhawk from React 18.3 to React 19.1.",
+     "at": "2026-09-19T23:02:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-09-19T23:04:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. in PHYS 137, Reading 2 is due Sunday and Problem Set 2 Thursday.",
+     "at": "2026-09-19T23:07:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-09-19T23:08:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "5badb0aeb0e2df18",
+   "title": "Fewer meetings, please",
+   "createdAt": "2026-09-20T16:54:00Z",
+   "updatedAt": "2026-09-22T16:53:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "fyi i can't stand long meetings.",
+     "at": "2026-09-20T16:54:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-09-20T16:55:00Z"
+    },
+    {
+     "role": "user",
+     "text": "what port does Cobalwood use by default?",
+     "at": "2026-09-22T16:52:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Cobalwood listens on port 6786 by default. You can change it in the config file.",
+     "at": "2026-09-22T16:53:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "047992b1-f09f-0730-a02b-33d4c8145568",
+   "title": "PHYS 137 lab 1 done",
+   "createdAt": "2026-09-23T14:57:00Z",
+   "updatedAt": "2026-09-23T14:59:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "i submitted Lab 1 for PHYS 137.",
+     "at": "2026-09-23T14:57:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-09-23T14:59:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "c0097892-7df7-74b3-3c0d-e9431ae02d21",
+   "title": "Iris's phone number",
+   "createdAt": "2026-09-27T21:15:00Z",
+   "updatedAt": "2026-09-27T21:18:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "quick note. Iris Sato's number is +1 (415) 555-0134.",
+     "at": "2026-09-27T21:15:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-09-27T21:18:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "71e1f475-47e4-111d-a39a-e944b01ea683",
+   "title": "Ferrostone log retention",
+   "createdAt": "2026-09-28T15:27:00Z",
+   "updatedAt": "2026-10-10T15:30:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "how long does Ferrostone keep logs?",
+     "at": "2026-09-28T15:27:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Ferrostone keeps logs for 39 days by default. You can change it in the config file.",
+     "at": "2026-09-28T15:28:00Z"
+    },
+    {
+     "role": "user",
+     "text": "fyi i love Thai curry.",
+     "at": "2026-10-02T15:27:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-10-02T15:30:00Z"
+    },
+    {
+     "role": "user",
+     "text": "what is the rate limit on Sabletide?",
+     "at": "2026-10-06T15:28:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Sabletide allows 4140 requests per minute. You can change it in the config file.",
+     "at": "2026-10-06T15:29:00Z"
+    },
+    {
+     "role": "user",
+     "text": "quick note. Priya Okafor's number is 020 7946 0959.",
+     "at": "2026-10-06T15:31:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-10-06T15:34:00Z"
+    },
+    {
+     "role": "user",
+     "text": "how long does Cobalwood keep logs?",
+     "at": "2026-10-10T15:29:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Cobalwood keeps logs for 90 days by default. You can change it in the config file.",
+     "at": "2026-10-10T15:30:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "e6d6df4f-59ff-f81a-ec1c-b2f77e0e0445",
+   "title": "Ferrostone default port",
+   "createdAt": "2026-10-14T19:20:00Z",
+   "updatedAt": "2026-10-14T19:21:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "what port does Ferrostone use by default?",
+     "at": "2026-10-14T19:20:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Ferrostone listens on port 7664 by default. You can change it in the config file.",
+     "at": "2026-10-14T19:21:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "490c874a-920b-6023-9ae5-fdba7d9b13ec",
+   "title": "GitHub handles for the team",
+   "createdAt": "2026-10-15T17:11:00Z",
+   "updatedAt": "2026-10-16T17:13:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "ok so Elena Lindqvist's github is elena-lindqvist.",
+     "at": "2026-10-15T17:11:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-10-15T17:14:00Z"
+    },
+    {
+     "role": "user",
+     "text": "Lena Delacroix's number is +91 98765 43210.",
+     "at": "2026-10-16T17:10:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-10-16T17:13:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "34f4d7bdafa36fae",
+   "title": "DATA 100 project 1",
+   "createdAt": "2026-10-21T17:53:00Z",
+   "updatedAt": "2026-10-22T17:53:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "quick note. Project 1 for DATA 100 is due Nov 20 at 2:30pm.",
+     "at": "2026-10-21T17:53:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Noted. Anything else to plan?",
+     "at": "2026-10-21T17:54:00Z"
+    },
+    {
+     "role": "user",
+     "text": "ok so i have lunch with Lena Delacroix on Nov 7 at 9am.",
+     "at": "2026-10-22T17:51:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Got it, noted.",
+     "at": "2026-10-22T17:53:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "0cf894880404e313",
+   "title": "MATH 54 reading 1",
+   "createdAt": "2026-10-24T14:12:00Z",
+   "updatedAt": "2026-10-24T14:13:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "quick note. Reading 1 for MATH 54 is due Nov 2.",
+     "at": "2026-10-24T14:12:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-10-24T14:13:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "473956e708ec6941",
+   "title": "Tidepool notes",
+   "createdAt": "2026-08-30T14:34:00Z",
+   "updatedAt": "2026-08-30T14:37:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Tidepool is my startup. Tidepool books patients for small clinics without phone calls.",
+     "at": "2026-08-30T14:34:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "That is a useful thing to build. How far along is it?",
+     "at": "2026-08-30T14:35:00Z"
+    },
+    {
+     "role": "user",
+     "text": "Tidepool has 1,200 weekly users across four clinics. Tidepool is in a paid pilot and raised a 150,000 dollar pre seed.",
+     "at": "2026-08-30T14:36:00Z"
+    },
+    {
+     "role": "user",
+     "text": "The Tidepool team is me and my cofounder Iris Sato, who writes the code.",
+     "at": "2026-08-30T14:37:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "d9ecde7b-c641-aa90-5eeb-61f05cf1d3d9",
+   "title": "Big news about PearX",
+   "createdAt": "2026-10-09T12:55:00Z",
+   "updatedAt": "2026-10-09T12:59:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Big news, I got an interview with PearX, the accelerator. My PearX interview is for Tidepool, my startup.",
+     "at": "2026-10-09T12:55:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Congratulations! When is it, and who will you meet?",
+     "at": "2026-10-09T12:56:00Z"
+    },
+    {
+     "role": "user",
+     "text": "The PearX interview is on November 4 at 2 pm over video. The PearX interview is the partner round with two partners.",
+     "at": "2026-10-09T12:57:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Partner rounds tend to ask about traction, the team and timing.",
+     "at": "2026-10-09T12:58:00Z"
+    },
+    {
+     "role": "user",
+     "text": "They told me the PearX interview will cover traction, the team and why now.",
+     "at": "2026-10-09T12:59:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "5e91a20c-5fe4-2cd8-cee0-1fc3efb0180d",
+   "title": "PearX interview prep",
+   "createdAt": "2026-10-19T11:08:00Z",
+   "updatedAt": "2026-10-19T11:11:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Help me write answers for my PearX interview. My PearX interview answer on traction should lead with the 1,200 weekly users.",
+     "at": "2026-10-19T11:08:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Here are answers you can practice.\n\nQ: What does Tidepool do?\nA: Tidepool lets small clinics book patients online, so nobody waits on hold.\n\nQ: What traction do you have?\nA: 1,200 weekly users across four clinics, growing 15 percent a month.\n\nQ: Why now?\nA: Clinics moved their records online in the last two years, so booking can follow.\n\nQ: Why this team?\nA: I ran a clinic front desk for three years, and Iris built clinic software before.",
+     "at": "2026-10-19T11:09:00Z"
+    },
+    {
+     "role": "user",
+     "text": "I want my PearX interview answer on why now to mention the records move.",
+     "at": "2026-10-19T11:10:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Here is a sixty second opening script.\nYou: Hi, I am Maya, the founder of Tidepool.\nYou: We help small clinics fill their calendars without phone tag.\nYou: Four clinics pay us today, and 1,200 patients book with us each week.\nPartner: What would you do with the money?\nYou: Hire one engineer and reach twenty clinics by summer.",
+     "at": "2026-10-19T11:11:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "9aed822c-f00b-288f-f8a3-b5554364228e",
+   "title": "Tidepool launch script",
+   "createdAt": "2026-09-29T16:43:00Z",
+   "updatedAt": "2026-09-29T16:45:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Write the script for my launch day talk. The Tidepool launch day talk is for Tidepool investors on December 2.",
+     "at": "2026-09-29T16:43:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Here is a three minute script.\nYou: Every clinic in this city loses an hour a day to phone calls.\nYou: Tidepool gives that hour back with online booking that just works.\n> \"We started with one clinic and grew to four by word of mouth.\"\nYou: We are raising a seed round to reach twenty clinics.",
+     "at": "2026-09-29T16:44:00Z"
+    },
+    {
+     "role": "user",
+     "text": "Keep the Tidepool launch day talk under three minutes and end on the ask.",
+     "at": "2026-09-29T16:45:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "064f365fe74ec017",
+   "title": "MATH 54 this term",
+   "createdAt": "2026-09-19T15:42:00Z",
+   "updatedAt": "2026-09-19T15:44:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I am taking MATH 54 with Prof. Osei this term.",
+     "at": "2026-09-19T15:42:00Z"
+    },
+    {
+     "role": "user",
+     "text": "The MATH 54 midterm is part of MATH 54 and covers chapters one to four. The MATH 54 midterm is on November 6 in Evans Hall.",
+     "at": "2026-09-19T15:43:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Good to know. Want a study plan for the next two weeks?",
+     "at": "2026-09-19T15:44:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "1f1ebbec-c126-8c34-0380-da7e2fb6c896",
+   "title": "MATH 54 practice questions",
+   "createdAt": "2026-10-21T09:09:00Z",
+   "updatedAt": "2026-10-21T09:10:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Give me practice questions for the MATH 54 midterm. I keep mixing up eigenvalues and determinants for the MATH 54 midterm.",
+     "at": "2026-10-21T09:09:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "1. What is the determinant of a two by two matrix?\nAnswer: For rows a b and c d, it is ad minus bc.\n2. When is a square matrix invertible?\nAnswer: Exactly when its determinant is not zero.\n3. What is an eigenvalue of a matrix A?\nAnswer: A number t where A times v equals t times v for some nonzero vector v.\n4. How do you find the eigenvalues of A?\nAnswer: Solve the determinant of A minus t times I equal to zero.",
+     "at": "2026-10-21T09:10:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "3b8db868a27267a8",
+   "title": "Lena is getting married",
+   "createdAt": "2026-08-20T15:15:00Z",
+   "updatedAt": "2026-08-20T15:16:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Lena Delacroix is my best friend since first grade. Lena's wedding is for Lena Delacroix and Omar Haddad on December 12 in Portland.",
+     "at": "2026-08-20T15:15:00Z"
+    },
+    {
+     "role": "user",
+     "text": "I'm the maid of honor at Lena's wedding and I give the toast.",
+     "at": "2026-08-20T15:16:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "5fe5c769-0a6d-8dfb-eb2b-9f9576b2f400",
+   "title": "Applying to Stripe",
+   "createdAt": "2026-10-04T10:17:00Z",
+   "updatedAt": "2026-10-04T10:18:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I am applying to Stripe for a product engineer role. The Stripe application is due November 10.",
+     "at": "2026-10-04T10:17:00Z"
+    },
+    {
+     "role": "user",
+     "text": "The Stripe application is for the product engineer role on the payments team.",
+     "at": "2026-10-04T10:18:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "bf2dd09a-ded6-23b6-02ad-453ed8da8138",
+   "title": "Cover letter for Stripe",
+   "createdAt": "2026-10-17T09:36:00Z",
+   "updatedAt": "2026-10-17T09:38:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Help me draft my cover letter for the Stripe application. My cover letter for the Stripe application should mention the Tidepool booking work.",
+     "at": "2026-10-17T09:36:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Dear Stripe hiring team,\n\nI am applying for the product engineer role on the payments team. For the past year I have built Tidepool, a booking tool that four clinics pay for, and I have learned that the best payments experience is the one a patient never has to think about.\n\nAt Tidepool I designed the booking flow end to end, from the first sketch to the code that takes a deposit. I talked to every clinic owner each week, and I shipped changes the same day they asked. That habit of listening first and shipping small is what I would bring to Stripe.\n\nI have used Stripe for every payment Tidepool takes, and I have read your docs more times than I can count. I would love to help make them feel as simple for the next founder as they did for me.",
+     "at": "2026-10-17T09:37:00Z"
+    },
+    {
+     "role": "user",
+     "text": "Stop there, I will write the closing paragraph later.",
+     "at": "2026-10-17T09:38:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "8556cdf53258a3a5",
+   "title": "Sparrowhawk setup",
+   "createdAt": "2026-09-09T17:49:00Z",
+   "updatedAt": "2026-09-09T17:50:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Sparrowhawk is my side project, a map of bird sightings. Sparrowhawk runs on Python 3.13 and Postgres 16 and deploys to Fly.",
+     "at": "2026-09-09T17:49:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "A solid stack for a small map app.",
+     "at": "2026-09-09T17:50:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "819d1557-6d54-c5f9-2d63-52fa52335bb8",
+   "title": "Sparrowhawk deploy error",
+   "createdAt": "2026-10-23T18:25:00Z",
+   "updatedAt": "2026-10-23T18:26:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "My deploy keeps failing. The Sparrowhawk deploy fails with a missing DATABASE_URL error.\n```dockerfile\nFROM python:3.13-slim\nCOPY . /app\nRUN pip install -r /app/requirements.txt\nCMD [\"python\", \"-m\", \"sparrowhawk\"]\n```",
+     "at": "2026-10-23T18:25:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Set the secret on Fly, then read it at start up.\n```sh\nfly secrets set DATABASE_URL=postgres://sparrowhawk@db.internal/sightings\n```\n```python\nimport os\nDATABASE_URL = os.environ[\"DATABASE_URL\"]\n```",
+     "at": "2026-10-23T18:26:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "1e24930e-b645-9558-05fa-7946e67d8480",
+   "title": "Setting up my assistant",
+   "createdAt": "2026-07-31T14:47:00Z",
+   "updatedAt": "2026-07-31T14:47:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "My name is Maya Collins. Please keep answers short and skip the pep talk.",
+     "at": "2026-07-31T14:47:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "5be9e2c525c26374",
+   "title": "Pear tart for Sunday",
+   "createdAt": "2026-10-14T13:36:00Z",
+   "updatedAt": "2026-10-14T13:37:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I am baking a pear tart for the Sunday dinner with my neighbors.",
+     "at": "2026-10-14T13:36:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Use firm pears and a little lemon so the tart holds its shape.",
+     "at": "2026-10-14T13:37:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "7aa7bd3c-00fb-2343-e2c1-b5a04e0b0d3f",
+   "title": "Kitchen counters",
+   "createdAt": "2026-10-11T12:53:00Z",
+   "updatedAt": "2026-10-11T12:53:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I have an interview with a contractor on Friday about the Kitchen remodel and new counters.",
+     "at": "2026-10-11T12:53:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "afbe460c-2ecf-4d64-dcc8-d9b39bc84341",
+   "title": "A coworker wedding",
+   "createdAt": "2026-09-14T14:44:00Z",
+   "updatedAt": "2026-09-14T14:44:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "My coworker Dana is getting married. Dana's wedding is in Austin in May, and I need a gift.",
+     "at": "2026-09-14T14:44:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "7ab76c3124fd4b6d",
+   "title": "Donations for Sparrowhawk",
+   "createdAt": "2026-09-24T12:47:00Z",
+   "updatedAt": "2026-09-24T12:47:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I might add Stripe payments to Sparrowhawk so people can donate.",
+     "at": "2026-09-24T12:47:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "f84005e8-c71c-daa3-dad1-4b3dcfd0730a",
+   "title": "MATH 54 homework rules",
+   "createdAt": "2026-10-20T17:43:00Z",
+   "updatedAt": "2026-10-20T17:45:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "My prof takes 10% off per day late on MATH 54 homework. This week MATH 54 is on eigenvalues and diagonalization in chapter five.",
+     "at": "2026-10-20T17:43:00Z"
+    },
+    {
+     "role": "user",
+     "text": "MATH 54 problem set 7 is due October 29.",
+     "at": "2026-10-20T17:44:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Then start the problem set early and keep chapter five open.",
+     "at": "2026-10-20T17:45:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "6eef43d1-0529-04bb-0815-e2856e3075a2",
+   "title": "History reading list",
+   "createdAt": "2026-09-29T09:45:00Z",
+   "updatedAt": "2026-09-29T09:46:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I am taking HIST 7B with Prof. Lindgren this term, a survey of United States history.",
+     "at": "2026-09-29T09:45:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "A good survey course. Start with the reconstruction chapters.",
+     "at": "2026-09-29T09:46:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "4ae67373-d000-4035-873b-d610f3d9c12d",
+   "title": "Lisbon trip",
+   "createdAt": "2026-08-20T14:07:00Z",
+   "updatedAt": "2026-08-20T14:07:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "My Lisbon trip ran from August 3 to August 10 with my sister. The tram 28 was packed every day of the Lisbon trip.",
+     "at": "2026-08-20T14:07:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "20897ea50a6da4f8",
+   "title": "Broken heater",
+   "createdAt": "2026-10-17T16:30:00Z",
+   "updatedAt": "2026-10-17T16:31:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "My landlord is Greg Ruiz. The heater in my apartment at 14 Alder Street has been broken since October 12.",
+     "at": "2026-10-17T16:30:00Z"
+    },
+    {
+     "role": "user",
+     "text": "My lease runs until June 30 and the rent is 1,800 dollars a month.",
+     "at": "2026-10-17T16:31:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "47bdbf2b-ab66-d0a8-8e74-7402b3b231c9",
+   "title": "Dinner ideas",
+   "createdAt": "2026-10-04T12:55:00Z",
+   "updatedAt": "2026-10-04T12:56:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I am vegetarian and I never eat mushrooms. I am allergic to peanuts.",
+     "at": "2026-10-04T12:55:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "A lentil curry with no peanuts would work well.",
+     "at": "2026-10-04T12:56:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "claude",
+   "id": "dd41d0b6-d90c-fb2d-8055-28d32a421673",
+   "title": "Sparrowhawk database choice",
+   "createdAt": "2026-10-01T18:39:00Z",
+   "updatedAt": "2026-10-01T18:39:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "For Sparrowhawk we picked Postgres over Mongo because we need joins for the sightings.",
+     "at": "2026-10-01T18:39:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "gemini",
+   "id": "7d3698aaf96524bd",
+   "title": "Tuesday soccer",
+   "createdAt": "2026-09-04T18:43:00Z",
+   "updatedAt": "2026-09-04T18:43:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "I play in the Alder Park soccer league every Tuesday at 6 pm.",
+     "at": "2026-09-04T18:43:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "ff7011ff-5278-4636-3788-ff1e72957169",
+   "title": "Notion PM role",
+   "createdAt": "2026-10-26T12:03:00Z",
+   "updatedAt": "2026-10-26T12:04:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "The Notion application is for the product manager role and is due November 14.",
+     "at": "2026-10-26T12:03:00Z"
+    },
+    {
+     "role": "user",
+     "text": "When I write, I use short warm sentences and never use exclamation marks.",
+     "at": "2026-10-26T12:04:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "9966f6ed-617d-3d28-0e1b-1b7ae3ea8f42",
+   "title": "SkipDoodle setup",
+   "createdAt": "2026-08-20T15:03:00Z",
+   "updatedAt": "2026-08-20T15:04:00Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "SkipDoodle is my weekend project, a drawing game for kids. SkipDoodle is built with React Native and Expo, and Supabase stores the drawings.",
+     "at": "2026-08-20T15:03:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Expo keeps the builds simple for a small game.",
+     "at": "2026-08-20T15:04:00Z"
+    }
+   ]
+  }
+ ],
+ "later": [
+  {
+   "platform": "gemini",
+   "id": "959ed441b180decb",
+   "title": "MATH 54 grading",
+   "createdAt": "2026-10-26T00:49:00Z",
+   "updatedAt": "2026-10-29T10:01:25.063Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "quick note. Reading 1 for MATH 54 is worth 10% of the grade.",
+     "at": "2026-10-26T00:49:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Thanks, I will keep that in mind.",
+     "at": "2026-10-26T00:50:00Z"
+    },
+    {
+     "role": "user",
+     "text": "what is the rate limit on Tesselcrest?",
+     "at": "2026-10-27T00:49:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Tesselcrest allows 4620 requests per minute. You can change it in the config file.",
+     "at": "2026-10-27T00:50:00Z"
+    }
+   ]
+  },
+  {
+   "platform": "chatgpt",
+   "id": "170f6718-2093-8954-7f70-7c397762490f",
+   "title": "Toast for Lena's wedding",
+   "createdAt": "2026-10-24T15:14:00Z",
+   "updatedAt": "2026-10-29T09:01:25.063Z",
+   "messages": [
+    {
+     "role": "user",
+     "text": "Help me write my toast for Lena's wedding. My toast for Lena's wedding should tell the story of our canoe trip.",
+     "at": "2026-10-24T15:14:00Z"
+    },
+    {
+     "role": "assistant",
+     "text": "Good evening, everyone. For those who do not know me, I am Maya, and I have been Lena’s best friend since we were six.\n\nLena is the person who shows up. When my car broke down at two in the morning, she came. When I failed my first exam, she sat on the floor with me and made a study plan. And on our canoe trip, when we lost the map, she laughed so hard that I forgot to be scared.\n\nOmar, you found someone who will always find the way home, even without a map. And Lena, you found someone who makes you laugh like that every single day. I have watched the two of you look after each other for four years, and it is the easiest thing in the world to believe in.\n\nSo please raise your glasses. To Lena and Omar, to every trip ahead of you, and to never needing the map.",
+     "at": "2026-10-24T15:15:00Z"
+    }
+   ]
+  }
+ ],
+ "changed": {
+  "platform": "claude",
+  "id": "04360fdf-1ceb-a762-55de-42b8444f0a29",
+  "title": "DATA 100 lab 1",
+  "createdAt": "2026-07-30T13:19:00Z",
+  "updatedAt": "2026-10-29T11:01:25.064Z",
+  "messages": [
+   {
+    "role": "user",
+    "text": "Lab 1 for DATA 100 is due Aug 18.",
+    "at": "2026-07-30T13:19:00Z"
+   },
+   {
+    "role": "assistant",
+    "text": "Got it, noted.",
+    "at": "2026-07-30T13:22:00Z"
+   },
+   {
+    "role": "user",
+    "text": "in MATH 54, Reading 3 is due Sunday and Problem Set 2 is due Monday.",
+    "at": "2026-07-30T13:23:00Z"
+   },
+   {
+    "role": "assistant",
+    "text": "Thanks, I will keep that in mind.",
+    "at": "2026-07-30T13:25:00Z"
+   },
+   {
+    "role": "user",
+    "text": "Quick update. Lab 1 for DATA 100 was moved from Aug 18 to Aug 22.",
+    "at": "2026-10-29T11:01:25.064Z"
+   },
+   {
+    "role": "assistant",
+    "text": "Noted. Lab 1 is now due Aug 22, so you have four more days.",
+    "at": "2026-10-29T11:01:25.064Z"
+   }
+  ]
+ },
+ "memory": {
+  "zone": "America/Los_Angeles",
+  "sections": [
+   {
+    "id": "sec_personal_info",
+    "label": "Personal info"
+   },
+   {
+    "id": "sec_school",
+    "label": "School"
+   },
+   {
+    "id": "sec_work",
+    "label": "Work"
+   },
+   {
+    "id": "sec_people",
+    "label": "People"
+   },
+   {
+    "id": "sec_plans_and_deadlines",
+    "label": "Plans and deadlines"
+   },
+   {
+    "id": "sec_projects",
+    "label": "Projects"
+   },
+   {
+    "id": "sec_preferences",
+    "label": "Preferences"
+   },
+   {
+    "id": "sec_information",
+    "label": "Information"
+   }
+  ],
+  "things": [
+   {
+    "id": "ent_school_data_100",
+    "kind": "course",
+    "label": "DATA 100",
+    "section": "sec_school",
+    "parent": null
+   },
+   {
+    "id": "ent_school_math_54",
+    "kind": "course",
+    "label": "MATH 54",
+    "section": "sec_school",
+    "parent": null
+   },
+   {
+    "id": "ent_work_kestrel_analytics",
+    "kind": "organization",
+    "label": "Kestrel Analytics",
+    "section": "sec_work",
+    "parent": null
+   },
+   {
+    "id": "ent_school_phys_137",
+    "kind": "course",
+    "label": "PHYS 137",
+    "section": "sec_school",
+    "parent": null
+   },
+   {
+    "id": "ent_people_nadia_reyes",
+    "kind": "person",
+    "label": "Nadia Reyes",
+    "section": "sec_people",
+    "parent": null
+   },
+   {
+    "id": "ent_school_data_100_problem_set_1",
+    "kind": "task",
+    "label": "Problem Set 1",
+    "section": "sec_school",
+    "parent": "ent_school_data_100"
+   },
+   {
+    "id": "ent_school_math_54_reading_2",
+    "kind": "task",
+    "label": "Reading 2",
+    "section": "sec_school",
+    "parent": "ent_school_math_54"
+   },
+   {
+    "id": "ent_school_math_54_problem_set_1",
+    "kind": "task",
+    "label": "Problem Set 1",
+    "section": "sec_school",
+    "parent": "ent_school_math_54"
+   },
+   {
+    "id": "ent_people_elena_lindqvist",
+    "kind": "person",
+    "label": "Elena Lindqvist",
+    "section": "sec_people",
+    "parent": null
+   },
+   {
+    "id": "ent_plans_and_deadlines_bank_appointment",
+    "kind": "event",
+    "label": "Bank appointment",
+    "section": "sec_plans_and_deadlines",
+    "parent": null
+   },
+   {
+    "id": "ent_projects_sparrowhawk",
+    "kind": "project",
+    "label": "Sparrowhawk",
+    "section": "sec_projects",
+    "parent": null
+   },
+   {
+    "id": "ent_people_silas_haddad",
+    "kind": "person",
+    "label": "Silas Haddad",
+    "section": "sec_people",
+    "parent": null
+   },
+   {
+    "id": "ent_people_caleb_moreau",
+    "kind": "person",
+    "label": "Caleb Moreau",
+    "section": "sec_people",
+    "parent": null
+   },
+   {
+    "id": "ent_people_iris_sato",
+    "kind": "person",
+    "label": "Iris Sato",
+    "section": "sec_people",
+    "parent": null
+   },
+   {
+    "id": "ent_school_data_100_lab_1",
+    "kind": "task",
+    "label": "Lab 1",
+    "section": "sec_school",
+    "parent": "ent_school_data_100"
+   },
+   {
+    "id": "ent_school_math_54_reading_3",
+    "kind": "task",
+    "label": "Reading 3",
+    "section": "sec_school",
+    "parent": "ent_school_math_54"
+   },
+   {
+    "id": "ent_school_math_54_problem_set_2",
+    "kind": "task",
+    "label": "Problem Set 2",
+    "section": "sec_school",
+    "parent": "ent_school_math_54"
+   },
+   {
+    "id": "ent_plans_and_deadlines_montreal_trip",
+    "kind": "event",
+    "label": "Montreal trip",
+    "section": "sec_plans_and_deadlines",
+    "parent": null
+   },
+   {
+    "id": "ent_information_orrinwood",
+    "kind": "topic",
+    "label": "Orrinwood",
+    "section": "sec_information",
+    "parent": null
+   },
+   {
+    "id": "ent_people_lena_delacroix",
+    "kind": "person",
+    "label": "Lena Delacroix",
+    "section": "sec_people",
+    "parent": null
+   },
+   {
+    "id": "ent_information_sabletide",
+    "kind": "topic",
+    "label": "Sabletide",
+    "section": "sec_information",
+    "parent": null
+   },
+   {
+    "id": "ent_people_priya_okafor",
+    "kind": "person",
+    "label": "Priya Okafor",
+    "section": "sec_people",
+    "parent": null
+   },
+   {
+    "id": "ent_school_math_54_lab_1",
+    "kind": "task",
+    "label": "Lab 1",
+    "section": "sec_school",
+    "parent": "ent_school_math_54"
+   },
+   {
+    "id": "ent_plans_and_deadlines_coffee_with_elena_lindqvist",
+    "kind": "event",
+    "label": "Coffee with Elena Lindqvist",
+    "section": "sec_plans_and_deadlines",
+    "parent": null
+   },
+   {
+    "id": "ent_information_tesselcrest",
+    "kind": "topic",
+    "label": "Tesselcrest",
+    "section": "sec_information",
+    "parent": null
+   },
+   {
+    "id": "ent_information_cobalwood",
+    "kind": "topic",
+    "label": "Cobalwood",
+    "section": "sec_information",
+    "parent": null
+   },
+   {
+    "id": "ent_plans_and_deadlines_lunch_with_priya_okafor",
+    "kind": "event",
+    "label": "Lunch with Priya Okafor",
+    "section": "sec_plans_and_deadlines",
+    "parent": null
+   },
+   {
+    "id": "ent_work_kestrel_analytics_weekly_report_1",
+    "kind": "task",
+    "label": "Weekly Report 1",
+    "section": "sec_work",
+    "parent": "ent_work_kestrel_analytics"
+   },
+   {
+    "id": "ent_information_ferrostone",
+    "kind": "topic",
+    "label": "Ferrostone",
+    "section": "sec_information",
+    "parent": null
+   },
+   {
+    "id": "ent_school_phys_137_lab_1",
+    "kind": "task",
+    "label": "Lab 1",
+    "section": "sec_school",
+    "parent": "ent_school_phys_137"
+   },
+   {
+    "id": "ent_school_phys_137_reading_1",
+    "kind": "task",
+    "label": "Reading 1",
+    "section": "sec_school",
+    "parent": "ent_school_phys_137"
+   },
+   {
+    "id": "ent_school_phys_137_problem_set_1",
+    "kind": "task",
+    "label": "Problem Set 1",
+    "section": "sec_school",
+    "parent": "ent_school_phys_137"
+   },
+   {
+    "id": "ent_school_phys_137_reading_2",
+    "kind": "task",
+    "label": "Reading 2",
+    "section": "sec_school",
+    "parent": "ent_school_phys_137"
+   },
+   {
+    "id": "ent_school_phys_137_problem_set_2",
+    "kind": "task",
+    "label": "Problem Set 2",
+    "section": "sec_school",
+    "parent": "ent_school_phys_137"
+   },
+   {
+    "id": "ent_school_data_100_project_1",
+    "kind": "project",
+    "label": "Project 1",
+    "section": "sec_school",
+    "parent": "ent_school_data_100"
+   },
+   {
+    "id": "ent_plans_and_deadlines_lunch_with_lena_delacroix",
+    "kind": "event",
+    "label": "Lunch with Lena Delacroix",
+    "section": "sec_plans_and_deadlines",
+    "parent": null
+   },
+   {
+    "id": "ent_school_math_54_reading_1",
+    "kind": "task",
+    "label": "Reading 1",
+    "section": "sec_school",
+    "parent": "ent_school_math_54"
+   }
+  ],
+  "facts": [
+   {
+    "id": "fact_pf_0001",
+    "owner": "sec_personal_info",
+    "kind": "attribute",
+    "key": "name",
+    "text": "Your name is Maya Collins.",
+    "specifics": [
+     [
+      13,
+      25
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:9aa5da2d-fd61-201a-8c93-f6fecfa04fca",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-06-30T23:44:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0002",
+    "owner": "sec_personal_info",
+    "kind": "attribute",
+    "key": "home",
+    "text": "You live in Madison.",
+    "specifics": [
+     [
+      12,
+      19
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": "location",
+    "sources": [
+     {
+      "chat": "claude:67dd1f3c-0c52-09a6-877d-6059e4479994",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-01T19:15:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0003",
+    "owner": "ent_school_data_100",
+    "kind": "attribute",
+    "key": "professor",
+    "text": "You're taking DATA 100 with Prof. Kim this term.",
+    "specifics": [
+     [
+      28,
+      37
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:d3ebaf33-cdad-bbad-13c0-e5ff5b417076",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-02T14:19:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0004",
+    "owner": "ent_school_math_54",
+    "kind": "attribute",
+    "key": "professor",
+    "text": "You're taking MATH 54 with Prof. Hartmann this term.",
+    "specifics": [
+     [
+      27,
+      41
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:8e63c6ef-fd1b-b2ee-002b-6ae509b1472b",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-03T14:34:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0005",
+    "owner": "ent_work_kestrel_analytics",
+    "kind": "attribute",
+    "key": "job_title",
+    "text": "You just started your job as a research assistant at Kestrel Analytics.",
+    "specifics": [
+     [
+      53,
+      70
+     ]
+    ],
+    "importance": 4,
+    "status": "superseded",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": "fact_pf_0054",
+    "replacedOn": "2026-08-29",
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:8e63c6ef-fd1b-b2ee-002b-6ae509b1472b",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-07-03T14:37:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0006",
+    "owner": "ent_work_kestrel_analytics",
+    "kind": "attribute",
+    "key": "works_at",
+    "text": "You just started your job as a research assistant at Kestrel Analytics.",
+    "specifics": [],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:8e63c6ef-fd1b-b2ee-002b-6ae509b1472b",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-07-03T14:37:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0007",
+    "owner": "ent_school_phys_137",
+    "kind": "attribute",
+    "key": "professor",
+    "text": "You're taking PHYS 137 with Prof. Alvarez this term.",
+    "specifics": [
+     [
+      28,
+      41
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:378f9709-c9d9-331f-e7bc-d2ecaca46256",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-04T13:33:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0008",
+    "owner": "ent_people_nadia_reyes",
+    "kind": "attribute",
+    "key": "relation_to_self",
+    "text": "Your manager at Kestrel Analytics is Nadia Reyes.",
+    "specifics": [
+     [
+      37,
+      48
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:069ad445-fb91-524e-f4c6-38282688a4a1",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-05T18:39:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0009",
+    "owner": "sec_personal_info",
+    "kind": "constraint",
+    "key": "allergy",
+    "text": "You're allergic to peanuts.",
+    "specifics": [],
+    "importance": 5,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": "health",
+    "sources": [
+     {
+      "chat": "gemini:c1c0c853c17c837e",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-05T16:52:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0010",
+    "owner": "ent_school_data_100_problem_set_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Problem Set 1 for DATA 100 is due Jul 31.",
+    "specifics": [
+     [
+      34,
+      40
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-07-31",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:5022ac98-7486-c25e-f2dd-e2d2c43217bf",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-11T16:36:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0011",
+    "owner": "ent_school_math_54_reading_2",
+    "kind": "task",
+    "key": "due",
+    "text": "In MATH 54, Reading 2 is due Monday and Problem Set 1 Thursday.",
+    "specifics": [
+     [
+      29,
+      35
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-07-13",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:5022ac98-7486-c25e-f2dd-e2d2c43217bf",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-07-11T16:41:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0012",
+    "owner": "ent_school_math_54_problem_set_1",
+    "kind": "task",
+    "key": "due",
+    "text": "In MATH 54, Reading 2 is due Monday and Problem Set 1 Thursday.",
+    "specifics": [
+     [
+      54,
+      62
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-07-16",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:5022ac98-7486-c25e-f2dd-e2d2c43217bf",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-07-11T16:41:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0013",
+    "owner": "ent_school_data_100_problem_set_1",
+    "kind": "attribute",
+    "key": "grade_weight",
+    "text": "Problem Set 1 for DATA 100 is worth 5% of the grade.",
+    "specifics": [
+     [
+      36,
+      38
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:5a372ca4dbd7b563",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-12T19:43:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0014",
+    "owner": "ent_people_elena_lindqvist",
+    "kind": "attribute",
+    "key": "relation_to_self",
+    "text": "Elena Lindqvist is your cousin.",
+    "specifics": [
+     [
+      0,
+      15
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:389e54ef-97e5-8e91-96be-0403cd67187b",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-07-16T17:37:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0015",
+    "owner": "ent_plans_and_deadlines_bank_appointment",
+    "kind": "event",
+    "key": "start",
+    "text": "Your bank appointment is on Thursday at 9am.",
+    "specifics": [
+     [
+      28,
+      43
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": null,
+    "start": "2026-07-23T09:00",
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:389e54ef-97e5-8e91-96be-0403cd67187b",
+      "msg": 7,
+      "role": "user",
+      "at": "2026-07-17T17:37:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0016",
+    "owner": "ent_projects_sparrowhawk",
+    "kind": "decision",
+    "key": "decision",
+    "text": "We decided to drop the GraphQL layer for Sparrowhawk.",
+    "specifics": [
+     [
+      14,
+      36
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:389e54ef-97e5-8e91-96be-0403cd67187b",
+      "msg": 9,
+      "role": "user",
+      "at": "2026-07-18T17:38:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0017",
+    "owner": "sec_preferences",
+    "kind": "preference",
+    "key": "likes",
+    "text": "You love rainy mornings.",
+    "specifics": [],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:389e54ef-97e5-8e91-96be-0403cd67187b",
+      "msg": 11,
+      "role": "user",
+      "at": "2026-07-22T17:38:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0018",
+    "owner": "ent_people_silas_haddad",
+    "kind": "attribute",
+    "key": "relation_to_self",
+    "text": "Silas Haddad is your best friend.",
+    "specifics": [
+     [
+      0,
+      12
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:389e54ef-97e5-8e91-96be-0403cd67187b",
+      "msg": 17,
+      "role": "user",
+      "at": "2026-07-25T17:37:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0019",
+    "owner": "ent_people_caleb_moreau",
+    "kind": "attribute",
+    "key": "relation_to_self",
+    "text": "Caleb Moreau is your roommate.",
+    "specifics": [
+     [
+      0,
+      12
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:c338f8545c68451f",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-25T18:44:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0020",
+    "owner": "ent_people_iris_sato",
+    "kind": "attribute",
+    "key": "relation_to_self",
+    "text": "Iris Sato is your lab partner.",
+    "specifics": [
+     [
+      0,
+      9
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:c338f8545c68451f",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-07-26T18:45:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0021",
+    "owner": "ent_people_caleb_moreau",
+    "kind": "attribute",
+    "key": "works_at",
+    "text": "Caleb Moreau works at Northwind Clinic.",
+    "specifics": [
+     [
+      22,
+      38
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:10fd9feb-7ef2-d858-2753-03d0fa9005cd",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-29T17:03:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0022",
+    "owner": "ent_school_data_100_lab_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Lab 1 for DATA 100 is due Aug 18.",
+    "specifics": [
+     [
+      26,
+      32
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-08-18",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:04360fdf-1ceb-a762-55de-42b8444f0a29",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-07-30T13:19:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0023",
+    "owner": "ent_school_math_54_reading_3",
+    "kind": "task",
+    "key": "due",
+    "text": "In MATH 54, Reading 3 is due Sunday and Problem Set 2 is due Monday.",
+    "specifics": [
+     [
+      29,
+      35
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-08-02",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:04360fdf-1ceb-a762-55de-42b8444f0a29",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-07-30T13:23:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0024",
+    "owner": "ent_school_math_54_problem_set_2",
+    "kind": "task",
+    "key": "due",
+    "text": "In MATH 54, Reading 3 is due Sunday and Problem Set 2 is due Monday.",
+    "specifics": [
+     [
+      61,
+      67
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-08-03",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:04360fdf-1ceb-a762-55de-42b8444f0a29",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-07-30T13:23:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0025",
+    "owner": "ent_plans_and_deadlines_montreal_trip",
+    "kind": "event",
+    "key": "start",
+    "text": "Your Montreal trip starts Aug 16.",
+    "specifics": [
+     [
+      26,
+      32
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": null,
+    "start": "2026-08-16",
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:f497a228-b5bc-b5ed-a5eb-9be91df7730c",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-08-01T16:06:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0026",
+    "owner": "ent_plans_and_deadlines_montreal_trip",
+    "kind": "attribute",
+    "key": "budget",
+    "text": "For your Montreal trip, a budget of $1,400 for 5 nights works.",
+    "specifics": [
+     [
+      36,
+      42
+     ],
+     [
+      47,
+      55
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:bf3d7fe6-fcc9-d267-535c-fc1400023064",
+      "msg": 2,
+      "role": "assistant",
+      "at": "2026-08-03T19:43:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0028",
+    "owner": "sec_preferences",
+    "kind": "preference",
+    "key": "dislikes",
+    "text": "You can't stand early flights.",
+    "specifics": [],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:53489641-18f7-2c51-503c-333e96abf016",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-08-04T23:35:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0029",
+    "owner": "ent_people_elena_lindqvist",
+    "kind": "attribute",
+    "key": "email",
+    "text": "Elena Lindqvist's email is elena.lindqvist@lindenpost.com.",
+    "specifics": [
+     [
+      27,
+      57
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:53489641-18f7-2c51-503c-333e96abf016",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-08-04T23:38:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0030",
+    "owner": "ent_people_caleb_moreau",
+    "kind": "attribute",
+    "key": "email",
+    "text": "Caleb Moreau's email is caleb.moreau@lindenpost.com.",
+    "specifics": [
+     [
+      24,
+      51
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:53489641-18f7-2c51-503c-333e96abf016",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-08-04T23:44:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0031",
+    "owner": "ent_people_elena_lindqvist",
+    "kind": "attribute",
+    "key": "works_at",
+    "text": "Elena Lindqvist works at Northwind Clinic.",
+    "specifics": [
+     [
+      25,
+      41
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:53489641-18f7-2c51-503c-333e96abf016",
+      "msg": 7,
+      "role": "user",
+      "at": "2026-08-06T23:34:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0032",
+    "owner": "ent_information_orrinwood",
+    "kind": "note",
+    "key": "port",
+    "text": "Orrinwood listens on port 3565 by default.",
+    "specifics": [
+     [
+      26,
+      30
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:16d03b3f-11b0-4a68-6c3d-ada68019cfb0",
+      "msg": 2,
+      "role": "assistant",
+      "at": "2026-08-06T13:37:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0033",
+    "owner": "sec_personal_info",
+    "kind": "attribute",
+    "key": "link.site",
+    "text": "Your site is https://lindenpost.com/mayacollins.",
+    "specifics": [
+     [
+      13,
+      47
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:16d03b3f-11b0-4a68-6c3d-ada68019cfb0",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-08-08T13:35:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0034",
+    "owner": "sec_preferences",
+    "kind": "preference",
+    "key": "likes",
+    "text": "You love jazz piano.",
+    "specifics": [],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:16d03b3f-11b0-4a68-6c3d-ada68019cfb0",
+      "msg": 7,
+      "role": "user",
+      "at": "2026-08-09T13:33:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0035",
+    "owner": "ent_people_lena_delacroix",
+    "kind": "attribute",
+    "key": "relation_to_self",
+    "text": "Lena Delacroix is your sister.",
+    "specifics": [
+     [
+      0,
+      14
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:16d03b3f-11b0-4a68-6c3d-ada68019cfb0",
+      "msg": 9,
+      "role": "user",
+      "at": "2026-08-09T13:35:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0036",
+    "owner": "ent_information_sabletide",
+    "kind": "note",
+    "key": "port",
+    "text": "Sabletide listens on port 2997 by default.",
+    "specifics": [
+     [
+      26,
+      30
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:27e6c632b691fcb6",
+      "msg": 2,
+      "role": "assistant",
+      "at": "2026-08-09T15:29:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0037",
+    "owner": "ent_projects_sparrowhawk",
+    "kind": "attribute",
+    "key": "version.react",
+    "text": "Sparrowhawk runs on React 18.3.",
+    "specifics": [
+     [
+      20,
+      30
+     ]
+    ],
+    "importance": 3,
+    "status": "superseded",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": "fact_pf_0069",
+    "replacedOn": "2026-09-19",
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:27e6c632b691fcb6",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-08-10T15:27:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0038",
+    "owner": "ent_people_priya_okafor",
+    "kind": "attribute",
+    "key": "relation_to_self",
+    "text": "Priya Okafor is your mentor.",
+    "specifics": [
+     [
+      0,
+      12
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:d6cf1999-f227-2afc-12b4-778324b0845b",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-08-11T23:46:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0039",
+    "owner": "ent_people_silas_haddad",
+    "kind": "attribute",
+    "key": "works_at",
+    "text": "Silas Haddad works at Sunfield Bakery.",
+    "specifics": [
+     [
+      22,
+      37
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:d6cf1999-f227-2afc-12b4-778324b0845b",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-08-15T23:45:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0040",
+    "owner": "ent_school_math_54_lab_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Lab 1 for MATH 54 was moved from Aug 23 at 11:59pm to Aug 27 at 11:59pm.",
+    "specifics": [
+     [
+      33,
+      50
+     ]
+    ],
+    "importance": 4,
+    "status": "superseded",
+    "due": "2026-08-23T23:59",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": "fact_pf_0041",
+    "replacedOn": "2026-08-15",
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:d6cf1999-f227-2afc-12b4-778324b0845b",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-08-15T23:47:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0041",
+    "owner": "ent_school_math_54_lab_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Lab 1 for MATH 54 was moved from Aug 23 at 11:59pm to Aug 27 at 11:59pm.",
+    "specifics": [
+     [
+      54,
+      71
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-08-27T23:59",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:d6cf1999-f227-2afc-12b4-778324b0845b",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-08-15T23:47:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0042",
+    "owner": "ent_people_priya_okafor",
+    "kind": "attribute",
+    "key": "email",
+    "text": "Priya Okafor's email is priya.okafor@lindenpost.com.",
+    "specifics": [
+     [
+      24,
+      51
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:9a793384b397a18c",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-08-16T21:28:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0043",
+    "owner": "ent_projects_sparrowhawk",
+    "kind": "attribute",
+    "key": "version.python",
+    "text": "Sparrowhawk runs on Python 3.12.",
+    "specifics": [
+     [
+      20,
+      31
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:9a793384b397a18c",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-08-19T21:29:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0044",
+    "owner": "sec_preferences",
+    "kind": "instruction",
+    "key": "instruction",
+    "text": "Please always answer in short bullet points.",
+    "specifics": [],
+    "importance": 5,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:9a793384b397a18c",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-08-20T21:28:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0045",
+    "owner": "ent_plans_and_deadlines_coffee_with_elena_lindqvist",
+    "kind": "event",
+    "key": "start",
+    "text": "You have coffee with Elena Lindqvist on Aug 29 at 12:30pm.",
+    "specifics": [
+     [
+      40,
+      57
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": "2026-08-29T12:30",
+    "progress": "cancelled",
+    "history": true,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:e0e885c1c03721d5",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-08-20T16:20:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0046",
+    "owner": "ent_school_data_100_lab_1",
+    "kind": "task",
+    "key": "status",
+    "text": "Lab 1 for DATA 100 was submitted.",
+    "specifics": [],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": "completed",
+    "history": true,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:e0e885c1c03721d5",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-08-22T16:19:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0047",
+    "owner": "ent_information_tesselcrest",
+    "kind": "note",
+    "key": "port",
+    "text": "Tesselcrest listens on port 9224 by default.",
+    "specifics": [
+     [
+      28,
+      32
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:cad9b7de-4af9-03dd-9d8f-a68aa9eeaa83",
+      "msg": 2,
+      "role": "assistant",
+      "at": "2026-08-22T16:22:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0048",
+    "owner": "ent_people_iris_sato",
+    "kind": "attribute",
+    "key": "email",
+    "text": "Iris Sato's email is iris.sato@lindenpost.com.",
+    "specifics": [
+     [
+      21,
+      45
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:cad9b7de-4af9-03dd-9d8f-a68aa9eeaa83",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-08-23T16:22:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0049",
+    "owner": "ent_plans_and_deadlines_coffee_with_elena_lindqvist",
+    "kind": "event",
+    "key": "status",
+    "text": "Coffee with Elena Lindqvist is cancelled.",
+    "specifics": [],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": "cancelled",
+    "history": true,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:f5b23eac4d4ed78e",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-08-24T00:11:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0050",
+    "owner": "ent_information_cobalwood",
+    "kind": "note",
+    "key": "rate_limit",
+    "text": "Cobalwood allows 540 requests per minute.",
+    "specifics": [
+     [
+      17,
+      40
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:f5b23eac4d4ed78e",
+      "msg": 4,
+      "role": "assistant",
+      "at": "2026-08-24T00:17:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0051",
+    "owner": "ent_information_tesselcrest",
+    "kind": "note",
+    "key": "log_retention",
+    "text": "Tesselcrest keeps logs for 83 days by default.",
+    "specifics": [
+     [
+      27,
+      34
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:72eb3365-b2f4-533e-9e13-33ebc3fe8c98",
+      "msg": 2,
+      "role": "assistant",
+      "at": "2026-08-25T14:10:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0052",
+    "owner": "ent_plans_and_deadlines_lunch_with_priya_okafor",
+    "kind": "event",
+    "key": "start",
+    "text": "You have lunch with Priya Okafor on Sep 11 at 12:30pm.",
+    "specifics": [
+     [
+      36,
+      53
+     ]
+    ],
+    "importance": 3,
+    "status": "superseded",
+    "due": null,
+    "start": "2026-09-11T12:30",
+    "progress": null,
+    "history": false,
+    "supersededBy": "fact_pf_0053",
+    "replacedOn": "2026-08-28",
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:72eb3365-b2f4-533e-9e13-33ebc3fe8c98",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-08-26T14:07:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0053",
+    "owner": "ent_plans_and_deadlines_lunch_with_priya_okafor",
+    "kind": "event",
+    "key": "start",
+    "text": "Lunch with Priya Okafor moved from Sep 11 at 12:30pm to Sep 14 at 12:30pm.",
+    "specifics": [
+     [
+      56,
+      73
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": "2026-09-14T12:30",
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:72eb3365-b2f4-533e-9e13-33ebc3fe8c98",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-08-28T14:07:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0054",
+    "owner": "ent_work_kestrel_analytics",
+    "kind": "attribute",
+    "key": "job_title",
+    "text": "You got promoted to lead research assistant at Kestrel Analytics.",
+    "specifics": [
+     [
+      47,
+      64
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:72eb3365-b2f4-533e-9e13-33ebc3fe8c98",
+      "msg": 7,
+      "role": "user",
+      "at": "2026-08-29T14:07:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0055",
+    "owner": "ent_work_kestrel_analytics_weekly_report_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Weekly Report 1 for Kestrel Analytics is due Sep 14.",
+    "specifics": [
+     [
+      45,
+      51
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-09-14",
+    "start": null,
+    "progress": "completed",
+    "history": true,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:dc0f3ee5-9491-dddb-d6b7-ad6c1e401906",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-08-30T22:25:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0056",
+    "owner": "sec_preferences",
+    "kind": "instruction",
+    "key": "instruction",
+    "text": "Please always show code snippets in TypeScript.",
+    "specifics": [],
+    "importance": 5,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:dc0f3ee5-9491-dddb-d6b7-ad6c1e401906",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-09-04T22:25:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0057",
+    "owner": "ent_information_ferrostone",
+    "kind": "note",
+    "key": "rate_limit",
+    "text": "Ferrostone allows 2640 requests per minute.",
+    "specifics": [
+     [
+      18,
+      42
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:dc0f3ee5-9491-dddb-d6b7-ad6c1e401906",
+      "msg": 8,
+      "role": "assistant",
+      "at": "2026-09-04T22:31:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0058",
+    "owner": "sec_personal_info",
+    "kind": "attribute",
+    "key": "phone",
+    "text": "You can be reached at +1 646 555 0101 or maya.collins@lindenpost.com.",
+    "specifics": [
+     [
+      22,
+      37
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:2e18fd6d-5c42-3ebb-bee1-fa69221a421a",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-04T14:27:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0059",
+    "owner": "sec_personal_info",
+    "kind": "attribute",
+    "key": "email",
+    "text": "You can be reached at +1 646 555 0101 or maya.collins@lindenpost.com.",
+    "specifics": [
+     [
+      41,
+      68
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:2e18fd6d-5c42-3ebb-bee1-fa69221a421a",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-04T14:27:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0060",
+    "owner": "ent_school_phys_137_lab_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Lab 1 for PHYS 137 is due Sep 20 at 5pm.",
+    "specifics": [
+     [
+      26,
+      39
+     ]
+    ],
+    "importance": 4,
+    "status": "superseded",
+    "due": "2026-09-20T17:00",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": "fact_pf_0068",
+    "replacedOn": "2026-09-17",
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:2e18fd6d-5c42-3ebb-bee1-fa69221a421a",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-09-05T14:26:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0061",
+    "owner": "ent_school_phys_137_lab_1",
+    "kind": "attribute",
+    "key": "grade_weight",
+    "text": "Lab 1 for PHYS 137 is worth 30% of the grade.",
+    "specifics": [
+     [
+      28,
+      31
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:2e18fd6d-5c42-3ebb-bee1-fa69221a421a",
+      "msg": 5,
+      "role": "user",
+      "at": "2026-09-06T14:27:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0062",
+    "owner": "ent_information_sabletide",
+    "kind": "note",
+    "key": "log_retention",
+    "text": "Sabletide keeps logs for 30 days by default.",
+    "specifics": [
+     [
+      25,
+      32
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:2e18fd6d-5c42-3ebb-bee1-fa69221a421a",
+      "msg": 8,
+      "role": "assistant",
+      "at": "2026-09-09T14:28:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0063",
+    "owner": "ent_projects_sparrowhawk",
+    "kind": "attribute",
+    "key": "version.postgres",
+    "text": "We switched Sparrowhawk from Postgres 15 to Postgres 16.",
+    "specifics": [
+     [
+      29,
+      40
+     ]
+    ],
+    "importance": 3,
+    "status": "superseded",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": "fact_pf_0064",
+    "replacedOn": "2026-09-12",
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:d14623ff-454b-3997-ddff-fd756af84678",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-12T23:59:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0064",
+    "owner": "ent_projects_sparrowhawk",
+    "kind": "attribute",
+    "key": "version.postgres",
+    "text": "We switched Sparrowhawk from Postgres 15 to Postgres 16.",
+    "specifics": [
+     [
+      44,
+      55
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:d14623ff-454b-3997-ddff-fd756af84678",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-12T23:59:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0065",
+    "owner": "ent_work_kestrel_analytics_weekly_report_1",
+    "kind": "task",
+    "key": "status",
+    "text": "You submitted Weekly Report 1 for Kestrel Analytics.",
+    "specifics": [],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": "completed",
+    "history": true,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:d14623ff-454b-3997-ddff-fd756af84678",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-09-14T00:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0066",
+    "owner": "ent_school_phys_137_reading_1",
+    "kind": "task",
+    "key": "due",
+    "text": "In PHYS 137, Reading 1 is due Monday and Problem Set 1 is due Friday.",
+    "specifics": [
+     [
+      30,
+      36
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-09-14",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:bb5ab1a12023dc09",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-13T13:41:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0067",
+    "owner": "ent_school_phys_137_problem_set_1",
+    "kind": "task",
+    "key": "due",
+    "text": "In PHYS 137, Reading 1 is due Monday and Problem Set 1 is due Friday.",
+    "specifics": [
+     [
+      62,
+      68
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-09-18",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:bb5ab1a12023dc09",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-13T13:41:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0068",
+    "owner": "ent_school_phys_137_lab_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Prof. Alvarez moved Lab 1 for PHYS 137 from Sep 20 at 5pm to Sep 24 at 5pm.",
+    "specifics": [
+     [
+      61,
+      74
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-09-24T17:00",
+    "start": null,
+    "progress": "completed",
+    "history": true,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:14b8ae1495168e02",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-17T17:46:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0069",
+    "owner": "ent_projects_sparrowhawk",
+    "kind": "attribute",
+    "key": "version.react",
+    "text": "We switched Sparrowhawk from React 18.3 to React 19.1.",
+    "specifics": [
+     [
+      43,
+      53
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:4834c2d34a902f63",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-19T23:02:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0070",
+    "owner": "ent_school_phys_137_reading_2",
+    "kind": "task",
+    "key": "due",
+    "text": "In PHYS 137, Reading 2 is due Sunday and Problem Set 2 Thursday.",
+    "specifics": [
+     [
+      30,
+      36
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-09-20",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:4834c2d34a902f63",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-09-19T23:07:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0071",
+    "owner": "ent_school_phys_137_problem_set_2",
+    "kind": "task",
+    "key": "due",
+    "text": "In PHYS 137, Reading 2 is due Sunday and Problem Set 2 Thursday.",
+    "specifics": [
+     [
+      55,
+      63
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-09-24",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:4834c2d34a902f63",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-09-19T23:07:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0072",
+    "owner": "sec_preferences",
+    "kind": "preference",
+    "key": "dislikes",
+    "text": "You can't stand long meetings.",
+    "specifics": [],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:5badb0aeb0e2df18",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-20T16:54:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0073",
+    "owner": "ent_information_cobalwood",
+    "kind": "note",
+    "key": "port",
+    "text": "Cobalwood listens on port 6786 by default.",
+    "specifics": [
+     [
+      26,
+      30
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:5badb0aeb0e2df18",
+      "msg": 4,
+      "role": "assistant",
+      "at": "2026-09-22T16:53:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0074",
+    "owner": "ent_school_phys_137_lab_1",
+    "kind": "task",
+    "key": "status",
+    "text": "You submitted Lab 1 for PHYS 137.",
+    "specifics": [],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": "completed",
+    "history": true,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:047992b1-f09f-0730-a02b-33d4c8145568",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-23T14:57:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0075",
+    "owner": "ent_people_iris_sato",
+    "kind": "attribute",
+    "key": "phone",
+    "text": "Iris Sato's number is +1 (415) 555-0134.",
+    "specifics": [
+     [
+      22,
+      39
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:c0097892-7df7-74b3-3c0d-e9431ae02d21",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-09-27T21:15:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0076",
+    "owner": "ent_information_ferrostone",
+    "kind": "note",
+    "key": "log_retention",
+    "text": "Ferrostone keeps logs for 39 days by default.",
+    "specifics": [
+     [
+      26,
+      33
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:71e1f475-47e4-111d-a39a-e944b01ea683",
+      "msg": 2,
+      "role": "assistant",
+      "at": "2026-09-28T15:28:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0077",
+    "owner": "sec_preferences",
+    "kind": "preference",
+    "key": "likes",
+    "text": "You love Thai curry.",
+    "specifics": [],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:71e1f475-47e4-111d-a39a-e944b01ea683",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-10-02T15:27:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0078",
+    "owner": "ent_information_sabletide",
+    "kind": "note",
+    "key": "rate_limit",
+    "text": "Sabletide allows 4140 requests per minute.",
+    "specifics": [
+     [
+      17,
+      41
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:71e1f475-47e4-111d-a39a-e944b01ea683",
+      "msg": 6,
+      "role": "assistant",
+      "at": "2026-10-06T15:29:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0079",
+    "owner": "ent_people_priya_okafor",
+    "kind": "attribute",
+    "key": "phone",
+    "text": "Priya Okafor's number is 020 7946 0959.",
+    "specifics": [
+     [
+      25,
+      38
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:71e1f475-47e4-111d-a39a-e944b01ea683",
+      "msg": 7,
+      "role": "user",
+      "at": "2026-10-06T15:31:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0080",
+    "owner": "ent_information_cobalwood",
+    "kind": "note",
+    "key": "log_retention",
+    "text": "Cobalwood keeps logs for 90 days by default.",
+    "specifics": [
+     [
+      25,
+      32
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:71e1f475-47e4-111d-a39a-e944b01ea683",
+      "msg": 10,
+      "role": "assistant",
+      "at": "2026-10-10T15:30:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0081",
+    "owner": "ent_information_ferrostone",
+    "kind": "note",
+    "key": "port",
+    "text": "Ferrostone listens on port 7664 by default.",
+    "specifics": [
+     [
+      27,
+      31
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "claude:e6d6df4f-59ff-f81a-ec1c-b2f77e0e0445",
+      "msg": 2,
+      "role": "assistant",
+      "at": "2026-10-14T19:21:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0082",
+    "owner": "ent_people_elena_lindqvist",
+    "kind": "attribute",
+    "key": "link.github",
+    "text": "Elena Lindqvist's github is elena-lindqvist.",
+    "specifics": [
+     [
+      28,
+      43
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:490c874a-920b-6023-9ae5-fdba7d9b13ec",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-10-15T17:11:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0083",
+    "owner": "ent_people_lena_delacroix",
+    "kind": "attribute",
+    "key": "phone",
+    "text": "Lena Delacroix's number is +91 98765 43210.",
+    "specifics": [
+     [
+      27,
+      42
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "chatgpt:490c874a-920b-6023-9ae5-fdba7d9b13ec",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-10-16T17:10:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0084",
+    "owner": "ent_school_data_100_project_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Project 1 for DATA 100 is due Nov 20 at 2:30pm.",
+    "specifics": [
+     [
+      30,
+      46
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-11-20T14:30",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:34f4d7bdafa36fae",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-10-21T17:53:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0085",
+    "owner": "ent_plans_and_deadlines_lunch_with_lena_delacroix",
+    "kind": "event",
+    "key": "start",
+    "text": "You have lunch with Lena Delacroix on Nov 7 at 9am.",
+    "specifics": [
+     [
+      38,
+      50
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": "2026-11-07T09:00",
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:34f4d7bdafa36fae",
+      "msg": 3,
+      "role": "user",
+      "at": "2026-10-22T17:51:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0086",
+    "owner": "ent_school_math_54_reading_1",
+    "kind": "task",
+    "key": "due",
+    "text": "Reading 1 for MATH 54 is due Nov 2.",
+    "specifics": [
+     [
+      29,
+      34
+     ]
+    ],
+    "importance": 4,
+    "status": "active",
+    "due": "2026-11-02",
+    "start": null,
+    "progress": "needs-action",
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:0cf894880404e313",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-10-24T14:12:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0087",
+    "owner": "ent_school_math_54_reading_1",
+    "kind": "attribute",
+    "key": "grade_weight",
+    "text": "Reading 1 for MATH 54 is worth 10% of the grade.",
+    "specifics": [
+     [
+      31,
+      34
+     ]
+    ],
+    "importance": 3,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:959ed441b180decb",
+      "msg": 1,
+      "role": "user",
+      "at": "2026-10-26T00:49:00Z"
+     }
+    ]
+   },
+   {
+    "id": "fact_pf_0088",
+    "owner": "ent_information_tesselcrest",
+    "kind": "note",
+    "key": "rate_limit",
+    "text": "Tesselcrest allows 4620 requests per minute.",
+    "specifics": [
+     [
+      19,
+      43
+     ]
+    ],
+    "importance": 2,
+    "status": "active",
+    "due": null,
+    "start": null,
+    "progress": null,
+    "history": false,
+    "supersededBy": null,
+    "replacedOn": null,
+    "sensitivity": null,
+    "sources": [
+     {
+      "chat": "gemini:959ed441b180decb",
+      "msg": 4,
+      "role": "assistant",
+      "at": "2026-10-27T00:50:00Z"
+     }
+    ]
+   }
+  ],
+  "moved": {
+   "id": "fact_lab_moved",
+   "owner": "ent_school_data_100_lab_1",
+   "kind": "task",
+   "key": "due",
+   "text": "Lab 1 for DATA 100 is due Aug 22.",
+   "specifics": [
+    [
+     26,
+     32
+    ]
+   ],
+   "importance": 4,
+   "status": "active",
+   "due": "2026-08-22",
+   "start": null,
+   "progress": "needs-action",
+   "history": false,
+   "supersededBy": null,
+   "replacedOn": null,
+   "sensitivity": null,
+   "sources": [
+    {
+     "chat": "claude:04360fdf-1ceb-a762-55de-42b8444f0a29",
+     "msg": 5,
+     "role": "user",
+     "at": "2026-10-29T11:01:25.064Z"
+    }
+   ]
+  },
+  "lab": "fact_pf_0022"
+ }
+}
