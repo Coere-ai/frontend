@@ -28,12 +28,14 @@ video::cue{font-family:"Coere Geist",ui-sans-serif,system-ui,sans-serif;font-siz
   if (params.has('preview')) {
     document.documentElement.className = 'preview';
     var start = Number(params.get('start')) || 0;
+    var end = Number(params.get('end')) || 0;
     var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     video.poster = video.dataset.still;
     video.muted = true;
     Array.prototype.forEach.call(document.querySelectorAll('track'), function (t) { t.remove(); });
     video.addEventListener('loadedmetadata', function () { video.currentTime = start; });
     video.addEventListener('ended', function () { video.currentTime = start; video.play().catch(function () {}); });
+    if (end > start) video.addEventListener('timeupdate', function () { if (video.currentTime >= end) video.currentTime = start; });
     new IntersectionObserver(function (entries) {
       if (!entries[0].isIntersecting) { video.pause(); return; }
       video.preload = 'auto';
