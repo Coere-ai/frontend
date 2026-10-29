@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { Film } from "@/site/content/films";
-import { VideoPlayer } from "@/site/player/video-player";
+import { FilmFrame } from "@/site/ui/film-frame";
 import { CloseIcon } from "@/site/ui/icons/interface-icons";
 
 /**
@@ -39,7 +39,7 @@ export function FilmDialog({ film, onClose }: { film: Film | null; onClose: () =
               <CloseIcon size={18} />
             </button>
           </div>
-          <VideoPlayer key={film.slug} film={film} />
+          <FilmFrame key={film.slug} film={film} className="rounded-2xl" />
         </div>
       ) : null}
     </dialog>

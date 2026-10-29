@@ -1,9 +1,9 @@
 import Link from "next/link";
 import type { Feature } from "@/site/content/features";
-import { films, PREVIEW_START_SECONDS } from "@/site/content/films";
+import { films } from "@/site/content/films";
 import type { Product } from "@/site/content/products";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
-import { LazyVideo } from "@/site/ui/lazy-video";
+import { FilmFrame } from "@/site/ui/film-frame";
 import { Reveal } from "@/site/ui/reveal";
 
 /**
@@ -29,13 +29,7 @@ export function FeatureRow({ feature, product, flip }: { feature: Feature; produ
       </Reveal>
       <Reveal delay={0.08} className={`md:col-span-7 ${flip ? "md:order-1" : ""}`}>
         <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.25)]">
-          <LazyVideo
-            src={film.src}
-            poster={film.still}
-            label={`${feature.name} in action`}
-            startAt={PREVIEW_START_SECONDS}
-            className="block aspect-[1440/900] w-full object-cover"
-          />
+          <FilmFrame film={film} preview />
         </div>
       </Reveal>
     </div>

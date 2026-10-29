@@ -19,7 +19,12 @@ export type Cue = { start: number; end: number; text: string };
 export type Film = {
   slug: string;
   title: string;
-  src: string;
+  /**
+   * The film's own HTML page, which every film on the site plays in. It
+   * draws the film with the browser's player at full resolution, exactly as
+   * the coere-v2 demo pages do. See scripts/films/build-pages.mjs.
+   */
+  page: string;
   /** The film's own first frame: a title card, right for the full player. */
   poster: string;
   /** A frame of real footage, for previews that play without their title card. */
@@ -35,7 +40,7 @@ function film(slug: string, title: string, cues: { chapters: Cue[]; captions: Cu
   return {
     slug,
     title,
-    src: `${BASE}/${slug}.mp4`,
+    page: `${BASE}/${slug}.html`,
     poster: `${BASE}/${slug}-poster.jpg`,
     still: `${BASE}/${slug}-still.jpg`,
     ...cues,
