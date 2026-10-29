@@ -39,10 +39,10 @@ import { contextFor } from "./views";
  */
 
 const CHAPTERS = [
-  { id: "context", title: "Lessons planned from where the class is" },
-  { id: "graph", title: "Every class and colleague in one memory" },
-  { id: "confidential", title: "One class per message" },
-  { id: "app", title: "Planning tools that know the class" },
+  { id: "context", title: "Lessons planned from where the class is", seconds: 26 },
+  { id: "graph", title: "Every class and colleague in one memory", seconds: 29 },
+  { id: "confidential", title: "One class per message", seconds: 26 },
+  { id: "app", title: "Planning tools that know the class", seconds: 25 },
 ];
 const ORDER = CHAPTERS.map((c) => c.id);
 /** The chapter the page was asked to start at. */

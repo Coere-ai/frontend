@@ -6,6 +6,7 @@ import { HELLO_KEY } from "@v2/apps/extension/src/console/cori/hello";
 import { HINT_KEY } from "@v2/apps/extension/src/content/agent/hint/seen";
 import type { World } from "../../stage/world";
 import { CLIENT, FIRM, NOW, PERSON, ZONE, type Fact, type Mem, type Node } from "./memory";
+import { TEAM } from "./corpus";
 import { field } from "../../../demos/industries/fields/manufacturing.mjs";
 
 /**
@@ -94,10 +95,20 @@ export function dueSoon(m: Mem, limit = 5): FactView[] {
     .map(factView);
 }
 
-/** What the graph's caption counts: field.graph.count, "176 memories from 109 chats in 3 topics". */
-const COUNTS = /(\d+) memories from (\d+) chats/.exec(field.graph.count as string)!;
+/** The chats memory came from, by AI: every chat in the library left at least one memory. */
+export function sourceChats(m: Mem): { all: number; by: Record<string, number> } {
+  const seen = new Map<string, string>();
+  for (const f of m.facts.values()) for (const s of f.sources) seen.set(s.convId, s.platform);
+  const by: Record<string, number> = {};
+  for (const p of seen.values()) by[p] = (by[p] ?? 0) + 1;
+  return { all: seen.size, by };
+}
+
+/** How many chats the team's AIs hold, which the library, Settings and the build count. */
+export const libraryChats = (m: Mem): number => m.chats.size;
 
 export function status(m: Mem): MemoryStatus {
+  const chats = sourceChats(m);
   return {
     state: "ready",
     models: { extract: "claude-opus-5-5", consolidate: "claude-opus-5-5", short: "claude-haiku-5-5" },
@@ -106,14 +117,14 @@ export function status(m: Mem): MemoryStatus {
     set: null,
     held: null,
     counts: {
-      memories: Number(COUNTS[1]),
-      dueSoon: dueSoon(m, 99).length,
+      memories: m.facts.size,
+      dueSoon: dueSoon(m, 999).length,
       review: 0,
-      sourceChats: Number(COUNTS[2]),
-      sourceChatsBy: { chatgpt: 49, claude: 37, gemini: 23 },
+      sourceChats: chats.all,
+      sourceChatsBy: chats.by,
       held: 0,
-      chatsRead: Number(COUNTS[2]),
-      chatsInLibrary: Number(COUNTS[2]),
+      chatsRead: libraryChats(m),
+      chatsInLibrary: libraryChats(m),
       failedJobs: 0,
       refusedJobs: 0,
     },
@@ -123,13 +134,11 @@ export function status(m: Mem): MemoryStatus {
   } as MemoryStatus;
 }
 
-export function settings() {
+export function settings(m: Mem) {
+  const by = new Map<string, number>();
+  for (const c of m.chats.values()) by.set(c.platform, (by.get(c.platform) ?? 0) + 1);
   return {
-    readFrom: [
-      { platform: "chatgpt", on: true, chats: 49, projectsOff: [] },
-      { platform: "claude", on: true, chats: 37, projectsOff: [] },
-      { platform: "gemini", on: true, chats: 23, projectsOff: [] },
-    ],
+    readFrom: ["chatgpt", "claude", "gemini"].map((platform) => ({ platform, on: true, chats: by.get(platform) ?? 0, projectsOff: [] })),
     recall: true,
     backfillMode: "direct",
     capUsd: 20,
@@ -162,11 +171,8 @@ export function clientViews(m: Mem): ClientView[] {
   return out;
 }
 
-const WORKERS = [
-  { key: "ana", name: "Ana Ruiz", team: "Production", role: "Night shift lead" },
-  { key: "daniel", name: "Daniel Ortiz", team: "Maintenance", role: "Maintenance lead" },
-  { key: "priya", name: "Priya Shah", team: "Quality", role: "Quality manager" },
-];
+/** Luis's coworkers, each with the team and role memory knows them by (corpus.ts). */
+const WORKERS = TEAM.map(([name, team, role]) => ({ key: name.split(" ")[0]!.toLowerCase(), name, team, role }));
 
 export function workerViews(m: Mem): WorkerView[] {
   return [{ id: m.self, key: "luis", name: PERSON.name, team: "Engineering", role: "Process engineer", self: true }, ...WORKERS.map((w) => ({ id: `wk_${w.key}`, ...w, self: false }))];
@@ -345,8 +351,8 @@ export function answerTeams(world: World, mem: Mem): void {
   });
   world
     .engine("memory.status", () => status(mem))
-    .engine("memory.settings", () => settings())
-    .engine("memory.buildEstimate", () => ({ chats: 109, seconds: 0, measured: true, progress: null }))
+    .engine("memory.settings", () => settings(mem))
+    .engine("memory.buildEstimate", () => ({ chats: libraryChats(mem), seconds: 0, measured: true, progress: null }))
     .engine("memory.overview", () => overview(mem))
     .engine("memory.node", (m) => nodeDetail(mem, String(args(m).id)))
     .engine("memory.children", (m) => children(mem, (args(m).id as string | null) ?? null))
@@ -365,8 +371,8 @@ export function answerTeams(world: World, mem: Mem): void {
     .engine("memory.documents", () => [])
     .engine("memory.quote", () => null)
     .engine("search", (m) => ({ hits: [], totalMatches: 0, ms: 4, stage: 1, queryTokens: String(args(m).query ?? "").toLowerCase().split(/\s+/).filter(Boolean) }))
-    .engine("listConversations", () => ({ rows: [], total: 109 }))
-    .engine("stats", () => ({ conversations: 109, chunks: 1360, projects: 0, textBytes: 1_900_000, dbBytes: 12_000_000, byPlatform: {} }));
+    .engine("listConversations", () => ({ rows: [], total: libraryChats(mem) }))
+    .engine("stats", () => ({ conversations: libraryChats(mem), chunks: libraryChats(mem) * 12, projects: 0, textBytes: libraryChats(mem) * 16_500, dbBytes: libraryChats(mem) * 120_000, byPlatform: Object.fromEntries(settings(mem).readFrom.map((r) => [r.platform, r.chats])) }));
 }
 
 export { ZONE };

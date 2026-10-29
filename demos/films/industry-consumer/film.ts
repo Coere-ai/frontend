@@ -38,10 +38,10 @@ import { answerTeams, contextFor, nodeDetail } from "./views";
  */
 
 const CHAPTERS = [
-  { id: "context", title: "Promotions planned from what worked" },
-  { id: "graph", title: "Every retail partner in one place" },
-  { id: "confidential", title: "One partner per message" },
-  { id: "app", title: "Planning tools with memory" },
+  { id: "context", title: "Promotions planned from what worked", seconds: 27 },
+  { id: "graph", title: "Every retail partner in one place", seconds: 35 },
+  { id: "confidential", title: "One partner per message", seconds: 30 },
+  { id: "app", title: "Planning tools with memory", seconds: 33 },
 ];
 
 const LIB = "/preview/live/lib/";

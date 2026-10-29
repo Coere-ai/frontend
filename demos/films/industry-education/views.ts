@@ -162,8 +162,10 @@ export function status(m: Mem, o: { memories?: number; state?: MemoryStatus["sta
   };
 }
 
+const ORDER = ["chatgpt", "claude", "gemini"];
+
 export function settings(m: Mem): MemorySettings {
-  const by = new Map(Object.entries(sourceChats(m).by) as Array<[string, number]>);
+  const by = new Map(Object.entries(sourceChats(m).by).sort(([a], [b]) => ORDER.indexOf(a) - ORDER.indexOf(b)) as Array<[string, number]>);
   return {
     readFrom: [...by].map(([platform, chats]) => ({ platform: platform as never, on: true, chats, projectsOff: [] })),
     recall: true,

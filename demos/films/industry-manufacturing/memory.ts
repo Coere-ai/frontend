@@ -3,6 +3,8 @@ import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDeta
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { field } from "../../../demos/industries/fields/manufacturing.mjs";
 import { FILM_NOW, ZONE as CLOCK_ZONE } from "./clock";
+import { FIELD } from "./corpus";
+import { growTeam, type Grown } from "./scale";
 
 /**
  * Brightwater Components' memory as Coere for Teams files it from Luis
@@ -12,7 +14,11 @@ import { FILM_NOW, ZONE as CLOCK_ZONE } from "./clock";
  * contacts, its line or program and its facts by slot, and Tone and
  * voice. Every fact names the chat it came from. The people, customers
  * and dates are the manufacturing page's
- * (demos/industries/fields/manufacturing.mjs), made up for the demo.
+ * (demos/industries/fields/manufacturing.mjs), made up for the demo. The
+ * lines below are the ones the film shows; the rest of the plant's year
+ * and a half of chats (about 400 across its people and AIs, and some 500
+ * memories) grows from a seed in corpus.ts and scale.ts and is filed
+ * beside them, so every count the dashboard gives is real.
  */
 
 /** Luis works at the plant in Monterrey; the film's day is clock.ts's. */
@@ -35,8 +41,6 @@ export type Node = GraphNode & {
   facts_: string[];
   values: IdentityValueView[];
   relations: MemoryNodeDetail["relations"];
-  /** How many memories the graph draws for it, past the ones listed here. */
-  extra: number;
   client?: string;
 };
 
@@ -66,6 +70,8 @@ type Said = {
   chat: string;
   /** A due day, YYYY-MM-DD, when it has one. */
   due?: string;
+  /** The slot's key, when the line says it (a grown line does). */
+  key?: string;
 };
 
 /** The key each client slot files a fact under (packages/solution's client_account template). */
@@ -214,7 +220,7 @@ export function buildMemory(): Mem {
   const start = Date.UTC(2025, 1, 1);
 
   const node = (o: Partial<Node> & Pick<Node, "id" | "kind" | "label" | "section">): Node => {
-    const n: Node = { parent: null, importance: 3, pinned: false, urgency: "none", facts: 0, history: false, aliases: [], summary: null, kids: [], facts_: [], values: [], relations: [], extra: 0, ...o };
+    const n: Node = { parent: null, importance: 3, pinned: false, urgency: "none", facts: 0, history: false, aliases: [], summary: null, kids: [], facts_: [], values: [], relations: [], ...o };
     nodes.set(n.id, n);
     if (n.parent) nodes.get(n.parent)?.kids.push(n.id);
     return n;
@@ -246,7 +252,7 @@ export function buildMemory(): Mem {
     const fact: Fact = {
       id: fid,
       kind,
-      key: (slot && SLOT_KEY[slot]) || "",
+      key: said.key ?? ((slot && SLOT_KEY[slot]) || ""),
       text: said.text,
       specifics: specificsOf(said.text),
       importance: task ? 4 : 3,
@@ -281,28 +287,28 @@ export function buildMemory(): Mem {
 
   // Company, a topic each, with the memories behind it the graph draws.
   for (const [label, list] of COMPANY) {
-    const topic = node({ id: id("ent", start + DAY), kind: "topic", label, section: sections.company, parent: sections.company, extra: 9 });
+    const topic = node({ id: id("ent", start + DAY), kind: "topic", label, section: sections.company, parent: sections.company });
     for (const said of list) add(topic, said, null);
   }
 
   // Clients: a folder each, its contacts and its engagement inside.
   const clientIds = new Map<string, string>();
-  const client = (key: string, label: string, aliases: string[], own: Said[], work: [string, Said[]] | null, extra: number) => {
-    const folder = node({ id: id("ent", Date.parse(`${own[0]!.on}T00:00:00Z`)), kind: "organization", label, section: sections.clients, parent: sections.clients, importance: 4, aliases, client: key, extra });
+  const client = (key: string, label: string, aliases: string[], own: Said[], work: [string, Said[]] | null) => {
+    const folder = node({ id: id("ent", Date.parse(`${own[0]!.on}T00:00:00Z`)), kind: "organization", label, section: sections.clients, parent: sections.clients, importance: 4, aliases, client: key });
     clientIds.set(key, folder.id);
     for (const said of own) add(folder, said, key);
     if (work) {
-      const project = node({ id: id("ent", Date.parse(`${work[1][0]!.on}T00:00:00Z`)), kind: "project", label: work[0], section: sections.clients, parent: folder.id, extra: Math.round(extra / 2) });
+      const project = node({ id: id("ent", Date.parse(`${work[1][0]!.on}T00:00:00Z`)), kind: "project", label: work[0], section: sections.clients, parent: folder.id });
       for (const said of work[1]) add(project, said, key);
       folder.relations.unshift({ type: "for", label: `${work[0]} is for this`, direction: "in", other: { id: project.id, label: work[0], kind: "project" } });
     }
     return folder;
   };
 
-  const corvane = client("corvane", CLIENT, ["Corvane"], CORVANE, [field.client.engagement as string, LINE3], 24);
+  const corvane = client("corvane", CLIENT, ["Corvane"], CORVANE, [field.client.engagement as string, LINE3]);
   const contact = (name: string, role: string, place: string, line: Said, on: string) => {
     const at = Date.parse(`${on}T00:00:00Z`);
-    const person = node({ id: id("ent", at), kind: "person", label: name, section: sections.clients, parent: corvane.id, extra: 4 });
+    const person = node({ id: id("ent", at), kind: "person", label: name, section: sections.clients, parent: corvane.id });
     const chat = chatOf(line.chat, line.ai);
     const src = (vid: string): FactSource[] => [{ evidenceId: `${vid}#e0`, platform: line.ai, convId: chat.id, title: chat.title, msg: 1, role: "user", at: new Date(at).toISOString(), url: null, stale: false }];
     const value = (fieldName: IdentityValueView["field"], v: string): IdentityValueView => {
@@ -318,12 +324,61 @@ export function buildMemory(): Mem {
   contact(hannah, "Supplier quality engineer", "Stuttgart", f("Hannah signs off on every quality report from Line 3.", undefined, "2026-03-10", "claude", "Corvane quality agreement", undefined, "attribute"), "2025-02-11");
   contact(nils, "Purchasing manager", "Stuttgart", f("Nils plans Corvane's bracket volumes each quarter.", undefined, "2026-08-11", "chatgpt", "December shipment plan", undefined, "attribute"), "2025-04-02");
 
-  client("ostrava", "Ostrava Rail", ["Ostrava"], OSTRAVA, ["Brake housings", HOUSINGS], 6);
-  client("pell", "Pell Agritech", ["Pell"], PELL, ["PPAP approval", PPAP], 5);
-  client("kessler", "Kessler Pumps", ["Kessler"], KESSLER, null, 5);
+  client("ostrava", "Ostrava Rail", ["Ostrava"], OSTRAVA, ["Brake housings", HOUSINGS]);
+  client("pell", "Pell Agritech", ["Pell"], PELL, ["PPAP approval", PPAP]);
+  client("kessler", "Kessler Pumps", ["Kessler"], KESSLER, null);
 
-  const tone = node({ id: id("ent", start + 2 * DAY), kind: "folder", label: field.graph.hubs[2].children[0].label, section: sections.tone, parent: sections.tone, extra: 3 });
+  const tone = node({ id: id("ent", start + 2 * DAY), kind: "folder", label: field.graph.hubs[2].children[0].label, section: sections.tone, parent: sections.tone });
   for (const said of TONE) add(tone, said, null);
+
+  // The rest of the plant's chats, grown from a seed (corpus.ts): its own folders, fourteen more customers and more on
+  // the three the film names, each line in the chat that said it. Corvane Motors stays as written above.
+  const handTitles = [...chats.values()].map((c) => c.title);
+  const grown = growTeam(FIELD, NOW, handTitles, ["Luis", "Hannah", "Nils", "Weiss", "Berg"]);
+  const firstOn = (t: Grown): number => Math.min(...[t, ...t.kids].flatMap((x) => x.facts.map((f) => Date.parse(`${f.on}T15:00:00Z`))), NOW - 30 * DAY);
+  const place = (t: Grown, parent: Node, section: string, client: string | null): Node => {
+    const n = node({ id: id("ent", firstOn(t)), kind: t.kind, label: t.label, section, parent: parent.id, importance: t.kind === "organization" && t.client ? 4 : 3, aliases: t.aliases ?? [], ...(t.client ? { client: t.client } : {}) });
+    if (t.client) clientIds.set(t.client, n.id);
+    fill(n, t, section, t.client ?? client);
+    return n;
+  };
+  /** Files what `t` holds into `n`: its lines, its people and their details, and what hangs under it. */
+  const fill = (n: Node, t: Grown, section: string, client: string | null) => {
+    for (const said of t.facts) add(n, said, client);
+    for (const kid of t.kids) {
+      const k = place(kid, n, section, client);
+      if (kid.values) {
+        const said = kid.facts[0];
+        k.values = [...kid.values, ...(n.kind === "organization" ? ([["org", n.label]] as const) : [])].map(([fieldName, v]) => {
+          const vid = id("fact", firstOn(kid));
+          const chat = said ? chatOf(said.chat, said.ai) : null;
+          return {
+            id: vid,
+            field: fieldName,
+            value: v,
+            href: fieldName === "email" ? `mailto:${v}` : fieldName === "phone" ? `tel:${v.replace(/[^\d+]/g, "")}` : null,
+            sources: chat && fieldName !== "org" ? [{ evidenceId: `${vid}#e0`, platform: chat.platform, convId: chat.id, title: chat.title, msg: 1, role: "user" as const, at: `${said!.on}T15:20:00.000Z`, url: null, stale: false }] : [],
+            said: fieldName !== "org" ? (said?.on ?? null) : null,
+          };
+        });
+      }
+      // A contact works at its client, and a piece of work is for it, as the sheet's Related lists them.
+      if (kid.kind === "person" && n.kind === "organization") {
+        k.relations = [{ type: "works_at", label: "Works at", direction: "out", other: { id: n.id, label: n.label, kind: "organization" } }];
+        n.relations.push({ type: "works_at", label: `${k.label} works here`, direction: "in", other: { id: k.id, label: k.label, kind: "person" } });
+      }
+      if (kid.kind === "project" && n.kind === "organization") n.relations.unshift({ type: "for", label: `${k.label} is for this`, direction: "in", other: { id: k.id, label: k.label, kind: "project" } });
+    }
+  };
+  const company = nodes.get(sections.company)!;
+  for (const t of grown.company) place(t, company, sections.company, null);
+  for (const n of [...nodes.values()].filter((x) => x.parent === sections.company)) {
+    const more = grown.more.get(n.label);
+    if (more) fill(n, more, sections.company, null);
+  }
+  for (const t of grown.clients) place(t, nodes.get(sections.clients)!, sections.clients, null);
+  for (const [key, more] of grown.grown) fill(nodes.get(clientIds.get(key)!)!, more, sections.clients, key);
+  fill(tone, grown.tone, sections.tone, null);
 
   // Counts and urgency roll up the tree, as the overview's node stats do.
   const rank = ["none", "later", "upcoming", "soon", "today", "overdue"];
@@ -334,7 +389,7 @@ export function buildMemory(): Mem {
       const u = roll(nodes.get(k)!);
       if (rank.indexOf(u) > rank.indexOf(urgency)) urgency = u;
     }
-    n.facts = n.facts_.length + n.values.length + n.extra;
+    n.facts = n.facts_.length + n.values.length;
     if (n.values.length) n.identity = n.values.length;
     n.urgency = urgency;
     return urgency;

@@ -40,10 +40,10 @@ import { answerTeams, contextFor } from "./views";
  */
 
 const CHAPTERS = [
-  { id: "context", title: "Faults fixed with what the last shift learned" },
-  { id: "graph", title: "Every customer and line in one memory" },
-  { id: "confidential", title: "Updates that stay with the customer" },
-  { id: "app", title: "Line tools that remember" },
+  { id: "context", title: "Faults fixed with what the last shift learned", seconds: 28 },
+  { id: "graph", title: "Every customer and line in one memory", seconds: 34 },
+  { id: "confidential", title: "Updates that stay with the customer", seconds: 30 },
+  { id: "app", title: "Line tools that remember", seconds: 24 },
 ];
 
 const LIB = "/preview/live/lib/";
