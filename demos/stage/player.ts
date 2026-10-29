@@ -110,6 +110,12 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
       $("tabs").replaceChildren();
       $("card").classList.remove("on");
       $("camera").style.transform = "";
+      // The dashboard keeps its view and scope in the site's storage, which every tab shares; each run starts as a fresh install.
+      try {
+        for (const key of Object.keys(localStorage)) if (key.startsWith("coere")) localStorage.removeItem(key);
+      } catch {
+        // Storage can be off; the run still plays.
+      }
       world.now = new World();
       setup(world.now);
       stage = makeStage();
