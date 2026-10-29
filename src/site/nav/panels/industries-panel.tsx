@@ -40,7 +40,7 @@ export function IndustriesPanel() {
                 href={`/industries#${industry.slug}`}
                 title={industry.name}
                 summary={industry.summary}
-                icon={<IndustryIcon name={industry.icon} size={18} />}
+                icon={<IndustryIcon name={industry.icon} size={24} />}
               />
             </li>
           ))}

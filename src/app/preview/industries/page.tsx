@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { ApplicationsGrid } from "@/site/industries/applications-grid";
-import { IndustryGrid } from "@/site/industries/industry-grid";
+import { IndustryGrid, PhotoCredits } from "@/site/industries/industry-grid";
 import { Container } from "@/site/ui/container";
 import { SectionHeading } from "@/site/ui/section-heading";
 
@@ -37,6 +37,7 @@ export default function IndustriesPage() {
           <div className="mt-6">
             <IndustryGrid />
           </div>
+          <PhotoCredits />
         </Container>
       </section>
       <ClosingCta title="Bring memory to your field." text="Tell us about your industry and what your people repeat to AI every day." />
