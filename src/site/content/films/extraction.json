@@ -1,0 +1,91 @@
+{
+ "chapters": [
+  {
+   "start": 0,
+   "end": 9.733,
+   "text": "Choose your AIs"
+  },
+  {
+   "start": 9.733,
+   "end": 18.133,
+   "text": "Extract all"
+  },
+  {
+   "start": 18.133,
+   "end": 33.067,
+   "text": "New chats come in"
+  },
+  {
+   "start": 33.067,
+   "end": 48,
+   "text": "A chat changes"
+  },
+  {
+   "start": 48,
+   "end": 54.267,
+   "text": "Your library"
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.002,
+   "end": 2.667,
+   "text": "Coere saves your chats from ChatGPT, Claude, Gemini and six more AIs."
+  },
+  {
+   "start": 2.667,
+   "end": 9.733,
+   "text": "Onboarding asks which AIs Maya uses. She picks ChatGPT, Claude and Gemini."
+  },
+  {
+   "start": 9.733,
+   "end": 14.367,
+   "text": "Extract all opens each AI in the background and saves every chat, with a row for each."
+  },
+  {
+   "start": 14.367,
+   "end": 18.133,
+   "text": "Every chat is saved, on this computer only."
+  },
+  {
+   "start": 18.133,
+   "end": 27.667,
+   "text": "Later, Maya has new chats. When she opens an AI, Coere saves them by itself."
+  },
+  {
+   "start": 27.667,
+   "end": 33.067,
+   "text": "Home counts what is saved, and Recently saved leads with the newest chats."
+  },
+  {
+   "start": 33.067,
+   "end": 36.933,
+   "text": "Memory says her DATA 100 lab is due Aug 18, from a chat on Claude."
+  },
+  {
+   "start": 36.933,
+   "end": 39.967,
+   "text": "Today she went back to that chat and said the lab moved to Aug 22."
+  },
+  {
+   "start": 39.967,
+   "end": 43.528,
+   "text": "Coere saved the changed chat and read it again. Memory now says Aug 22."
+  },
+  {
+   "start": 43.528,
+   "end": 48,
+   "text": "The old date stays under Earlier, with the message that moved it."
+  },
+  {
+   "start": 48,
+   "end": 52.2,
+   "text": "The Library keeps every chat from every AI, to search, read, download or move to another AI."
+  },
+  {
+   "start": 52.2,
+   "end": 54.267,
+   "text": "Saving chats needs no AI and no account."
+  }
+ ]
+}

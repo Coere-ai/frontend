@@ -1,0 +1,86 @@
+{
+ "chapters": [
+  {
+   "start": 0,
+   "end": 7.6,
+   "text": "Build your memory"
+  },
+  {
+   "start": 7.6,
+   "end": 14.233,
+   "text": "The graph grows"
+  },
+  {
+   "start": 14.233,
+   "end": 20.447,
+   "text": "Your memory"
+  },
+  {
+   "start": 20.447,
+   "end": 36.079,
+   "text": "Memories and chats"
+  },
+  {
+   "start": 36.079,
+   "end": 42.159,
+   "text": "Up close"
+  },
+  {
+   "start": 42.159,
+   "end": 52.367,
+   "text": "Search"
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.002,
+   "end": 2.667,
+   "text": "Coere builds a memory from Maya’s chats, with her own keys."
+  },
+  {
+   "start": 2.667,
+   "end": 7.6,
+   "text": "Nothing goes to an AI until she presses Build my memory."
+  },
+  {
+   "start": 7.6,
+   "end": 14.233,
+   "text": "Coere reads her chats and the graph grows, section by section."
+  },
+  {
+   "start": 14.233,
+   "end": 17.44,
+   "text": "The Memory page draws everything as one graph, with Maya in the middle and a section for each part of her life."
+  },
+  {
+   "start": 17.44,
+   "end": 20.447,
+   "text": "Each memory sits beside the chats it came from, the small dots around it."
+  },
+  {
+   "start": 20.447,
+   "end": 26.426,
+   "text": "All shows both. Memories shows only what Coere learned."
+  },
+  {
+   "start": 26.426,
+   "end": 36.079,
+   "text": "Chats shows only the chats, each round the thing it taught."
+  },
+  {
+   "start": 36.079,
+   "end": 42.159,
+   "text": "A click opens a section, with its folders, memories and chats."
+  },
+  {
+   "start": 42.159,
+   "end": 50.3,
+   "text": "Search lists the top four matches and lights them on the graph."
+  },
+  {
+   "start": 50.3,
+   "end": 52.367,
+   "text": "Every memory keeps the chat and the words it came from."
+  }
+ ]
+}

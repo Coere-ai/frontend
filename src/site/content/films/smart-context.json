@@ -1,0 +1,121 @@
+{
+ "chapters": [
+  {
+   "start": 0,
+   "end": 5.994,
+   "text": "Type a message"
+  },
+  {
+   "start": 5.994,
+   "end": 16.011,
+   "text": "What goes with it"
+  },
+  {
+   "start": 16.011,
+   "end": 33.432,
+   "text": "Add more"
+  },
+  {
+   "start": 33.432,
+   "end": 38.633,
+   "text": "One Enter"
+  },
+  {
+   "start": 38.633,
+   "end": 76.767,
+   "text": "In one chat"
+  },
+  {
+   "start": 76.767,
+   "end": 102.3,
+   "text": "File Upload (beta)"
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.003,
+   "end": 2.667,
+   "text": "Smart context adds what Maya’s new chat needs, as she types."
+  },
+  {
+   "start": 2.667,
+   "end": 5.994,
+   "text": "In a fresh ChatGPT chat, Maya asks for help with her PearX interview."
+  },
+  {
+   "start": 5.994,
+   "end": 11.805,
+   "text": "The blue line says what goes with it: her earlier prep chat, and the AIs she had it with."
+  },
+  {
+   "start": 11.805,
+   "end": 16.011,
+   "text": "The list shows all of it: the chat, who she is, and what she knows about PearX and Tidepool."
+  },
+  {
+   "start": 16.011,
+   "end": 23.531,
+   "text": "Add memory searches her memory. The top four show, and what matches lights up."
+  },
+  {
+   "start": 23.531,
+   "end": 33.432,
+   "text": "Ask Cori takes it in her own words, and adds the notes she meant."
+  },
+  {
+   "start": 33.432,
+   "end": 38.633,
+   "text": "One Enter puts it all in front of her draft and sends. ChatGPT starts from the work she already did."
+  },
+  {
+   "start": 38.633,
+   "end": 42.755,
+   "text": "In another chat she brings up her side project."
+  },
+  {
+   "start": 42.755,
+   "end": 50.377,
+   "text": "Coere adds who she is and what it knows about SkipDoodle."
+  },
+  {
+   "start": 50.377,
+   "end": 58.306,
+   "text": "Then she asks a follow up in the same chat."
+  },
+  {
+   "start": 58.306,
+   "end": 69.29,
+   "text": "Nothing new goes with it. ChatGPT already has it."
+  },
+  {
+   "start": 69.29,
+   "end": 76.767,
+   "text": "Later, asking about the stack brings SkipDoodle’s tech stack back."
+  },
+  {
+   "start": 76.767,
+   "end": 79.899,
+   "text": "For a long context, Dev Tools has File Upload (beta)."
+  },
+  {
+   "start": 79.899,
+   "end": 85.767,
+   "text": "With it on, a context longer than the number she sets goes as a text file. A short one stays as text."
+  },
+  {
+   "start": 85.767,
+   "end": 91.887,
+   "text": "Her PearX prep chat makes this context long."
+  },
+  {
+   "start": 91.887,
+   "end": 100.033,
+   "text": "One Enter attaches it as coere-context.txt, puts a short note in front of her draft, and sends once."
+  },
+  {
+   "start": 100.033,
+   "end": 102.3,
+   "text": "What goes is always on the line above the box, to change before she sends."
+  }
+ ]
+}

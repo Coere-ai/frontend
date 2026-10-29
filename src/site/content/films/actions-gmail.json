@@ -1,0 +1,106 @@
+{
+ "chapters": [
+  {
+   "start": 0,
+   "end": 8.7,
+   "text": "Turn on Browser Use"
+  },
+  {
+   "start": 8.7,
+   "end": 12.692,
+   "text": "Ask Cori"
+  },
+  {
+   "start": 12.692,
+   "end": 21.667,
+   "text": "The plan"
+  },
+  {
+   "start": 21.667,
+   "end": 25.491,
+   "text": "Cori is working"
+  },
+  {
+   "start": 25.491,
+   "end": 33.4,
+   "text": "Your style"
+  },
+  {
+   "start": 33.4,
+   "end": 37.122,
+   "text": "Draft saved"
+  },
+  {
+   "start": 37.122,
+   "end": 53.367,
+   "text": "Send and undo"
+  }
+ ],
+ "captions": [
+  {
+   "start": 0.003,
+   "end": 2.733,
+   "text": "Cori can write email for Maya, in her style, from her memory."
+  },
+  {
+   "start": 2.733,
+   "end": 5.059,
+   "text": "In Settings, Maya turns on Coere Browser Use."
+  },
+  {
+   "start": 5.059,
+   "end": 8.7,
+   "text": "Autonomous and Bolt are the defaults. Human Review asks before each click."
+  },
+  {
+   "start": 8.7,
+   "end": 13.706,
+   "text": "On the Cori page she asks for an email in her own words."
+  },
+  {
+   "start": 13.706,
+   "end": 16.329,
+   "text": "Cori shows his plan and starts."
+  },
+  {
+   "start": 16.329,
+   "end": 21.667,
+   "text": "Two people in her mail are called Sam, so Cori asks which one."
+  },
+  {
+   "start": 21.667,
+   "end": 25.491,
+   "text": "Cori works in a tab of his own, in the Coere tab group, with a glow around the page."
+  },
+  {
+   "start": 25.491,
+   "end": 29.318,
+   "text": "He reads her past emails with Sam, then writes in her style. The bar shows each step and Stop."
+  },
+  {
+   "start": 29.318,
+   "end": 33.4,
+   "text": "The email is in her voice, signed the way she signs."
+  },
+  {
+   "start": 33.4,
+   "end": 37.122,
+   "text": "The draft waits in Gmail, unsent. Open draft or Delete draft are one press away."
+  },
+  {
+   "start": 37.122,
+   "end": 44.367,
+   "text": "When her line says send, Cori sends."
+  },
+  {
+   "start": 44.367,
+   "end": 51.133,
+   "text": "Sent to Priya. Undo send takes it back while Gmail still can."
+  },
+  {
+   "start": 51.133,
+   "end": 53.367,
+   "text": "Cori asks before he sends to someone you did not name."
+  }
+ ]
+}
