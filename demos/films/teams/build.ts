@@ -21,6 +21,13 @@ const PHASES: ReadonlyArray<[BuildPhase, number]> = [
 ];
 const TICK_MS = 280;
 
+/**
+ * The build's time at the engine's starting rates, before it has measured
+ * this library: about 3.4 seconds a chat, as its own estimate gives 1 h 10
+ * min for 1,240 chats (onboarding/build/memory-onboarding.test.tsx).
+ */
+const estimate = (mem: Mem): number => Math.round(mem.chats.length * 3.4);
+
 type Args = Record<string, unknown>;
 const args = (m: { args?: unknown }): Args => (m.args ?? {}) as Args;
 
@@ -33,7 +40,7 @@ export function answerBuild(world: World, mem: Mem): void {
   world
     .engine("memory.settings", () => settings)
     .engine("memory.setSettings", (m) => (settings = { ...settings, ...(args(m) as Partial<MemorySettings>) }))
-    .engine("memory.buildEstimate", () => ({ chats: mem.chats.length, seconds: 540, measured: false, progress }))
+    .engine("memory.buildEstimate", () => ({ chats: mem.chats.length, seconds: estimate(mem), measured: false, progress }))
     .engine("memory.status", () => v.status(mem, { state: progress ? "running" : "ready" }))
     .engine("memory.control", (m) => {
       if (args(m).action === "build" && progress === null) start(args(m).from === "onboarding");
@@ -76,7 +83,7 @@ export function answerBuild(world: World, mem: Mem): void {
         sections: shown.nodes.filter((n) => n.kind === "section").length,
         folders: shown.nodes.filter((n) => n.kind !== "section" && n.kind !== "self").length,
         // The time left, at the engine's starting rates for a library of this size.
-        secondsLeft: Math.max(20, Math.round(540 * (1 - at / span))),
+        secondsLeft: Math.max(20, Math.round(estimate(mem) * (1 - at / span))),
         startedAt,
         fromOnboarding,
       };

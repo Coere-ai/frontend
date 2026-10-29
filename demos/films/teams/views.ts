@@ -304,7 +304,7 @@ export function contextFor(m: Mem, tail: string): ContextAnswer & { client: { id
   const asked = words(tail).filter((w) => !named.node.label.toLowerCase().includes(w) && !STOP.has(w));
   // The client's own lines the draft is about, the dated ones first, as the card's lines rank (packages/solution/src/context).
   const facts = allFacts(m)
-    .filter((f) => f.client === named.key && f.owner === named.node.id)
+    .filter((f) => f.client === named.key)
     .map((f) => ({ f, score: asked.filter((t) => f.text.toLowerCase().includes(t)).length + (f.specifics.length > 0 ? 2 : 0) + (f.kind === "task" ? 1 : 0) }))
     .filter((x) => x.score >= 3)
     .sort((a, b) => b.score - a.score)

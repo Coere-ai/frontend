@@ -71,7 +71,8 @@ function run(world: World, mem: Mem, batch: Batch): void {
       const chats = mem.chats.filter((c) => c.platform === e.platform);
       const projects = new Set(chats.map((c) => c.project).filter(Boolean)).size;
       // The AIs start a moment apart and run at their own pace, as separate tabs do.
-      return { e, chats: chats.length, projects, delay: 250 + i * 180, ms: RUN_MS * (0.75 + (chats.length / 20) * 0.4) };
+      // A bigger library takes a little longer, within the few seconds a viewer waits.
+      return { e, chats: chats.length, projects, delay: 250 + i * 180, ms: RUN_MS * (0.75 + Math.min(chats.length, 80) / 80) * 0.75 };
     });
   const timer = setInterval(() => {
     const now = Date.now();

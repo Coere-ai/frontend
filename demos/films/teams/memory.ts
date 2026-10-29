@@ -2,18 +2,27 @@ import type { Conversation, PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail, TreeItem } from "@coere/memory";
 import type { ClientView, WorkerView } from "@coere/solution";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
-import { CLIENTS, generateSolutionCorpus, NEW_CLIENTS, WORKERS, type PlantedItem, type SolutionCorpus } from "@v2/tools/gen-corpus/solution/index";
+import { CLIENTS, NEW_CLIENTS, VENDOR_NAMES, WORKERS, type PlantedItem, type SolutionCorpus } from "@v2/tools/gen-corpus/solution/index";
+import { MORE_CLIENTS, teamCorpus } from "./corpus";
 
 /**
  * Fernhill Creative's memory as Coere for Teams builds it from Maya's
  * chats: the agency corpus coere-v2's films and e2e specs use
- * (tools/gen-corpus/solution), its small slice of 90 chats, and every item
+ * (tools/gen-corpus/solution) with the agency's smaller clients
+ * (corpus.ts), a library of LIBRARY chats across her AIs, and every item
  * those chats plant, filed as the engine files them: Company with its
- * catalog folders and coworkers, Clients with a folder per client holding
- * its contacts, engagement and facts by slot, and Tone and voice. Amounts
- * and credentials never reach memory, so items that carry them are left
- * out, as are the items memory does not keep.
+ * catalog folders nested as the catalog nests them, coworkers in People
+ * and each vendor and competitor in its own folder, Clients with a folder
+ * per client holding its contacts, its engagement and facts by slot, and
+ * her own Preferences, Writing style and Tone and voice, which the work
+ * rows of the checklist keep. Amounts and credentials never reach memory,
+ * so items that carry them are left out, as are the items memory does not
+ * keep (her personal life, which the checklist leaves unticked, and one
+ * off questions).
  */
+
+/** How many chats Maya's AIs hold, which Extract all saves and the build reads. */
+export const LIBRARY = 436;
 
 export const ZONE = "America/Los_Angeles";
 type UrgencyKind = Parameters<typeof describeUrgency>[0]["kind"];
@@ -47,7 +56,7 @@ export interface Mem {
   nodes: Map<string, Node>;
   facts: Map<string, Fact>;
   self: string;
-  sections: { company: string; clients: string; tone: string };
+  sections: { company: string; clients: string; preferences: string; style: string; tone: string };
   /** Client key to its folder id. */
   clientIds: Map<string, string>;
   /** The client the chats found that waits in Review. */
@@ -72,14 +81,20 @@ function idMaker() {
   };
 }
 
-/** The 90 chats of the small slice, as tests/e2e/solution/helpers/agency-library.ts serves them. */
-function smallChats(c: SolutionCorpus): Conversation[] {
+/**
+ * The library: the chats every story in the film stands on (the tricky,
+ * confidential and identity families, the new clients, everything about
+ * Kestrel Outdoor and the small client that is deleted), then the newest
+ * of the rest up to LIBRARY, as tests/e2e/solution/helpers/agency-library.ts
+ * cuts its slices.
+ */
+function libraryChats(c: SolutionCorpus): Conversation[] {
   const kept = (i: PlantedItem) =>
-    i.family === "tricky" || i.family === "confidential" || i.family === "identity" || Boolean(i.newClient) || (i.client === "kestrel" && (i.slot === "promises" || i.slot === "contacts"));
+    i.family === "tricky" || i.family === "confidential" || i.family === "identity" || Boolean(i.newClient) || i.client === "kestrel" || i.client === "lantern";
   const must = new Set(c.items.filter(kept).map((i) => i.convId));
   const id = (x: Conversation) => `${x.platform}:${x.platformConvId}`;
   const rest = c.conversations.filter((x) => !must.has(id(x))).reverse();
-  const keep = new Set([...must, ...rest.slice(0, Math.max(0, 90 - must.size)).map(id)]);
+  const keep = new Set([...must, ...rest.slice(0, Math.max(0, LIBRARY - must.size)).map(id)]);
   return c.conversations.filter((x) => keep.has(id(x)));
 }
 
@@ -130,6 +145,11 @@ const titled = (c: Conversation): Conversation => {
 /** The catalog names of the folders the agency's items file under (packages/solution taxonomy). */
 const FOLDERS: Record<string, string> = {
   "company.about": "About the company",
+  "company.competitors": "Competitors",
+  "company.hiring": "Hiring",
+  "company.legal": "Legal and compliance",
+  "company.onboarding": "Onboarding",
+  "company.policies.remote_work": "Remote work",
   "company.communication": "How we communicate",
   "company.customers": "Customers in general",
   "company.decisions": "Decisions",
@@ -155,7 +175,26 @@ const FOLDERS: Record<string, string> = {
   "company.teams": "Teams and org chart",
   "company.tools": "Tools and systems",
   "tone.desired": "How you want to come across",
+  "preferences.answers": "How you want answers",
+  "preferences.answers.format": "Answer format",
+  "preferences.answers.length": "Answer length",
+  "preferences.answers.language": "Answer language",
+  "preferences.writing_rules": "Writing rules for AIs",
+  "preferences.ai_tone": "Tone of answers",
+  "preferences.formats": "Units and formats",
+  "preferences.tools": "Tools and apps you prefer",
+  "preferences.working": "How you like to work",
+  "style.habits": "Habits",
 };
+
+/** The sections memory files Maya's chats under, by the corpus's top level keys, in the order the graph draws them. */
+const SECTIONS: ReadonlyArray<[top: string, label: string]> = [
+  ["company", "Company"],
+  ["clients", "Clients"],
+  ["preferences", "Preferences"],
+  ["style", "Writing style"],
+  ["tone", "Tone and voice"],
+];
 
 /** The fact kind each client slot holds, as the client template files them. */
 const SLOT_KIND: Record<string, FactView["kind"]> = {
@@ -167,6 +206,9 @@ const SLOT_KIND: Record<string, FactView["kind"]> = {
   contacts: "attribute",
   overview: "attribute",
 };
+
+/** The client slots whose facts about the engagement live in the engagement's own folder. */
+const ENGAGEMENT_SLOTS = new Set(["engagements", "scope", "issues", "requests", "documents", "pipeline", "decisions"]);
 
 /** The key each client slot files a fact under (packages/solution's client_account template), so every reader finds its slot. */
 const SLOT_KEY: Record<string, string> = {
@@ -207,8 +249,8 @@ function specificsOf(text: string): Array<[number, number]> {
 }
 
 export function buildMemory(now: number): Mem {
-  const corpus = generateSolutionCorpus({ now });
-  const served = smallChats(corpus).map(titled);
+  const corpus = teamCorpus(now);
+  const served = libraryChats(corpus).map(titled);
   const byConv = new Map(served.map((c) => [`${c.platform}:${c.platformConvId}`, c]));
   const chats: Chat[] = served.map((c) => ({
     id: `${c.platform}:${c.platformConvId}`,
@@ -245,22 +287,33 @@ export function buildMemory(now: number): Mem {
   };
 
   const self = node({ id: id("ent", start), kind: "self", label: "You", section: "", importance: 5 });
-  const sections = { company: "sec_company", clients: "sec_clients", tone: "sec_tone" };
-  node({ id: sections.company, kind: "section", label: "Company", section: sections.company });
-  node({ id: sections.clients, kind: "section", label: "Clients", section: sections.clients });
-  node({ id: sections.tone, kind: "section", label: "Tone and voice", section: sections.tone });
+  // Company and Clients take the ids the Solution page knows them by (solution/memory/org-points.ts).
+  const sections = { company: "sec_company", clients: "sec_clients", preferences: "sec_preferences", style: "sec_style", tone: "sec_tone" };
+  const sectionOf = new Map(SECTIONS.map(([top, label]) => [top, node({ id: `sec_${top}`, kind: "section", label, section: `sec_${top}` }).id]));
 
-  const items = corpus.items.filter((i) => byConv.has(i.convId) && i.kept && !i.amounts?.length && !i.credentials?.length && ["company", "clients", "tone"].includes(i.top));
+  const items = corpus.items.filter((i) => byConv.has(i.convId) && i.kept && !i.amounts?.length && !i.credentials?.length && sectionOf.has(i.top));
   const saidAt = (i: PlantedItem) => Date.parse(byConv.get(i.convId)?.messages[i.msgIndex]?.createdAt ?? "") || now - DAY;
 
-  // Company: a folder per catalog part, coworkers as people in People.
+  // A folder per catalog part, nested as the catalog nests them: Decisions holds Technical decisions.
   const folders = new Map<string, string>();
   const folder = (section: string, key: string, at: number): string => {
-    const top = key.split(".").slice(0, 2).join(".");
-    const known = folders.get(top);
+    let parent = section;
+    const parts = key.split(".");
+    for (let n = 2; n <= parts.length; n++) {
+      const part = parts.slice(0, n).join(".");
+      const known = folders.get(part);
+      parent = known ?? node({ id: id("ent", at), kind: "folder", label: FOLDERS[part] ?? part, section, parent, importance: 3 }).id;
+      folders.set(part, parent);
+    }
+    return parent;
+  };
+  // Each vendor and competitor is its own folder in Partners and vendors or Competitors.
+  const vendorIds = new Map<string, string>();
+  const vendor = (name: string, key: string, at: number): string => {
+    const known = vendorIds.get(name);
     if (known) return known;
-    const made = node({ id: id("ent", at), kind: "folder", label: FOLDERS[top] ?? FOLDERS[key] ?? top, section, parent: section, importance: 3 });
-    folders.set(top, made.id);
+    const made = node({ id: id("ent", at), kind: "organization", label: name, section: sections.company, parent: folder(sections.company, key, at), importance: 3 });
+    vendorIds.set(name, made.id);
     return made.id;
   };
 
@@ -268,8 +321,9 @@ export function buildMemory(now: number): Mem {
   const clientIds = new Map<string, string>();
   const contactIds = new Map<string, string>();
   const workerIds = new Map<string, string>();
-  const all = [...CLIENTS.map((c) => ({ key: c.key, name: c.name, aliases: c.aliases, work: c.work, contacts: c.contacts, domain: c.domain })), ...NEW_CLIENTS.map((c) => ({ key: c.key, name: c.name, aliases: c.aliases, work: c.work, contacts: [] as typeof CLIENTS[number]["contacts"], domain: "" }))];
+  const all = [...[...CLIENTS, ...MORE_CLIENTS].map((c) => ({ key: c.key, name: c.name, aliases: c.aliases, work: c.work, contacts: c.contacts, domain: c.domain })), ...NEW_CLIENTS.map((c) => ({ key: c.key, name: c.name, aliases: c.aliases, work: c.work, contacts: [] as typeof CLIENTS[number]["contacts"], domain: "" }))];
   const proposedKey = "pebblebrook";
+  const projectIds = new Map<string, string>();
   for (const c of all) {
     const mine = items.filter((i) => i.client === c.key);
     if (mine.length === 0 || c.key === proposedKey) continue;
@@ -304,30 +358,35 @@ export function buildMemory(now: number): Mem {
     if (mine.some((i) => i.text.includes(c.work))) {
       const work = node({ id: id("ent", first + 1000), kind: "project", label: c.work, section: sections.clients, parent: folderNode.id, importance: 3 });
       folderNode.relations.unshift({ type: "for", label: `${c.work} is for this`, direction: "in", other: { id: work.id, label: c.work, kind: "project" } });
+      work.relations = [{ type: "for", label: "For", direction: "out", other: { id: folderNode.id, label: c.name, kind: "organization" } }];
+      projectIds.set(c.key, work.id);
     }
   }
   const pb = NEW_CLIENTS.find((c) => c.key === proposedKey)!;
   const proposed = { key: pb.key, name: pb.name, id: id("ent", now - 60 * DAY), chats: new Set(items.filter((i) => i.client === proposedKey).map((i) => i.convId)).size };
-
-  const toneFolder = node({ id: id("ent", start + DAY), kind: "folder", label: FOLDERS["tone.desired"]!, section: sections.tone, parent: sections.tone, importance: 3 });
 
   for (const i of items) {
     if (i.client === proposedKey) continue;
     const at = saidAt(i);
     const conv = byConv.get(i.convId)!;
     let owner: string | undefined;
-    let section = sections.company;
-    if (i.top === "tone") {
-      owner = toneFolder.id;
-      section = sections.tone;
+    if (i.top !== "company" && i.top !== "clients") {
+      // Her own: Preferences, Writing style, Tone and voice, each part in its catalog folder.
+      owner = folder(sectionOf.get(i.top)!, i.section, at);
     } else if (i.top === "clients" && i.client) {
-      section = sections.clients;
       const client = all.find((c) => c.key === i.client)!;
       const named = client.contacts.find((k) => i.text.startsWith(k.name) && i.slot === "contacts");
       if (i.identity?.length) continue;
-      owner = (named && contactIds.get(`${client.key}:${named.key}`)) ?? clientIds.get(i.client);
+      // What is about the engagement itself (its scope, requests, issues, brief, decisions and next step) goes in the
+      // engagement's folder; promises, deadlines and meetings stay in the client's own slots.
+      const work = ENGAGEMENT_SLOTS.has(i.slot ?? "") && i.text.includes(client.work) ? projectIds.get(client.key) : undefined;
+      owner = (named && contactIds.get(`${client.key}:${named.key}`)) ?? work ?? clientIds.get(i.client);
+    } else if (i.section === "company.partners" || i.section === "company.competitors") {
+      const name = VENDOR_NAMES.find((v) => i.text.startsWith(v)) ?? VENDOR_NAMES.find((v) => i.text.includes(v));
+      owner = name ? vendor(name, i.section, at) : folder(sections.company, i.section, at);
     } else if (i.top === "company") {
-      const worker = WORKERS.find((w) => i.text.includes(w.name) && i.section === "company.people");
+      // A coworker by full name, or by first name in a line about people at work, as the chats name them.
+      const worker = i.section === "company.people" ? (WORKERS.find((w) => i.text.includes(w.name)) ?? WORKERS.find((w) => new RegExp(`\\b${w.first}\\b`).test(i.text))) : undefined;
       if (worker) {
         const people = folder(sections.company, "company.people", at);
         owner =
@@ -345,7 +404,7 @@ export function buildMemory(now: number): Mem {
       } else owner = folder(sections.company, i.section, at);
     }
     if (!owner) continue;
-    const kind: FactView["kind"] = (i.slot && SLOT_KIND[i.slot]) || (i.top === "tone" ? "style" : i.text.startsWith("We decided") || i.text.startsWith("We switched") ? "decision" : "note");
+    const kind: FactView["kind"] = (i.slot && SLOT_KIND[i.slot]) || (i.top === "tone" || i.top === "style" ? "style" : i.top === "preferences" ? "preference" : i.text.startsWith("We decided") || i.text.startsWith("We switched") ? "decision" : "note");
     const due = kind === "task" ? dueOf(i.text, at) : null;
     const source: FactSource = { evidenceId: "", platform: conv.platform, convId: i.convId, title: conv.title, msg: i.msgIndex, role: "user", at: new Date(at).toISOString(), url: null, stale: false };
     const fid = id("fact", at);
