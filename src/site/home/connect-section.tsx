@@ -3,9 +3,18 @@ import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
+import { ActionsReel } from "./actions-reel";
 import { SectionIntro } from "./section-intro";
 
 const items: ShowcaseItem[] = [
+  {
+    key: "context",
+    title: "Context, added as you type",
+    summary: "Start a new chat on any AI and Coere brings what it needs from your memory: who you are, the chat that holds your work, and what you know about the topic.",
+    checks: ["The line: a blue line says what goes and which AIs it came from", "One Enter: it goes in front of your message and sends", "No repeats: a follow up in the same chat sends nothing twice"],
+    href: "/products/connect",
+    visual: <FilmFrame film={films.smartContext} preview />,
+  },
   {
     key: "graph",
     title: "Your memory graph",
@@ -25,14 +34,19 @@ const items: ShowcaseItem[] = [
   {
     key: "actions",
     title: "Coere Actions",
-    summary: "Cori, the helper in Coere, acts on what your memory knows, in your words and with your say on anything that leaves.",
-    checks: ["Gmail: drafts in your style, and asks before writing to anyone you didn't name", "Writing: fix or improve text in Gmail, Docs and chat boxes", "Voice: hold Right Option, talk, and hear the answer"],
+    summary: "Cori, the helper in Coere, does the work from what your memory knows, and asks before anything leaves.",
+    checks: [
+      "Email: drafts in your style, in its own Gmail tab",
+      "Calendar: adds the event with the guests and time zone you said",
+      "Writing: fix or improve text in Gmail, Docs and chat boxes",
+      "Forms and quizzes: answers from memory, and asks before it submits",
+    ],
     href: "/products/connect#actions",
-    visual: <FilmFrame film={films.actionsGmail} preview />,
+    visual: <ActionsReel />,
   },
 ];
 
-/** Coere Connect on the home page: what the memory is, how it fills, and what it does. */
+/** Coere Connect on the home page: context as you type, the memory, how it fills, and what Cori does with it. */
 export function ConnectSection() {
   return (
     <section id="connect" className="scroll-mt-24 border-t border-neutral-100 py-28 md:py-36">
