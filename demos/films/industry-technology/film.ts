@@ -29,10 +29,10 @@ import * as v from "./views";
  */
 
 const CHAPTERS = [
-  { id: "context", title: "From Claude to ChatGPT" },
-  { id: "graph", title: "Every client project" },
-  { id: "confidential", title: "Ask about the stack" },
-  { id: "app", title: "A coding assistant" },
+  { id: "context", title: "From Claude to ChatGPT", seconds: 36 },
+  { id: "graph", title: "Every client project", seconds: 31 },
+  { id: "confidential", title: "Ask about the stack", seconds: 26 },
+  { id: "app", title: "A coding assistant", seconds: 20 },
 ];
 
 const LIB = "/preview/live/lib/";
@@ -164,8 +164,10 @@ async function connect(s: Stage): Promise<void> {
       await s.rest();
       await until(() => /Ledger API retry bug/.test(stripLine(gpt.doc)?.textContent ?? ""), 10_000);
       s.say("Coere says what goes with it: his Claude chat, the stack and the decisions.");
+      // The strip's reveal plays before the pointer goes to it.
+      await s.wait(800);
       await s.glide(gpt, stripLine);
-      await s.wait(2200);
+      await s.wait(1100);
       await s.click(gpt, role("button", "Show the memories that go in", { exact: true }), { after: 400 });
       await s.waitFor(gpt, stripList);
       await s.rest();
@@ -254,8 +256,9 @@ async function confidential(s: Stage): Promise<void> {
       await s.rest();
       await until(() => /Halcyon Health/.test(stripLine(chat.doc)?.textContent ?? ""), 15_000);
       s.say("The line names the client. Only Halcyon's context goes, nothing from other clients.");
+      await s.wait(800);
       await s.glide(chat, stripLine);
-      await s.wait(2400);
+      await s.wait(1100);
       await s.click(chat, role("button", "Show the memories that go in", { exact: true }), { after: 400 });
       if (await s.waitFor(chat, stripList, 5000).then(() => true, () => false)) {
         await s.rest();

@@ -34,10 +34,10 @@ import { answerCori, answerTeam, filmClock } from "./team";
  */
 
 const CHAPTERS = [
-  { id: "context", title: "Review prep" },
-  { id: "graph", title: "Every household" },
-  { id: "confidential", title: "One client at a time" },
-  { id: "app", title: "Review prep app" },
+  { id: "context", title: "Review prep", seconds: 28 },
+  { id: "graph", title: "Every household", seconds: 30 },
+  { id: "confidential", title: "One client at a time", seconds: 35 },
+  { id: "app", title: "Review prep app", seconds: 21 },
 ];
 
 const DANIEL = { name: field.person.name, first: field.person.name.split(" ")[0], initials: field.person.initials };
@@ -151,8 +151,10 @@ async function reviewPrep(s: Stage): Promise<void> {
   await s.rest();
   await until(() => /Adding/.test(stripText(site)), 10_000);
   s.say("The blue line says what goes: his prep chat and what the household told him this year.");
+  // The strip's reveal plays before the pointer goes to it.
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(2600);
+  await s.wait(1100);
   await openList(s, site);
   s.say("The list shows it all: the chat, who he is, and the household's goals and accounts.");
   await s.wait(5200);
@@ -293,8 +295,9 @@ async function oneClient(s: Stage, before: Tab | null): Promise<void> {
   await s.rest();
   await until(() => stripText(site).includes(`on the client ${CLIENT}`), 15_000);
   s.say(`The line names one client. Only ${CLIENT}'s memory goes with it.`);
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(1800);
+  await s.wait(1100);
   await openList(s, site);
   await s.wait(3000);
   await hideList(s, site);

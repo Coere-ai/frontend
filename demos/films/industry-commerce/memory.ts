@@ -2,6 +2,8 @@ import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { field } from "../../../demos/industries/fields/commerce.mjs";
+import { grow } from "./grow";
+import { roster } from "./roster";
 
 /**
  * Harbourline Trading's memory as Coere for Teams files it from Grace
@@ -23,6 +25,8 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 export const FIRM = field.firm as string;
 export const PERSON = field.person as { name: string; initials: string };
 export const CLIENT = field.client.name as string;
+/** How many chats the team's AIs hold across its people, every one of them a source of its memory. */
+export const LIBRARY = 426;
 
 type UrgencyKind = Parameters<typeof describeUrgency>[0]["kind"];
 
@@ -320,6 +324,33 @@ export function buildMemory(): Mem {
 
   const tone = node({ id: id("ent", start + 2 * DAY), kind: "folder", label: field.graph.hubs[2].children[0].label, section: sections.tone, parent: sections.tone, extra: 3 });
   for (const said of TONE) add(tone, said, null);
+
+  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): the other partners and
+  // their contracts, the firm's factories, forwarders, product lines, policies and staff, from as many chats as
+  // the team's AIs hold. Memory now holds every memory the graph draws, so nothing is drawn past what is listed.
+  const r = roster(NOW);
+  const byLabel = (label: string) => [...nodes.values()].find((x) => x.label === label && (x.kind === "topic" || x.kind === "folder"))!.id;
+  const grown = grow({
+    seed: 0xc0a3,
+    now: NOW,
+    zone: ZONE,
+    nodes: nodes as never,
+    facts,
+    chats: LIBRARY,
+    existing: [...chats.values()].map((c) => ({ platform: c.platform, title: c.title })),
+    plant: [
+      { parent: sections.company, section: sections.company, things: r.company },
+      { parent: byLabel("Freight partners"), section: sections.company, things: r.forwarders },
+      { parent: sections.clients, section: sections.clients, things: r.clientThings },
+      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+    ],
+  });
+  for (const c of grown.chats) chats.set(`${c.platform}:${c.title}`, { id: c.id, platform: c.platform, title: c.title });
+  for (const t of r.clientThings) {
+    const x = [...nodes.values()].find((y) => y.kind === "organization" && y.client === t.client);
+    if (x && t.client) clientIds.set(t.client, x.id);
+  }
+  for (const n of nodes.values()) n.extra = 0;
 
   // Counts and urgency roll up the tree, as the overview's node stats do.
   const rank = ["none", "later", "upcoming", "soon", "today", "overdue"];

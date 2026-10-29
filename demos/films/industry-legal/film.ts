@@ -37,10 +37,10 @@ import { contextFor } from "./views";
  */
 
 const CHAPTERS = [
-  { id: "context", title: "Deposition prep" },
-  { id: "graph", title: "Clients and matters" },
-  { id: "confidential", title: "One client at a time" },
-  { id: "app", title: "A matter desk" },
+  { id: "context", title: "Deposition prep", seconds: 25 },
+  { id: "graph", title: "Clients and matters", seconds: 29 },
+  { id: "confidential", title: "One client at a time", seconds: 27 },
+  { id: "app", title: "A matter desk", seconds: 26 },
 ];
 const ORDER = CHAPTERS.map((c) => c.id);
 /** The chapter the page was asked to start at. */
@@ -143,9 +143,10 @@ async function context(s: Stage, next: { graph?: Promise<Tab> }): Promise<void> 
   await s.rest();
   await until(() => /Adding your chat/.test(stripText(site)), 15_000);
   s.say("The line above the box says what goes: her outline and the case.");
-  await s.wait(700);
+  // The strip's reveal plays before the pointer goes to it.
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(2600);
+  await s.wait(1100);
   await s.click(site, showList, { after: 400 });
   await s.waitFor(site, stripList);
   await s.rest();
@@ -210,9 +211,9 @@ async function confidential(s: Stage, next: { chat?: Promise<Tab>; cori?: Promis
   await s.rest();
   await until(() => stripText(site).includes(`on the client ${CLIENT}`), 20_000);
   s.say(`The line names the client the draft is about. Only ${CLIENT} goes with it.`);
-  await s.wait(600);
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(2600);
+  await s.wait(1100);
   await s.click(site, showList, { after: 400 });
   await s.waitFor(site, stripList);
   await s.rest();

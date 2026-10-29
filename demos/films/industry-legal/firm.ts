@@ -3,6 +3,8 @@ import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDeta
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { field } from "../../../demos/industries/fields/legal.mjs";
 import { FILM_NOW, ZONE } from "./clock";
+import { grow } from "./grow";
+import { MORE_WORKERS, roster } from "./roster";
 
 /**
  * Whitlock & Rhee's memory as Coere for Teams files it from the firm's
@@ -43,18 +45,23 @@ export interface Mem {
 export const FIRM = { name: field.firm, aliases: ["Whitlock & Rhee", "Whitlock"], domains: ["whitlockrhee.com"], industry: "law" as const };
 export const SELF = { name: field.person.name, role: "Litigation associate", team: "Litigation" };
 
-/** The firm's clients as Settings lists them. */
-export const CLIENTS = [
+/** How many chats the firm's AIs hold across its people, every one of them a source of its memory. */
+export const LIBRARY = 384;
+
+/** The firm's clients as Settings lists them: the four the film names, then the rest of the firm's book (roster.ts). */
+export const CLIENTS: Array<{ key: string; name: string; aliases: string[]; domains: string[]; status: "active" | "paused" }> = [
   { key: "hartwell", name: "Hartwell Logistics", aliases: ["Hartwell"], domains: ["hartwelllogistics.com"], status: "active" as const },
   { key: "osei", name: "Osei Bakery", aliases: ["Osei"], domains: ["oseibakery.com"], status: "active" as const },
   { key: "calder", name: "Calder Foods", aliases: ["Calder"], domains: ["calderfoods.com"], status: "active" as const },
   { key: "dunmore", name: "Dunmore Clinic", aliases: ["Dunmore"], domains: ["dunmoreclinic.org"], status: "active" as const },
+  ...roster(FILM_NOW).clients,
 ];
 
 export const WORKERS = [
   { key: "grace", name: "Grace Rhee", team: "Litigation", role: "Partner" },
   { key: "daniel", name: "Daniel Whitlock", team: "Litigation", role: "Managing partner" },
   { key: "sam", name: "Sam Ortiz", team: "Litigation", role: "Paralegal" },
+  ...MORE_WORKERS.map(({ key, name, team, role }) => ({ key, name, team, role })),
 ];
 
 /** The chats the firm's memories come from: which AI, and when. */
@@ -416,21 +423,31 @@ export function buildFirm(): Mem {
   for (const t of [HARTWELL, OSEI, CALDER, DUNMORE]) place(t, clients, sections.clients, null);
   place(TONE, tone, sections.tone, null);
 
-  // Counts and urgency roll up the tree, as the overview's node stats do.
-  const rank = ["none", "later", "upcoming", "soon", "today", "overdue"];
-  const roll = (n: Node): void => {
-    let urgency: GraphNode["urgency"] = "none";
-    for (const f of n.facts_.map((x) => facts.get(x)!)) if (rank.indexOf(f.urgency) > rank.indexOf(urgency)) urgency = f.urgency;
-    for (const kid of n.kids) {
-      roll(nodes.get(kid)!);
-      const u = nodes.get(kid)!.urgency;
-      if (rank.indexOf(u) > rank.indexOf(urgency)) urgency = u;
-    }
-    n.facts = n.facts_.length + n.values.length;
-    if (n.values.length) n.identity = n.values.length;
-    n.urgency = urgency;
-  };
-  for (const s of Object.values(sections)) for (const kid of nodes.get(s)!.kids) roll(nodes.get(kid)!);
+  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): the other clients, the
+  // firm's practice areas, policies, vendors, judges and staff, from as many chats as the firm's AIs hold.
+  const r = roster(now);
+  const byLabel = (label: string) => [...nodes.values()].find((n) => n.label === label && n.kind === "folder")!.id;
+  const existing = [...new Map([...facts.values()].flatMap((f) => f.sources).map((src) => [src.convId, { platform: src.platform, title: src.title }])).values()];
+  const grown = grow({
+    seed: 0x1e6a1,
+    now,
+    zone: ZONE,
+    nodes,
+    facts,
+    chats: LIBRARY,
+    existing,
+    plant: [
+      { parent: sections.company, section: sections.company, things: r.company },
+      { parent: byLabel(companyName(3)), section: sections.company, things: r.people },
+      { parent: sections.clients, section: sections.clients, things: r.clientThings },
+      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+    ],
+  });
+  for (const t of r.clientThings) {
+    const n = [...nodes.values()].find((x) => x.kind === "organization" && x.client === t.client);
+    if (n && t.client) clientIds.set(t.client, n.id);
+  }
+  void used;
 
-  return { now, nodes, facts, self: self.id, sections, clientIds, chats: used.size, written: null };
+  return { now, nodes, facts, self: self.id, sections, clientIds, chats: existing.length + grown.chats.length, written: null };
 }

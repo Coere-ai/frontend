@@ -85,7 +85,8 @@ export function answerTeam(world: World, mem: Mem): void {
     .engine("memory.documents", () => [])
     .engine("memory.quote", () => null)
     .engine("search", (m) => ({ hits: [], totalMatches: 0, ms: 4, stage: 1, queryTokens: String(args(m).query ?? "").toLowerCase().split(/\s+/).filter(Boolean) }))
-    .engine("listConversations", () => ({ rows: [], total: v.sourceChats(mem).all }));
+    .engine("listConversations", () => ({ rows: [], total: v.sourceChats(mem).all }))
+    .engine("stats", () => ({ conversations: v.sourceChats(mem).all, chunks: 0, projects: 0, textBytes: 0, dbBytes: 0, byPlatform: {} }));
 }
 
 /** Cori as the service worker runs him, in the demo's top page; a `cori.ask` from a tab gets his answer. */

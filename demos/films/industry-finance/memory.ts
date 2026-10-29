@@ -2,6 +2,8 @@ import type { PlatformId } from "@coere/core";
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { field } from "../../../demos/industries/fields/finance.mjs";
+import { grow } from "./grow";
+import { MORE_WORKERS, roster } from "./roster";
 
 /**
  * Ashgrove Wealth Partners' memory as Coere for Teams files it from the
@@ -257,7 +259,11 @@ export const WORKERS = [
   { key: "priya", name: "Priya Shah", team: "Compliance", role: "Chief compliance officer" },
   { key: "tom", name: "Tom Becker", team: "Advice", role: "Associate advisor" },
   { key: "lena", name: "Lena Ortiz", team: "Operations", role: "Client service" },
+  ...MORE_WORKERS.map(({ key, name, team, role }) => ({ key, name, team, role })),
 ];
+
+/** How many chats the team's AIs hold across its people, every one of them a source of its memory. */
+export const LIBRARY = 412;
 
 /** "May 9" and the like, emails and phones, as the ranges the sheet sets in mono. */
 function specificsOf(text: string): Array<[number, number]> {
@@ -386,6 +392,30 @@ export function buildMemory(): Mem {
   const tone = node({ id: "ent_tone", kind: "folder", label: field.graph.hubs[2].children[0].label, section: sections.tone, parent: sections.tone });
   for (const def of TONE) addFact(tone.id, null, def);
 
+  // The rest of the firm, grown from its roster to its real size (grow.ts, roster.ts): the other households,
+  // the firm's desks, model portfolios, policies, vendors and staff, from as many chats as the team's AIs hold.
+  const r = roster(now);
+  const byLabel = (label: string) => [...nodes.values()].find((x) => x.label === label && x.kind === "folder")!.id;
+  const existing = [...new Map([...facts.values()].flatMap((f) => f.sources).map((src) => [src.convId, { platform: src.platform, title: src.title }])).values()];
+  grow({
+    seed: 0xa5e6,
+    now,
+    zone: ZONE,
+    nodes,
+    facts,
+    chats: LIBRARY,
+    existing,
+    plant: [
+      { parent: sections.company, section: sections.company, things: r.company },
+      { parent: sections.clients, section: sections.clients, things: r.clientThings },
+      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+    ],
+  });
+  for (const t of r.clientThings) {
+    const x = [...nodes.values()].find((y) => y.kind === "organization" && y.client === t.client);
+    if (x && t.client) clientIds.set(t.client, x.id);
+  }
+
   // Counts and urgency roll up the tree, as the overview's node stats do.
   const rank = ["none", "later", "upcoming", "soon", "today", "overdue"];
   const roll = (x: Node): void => {
@@ -402,6 +432,6 @@ export function buildMemory(): Mem {
   };
   for (const s of Object.values(sections)) for (const k of nodes.get(s)!.kids) roll(nodes.get(k)!);
 
-  return { now, nodes, facts, self: self.id, sections, clientIds, clients: CLIENT_DEFS };
+  return { now, nodes, facts, self: self.id, sections, clientIds, clients: [...CLIENT_DEFS, ...r.clients] };
 }
 

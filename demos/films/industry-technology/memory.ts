@@ -1,6 +1,8 @@
 import type { FactSource, FactView, GraphNode, IdentityValueView, MemoryNodeDetail } from "@coere/memory";
 import { describeUrgency } from "@v2/packages/memory/src/time/labels";
 import { chatOf, CHATS, dayAt, iso, monthDay, ZONE, type SourceChat } from "./field";
+import { grow } from "./grow";
+import { MORE_WORKERS, roster } from "./roster";
 
 /**
  * Northbeam Labs' memory as Coere for Teams files it from the team's chats,
@@ -75,6 +77,9 @@ export const WORKERS = [
   { key: "leo", name: "Leo Grant", team: "Platform", role: "Staff engineer" },
   { key: "ana", name: "Ana Ruiz", team: "Engineering", role: "Engineering manager" },
 ];
+
+/** How many chats the team's AIs hold across its people, every one of them a source of its memory. */
+export const LIBRARY = 368;
 
 /** The Ledger API's stack and decisions, as the chats on three AIs settled them. */
 export const STACK: Line[] = [
@@ -280,6 +285,32 @@ export function buildMemory(now: number): Mem {
     { text: "Client updates are short and lead with the dates.", chat: "onboard" },
   ]);
 
+  // The rest of the studio, grown from its roster to its real size (grow.ts, roster.ts): the other clients and
+  // their projects, the studio's practices, policies, vendors and engineers, from as many chats as its AIs hold.
+  const r = roster(now);
+  const byLabel = (label: string) => [...nodes.values()].find((x) => x.label === label && x.kind === "folder" && x.parent && nodes.get(x.parent)?.kind === "section")!.id;
+  const existing = [...new Map([...facts.values()].flatMap((f) => f.sources).map((src) => [src.convId, { platform: src.platform, title: src.title }])).values()];
+  const grown = grow({
+    seed: 0x7ec4,
+    now,
+    zone: ZONE,
+    nodes,
+    facts,
+    chats: LIBRARY,
+    existing,
+    plant: [
+      { parent: sections.company, section: sections.company, things: r.company },
+      { parent: people.id, section: sections.company, things: r.people },
+      { parent: sections.clients, section: sections.clients, things: r.clientThings },
+      ...Object.entries(r.more).map(([label, lines]) => ({ parent: byLabel(label), section: nodes.get(byLabel(label))!.section, lines })),
+    ],
+  });
+  for (const t of r.clientThings) {
+    const x = [...nodes.values()].find((y) => y.kind === "organization" && y.client === t.client);
+    if (x && t.client) clientIds.set(t.client, x.id);
+  }
+  const chats: SourceChat[] = [...CHATS, ...grown.chats.map((c) => ({ key: c.id.split(":")[1]!, title: c.title, platform: c.platform, ago: Math.round((now - Date.parse(c.at)) / 86_400_000) }))];
+
   // Counts and urgency roll up the tree, as the overview's node stats do.
   const rank = ["none", "later", "upcoming", "soon", "today", "overdue"];
   const roll = (x: Node): GraphNode["urgency"] => {
@@ -296,5 +327,5 @@ export function buildMemory(now: number): Mem {
   };
   for (const s of Object.values(sections)) for (const k of nodes.get(s)!.kids) roll(nodes.get(k)!);
 
-  return { now, chats: CHATS, nodes, facts, self: self.id, sections, clientIds, clients: CLIENTS, workers: WORKERS, written: null };
+  return { now, chats, nodes, facts, self: self.id, sections, clientIds, clients: [...CLIENTS, ...r.clients], workers: [...WORKERS, ...MORE_WORKERS.map(({ key, name, team, role }) => ({ key, name, team, role }))], written: null };
 }

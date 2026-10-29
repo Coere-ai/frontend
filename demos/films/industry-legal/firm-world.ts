@@ -95,6 +95,7 @@ export function answerMemory(world: World, mem: Mem): void {
     .engine("memory.quote", () => null)
     .engine("search", (m) => ({ hits: [], totalMatches: 0, ms: 4, stage: 1, queryTokens: String(args(m).query ?? "").toLowerCase().split(/\s+/).filter(Boolean) }))
     .engine("listConversations", () => ({ rows: [], total: mem.chats }))
+    .engine("stats", () => ({ conversations: mem.chats, chunks: 0, projects: 0, textBytes: 0, dbBytes: 0, byPlatform: {} }))
     // A chat site's scan saves the chats in its sidebar; the library already holds them, so nothing is rewritten.
     .engine("upsertConversation", (m) => {
       const conv = (args(m).conv ?? {}) as { platform?: string; platformConvId?: string; messages?: unknown[] };
