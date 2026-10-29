@@ -9,6 +9,6 @@ export const navTabs: { id: NavTabId; label: string; href: string }[] = [
   { id: "about", label: "About Us", href: "/about" },
 ];
 
-/** The contact button reads Coming Soon for now, and emails the team. */
+/** The contact button reads Waitlist Coming Soon for now, and emails the team. */
 export const contactHref = "mailto:edisonlaw@berkeley.edu";
-export const contactLabel = "Coming Soon";
+export const contactLabel = "Waitlist Coming Soon";
