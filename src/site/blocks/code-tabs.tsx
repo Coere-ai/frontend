@@ -43,9 +43,19 @@ export function CodeTabs({ samples }: { samples: CodeSample[] }) {
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <pre className="overflow-x-auto p-6 text-[13px] leading-relaxed">
-        <Highlighted code={sample.code} language={sample.language} />
-      </pre>
+      {/* Every sample sits in the same cell and only the picked one shows, so the
+          box keeps the tallest sample's size and never jumps between tabs. */}
+      <div className="grid">
+        {samples.map((s, index) => (
+          <pre
+            key={s.label}
+            aria-hidden={index !== picked}
+            className={`overflow-x-auto p-6 text-[13px] leading-relaxed [grid-area:1/1] ${index === picked ? "" : "invisible"}`}
+          >
+            <Highlighted code={s.code} language={s.language} />
+          </pre>
+        ))}
+      </div>
     </div>
   );
 }
