@@ -15,7 +15,7 @@ type Item = { href: string; label: string };
 /** The links each tab shows on small screens, where there is no room for the full menus. */
 const items: Record<NavTabId, Item[]> = {
   products: products.map((p) => ({ href: `/products/${p.slug}`, label: p.name })),
-  industries: [{ href: "/industries", label: "All industries" }, ...industries.slice(0, 6).map((i) => ({ href: `/industries#${i.slug}`, label: i.name }))],
+  industries: [{ href: "/industries", label: "All industries" }, ...industries.slice(0, 6).map((i) => ({ href: `/industries/${i.slug}`, label: i.name }))],
   resources: [
     { href: "/#demo", label: "Product demo" },
     { href: "/resources#films", label: "Feature films" },
