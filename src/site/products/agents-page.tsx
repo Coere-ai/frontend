@@ -23,12 +23,12 @@ export function AgentsPage() {
   }));
   return (
     <>
-      <ProductHero copy={agentsHero} background={backgrounds.curl} app={<AgentLineup />} appFit="contained" secondary={{ href: "#agents", label: "Meet the agents" }} />
+      <ProductHero copy={agentsHero} background={backgrounds.dune} app={<AgentLineup />} appFit="contained" secondary={{ href: "#agents", label: "Meet the agents" }} />
       <ProductSection id="agents" title="Meet the agents" line="The same Cori, in the colors of its field. Each knows your memory and the work that field does.">
         <AgentCards />
       </ProductSection>
       <ProductSection id="workers" title="Workers: one task, many tabs" line="When a task needs many pages read, an agent splits it across workers and merges what they find." tint>
-        <AccordionShowcase items={workers} background={backgrounds.glass} />
+        <AccordionShowcase items={workers} background={backgrounds.flow} />
       </ProductSection>
       <ProductSection title="What every agent can do">
         <FeatureGrid items={asGrid(agentsGrid)} />
