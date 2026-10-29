@@ -42,7 +42,7 @@ export function ResourcesPanel() {
 
       <Link href="/resources#quickstart" className="group grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-6 rounded-2xl bg-neutral-50 p-4">
         <div className="relative isolate overflow-hidden rounded-xl p-4">
-          <SizedPhoto src={backgrounds.waves.src} alt="" fill sizes="400px" className="-z-10 object-cover" />
+          <SizedPhoto src={backgrounds.prism.src} alt="" fill sizes="400px" className="-z-10 object-cover" />
           <CodeWindow file="context.py" code={firstCall} language="python" />
         </div>
         <div>

@@ -59,7 +59,7 @@ export function ConnectSection() {
           linkLabel="Explore Coere Connect"
         />
         <div className="mt-20">
-          <AccordionShowcase items={items} background={backgrounds.curl} />
+          <AccordionShowcase items={items} background={backgrounds.dune} />
         </div>
       </Container>
     </section>

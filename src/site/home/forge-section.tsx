@@ -12,7 +12,7 @@ export function ForgeSection() {
   return (
     <section id="forge" className="scroll-mt-24 pb-28 md:pb-36">
       <Container>
-        <Stage background={backgrounds.waves}>
+        <Stage background={backgrounds.blocks}>
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-neutral-950/80 via-neutral-950/50 to-neutral-950/30" />
           <div className="relative grid items-center gap-12 p-8 md:p-14 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-14 lg:p-16">
             <div className="text-white">

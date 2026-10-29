@@ -13,7 +13,7 @@ export function SolutionsSection() {
   return (
     <section id="solutions" className="scroll-mt-24 pb-28 md:pb-36">
       <Container>
-        <Stage background={backgrounds.glass}>
+        <Stage background={backgrounds.prism}>
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-neutral-950/80 via-neutral-950/40 to-transparent" />
           <div className="relative grid items-center gap-12 p-8 md:p-14 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16 lg:p-16">
             <div className="text-white">

@@ -24,7 +24,7 @@ export function ForgePage() {
             <h2 className="text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">From a key to context, end to end</h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">Real screens from Coere, step by step. Use the arrows to move through them.</p>
           </div>
-          <Stage background={backgrounds.waves} className="mt-16">
+          <Stage background={backgrounds.light} className="mt-16">
             <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/45" />
             <div className="relative p-6 md:p-12">
               <ForgeWalkthrough />

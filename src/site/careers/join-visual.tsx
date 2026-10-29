@@ -63,7 +63,7 @@ function OpenCard() {
 export function JoinVisual({ className }: { className?: string }) {
   return (
     <div className={`relative isolate overflow-hidden rounded-2xl bg-neutral-950 ${className ?? ""}`}>
-      <SizedPhoto src={backgrounds.waves.src} alt="" fill sizes="700px" className="-z-10 object-cover" />
+      <SizedPhoto src={backgrounds.tangle.src} alt="" fill sizes="700px" className="-z-10 object-cover" />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-neutral-950/55 to-neutral-950/0" />
       <p className="p-6 text-[22px] leading-tight font-medium tracking-[-0.02em] text-white text-balance">
         Come join us in building the future of AI infrastructure.
