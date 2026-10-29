@@ -130,8 +130,9 @@ export async function onTheSite(s: Stage, mem: Mem): Promise<void> {
   }), 30_000);
   await s.rest();
   s.say("The blue line names the client the draft is about. One client goes with each send.");
+  await s.wait(800);
   await s.glide(site, strip);
-  await s.wait(5000);
+  await s.wait(1100);
   // Then she sends it: the client's context goes in with the message, and the reply has the dates.
   s.say(`She sends it, and ${CLIENT}'s context goes with it.`);
   await s.click(site, composer, { after: 200 });

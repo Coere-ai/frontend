@@ -59,8 +59,14 @@ export interface Mem {
   sections: { company: string; clients: string; preferences: string; style: string; tone: string };
   /** Client key to its folder id. */
   clientIds: Map<string, string>;
-  /** The client the chats found that waits in Review. */
+  /** A client the chats name in passing, with no folder of its own yet, which waits in Review with the rest. */
   proposed: { key: string; name: string; id: string; chats: number };
+  /**
+   * The clients Maya kept from Review, by key. No client was typed on the
+   * first run (the owner, 2026-10-29), so every client the chats found is
+   * proposed until she keeps it (packages/solution clients/propose.ts).
+   */
+  kept: Set<string>;
   /**
    * While a build runs, how many of the memories it has written so far, in
    * the order it writes them; null once memory is built.
@@ -473,5 +479,5 @@ export function buildMemory(now: number): Mem {
   };
   for (const n of [...nodes.values()].filter((x) => x.kind === "section")) for (const k of n.kids) roll(nodes.get(k)!);
 
-  return { now, corpus, chats, nodes, facts, self: self.id, sections, clientIds, proposed, written: null };
+  return { now, corpus, chats, nodes, facts, self: self.id, sections, clientIds, proposed, kept: new Set(), written: null };
 }

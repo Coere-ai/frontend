@@ -8,11 +8,11 @@ import type { Mem } from "./memory";
 
 /**
  * The Coere for Teams first run (tools/demo-video/teams/first-run.ts): the
- * company card filled in for Fernhill Creative with its first clients,
- * Maya's AIs, Extract all, the build step and the graph growing into
- * Company and Clients, then the finish.
+ * company card filled in for Fernhill Creative with no client typed (the
+ * owner, 2026-10-29: clients come from the chats), Maya's AIs, the team
+ * invited, Extract all, the build step and the graph growing into Company
+ * and Clients, then the finish.
  */
-const LISTED = 4;
 
 /** A form field by its label's words, as getByLabel finds it. */
 const field = (words: string | RegExp) =>
@@ -32,12 +32,12 @@ const bigButton = label("the big button", (doc: Document) => doc.querySelector<H
 /** The AIs Maya's chats are on, in the order first seen, as agencyPlatforms() lists them. */
 export const agencyPlatforms = (mem: Mem): PlatformId[] => [...new Set(mem.chats.map((c) => c.platform))];
 
-/** The first clients a person lists on the first run, one per line, each with its website. */
-const clientLines = (mem: Mem, count: number): string =>
-  mem.corpus.record.clients
-    .slice(0, count)
-    .map((c) => [c.name, ...c.domains].join(", "))
-    .join("\n");
+/** Fernhill's coworkers' work emails, as the person who sets the company up invites them (tests/e2e/solution/helpers/readme.ts teamEmails). */
+const teamEmails = (mem: Mem): string[] => {
+  const { record } = mem.corpus;
+  const domain = record.company.domains[0] ?? "fernhill-creative.co";
+  return record.workers.map((w) => `${w.name.split(" ")[0]?.toLowerCase()}@${domain}`);
+};
 
 /** Puts a select on a value, as selectOption does after the click that opened it. */
 function selectValue(tab: Tab, el: Element | null, value: string): void {
@@ -46,15 +46,6 @@ function selectValue(tab: Tab, el: Element | null, value: string): void {
   select.value = value;
   select.dispatchEvent(new (winOf(tab).Event)("input", { bubbles: true }));
   select.dispatchEvent(new (winOf(tab).Event)("change", { bubbles: true }));
-}
-
-/** Text put in at once, as a paste or Playwright's insertText does. */
-function insertText(tab: Tab, text: string): void {
-  if (!tab.doc.execCommand("insertText", false, text)) {
-    const box = tab.doc.activeElement as HTMLTextAreaElement;
-    box.value += text;
-    box.dispatchEvent(new (winOf(tab).InputEvent)("input", { bubbles: true, inputType: "insertFromPaste", data: text }));
-  }
 }
 
 /**
@@ -73,6 +64,15 @@ function knowTabs(s: Stage, tab: Tab): void {
   };
 }
 
+/**
+ * Send invites hands the emails to the person's own mail app, as a mailto
+ * window (solution/team/local-transport.ts). The demo has no mail app, so
+ * the window it would open is not opened.
+ */
+function noMailApp(tab: Tab): void {
+  (tab.win as Window).open = () => null;
+}
+
 export async function firstRun(s: Stage, mem: Mem): Promise<Tab> {
   const record = mem.corpus.record;
   s.chapter("install");
@@ -80,24 +80,18 @@ export async function firstRun(s: Stage, mem: Mem): Promise<Tab> {
   // The title card shows while the first run's page opens behind it.
   const [onboarding] = await Promise.all([s.open("onboarding", "/preview/live/lib/onboarding-v2-solution.html"), s.card("Coere for Teams", "One memory of your company and its clients.", 3000)]);
   knowTabs(s, onboarding);
+  noMailApp(onboarding);
   const card = label("Your company", (doc: Document) => deepAll(doc, 'section, [role="region"]').find((el) => shown(el) && nameOf(el) === "Your company") ?? null);
   await s.waitFor(onboarding, card);
+  // Filmed as the card lifts, so the chapter played alone (with no title card) has a page to show.
+  await s.film(onboarding);
 
   s.chapter("company");
-  await s.film(onboarding);
-  s.say("The first run asks for the company once, with its clients.");
+  s.say("The first run asks for the company once. There is no client list. Coere finds the clients in the chats.");
   await s.click(onboarding, field("Company name"), { after: 150 });
   await s.type(onboarding, record.company.name, 50);
   await s.click(onboarding, field("What does it do?"), { after: 100 });
   selectValue(onboarding, field("What does it do?")(onboarding.doc), "agency");
-  s.say("Maya pastes the first clients, each with its website.");
-  await s.click(onboarding, field(/^Your clients/), { after: 150 });
-  insertText(onboarding, clientLines(mem, LISTED));
-  await s.waitFor(onboarding, label("the client count", (doc: Document) => {
-    const c = card(doc);
-    return c && (c.textContent ?? "").includes(`${LISTED} clients`) ? c : null;
-  }));
-  await s.wait(1200);
   await s.click(onboarding, field("Your name"), { after: 100 });
   await s.type(onboarding, record.self.name, 40);
   await s.click(onboarding, field("Your role"), { after: 100 });
@@ -106,6 +100,19 @@ export async function firstRun(s: Stage, mem: Mem): Promise<Tab> {
   for (const id of agencyPlatforms(mem)) await s.click(onboarding, aiBox(id), { after: 350 });
   await s.wait(500);
   await s.click(onboarding, bigButton, { after: 300 });
+  await s.rest();
+
+  s.chapter("team");
+  s.say("Maya set the company up, so she invites her team. Each coworker joins with the invite code.");
+  await s.waitFor(onboarding, heading("Invite your team"));
+  // The step comes in at the page's top; the pointer starts from there.
+  scrollTops(onboarding);
+  await s.click(onboarding, field("Work emails"), { after: 150 });
+  await s.type(onboarding, teamEmails(mem).slice(0, 4).join(", "), 18);
+  await s.wait(1500);
+  await s.glide(onboarding, field("Or share your invite code"));
+  await s.wait(1500);
+  await s.click(onboarding, button("Send invites"), { after: 300 });
   await s.rest();
   // Ticking the AIs scrolled the page down; the rows start at its top.
   scrollTops(onboarding);

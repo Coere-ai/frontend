@@ -14,9 +14,10 @@ import { askCori, deleteClient, exportClient, onTheSite } from "./work";
 /**
  * The Coere for Teams film (coere-v2 tools/demo-video/teams.demo.ts): Maya,
  * account director at Fernhill Creative, sets up the company on the first
- * run, saves her chats and builds the agency's memory, then works with it:
- * Company and Clients on the graph, a client and a contact, a new client,
- * Cori on what was promised, a draft that gets its client and goes, a
+ * run with no client typed and invites her team, saves her chats and
+ * builds the agency's memory, then works with it: Company and Clients on
+ * the graph, a client and a contact, the clients the chats found kept from
+ * Review, Cori on what was promised, a draft that gets its client and goes, a
  * client exported and another deleted. Coere for Teams' own pages and
  * content script run here; the engine's answers come from the agency's
  * memory (memory.ts), Cori is the service worker's own (cori.ts), and
@@ -92,15 +93,16 @@ play(
   {
     title: "Coere for Teams",
     chapters: [
-      { id: "install", title: "Install", seconds: 3 },
-      { id: "company", title: "The company card", seconds: 19 },
+      { id: "install", title: "Install", seconds: 4 },
+      { id: "company", title: "The company card", seconds: 16 },
+      { id: "team", title: "Invite the team", seconds: 8 },
       { id: "extract", title: "Extract all", seconds: 9 },
       { id: "build", title: "The build", seconds: 36 },
       { id: "graph", title: "Company and Clients", seconds: 20 },
-      { id: "client", title: "A client", seconds: 19 },
-      { id: "new-client", title: "A new client", seconds: 10 },
-      { id: "cori", title: "Ask Cori", seconds: 15 },
-      { id: "chat", title: "The client in a chat", seconds: 28 },
+      { id: "client", title: "A client", seconds: 18 },
+      { id: "new-client", title: "Clients from the chats", seconds: 13 },
+      { id: "cori", title: "Ask Cori", seconds: 14 },
+      { id: "chat", title: "The client in a chat", seconds: 24 },
       { id: "share", title: "Share a client", seconds: 14 },
       { id: "delete", title: "Delete a client", seconds: 20 },
     ],

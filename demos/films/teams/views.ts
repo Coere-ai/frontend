@@ -189,13 +189,13 @@ export function clientViews(m: Mem): ClientView[] {
       aliases: c?.aliases ?? [],
       domains: c?.domains ?? [],
       status: c?.status ?? "active",
-      state: "kept",
+      state: m.kept.has(key) ? "kept" : "proposed",
       contacts: n.kids.filter((k) => m.nodes.get(k)?.kind === "person").length,
       next: open ? { text: open.text, at: open.due!.at } : null,
       activeAt: Math.max(0, ...mine.map((f) => Date.parse(f.sources[0]!.at))),
     });
   }
-  out.push({ id: m.proposed.id, key: m.proposed.key, name: m.proposed.name, aliases: [], domains: [], status: "prospect", state: "proposed", contacts: 0, next: null, activeAt: m.now - 60 * 86_400_000 });
+  out.push({ id: m.proposed.id, key: m.proposed.key, name: m.proposed.name, aliases: [], domains: [], status: "prospect", state: m.kept.has(m.proposed.key) ? "kept" : "proposed", contacts: 0, next: null, activeAt: m.now - 60 * 86_400_000 });
   return out;
 }
 
@@ -213,8 +213,24 @@ export function orgSettings(m: Mem): OrgSettings {
   return { company: { ...r.company, aliases: [], domains: [] }, self: r.self, switches: r.switches };
 }
 
+/**
+ * Review's New client cards: every client the chats found that Maya has not
+ * kept yet, each with how many chats named it (coere-solution.md 4.8). The
+ * numbers stay put, so an answer finds its card.
+ */
 export function orgReview(m: Mem): OrgReviewItem[] {
-  return [{ n: 1, kind: "new_client", client: { id: m.proposed.id, key: m.proposed.key, name: m.proposed.name }, chats: m.proposed.chats }];
+  const found = [...m.clientIds].map(([key, id]) => ({ key, id, name: m.nodes.get(id)!.label, chats: new Set(allFacts(m).filter((f) => f.client === key).flatMap((f) => f.sources.map((s) => s.convId))).size }));
+  found.push({ key: m.proposed.key, id: m.proposed.id, name: m.proposed.name, chats: m.proposed.chats });
+  return found.flatMap((c, i) => (m.kept.has(c.key) ? [] : [{ n: i + 1, kind: "new_client" as const, client: { id: c.id, key: c.key, name: c.name }, chats: Math.max(1, c.chats) }]));
+}
+
+/** Keep on a New client card: the client is kept, and its card leaves (memory.orgReview's answer). */
+export function answerOrgReview(m: Mem, a: { n: number; answer: string } | undefined): boolean {
+  if (!a || a.answer !== "keep") return false;
+  const item = orgReview(m).find((i) => i.n === a.n);
+  if (item?.kind !== "new_client") return false;
+  m.kept.add(item.client.key);
+  return true;
 }
 
 /** A node as search and Cori name it, with its path from the section down. */

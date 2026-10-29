@@ -1,12 +1,14 @@
 import { role } from "../../stage/query";
 import type { Stage, Tab } from "../../stage/stage";
 import { inlineMemoryCss } from "./css-fix";
-import { clearDock, groupButton, openByName, roleIn, searchBox, sideSheet } from "./helpers";
+import { clearDock, groupButton, label, openByName, roleIn, searchBox, sideSheet } from "./helpers";
 
 /**
  * The agency's Memory page (tools/demo-video/teams/memory.ts): the graph on
  * All, Company and Clients, a client opened to its slots with its sheet, a
- * contact's identity, and a client the chats found waiting in Review.
+ * contact's identity, and the clients the chats found waiting in Review,
+ * all kept with one press. No client was typed on the first run, so each
+ * one came from the chats.
  */
 export const CLIENT = "Kestrel Outdoor";
 const CONTACT = "Dana Ruiz";
@@ -43,7 +45,7 @@ export async function agencyMemory(s: Stage, page: Tab): Promise<void> {
   await s.wait(3800);
   for (const [part, line] of [
     ["Company", "Company holds the agency: its people, its way of working and its tools."],
-    ["Clients", "Clients has a folder for each client, with its contacts and promises."],
+    ["Clients", "Clients has a folder for each client the chats talk about, with its contacts and promises."],
   ] as const) {
     s.say(line);
     await s.click(page, scope(part), { after: 300 });
@@ -66,15 +68,23 @@ export async function agencyMemory(s: Stage, page: Tab): Promise<void> {
   await s.click(page, roleIn(sideSheet(CONTACT), "button", "Close", true), { after: 300 });
 
   s.chapter("new-client");
-  s.say("A client the chats found waits in Review until Maya keeps it.");
+  s.say("Nobody typed a client. Each one the chats found waits in Review as a new client.");
   await s.click(page, role("button", "Review", { exact: true }), { after: 300 });
-  const card = (doc: Document) => {
+  const isNew = (a: Element) => /^New client: /.test((a.textContent ?? "").trim());
+  const card = label("a New client card", (doc: Document) => {
     const sheet = sideSheet("Review")(doc);
-    return sheet ? [...sheet.querySelectorAll("article")].find((a) => /^New client: /.test((a.textContent ?? "").trim())) : null;
-  };
-  await s.waitFor(page, card);
+    return sheet ? [...sheet.querySelectorAll("article")].find(isNew) : null;
+  });
+  await s.waitFor(page, card, 20_000);
   await s.glide(page, card);
-  await s.wait(4000);
+  await s.wait(3500);
+  s.say("Maya keeps them all with one press.");
+  await s.click(page, roleIn(sideSheet("Review"), "button", /^Keep all \d+ new clients$/), { after: 300 });
+  await s.waitFor(page, label("Review with no new client", (doc: Document) => {
+    const sheet = sideSheet("Review")(doc);
+    return sheet && ![...sheet.querySelectorAll("article")].some(isNew) ? sheet : null;
+  }), 60_000);
+  await s.wait(2500);
   await s.click(page, roleIn(sideSheet("Review"), "button", "Close", true), { after: 300 });
   await s.rest();
 }

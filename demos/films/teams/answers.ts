@@ -59,7 +59,13 @@ export function answerMemory(world: World, mem: Mem): void {
     .engine("memory.workers", () => ({ workers: v.workerViews(mem) }))
     .engine("memory.orgGet", () => v.orgSettings(mem))
     .engine("memory.search", (m) => v.search(mem, String(args(m).q ?? ""), Number(args(m).limit ?? 8)))
-    .engine("memory.orgReview", () => ({ items: v.orgReview(mem) }))
+    .engine("memory.orgReview", (m) => {
+      const kept = v.answerOrgReview(mem, args(m).answer as { n: number; answer: string } | undefined);
+      const items = v.orgReview(mem);
+      // Once the last new client is kept, the engine says what changed, so the client list drops its New marks.
+      if (kept && !items.some((i) => i.kind === "new_client")) setTimeout(() => world.tell({ ch: "coere", type: "engine.event", event: { name: "memory.changed", ids: [...mem.clientIds.values()] } }), 0);
+      return { items };
+    })
     .engine("memory.contextFor", (m) => v.contextFor(mem, String(args(m).tail ?? "")))
     .engine("memory.contextSent", () => undefined)
     .engine("memory.skipChats", () => [])
