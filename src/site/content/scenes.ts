@@ -10,6 +10,16 @@ import type { FilmKey } from "./films";
 const at = (cut: string, n: string) => `/preview/screens/${cut}/${n}.html`;
 
 export const scenes = {
+  teams: [
+    { src: at("teams", "014"), view: { x: 200, y: 60, w: 1100 } },
+    { src: at("teams", "018"), view: { x: 440, y: 80, w: 1000 } },
+    { src: at("teams", "022"), view: { x: 560, y: 300, w: 820 } },
+    { src: at("teams", "027"), view: { x: 400, y: 180, w: 900 } },
+  ],
+  client: [
+    { src: at("teams", "027"), view: { x: 400, y: 180, w: 900 } },
+    { src: at("teams", "022"), view: { x: 560, y: 300, w: 820 } },
+  ],
   context: [
     { src: at("smart-context", "003"), view: { x: 400, y: 200, w: 900 }, hold: 2600 },
     { src: at("smart-context", "004"), view: { x: 430, y: 0, w: 840 }, hold: 3600 },
@@ -31,4 +41,5 @@ export type SceneKey = keyof typeof scenes;
 export const sceneOfFilm: Partial<Record<FilmKey, SceneKey>> = {
   coriRewrite: "writing",
   smartContext: "context",
+  teams: "teams",
 };
