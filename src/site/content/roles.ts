@@ -16,7 +16,7 @@ export type Role = {
   lookingFor: string[];
 };
 
-const LOCATION = "Berkeley, CA (hybrid)";
+const LOCATION = "San Francisco, CA";
 
 export const teams: Team[] = ["Engineering", "Business", "Marketing", "Internships"];
 
