@@ -1,0 +1,5 @@
+{
+  "title": "Cori's workers",
+  "version": 2,
+  "bundles": { "worker-page.js": { "from": "worker-page.ts", "version": 2 } }
+}
