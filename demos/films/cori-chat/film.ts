@@ -28,12 +28,12 @@ const MAYA = { name: "Maya Collins", first: "Maya", initials: "MC" };
 const DASHBOARD = "/preview/live/lib/console-v2.html?tab=cori";
 
 const CHAPTERS = [
-  { id: "past", title: "Your past chats" },
-  { id: "search", title: "Search your chats" },
-  { id: "ask", title: "Ask Cori" },
-  { id: "popup", title: "The toolbar popup" },
-  { id: "right-option", title: "Right Option" },
-  { id: "history", title: "One history" },
+  { id: "past", title: "Your past chats", seconds: 14 },
+  { id: "search", title: "Search your chats", seconds: 7 },
+  { id: "ask", title: "Ask Cori", seconds: 9 },
+  { id: "popup", title: "The toolbar popup", seconds: 8 },
+  { id: "right-option", title: "Right Option", seconds: 14 },
+  { id: "history", title: "One history", seconds: 14 },
 ];
 
 const pageBox: Query = ".cx-cori-page textarea";
@@ -191,7 +191,7 @@ function setup(world: World): void {
     "coere.browser_use": { on: true, level: "autonomous", model: "bolt", blocked: [], grantedAt: Date.now() - 86_400_000 },
   });
   consoleWorld(world);
-  // Her memory as it stands after the import: 12 memories from 3 chats.
+  // Her memory as it stands after the import: 532 memories from 324 chats (bake.mts).
   world.engine("memory.status", () => MEMORY_STATUS);
   hostCori(world);
   seeded = coriHistory(world);

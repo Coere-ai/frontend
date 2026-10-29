@@ -2,10 +2,14 @@
  * Bakes what Cori reads from Maya's memory in this film, once, through
  * coere-v2's real code in Node: a v2.2 memory core (tests/integration/
  * memory-v22/world.ts: the real engine library on wasm SQLite and the real
- * memory core) imports her memory file as Import memory does
- * (tests/fixtures/memory/maya-actions.coere, the one the film imported),
- * with her self named, as tools/demo-video/actions/stage.ts importMaya
- * does. Then the service worker's own Cori host asks the film's three
+ * memory core) imports her memory file as Import memory does. The file is
+ * her whole memory, 532 memories from 324 chats (ChatGPT 148, Claude 102,
+ * Gemini 74), written through v2's own write path by the Smart context
+ * film's generator (../smart-context/maya-world.mts, maya-memory.mts),
+ * which holds everything the film's own memory file held
+ * (tests/fixtures/memory/maya-actions.coere: the people she writes to, the
+ * CS 162 due date, her clinic form) and the rest of her year. Then the
+ * service worker's own Cori host asks the film's three
  * lines from the surface each was asked on, and every engine call the host
  * makes is written down with the core's answer. The demo runs the same
  * host in the page and gives it these answers, so Cori answers there with
@@ -18,7 +22,7 @@
  * Run with coere-v2's tsx:
  *   COERE_V2=/path/to/coere-v2 $COERE_V2/node_modules/.bin/tsx demos/films/cori-chat/bake.mts
  */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -28,30 +32,36 @@ if (!V2) throw new Error('COERE_V2 names the coere-v2 checkout')
 const v2 = (p: string) => import(join(V2, p))
 
 const { v22World } = await v2('tests/integration/memory-v22/world.ts')
-const { MAYA_MEMORY_PATH } = await v2('tools/gen-fake-memory/maya/path.ts')
 const { PLATFORMS } = await v2('packages/platforms/src/index.ts')
 const { createCoriHost, surfaceData } = await v2('apps/extension/src/background/cori/host.ts')
 const { engineOverWorker } = await v2('apps/extension/src/background/cori/engine-port.ts')
 const { memoryData, memoryOverWorker, v22Data } = await v2('apps/extension/src/background/cori/data-memory.ts')
 const { bulkAvailableIn } = await v2('apps/extension/src/lib/bulk-available.ts')
 const { LINES, ZONE, NOW } = await import('./lines.ts')
+const { mayaMemory } = await import('../smart-context/maya-memory.mts')
 
 const w = await v22World({ chats: [], now: NOW, platformName: (p: string) => ({ chatgpt: 'ChatGPT', claude: 'Claude', gemini: 'Gemini' })[p] ?? p })
 await w.core.start()
 
-const core = w.core
 const memoryApi = (method: string, args?: unknown) => {
+  const core = w.core
   for (const part of [core.search, core.runtime, core.v22, core.actions]) if (part && method in part) return part[method](args)
   if (method === 'memory.edit') return core.store.edit((args as { op: unknown }).op)
   return undefined
 }
 
 // Import memory, as the Memory page's Import sheet does, then her self named.
-const report = await core.format.import(new Blob([readFileSync(join(V2, MAYA_MEMORY_PATH))]))
+const maya = await mayaMemory(V2)
+const report = await w.core.format.import(new Blob([maya.bytes]))
 console.error('import', JSON.stringify(report))
 const overview = (await memoryApi('memory.overview', {})) as { nodes: Array<{ id: string; kind: string }> }
 const self = overview.nodes.find((n) => n.kind === 'self')
 if (self) await memoryApi('memory.edit', { op: { kind: 'rename', id: self.id, name: 'Maya Collins' } })
+// Her things get their vectors when the worker opens the file again, as after an import in the extension.
+await w.restart()
+const unembedded = () =>
+  w.memoryDriver.get(`SELECT COUNT(*) AS n FROM entity e WHERE e.status = 'active' AND e.kind <> 'self' AND NOT EXISTS (SELECT 1 FROM node_vec v WHERE v.owner = 'node' AND v.id = e.id)`)?.n ?? 0
+for (let i = 0; i < 300 && unembedded() > 0; i++) await new Promise((r) => setTimeout(r, 200))
 
 // Every call Cori's host makes, with the core's answer.
 const calls: Array<{ method: string; args: unknown; answer: unknown }> = []
@@ -89,7 +99,7 @@ const answers: unknown[] = []
 for (const l of LINES) {
   const result = await host.ask(l.asker, { input: { line: l.line }, state: null, conv: 'cori_bake00000001' })
   answers.push({ line: l.line, result })
-  console.error(l.line, JSON.stringify(result.answer.blocks).slice(0, 400))
+  console.error(l.line, JSON.stringify(result.answer.blocks).slice(0, 6000))
 }
 
 // How each memory card reads when its chat is opened again: the history's own read.
@@ -108,6 +118,9 @@ const now = Object.fromEntries((read.turns[0]?.blocks[0]?.facts ?? []).map((f) =
 // Memory's status after the import, which the popup's Home counts from.
 const status = await memoryApi('memory.status')
 writeFileSync(join(here, 'data/cori.json'), JSON.stringify({ calls, now, status }, null, 1))
+// Her Claude chats, newest first, for Claude's sidebar on the page Right Option opens on (sites.mjs).
+const claude = maya.world.chats.filter((c) => c.platform === 'claude').reverse().map((c) => c.title)
+writeFileSync(join(here, 'data/claude-chats.json'), JSON.stringify(claude, null, 1))
 console.error(`wrote data/cori.json: ${calls.length} calls, ${Object.keys(now).length} cards`)
 w.close()
 process.exit(0)
