@@ -1,4 +1,6 @@
-import { PREVIEW_START_SECONDS, type Film } from "@/site/content/films";
+import { films, PREVIEW_START_SECONDS, type Film, type FilmKey } from "@/site/content/films";
+import { scenes, sceneOfFilm } from "@/site/content/scenes";
+import { ScreenScene } from "./screen-scene";
 
 /**
  * Plays a film in its own HTML page, so it looks the same here as on the
@@ -12,6 +14,10 @@ import { PREVIEW_START_SECONDS, type Film } from "@/site/content/films";
  * that shows two things.
  */
 export function FilmFrame({ film, preview = false, from = film.previewFrom ?? PREVIEW_START_SECONDS, to, className }: { film: Film; preview?: boolean; from?: number; to?: number; className?: string }) {
+  // A preview of a feature that has HTML screens plays those instead, sharp at any size.
+  const key = (Object.keys(films) as FilmKey[]).find((k) => films[k] === film);
+  const scene = preview && to === undefined && key ? sceneOfFilm[key] : undefined;
+  if (scene) return <ScreenScene shots={scenes[scene]} label={`${film.title}, shown on the app`} className={className} />;
   const src = preview ? `${film.page}?preview&start=${from}${to ? `&end=${to}` : ""}` : film.page;
   return (
     <iframe
