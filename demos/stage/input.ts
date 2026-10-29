@@ -59,7 +59,8 @@ export class Hover {
 /** The element under a press takes focus as a real press gives it: itself, or the nearest focusable around it. */
 function focusFor(el: Element): void {
   const target = (el as HTMLElement).closest?.('input, textarea, select, button, a[href], [tabindex], [contenteditable="true"], [contenteditable=""]') as HTMLElement | null;
-  if (target) target.focus({ preventScroll: true });
+  // As a mouse press focuses: no keyboard focus ring.
+  if (target) target.focus({ preventScroll: true, focusVisible: false } as FocusOptions);
   // A press on a bare part of the page takes the focus away from the field that had it.
   else (focused(el.ownerDocument) as HTMLElement | null)?.blur?.();
 }
