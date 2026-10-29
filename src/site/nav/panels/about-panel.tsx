@@ -1,31 +1,30 @@
-import Image from "next/image";
 import Link from "next/link";
+import { JoinVisual } from "@/site/careers/join-visual";
 import { contactHref } from "@/site/content/navigation";
-import { PanelLabel, PanelLink } from "./panel-parts";
 import { Underlined } from "@/site/ui/underlined";
 
-/** About menu: the company links, and a card that opens the story. */
+const items = [
+  { href: "/about", title: "Our story", summary: "Why memory should belong to you." },
+  { href: "/about#team", title: "About Us", summary: "The people building Coere." },
+];
+
+/** About menu: two big links, one above the other, and the invitation to build Coere with us. */
 export function AboutPanel() {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-12">
-      <div>
-        <PanelLabel>Company</PanelLabel>
-        <ul className="mt-3 grid grid-cols-2 gap-x-8 gap-y-1">
-          <li><PanelLink href="/about" title="Our story" summary="Why memory should belong to you." /></li>
-          <li><PanelLink href="/about#team" title="Team" summary="The people building Coere." /></li>
-          <li><PanelLink href="/careers" title="Careers" summary="Join the founding team." /></li>
-          <li><PanelLink href={contactHref} title="Contact" summary="Talk to the founders." /></li>
-        </ul>
-      </div>
-      <Link href="/about" className="group grid grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center gap-6 rounded-2xl bg-neutral-50 p-4">
-        <div className="overflow-hidden rounded-xl">
-          <Image src="/preview/images/catalyst.webp" alt="" width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover" />
-        </div>
-        <div>
-          <p className="text-[13px] font-medium text-neutral-500">Our story</p>
-          <p className="mt-1 text-xl font-medium tracking-[-0.02em] text-neutral-950"><Underlined big>AI split you into pieces. We put you back together.</Underlined></p>
-        </div>
-      </Link>
+    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-12">
+      <ul className="flex flex-col justify-center divide-y divide-neutral-200">
+        {items.map((item) => (
+          <li key={item.title}>
+            <Link href={item.href} className="group block py-6 first:pt-0">
+              <span className="block text-[28px] font-medium tracking-[-0.03em] text-neutral-950">
+                <Underlined big>{item.title}</Underlined>
+              </span>
+              <span className="mt-1.5 block text-[15px] text-neutral-500">{item.summary}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <JoinVisual href={contactHref} label="Contact us" />
     </div>
   );
 }

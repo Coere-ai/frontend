@@ -1,4 +1,4 @@
-/** The tabs in the navbar, in order. Each opens a menu on hover and is a link on click. */
+/** The tabs in the navbar, in order. Each opens a menu on hover and is a link on click. Careers is hidden for now; its page stays, unlinked. */
 export type NavTabId = "products" | "industries" | "resources" | "blog" | "about" | "careers";
 
 export const navTabs: { id: NavTabId; label: string; href: string }[] = [
@@ -7,7 +7,6 @@ export const navTabs: { id: NavTabId; label: string; href: string }[] = [
   { id: "resources", label: "Resources", href: "/resources" },
   { id: "blog", label: "Blog", href: "/blog" },
   { id: "about", label: "About Us", href: "/about" },
-  { id: "careers", label: "Careers", href: "/careers" },
 ];
 
 /** The contact button reads Coming Soon for now, and emails the team. */
