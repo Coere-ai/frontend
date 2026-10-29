@@ -7,6 +7,7 @@ import { features } from "@/site/content/features";
 import { products } from "@/site/content/products";
 import { FeaturePreview } from "./feature-preview";
 import { PanelLabel } from "./panel-parts";
+import { hoverUnderline } from "@/site/ui/hover-underline";
 
 /**
  * Products menu: the three products left to right, then the features list,
@@ -22,7 +23,7 @@ export function ProductsPanel() {
       {products.map((product) => (
         <Link key={product.slug} href={`/products/${product.slug}`} className="group row-span-4 grid grid-rows-subgrid">
           <p className="text-[13px] font-medium text-neutral-500">{product.kind}</p>
-          <h3 className="mt-1.5 text-[22px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[26px]">
+          <h3 className={`mt-1.5 text-[22px] font-medium tracking-[-0.03em] text-neutral-950 2xl:text-[26px] ${hoverUnderline}`}>
             {product.name}
           </h3>
           <p className="mt-2 text-[14px] leading-snug text-neutral-500">{product.description}</p>
@@ -33,7 +34,7 @@ export function ProductsPanel() {
               width={754}
               height={421}
               unoptimized
-              className="aspect-[754/421] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+              className="aspect-[754/421] w-full object-cover"
             />
           </div>
         </Link>

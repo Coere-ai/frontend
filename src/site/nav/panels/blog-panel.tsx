@@ -3,6 +3,7 @@ import Link from "next/link";
 import { posts } from "@/site/content/posts";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { PanelMore } from "./panel-parts";
+import { hoverUnderline } from "@/site/ui/hover-underline";
 
 /** A title whose last word and arrow never part across a line break. */
 function TitleWithArrow({ title }: { title: string }) {
@@ -44,10 +45,10 @@ export function BlogPanel() {
                   width={754}
                   height={421}
                   unoptimized
-                  className="aspect-[754/421] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                  className="aspect-[754/421] w-full object-cover"
                 />
               </div>
-              <p className="mt-4 text-[15px] leading-snug text-neutral-950">
+              <p className={`mt-4 text-[15px] leading-snug text-neutral-950 ${hoverUnderline}`}>
                 <TitleWithArrow title={post.title} />
               </p>
             </Link>

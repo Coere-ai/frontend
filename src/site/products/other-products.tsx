@@ -3,6 +3,7 @@ import Link from "next/link";
 import { products, type Product } from "@/site/content/products";
 import { Container } from "@/site/ui/container";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
+import { hoverUnderline } from "@/site/ui/hover-underline";
 
 /** The other two products, as wide cards with their artwork. */
 export function OtherProducts({ current }: { current: Product["slug"] }) {
@@ -15,11 +16,11 @@ export function OtherProducts({ current }: { current: Product["slug"] }) {
           {others.map((product) => (
             <Link key={product.slug} href={`/products/${product.slug}`} className="group grid items-center gap-6 rounded-3xl bg-white p-3 ring-1 ring-neutral-200 sm:grid-cols-2">
               <div className="overflow-hidden rounded-2xl">
-                <Image src={product.image} alt={`${product.name} artwork`} width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                <Image src={product.image} alt={`${product.name} artwork`} width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover" />
               </div>
               <div className="px-3 pb-3 sm:pb-0">
                 <p className="text-[13px] font-medium text-neutral-500">{product.kind}</p>
-                <p className="mt-1 text-2xl font-medium tracking-[-0.03em] text-neutral-950">{product.name}</p>
+                <p className={`mt-1 text-2xl font-medium tracking-[-0.03em] text-neutral-950 ${hoverUnderline}`}>{product.name}</p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-[15px] font-medium text-neutral-950">
                   Explore
                   <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-0.5" />

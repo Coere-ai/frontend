@@ -4,6 +4,7 @@ import { applications } from "@/site/content/industries";
 import { productBySlug } from "@/site/content/products";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { Reveal } from "@/site/ui/reveal";
+import { hoverUnderline } from "@/site/ui/hover-underline";
 
 /** The ways to use Coere, one per product, each with that product's artwork. */
 export function ApplicationsGrid() {
@@ -14,12 +15,12 @@ export function ApplicationsGrid() {
         if (!product) return null;
         return (
           <Reveal key={app.slug} delay={index * 0.06}>
-            <Link href={`/products/${product.slug}`} className="group flex h-full flex-col rounded-3xl bg-white p-3 ring-1 ring-neutral-200 transition-shadow hover:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.25)]">
+            <Link href={`/products/${product.slug}`} className="group flex h-full flex-col rounded-3xl bg-white p-3 ring-1 ring-neutral-200">
               <div className="overflow-hidden rounded-2xl">
-                <Image src={product.image} alt="" width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                <Image src={product.image} alt="" width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover" />
               </div>
               <div className="flex flex-1 flex-col px-3 pt-6 pb-4">
-                <h3 className="text-2xl font-medium tracking-[-0.03em] text-neutral-950">{app.name}</h3>
+                <h3 className={`text-2xl font-medium tracking-[-0.03em] text-neutral-950 ${hoverUnderline}`}>{app.name}</h3>
                 <p className="mt-2 flex-1 text-[15px] leading-relaxed text-neutral-500">{app.summary}</p>
                 <span className="mt-6 inline-flex items-center gap-1.5 text-[15px] font-medium text-neutral-950">
                   With {product.name}
