@@ -18,7 +18,7 @@ export type Industry = {
 /** Industry photos are private like the rest of the new site. */
 const photo = (slug: string, alt: string, by: string) => ({ src: `/preview/images/industries/${slug}.webp`, alt, by });
 
-/** One way to use Coere, tied to the product that does it. */
+/** Who Coere is for, each tied to the product that serves them. */
 export type Application = {
   slug: string;
   name: string;
@@ -28,22 +28,22 @@ export type Application = {
 
 export const applications: Application[] = [
   {
-    slug: "personal-context",
-    name: "Personal context",
-    summary: "Carry what you know from one AI to the next.",
+    slug: "consumer",
+    name: "Consumer",
+    summary: "One memory across every AI a person uses.",
     product: "connect",
   },
   {
-    slug: "crm",
-    name: "CRM and company knowledge",
-    summary: "Every client, promise and decision in one shared memory.",
-    product: "solutions",
+    slug: "developer",
+    name: "Developer",
+    summary: "Apps and agents that read memory with permission.",
+    product: "forge",
   },
   {
-    slug: "user-retention",
-    name: "User retention",
-    summary: "Apps that remember their users keep them.",
-    product: "forge",
+    slug: "business",
+    name: "Business",
+    summary: "One memory of the company and every client.",
+    product: "solutions",
   },
 ];
 
