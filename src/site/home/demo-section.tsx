@@ -9,7 +9,6 @@ export function DemoSection() {
     <section id="demo" className="scroll-mt-24 pb-32">
       <Container>
         <FilmShowcase film={films.v2} backdrop={backgrounds.ribbons} />
-        <p className="mt-5 text-center text-[14px] text-neutral-500">Filmed from the real extension with made up chats.</p>
       </Container>
     </section>
   );

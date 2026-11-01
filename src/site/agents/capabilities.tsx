@@ -51,7 +51,7 @@ export function Capabilities() {
         <div className="max-w-3xl">
           <p className="text-[15px] font-medium text-white/60">Capabilities</p>
           <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-balance md:text-5xl md:leading-[1.05]">Everything one worker can do</h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/70">Pick a capability to watch it run, live on Coere&apos;s real code.</p>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/70">Pick a capability to watch it run.</p>
         </div>
 
         <div className="mt-16 grid gap-10 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)] lg:gap-14">
