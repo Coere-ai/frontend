@@ -104,16 +104,6 @@ export const features: Feature[] = [
     film: "workers",
     href: "/products/agents#capability-workers",
   },
-  {
-    slug: "benchmarks",
-    name: "Benchmarks",
-    title: "Measured, with the cost of every run",
-    description:
-      "Coere scores its memory on LoCoMo and on its own checks from the dashboard, and says what each run cost.",
-    film: "benchmarksEvals",
-    href: "/products/agents#capability-benchmarks",
-    menu: false,
-  },
 ];
 
 export function featureBySlug(slug: string): Feature | undefined {
