@@ -28,11 +28,11 @@ export function CompareSection() {
   }, []);
 
   return (
-    <section id="compare" className="scroll-mt-24 py-28 md:py-36">
+    <section id="compare" className="scroll-mt-24 py-28 md:py-32">
       <Container>
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[15px] font-medium text-brand-500">Without Coere vs with Coere</p>
-          <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04]">The same chat, 97.7% fewer tokens</h2>
+          <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">The same chat, 97.7% fewer tokens</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">
             Without Coere, you paste files and notes into every new chat. With Coere, you name the project and the right context goes in for you.
           </p>

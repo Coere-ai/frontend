@@ -8,12 +8,13 @@ import { connectCases, connectGrid, connectHero, connectSlides } from "@/site/co
 import { ClosingCta } from "@/site/home/closing-cta";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
+import { CompareSection } from "./compare-section";
 import { asGrid, asUseCases } from "./film-cases";
 import { ProductHero } from "./hero";
 import { OtherProducts } from "./other-products";
 import { ProductSection } from "./product-section";
 
-/** Coere Connect: what people use it for, everything it does, then why they choose it. */
+/** Coere Connect: what people use it for, what it saves against pasting context by hand, everything it does, then why they choose it. */
 export function ConnectPage() {
   return (
     <>
@@ -21,6 +22,7 @@ export function ConnectPage() {
       <ProductSection id="use-cases" title="Put your memory to work" line="Bring every chat in, build one memory from them, and let Cori act on it." tint>
         <UseCaseTabs cases={asUseCases(connectCases)} />
       </ProductSection>
+      <CompareSection />
       <ProductSection title="Everything in Coere Connect" link={ALL_FEATURES}>
         <FeatureGrid items={asGrid(connectGrid)} />
       </ProductSection>
