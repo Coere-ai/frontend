@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CheckList } from "@/site/blocks/check-list";
 import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
@@ -21,9 +22,9 @@ export function SolutionsSection() {
               <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-balance md:text-5xl md:leading-[1.05]">One memory for the whole company</h2>
               <p className="mt-5 text-lg leading-relaxed text-white/85">Everything your team tells AI about the company and its clients, kept in one place. Every chat starts from what the team already knows.</p>
               <CheckList tone="light" className="mt-7" items={["Company: the team, its tools and how it works", "Clients: each with its contacts, promises and decisions", "The right client: a draft about one never gets another's memory"]} />
-              <a href="/products/solutions" className="mt-9 inline-flex h-12 items-center rounded-full bg-white px-6 text-[16px] font-medium text-neutral-950">
+              <Link href="/products/solutions" className="mt-9 inline-flex h-12 items-center rounded-full bg-white px-6 text-[16px] font-medium text-neutral-950">
                 Explore Coere Solutions
-              </a>
+              </Link>
             </div>
             <div className="overflow-hidden rounded-2xl shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)] ring-1 ring-white/15">
               <FilmFrame film={films.teams} preview />

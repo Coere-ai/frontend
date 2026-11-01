@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import { KEYWORDS } from "@/lib/seo";
 import { founders, siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -12,7 +13,8 @@ const geistSans = Geist({
 /**
  * Site-wide metadata. The share images come from the opengraph-image and
  * twitter-image files beside this one, and the icons from favicon.ico, icon.svg,
- * icon1.png and apple-icon.png. The home page sets its own canonical link.
+ * icon1.png and apple-icon.png. Each page sets its own title, description,
+ * keywords and canonical link through pageMetadata (lib/seo).
  */
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -21,7 +23,14 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  keywords: KEYWORDS,
   applicationName: siteConfig.name,
+  category: "technology",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
   authors: founders.map((f) => ({ name: f.name })),
   creator: siteConfig.legalName,
   publisher: siteConfig.legalName,

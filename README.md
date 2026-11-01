@@ -1,7 +1,6 @@
 # Coere
 
-The Coere website, built with Next.js, TypeScript, Tailwind CSS, Motion and
-three.js.
+The Coere website, built with Next.js, TypeScript, Tailwind CSS and Motion.
 
 ```bash
 npm install
@@ -14,52 +13,26 @@ npm run lint
 `NEXT_PUBLIC_SITE_URL` sets the site's canonical address and defaults to
 `https://www.coere.ai`. It should match the host that serves the site.
 
-## The private new site
+## Search and sharing
 
-The redesigned site is private. Everyone sees the current site at coere.ai
-until they sign in at `/access`. A sign in lasts one hour, and for that hour
-coere.ai itself shows the new site at its real addresses (`/`, `/blog`,
-`/products/forge` and so on). Without a pass, none of it answers.
+Every page is public and indexed. `src/lib/seo.ts` holds the shared keywords
+and `pageMetadata`, which gives a page its title, description, keywords,
+canonical link and share card in one call; the words for each page are in
+`src/site/content/seo.ts`. The home page carries the WebSite and
+Organization structured data and each product page a SoftwareApplication
+(`src/site/seo/json-ld.tsx`). `src/app/sitemap.ts` lists every page the menus
+link to, `src/app/robots.ts` keeps crawlers out of the live demos' own pages,
+and `public/llms.txt` describes Coere for AI crawlers.
 
-Set two variables in the deploy's environment:
+The blog and careers pages are hidden from the menus for now. They still
+answer at their addresses but are `noindex` and left out of the sitemap.
 
-```
-USER=...
-PASSWORD=...
-```
-
-With either one missing, nobody can sign in. Changing either one signs
-everyone out.
-
-Shells set `USER` to your login name, and Next does not let a `.env` file
-override a variable the shell already set. To try it locally, start the dev
-server with both on the command line:
-
-```bash
-USER=me PASSWORD=secret npm run dev
-```
-
-How it works:
-
-- `/access` posts to `/access/verify`, which compares the credentials as
-  digests and sets an httpOnly cookie for one hour. A wrong guess waits 800 ms.
-  `/access/leave` signs out early.
-- The cookie holds only when the pass ends and an HMAC over that, keyed by the
-  two variables (`src/lib/access`).
-- `src/proxy.ts` rewrites page requests from pass holders to the routes under
-  `src/app/preview`, so the address bar never changes. Anything under
-  `/preview`, including the films and images in `public/preview`, is a 404
-  without a pass.
-- The preview layout checks the pass again on the server, so a mistake in the
-  proxy can't leak a page. Private pages are `noindex` and `no-store`, and
-  private files are `private` so no shared cache keeps them.
-
-## Where the new site lives
+## Where things live
 
 ```
-src/app/preview/      routes: home, products, industries and each industry,
+src/app/(site)/       routes: home, products, industries and each industry,
                       resources (the developer docs), blog, about, careers,
-                      and a 404 inside the new layout
+                      and a 404 inside the site's layout
 src/site/content/     everything the pages say: products, features, films and
                       their cues, industries and their stories, page copy,
                       code samples, backgrounds, posts, roles, navbar tabs

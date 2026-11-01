@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CheckList } from "@/site/blocks/check-list";
 import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
@@ -27,8 +28,8 @@ export function ForgeSection() {
                 items={["Permission first: a token only after the person allows it", "Only what changed: with a chat id, the next message gets what is new", "On record: each app shows what it was sent"]}
               />
               <div className="mt-9 flex flex-wrap items-center gap-3">
-                <a href="/products/forge" className="inline-flex h-12 items-center rounded-full bg-white px-6 text-[16px] font-medium text-neutral-950">Explore Coere Forge</a>
-                <a href="/resources" className="inline-flex h-12 items-center rounded-full px-5 text-[16px] font-medium text-white ring-1 ring-white/40">Read the docs</a>
+                <Link href="/products/forge" className="inline-flex h-12 items-center rounded-full bg-white px-6 text-[16px] font-medium text-neutral-950">Explore Coere Forge</Link>
+                <Link href="/resources" className="inline-flex h-12 items-center rounded-full px-5 text-[16px] font-medium text-white ring-1 ring-white/40">Read the docs</Link>
               </div>
             </div>
             <FilmFrame film={films.forgeDev} />

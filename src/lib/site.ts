@@ -4,7 +4,7 @@
 export const siteConfig = {
   name: "Coere",
   legalName: "Coere AI",
-  tagline: "The memory layer for AI",
+  tagline: "The memory layer you own, across every AI",
   domain: "coere.ai",
   /**
    * The canonical origin, with no trailing slash. The apex coere.ai redirects
@@ -12,8 +12,9 @@ export const siteConfig = {
    */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.coere.ai",
   /** For search results and link previews; not shown on the page. */
-  title: "Coere AI | The memory layer for AI",
-  description: "Coere AI is the memory layer for AI.",
+  title: "Coere | The memory layer you own, across every AI",
+  description:
+    "Coere is the AI memory layer you own. It saves your chats from ChatGPT, Claude, Gemini and more, and brings the right context into every new chat.",
   email: "coereagent@gmail.com",
   /** Profiles that speak for Coere, for search engines (schema.org sameAs). */
   profiles: [
@@ -22,12 +23,7 @@ export const siteConfig = {
   ],
 } as const;
 
-export const navLinks = [
-  { href: "#what-we-do", label: "What we do" },
-  { href: "#who-we-are", label: "Who we are" },
-] as const;
-
-/** The AI logos in the hero. They live in /public. */
+/** The AIs Coere works with, and their logos in /public. */
 export const agents = [
   { name: "ChatGPT", logo: "/openai.svg" },
   { name: "Claude", logo: "/claude-color.svg" },

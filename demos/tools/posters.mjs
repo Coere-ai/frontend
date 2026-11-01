@@ -5,8 +5,7 @@
 // the dev server and the busiest frame of it is kept (the most detail, which
 // is where Coere is doing something, never an empty page or a title card).
 // Writes public/preview/live/posters/<film>/<chapter>.webp, and start.webp
-// for the film's first chapter. Needs the dev server at localhost:3000 with
-// the access pass USER=tester PASSWORD=s3cret-pass.
+// for the film's first chapter. Needs the dev server at localhost:3000.
 import { createRequire } from "node:module";
 import { copyFileSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,10 +28,6 @@ const films = (wanted.length ? wanted : readdirSync(join(root, "demos/films"))).
 const browser = await puppeteer.launch({ executablePath: "/opt/pw-browsers/chromium", args: ["--no-sandbox"] });
 const page = await browser.newPage();
 await page.setViewport({ width: 1440, height: 900 });
-await page.goto(`${BASE}/access`, { waitUntil: "networkidle0" });
-await page.type("input[name=user]", "tester");
-await page.type("input[name=password]", "s3cret-pass");
-await Promise.all([page.waitForNavigation(), page.click("form button")]);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

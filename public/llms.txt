@@ -1,12 +1,28 @@
 # Coere
 
-> Coere (Coere AI) is the memory layer for AI. Coere is not Cohere: the name comes from the Latin cohaerere, "to connect". Website: https://www.coere.ai/
+> Coere (Coere AI) is the memory layer you own, across every AI. It saves your chats from ChatGPT, Claude, Gemini and other AIs, builds them into one memory graph, and brings the right context into every new chat. Coere is not Cohere: the name comes from the Latin cohaerere, "to connect". Website: https://www.coere.ai/
+
+## Products
+
+- [Coere Connect](https://www.coere.ai/products/connect): a Chrome extension for people. It saves every chat from ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Grok, Copilot, Meta AI and Kimi on your computer, builds a memory graph you own, and adds the right context to each new chat as you type.
+- [Coere Solutions](https://www.coere.ai/products/solutions): one shared memory for a company, its people and its clients, built from the chats the team already has. A draft about one client only ever gets that client's memory.
+- [Coere Forge](https://www.coere.ai/products/forge): the memory API, MCP server, and TypeScript and Python SDKs, so apps and AI agents can use a person's Coere memory with their permission.
+- [Coere Agents](https://www.coere.ai/products/agents): Cori, the helper in Coere. It works from your memory to draft email in Gmail, add calendar events, fix writing, fill forms and split research across workers, and asks before it sends.
+
+## Industries
+
+- [All industries](https://www.coere.ai/industries): law firms, financial advisors, software teams, trading companies, consumer brands, manufacturers, energy companies, and teachers and schools.
+
+## Developers
+
+- [Developer docs](https://www.coere.ai/resources): tokens and scopes, every endpoint, the MCP server and the SDKs.
 
 ## Team
 
 - Michelle Dong, Co-founder and CEO (UC Berkeley, Business and Computer Science)
 - Edison Law, Co-founder and CTO (UC Berkeley, EECS and Bioengineering)
 - Sarah Shelke, COO and CMO (UC Berkeley, Economics and Neuroscience)
+- [About Coere](https://www.coere.ai/about)
 
 ## Contact
 

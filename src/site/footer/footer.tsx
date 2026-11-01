@@ -30,10 +30,7 @@ function currentYear(): number {
   return new Date().getFullYear();
 }
 
-/**
- * The site footer. The sign out button ends the preview pass early, since
- * only pass holders ever see this footer.
- */
+/** The site footer: the product, company and resource links, and the copyright line. */
 export function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-white">
@@ -61,9 +58,6 @@ export function Footer() {
       </Container>
       <Container className="flex flex-col gap-3 border-t border-neutral-100 py-6 text-[13px] text-neutral-500 sm:flex-row sm:items-center sm:justify-between">
         <p>© {currentYear()} Coere AI</p>
-        <form action="/access/leave" method="post">
-          <button className="hover:text-neutral-950">Sign out of the preview</button>
-        </form>
       </Container>
     </footer>
   );
