@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { homeSeo } from "@/site/content/seo";
 import { ClosingCta } from "@/site/home/closing-cta";
+import { CompareSection } from "@/site/home/compare-section";
 import { ConnectSection } from "@/site/home/connect-section";
 import { DemoSection } from "@/site/home/demo-section";
 import { ForgeSection } from "@/site/home/forge-section";
@@ -12,8 +13,9 @@ import { JsonLd, siteGraph } from "@/site/seo/json-ld";
 export const metadata: Metadata = pageMetadata({ ...homeSeo, path: "/", absolute: true });
 
 /**
- * The home page, kept short: the line, the full demo, then one part per
- * product, each with its own layout and a way to its page.
+ * The home page, kept short: the line, the full demo, Coere against pasting
+ * context by hand, then one part per product, each with its own layout and
+ * a way to its page.
  */
 export default function HomePage() {
   return (
@@ -21,6 +23,7 @@ export default function HomePage() {
       <JsonLd data={siteGraph} />
       <Hero />
       <DemoSection />
+      <CompareSection />
       <ConnectSection />
       <SolutionsSection />
       <ForgeSection />
