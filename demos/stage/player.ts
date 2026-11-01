@@ -8,7 +8,9 @@ import { World } from "./world";
  * picks what plays: `from` and `to` name chapters (the site's short
  * showcases play one part this way, skipping to it unseen), `at` starts
  * that many seconds into `from`, `captions=1` shows the caption line, and
- * `loop=0` stops at the end. The stage is the films' 1440 by 900 window,
+ * `loop=0` stops at the end. `pace=1` plays once at its own pace and keeps
+ * when each step began, for demos/tools/pace.mjs to save as pace.json; a
+ * jump to `at` reads that file to land where the play bar says. The stage is the films' 1440 by 900 window,
  * scaled to fit whatever frame the page sits in.
  *
  * The page tells the site around it how it is doing, by message: which
@@ -67,6 +69,18 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
   let chapter: string | null = null;
   let elapsed = 0;
   let spent = 0;
+  // When the current chapter began, by the clock, for timing a skip in real time.
+  let began = performance.now();
+  // The script's steps in this chapter so far. pace.json holds, per chapter, when each step began at the film's own pace.
+  let step = 0;
+  const recording = params.get("pace") === "1";
+  const paced: Record<string, number[]> = {};
+  let pace: Record<string, number[]> | null = null;
+  if (startAt > 0)
+    void fetch("pace.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((p) => (pace = p))
+      .catch(() => undefined);
   const world = { now: new World() };
 
   const host: DemoHost = {
@@ -88,9 +102,17 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
     $("cover").classList.add("off");
     tell();
   };
-  /** Reveals a part played alone once it is really there: its chapter reached, a tab on screen, `at` spent. */
+  /**
+   * Reveals a part played alone once it is really there: its chapter reached,
+   * a tab on screen, and `at` gone by. How far into the chapter a skip is, in
+   * the seconds the play bar shows, is when its latest step began at the
+   * film's own pace (pace.json). Without that, it is the script's own
+   * pauses, which a skip runs at once, plus the time the clock has run on
+   * Coere's work since the chapter began.
+   */
+  const gone = () => (chapter && step > 0 ? pace?.[chapter]?.[step - 1] : undefined) ?? spent + (performance.now() - began);
   const settle = () => {
-    if (skipping && reached && spent >= waitingFor && stage?.filming) {
+    if (skipping && reached && gone() >= waitingFor && stage?.filming) {
       // One frame later, so the tab has drawn.
       requestAnimationFrame(() => skipping && reveal());
     }
@@ -102,9 +124,18 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
       fast: () => skipping,
       chapter(id) {
         if (to && id === to && !skipping) throw new Stop();
+        // A skip that ran past its chapter before reaching `at` shows the next one from its start.
+        const overran = skipping && reached && id !== from;
         chapter = id;
         elapsed = 0;
         spent = 0;
+        began = performance.now();
+        step = 0;
+        if (recording) paced[id] = [];
+        if (overran) {
+          waitingFor = 0;
+          settle();
+        }
         if (skipping && id === from) {
           // A part played alone shows once a tab is on screen and the script has spent `at` in it, never on a blank stage.
           reached = true;
@@ -115,6 +146,8 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
         tell();
       },
       spend(ms) {
+        if (recording && chapter && !skipping) paced[chapter]?.push(Math.round(performance.now() - began));
+        step += 1;
         spent += ms;
         settle();
       },
@@ -134,6 +167,8 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
   }
   setInterval(() => {
     if (!paused && !skipping) elapsed += 0.25;
+    // A skip waiting on Coere's own work reaches `at` with no script step to say so.
+    settle();
     tell();
   }, 250);
   addEventListener("message", (event) => {
@@ -184,6 +219,7 @@ export function play(meta: FilmMeta, film: Film, setup: Setup): void {
       if (mine !== run) return;
       // A run that stops at its end says so, for the tools that play films through (demos/tools).
       if (!loop) {
+        if (recording) Object.assign(window, { __pace: paced });
         document.documentElement.dataset.demoEnded = "";
         return;
       }
