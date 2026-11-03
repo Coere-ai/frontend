@@ -1,0 +1,67 @@
+/**
+ * The checks on each request's params before it is forwarded
+ * (docs/accounts.md 8.4): one for a message, each entry for a batch. They
+ * keep Coere's key to the models and sizes the extension uses, and refuse a
+ * stream, since metering reads the whole answer.
+ */
+
+export const ALLOWED_MODELS: ReadonlySet<string> = new Set([
+  "claude-opus-5-5",
+  "claude-sonnet-5-5",
+  "claude-haiku-5-5",
+]);
+
+export const ALLOWED_BETAS: ReadonlySet<string> = new Set([
+  "message-batches-2024-09-24",
+  "token-counting-2024-11-01",
+  "server-side-fallback-2026-07-01",
+]);
+
+export const MAX_TOKENS_CAP = 64_000;
+/** Anthropic's own ceiling for one batch. */
+export const MAX_BATCH_REQUESTS = 100_000;
+
+export type ParamsCheck =
+  | { ok: true }
+  | { ok: false; reason: "model"; model: string }
+  | { ok: false; reason: "bad_request" };
+
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
+
+/** One request's params: an allowed model, max_tokens at most 64,000, and no stream. */
+export function checkParams(params: unknown): ParamsCheck {
+  if (!isRecord(params)) return { ok: false, reason: "bad_request" };
+  const { model, max_tokens: maxTokens, stream } = params;
+  if (typeof model !== "string") return { ok: false, reason: "bad_request" };
+  if (!ALLOWED_MODELS.has(model)) return { ok: false, reason: "model", model: model.slice(0, 80) };
+  if (maxTokens !== undefined && (typeof maxTokens !== "number" || !Number.isInteger(maxTokens) || maxTokens > MAX_TOKENS_CAP)) {
+    return { ok: false, reason: "bad_request" };
+  }
+  if (stream === true) return { ok: false, reason: "bad_request" };
+  return { ok: true };
+}
+
+/** A batch create body: every entry's params pass, and the count is kept for the batch row. */
+export function checkBatchBody(body: unknown): ParamsCheck & { count?: number } {
+  if (!isRecord(body) || !Array.isArray(body.requests)) return { ok: false, reason: "bad_request" };
+  const requests = body.requests as unknown[];
+  if (requests.length === 0 || requests.length > MAX_BATCH_REQUESTS) return { ok: false, reason: "bad_request" };
+  for (const entry of requests) {
+    if (!isRecord(entry)) return { ok: false, reason: "bad_request" };
+    const check = checkParams(entry.params);
+    if (!check.ok) return check;
+  }
+  return { ok: true, count: requests.length };
+}
+
+/**
+ * The `anthropic-beta` header to forward: null when absent, the header when
+ * every comma separated value is allowed, false when any is not.
+ */
+export function checkBeta(header: string | null): string | null | false {
+  if (header === null) return null;
+  const values = header.split(",").map((v) => v.trim()).filter(Boolean);
+  if (values.length === 0) return null;
+  return values.every((v) => ALLOWED_BETAS.has(v)) ? values.join(",") : false;
+}
