@@ -1,9 +1,11 @@
 "use client";
 
 import type { SignInState } from "@/lib/auth/sign-in-state";
+import { CodeInput, IconInput } from "@/site/account/auth-fields";
 import { textButtonClass } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
-import { FormField, inputClass } from "@/site/ui/form-field";
+import { FormField } from "@/site/ui/form-field";
+import { LockIcon, MailIcon, UserIcon } from "@/site/ui/icons/interface-icons";
 import { Underlined } from "@/site/ui/underlined";
 
 /**
@@ -29,7 +31,7 @@ export function EmailStep({ state, pending }: StepProps) {
   return (
     <>
       <FormField id="email" label="Email" error={error}>
-        <input id="email" name="email" type="email" autoComplete="email" required defaultValue={state.email} aria-invalid={Boolean(error)} aria-describedby={error ? "email-error" : undefined} className={`${inputClass(Boolean(error))} h-12`} />
+        <IconInput icon={MailIcon} invalid={Boolean(error)} id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required defaultValue={state.email} aria-invalid={Boolean(error)} aria-describedby={error ? "email-error" : undefined} />
       </FormField>
       <button type="submit" name="intent" value="send" disabled={pending} className={buttonClass("primary", "w-full disabled:opacity-60")}>
         {pending ? "Sending" : "Email me a code"}
@@ -46,13 +48,20 @@ export function CodeStep({ state, pending }: StepProps) {
   return (
     <>
       <div>
-        <p className="text-[13px] text-neutral-500">Code sent to</p>
-        <p className="mt-1 text-xl font-medium tracking-[-0.02em] break-all text-neutral-950">{state.email}</p>
-        <p className="mt-2 text-[14px] leading-relaxed text-neutral-500">Type the 6 digit code from the email, or open the link in it.</p>
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
+            <MailIcon size={20} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] text-neutral-500">Code sent to</p>
+            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{state.email}</p>
+          </div>
+        </div>
+        <p className="mt-4 text-[14px] leading-relaxed text-neutral-500">Type the 6 digit code from the email, or open the link in it.</p>
       </div>
       <input type="hidden" name="email" value={state.email} />
       <FormField id="code" label="Code" error={error}>
-        <input id="code" name="code" inputMode="numeric" autoComplete="one-time-code" maxLength={7} autoFocus aria-invalid={Boolean(error)} aria-describedby={error ? "code-error" : undefined} className={`${inputClass(Boolean(error))} h-12 tracking-[0.3em] tabular-nums`} />
+        <CodeInput id="code" name="code" invalid={Boolean(error)} describedBy={error ? "code-error" : undefined} />
       </FormField>
       <button type="submit" name="intent" value="verify" disabled={pending} className={buttonClass("primary", "w-full disabled:opacity-60")}>
         {pending ? "Checking" : "Verify"}
@@ -71,10 +80,10 @@ export function PasswordStep({ state, pending }: StepProps) {
   return (
     <>
       <FormField id="login" label="Email or username" error={loginError}>
-        <input id="login" name="login" autoComplete="username" defaultValue={state.login} autoCapitalize="none" spellCheck={false} required aria-invalid={Boolean(loginError)} aria-describedby={loginError ? "login-error" : undefined} className={`${inputClass(Boolean(loginError))} h-12`} />
+        <IconInput icon={UserIcon} invalid={Boolean(loginError)} id="login" name="login" autoComplete="username" defaultValue={state.login} autoCapitalize="none" spellCheck={false} required aria-invalid={Boolean(loginError)} aria-describedby={loginError ? "login-error" : undefined} />
       </FormField>
       <FormField id="password" label="Password" error={passwordError}>
-        <input id="password" name="password" type="password" autoComplete="current-password" required aria-invalid={Boolean(passwordError)} aria-describedby={passwordError ? "password-error" : undefined} className={`${inputClass(Boolean(passwordError))} h-12`} />
+        <IconInput icon={LockIcon} invalid={Boolean(passwordError)} id="password" name="password" type="password" autoComplete="current-password" required aria-invalid={Boolean(passwordError)} aria-describedby={passwordError ? "password-error" : undefined} />
       </FormField>
       <button type="submit" name="intent" value="password" disabled={pending} className={buttonClass("primary", "w-full disabled:opacity-60")}>
         {pending ? "Signing in" : "Sign in"}
