@@ -300,8 +300,8 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
 | `POST /api/v1/events` | Feature counts and tokens saved |
 | `GET /api/v1/org`, `GET /api/v1/org/index` | The organization and its shared graph, members only |
 
-- Every route checks the token itself through `device_auth`. The proxy does
-  not run on `/api/v1`.
+- Every route checks the token itself through `device_auth`.
+  `src/proxy.ts` does not run on `/api/v1`.
 - Answers are `no-store` and `noindex`, with no CORS headers: the extension
   holds the site as a host, and pages never call these routes.
 - Requests per minute come from the plan and are counted per device in each
