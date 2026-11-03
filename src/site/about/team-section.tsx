@@ -1,4 +1,4 @@
-import { executives, founders, type TeamMember } from "@/lib/site";
+import { executives, founders, siteConfig, type TeamMember } from "@/lib/site";
 import { Container } from "@/site/ui/container";
 import { Reveal } from "@/site/ui/reveal";
 import { SectionHeading } from "@/site/ui/section-heading";
@@ -24,7 +24,7 @@ export function TeamSection() {
   return (
     <section id="team" className="scroll-mt-24 border-t border-neutral-100 py-28">
       <Container>
-        <SectionHeading eyebrow="Our team" title="The people building Coere" description="Coere comes from the Latin cohaerere, to connect." />
+        <SectionHeading eyebrow="Our team" title="The people building Coere" description={siteConfig.notCohere} />
         <Group title="Founders" members={founders} />
         <Group title="Executive team" members={executives} />
       </Container>

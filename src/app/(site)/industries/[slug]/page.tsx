@@ -24,9 +24,11 @@ export async function generateMetadata({ params }: PageProps<"/industries/[slug]
   if (!found) return {};
   const { industry, content } = found;
   const audience = industryAudience[industry.slug] ?? industry.name.toLowerCase();
+  // The AIs it works across, when the field's own line leaves room for them in a result.
+  const full = `${content.line} One AI memory for ${audience}, across ChatGPT, Claude and Gemini.`;
   return pageMetadata({
     title: `Coere for ${industry.name.toLowerCase()}: AI memory for ${audience}`,
-    description: `${content.line} One AI memory for ${audience}, across ChatGPT, Claude and Gemini.`,
+    description: full.length <= 160 ? full : `${content.line} One AI memory for ${audience}.`,
     path: `/industries/${industry.slug}`,
     keywords: [`AI for ${audience}`, `AI memory for ${audience}`, `ChatGPT for ${audience}`, ...content.highlights],
   });

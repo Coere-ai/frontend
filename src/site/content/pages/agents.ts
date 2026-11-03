@@ -4,7 +4,7 @@ import type { HeroCopy } from "./types";
 export const agentsHero: HeroCopy = {
   eyebrow: "Coere Agents",
   title: "One worker, infinite possibilities",
-  line: "Give Cori one task. It works from your memory, and when the job is big it becomes as many workers as the job needs, each in a tab of its own.",
+  line: "Coere Agents is Cori, an AI agent that works from your memory. Give it one task, and when the job is big it becomes as many workers as the job needs, each in a tab of its own.",
   checks: [
     "Your memory: every worker starts from what you and your team know",
     "As many as it takes: one task can run in ten tabs at once",
