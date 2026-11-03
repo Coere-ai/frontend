@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/session-token";
+import { refreshSession } from "@/lib/supabase/refresh";
 
 /**
  * The gate in front of the private dashboard, and nothing else.
@@ -18,6 +19,12 @@ import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/session-token";
  *
  * Everything here is also marked noindex, and the dashboard's document gets a
  * per-request nonce Content-Security-Policy.
+ *
+ * The account pages (sign in, sign up, the emailed link, /connect, the
+ * person's dashboard) pass through here too, for two things only: the
+ * Supabase session is refreshed before they render, and they get the same
+ * nonce policy and noindex. Who may see what is decided by each page, action
+ * and route itself.
  */
 
 const NOINDEX = "noindex, nofollow, noarchive";
@@ -58,8 +65,41 @@ function notFound(): NextResponse {
   });
 }
 
-export function proxy(request: NextRequest): NextResponse {
+/** The private account paths. Keep in step with the matcher below. */
+const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect)$|^\/(auth|dashboard|join)(\/|$)/;
+
+/** A fresh 16 byte nonce, well past the 128 bits the CSP spec asks for. */
+function newNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes));
+}
+
+/**
+ * An account page: refresh the session first, so the request headers built
+ * after it carry the new cookies to the page, then add the policy. Every
+ * account page renders per request (it reads the session), which a nonce
+ * needs anyway.
+ */
+async function accountPage(request: NextRequest): Promise<NextResponse> {
+  const refreshed = await refreshSession(request);
+  const nonce = newNonce();
+  const csp = buildCsp(nonce, process.env.NODE_ENV === "development");
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("content-security-policy", csp);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("content-security-policy", csp);
+  response.headers.set("x-robots-tag", NOINDEX);
+  return refreshed.apply(response);
+}
+
+export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
+  if (ACCOUNT_PATH.test(pathname)) return accountPage(request);
+
   const signedIn = verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
 
   if (pathname.startsWith("/api/statistics")) {
@@ -90,7 +130,17 @@ export function proxy(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  // Only the dashboard and its data. `:path*` matches zero or more segments,
-  // so the first entry covers /statistics itself as well.
-  matcher: ["/statistics/:path*", "/api/statistics/:path*"],
+  // Only the private pages and their data, so public pages stay static.
+  // `:path*` matches zero or more segments, so "/statistics/:path*" covers
+  // /statistics itself as well.
+  matcher: [
+    "/statistics/:path*",
+    "/api/statistics/:path*",
+    "/sign-in",
+    "/sign-up",
+    "/auth/:path*",
+    "/connect",
+    "/dashboard/:path*",
+    "/join/:path*",
+  ],
 };
