@@ -95,3 +95,24 @@ export const PauseIcon = (p: IconProps) => (
     <path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor" stroke="none" />
   </Icon>
 );
+
+export const MailIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />
+    <path d="m4.5 7.5 7.5 5.5 7.5-5.5" />
+  </Icon>
+);
+
+export const LockIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
+    <path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3M12 14.5v2" />
+  </Icon>
+);
+
+export const UserIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="8.5" r="3.5" />
+    <path d="M5 19.5c1.2-3.3 3.9-5 7-5s5.8 1.7 7 5" />
+  </Icon>
+);
