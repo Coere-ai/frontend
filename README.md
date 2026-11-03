@@ -30,7 +30,8 @@ The guide pages (`/portable-ai-memory`, `/chatgpt-to-claude-memory`,
 sitemap and footer read. `src/app/sitemap.ts` lists every page the menus and
 footer link to, with dates that change only when the words do.
 `src/app/robots.ts` names the search and AI crawlers one by one and keeps all
-of them out of the live demos' own pages, `/statistics` and `/api/`; it says
+of them out of the live demos' own pages, `/statistics`, `/api/` and the
+account pages; it says
 how to stop model training without leaving AI search. `docs/seo-report.md`
 has the research and the remaining manual steps.
 
@@ -154,8 +155,8 @@ non zero on any failure. The checks live in `scripts/db`.
 ### What is recorded
 
 `src/site/tracker/site-tracker.tsx` is mounted by the site layout, so it runs
-on every public page and never on `/statistics`. It records the view, counts
-seconds the tab was in focus, notes the deepest scroll, and reports clicks.
+on every public page and never on `/statistics` or the account pages. It
+records the view, counts seconds the tab was in focus, notes the deepest scroll, and reports clicks.
 `data-cta` on a link marks it as a conversion and `data-track` marks anything
 else worth counting; links off the site are counted on their own. It skips
 pages shown inside a frame, and crawlers are labelled by their user agent and
@@ -201,3 +202,81 @@ npm test
 
 runs the unit tests (`src/**/*.test.ts`) with Node's test runner through
 `tsx`.
+
+## Accounts
+
+People sign in at `/sign-in` with a code emailed to them, or with a password,
+through Supabase Auth. `docs/accounts.md` is the contract for all of it; this
+section is what the owner sets up by hand.
+
+- Every Supabase call runs on the server. The browser never talks to
+  Supabase, so the content security policy keeps `connect-src 'self'`.
+- `src/proxy.ts` refreshes the session on the private paths only (`/sign-in`,
+  `/sign-up`, `/auth/*`, `/connect`, `/dashboard/*`, `/join/*`), and gives
+  them the nonce policy and noindex. Public pages stay static.
+- The session cookies are httpOnly and last 400 days. A second cookie,
+  `coere_signed_in=1`, is readable by scripts so the navbar can say
+  Dashboard instead of Sign in; it grants nothing.
+- Each sign in path allows 10 tries in 15 minutes per network address and
+  per email, and a wrong code or password waits before it answers.
+- `/connect` is the page the extension opens to get its device token.
+
+### Settings
+
+| Variable | What it is |
+| --- | --- |
+| `SUPABASE_PUBLISHABLE_KEY` | The project's publishable key, used by the server's session client. Not `NEXT_PUBLIC_`: only the server uses it |
+| `COERE_EXTENSION_IDS` | The extension ids allowed to connect, comma separated. Unset, any id may connect outside production and none in production |
+| `SECURITY_SALT` | A long random string, the key for the address hash in `security_events` |
+
+`SUPABASE_URL` and `SUPABASE_SECRET_KEY` are the same as for the analytics
+below.
+
+### In the Supabase dashboard
+
+- **Authentication, Sign In / Providers, Email**: on, with **Confirm email**
+  on. Set **Email OTP Length** to 6 and **Minimum password length** to 10.
+- **Authentication, URL Configuration**: Site URL `https://www.coere.ai`.
+  Redirect URLs `https://www.coere.ai/**`, plus `http://localhost:3000/**`
+  for development.
+- **Authentication, Sessions**: leave **Time-box user sessions** and
+  **Inactivity timeout** off, so a person stays signed in until they sign
+  out.
+- **Authentication, Emails, SMTP Settings**: Supabase's own sender allows
+  only a few emails an hour, so set up a real one before launch.
+
+### Email templates
+
+Under **Authentication, Emails, Templates**. A new address that signs in by
+code gets **Confirm signup**, a known one gets **Magic Link**, so both hold
+the code and the link.
+
+**Magic Link**, subject `Your Coere sign in code`:
+
+```html
+<h2>Sign in to Coere</h2>
+<p>Your code is <strong>{{ .Token }}</strong>. Type it on the sign in page.</p>
+<p>Or open this link in the browser you want to sign in on:</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">Sign in to Coere</a></p>
+<p>If you did not ask to sign in, you can ignore this email.</p>
+```
+
+**Confirm signup**, subject `Confirm your Coere account`:
+
+```html
+<h2>Welcome to Coere</h2>
+<p>Open this link to confirm your email and sign in:</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">Confirm your email</a></p>
+<p>Or type this code on the sign in page: <strong>{{ .Token }}</strong></p>
+<p>If you did not make a Coere account, you can ignore this email.</p>
+```
+
+How the link finds its way back: the server sends `emailRedirectTo` as the
+site's origin plus the page to return to (for example
+`https://www.coere.ai/connect?ext=…&state=…`). Supabase puts that in
+`{{ .RedirectTo }}` when it matches a Redirect URL, and the Site URL
+otherwise. It is not encoded, so its own query runs on into the link's;
+`/auth/confirm` therefore reads everything after `next=` as the address,
+and `next` must stay last in the link. An address on another origin, or the
+bare Site URL, goes to `/dashboard`. `{{ .SiteURL }}` is always the live
+site, so in development type the code instead of opening the link.
