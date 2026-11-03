@@ -3,6 +3,7 @@ import { CheckList } from "@/site/blocks/check-list";
 import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
+import { CircleArrowLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 
@@ -10,6 +11,7 @@ import { FilmFrame } from "@/site/ui/film-frame";
  * Coere Forge on the home page: one panel of artwork, like Solutions, with
  * the words on the left and, on the right, a developer making a token,
  * adding Coere to their app's AI call and running it, live with its player.
+ * Forge is not out yet, so its button joins the waitlist.
  */
 export function ForgeSection() {
   return (
@@ -28,9 +30,14 @@ export function ForgeSection() {
                 items={["Permission first: a token only after the person allows it", "Only what changed: with a chat id, the next message gets what is new", "On record: each app shows what it was sent"]}
               />
               <div className="mt-9 flex flex-wrap items-center gap-3">
-                <Link href="/products/forge" className="inline-flex h-12 items-center rounded-full bg-white px-6 text-[16px] font-medium text-neutral-950">Explore Coere Forge</Link>
-                <Link href="/resources" className="inline-flex h-12 items-center rounded-full px-5 text-[16px] font-medium text-white ring-1 ring-white/40">Read the docs</Link>
+                <CircleArrowLink href="/developers/waitlist" tone="light">
+                  Join the waitlist
+                </CircleArrowLink>
+                <Link href="/products/forge" className="inline-flex h-11 items-center rounded-full px-5 text-[15px] font-medium text-white ring-1 ring-white/40 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                  Explore Coere Forge
+                </Link>
               </div>
+              <p className="mt-4 text-[15px] text-white/70">Coere Forge is coming soon.</p>
             </div>
             <FilmFrame film={films.forgeDev} />
           </div>
