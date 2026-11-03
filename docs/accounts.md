@@ -344,7 +344,7 @@ session is checked.
 | `/dashboard` | Connected browsers, memory counts, this month's usage against the plan, the last backup, and buttons that use the bridge: Open library, Back up now. |
 | `/dashboard/memory` | The memory graph (the product's flat graph, laid out by the same `layoutTree`), a searchable list of memories by section, and the source of each. Built from the stored index (section 8.7). Download the `.coere` file. **Edit in Coere** opens the local Memory page through the bridge. |
 | `/dashboard/chats` | The chats memory came from: title, AI, when it was saved, message count. Titles only. Chat text stays in the browser. |
-| `/dashboard/usage` | Cost and tokens by day, by model and by kind, against the plan's monthly limit. |
+| `/dashboard/usage` | Cost and tokens by day, by model and by kind, against the monthly limit, and the lifetime spend against the lifetime limit when there is one. |
 | `/dashboard/settings` | The synced settings (section 6.6), the memory backup switch and the sensitive memories switch. A change bumps the version, and the page sends `coere.settings` through the bridge so the extension pulls at once. |
 | `/dashboard/organization` | Section 14: create an organization or join one, its members and roles, invites, the shared knowledge graph and the organization's totals. |
 | `/dashboard/account` | Email, username, password, connected browsers with **Revoke**, download everything, delete the memory copy, delete the account. |
@@ -388,7 +388,7 @@ Errors outside the Anthropic routes are problem details
 | `memory_sync_off` | 409 | A memory upload while the backup is off |
 | `too_large` | 413 | A body or file over its limit |
 | `rate_limited` | 429 | Too many requests this minute, with `Retry-After` |
-| `usage_limit` | 429 | The plan's monthly limit is spent |
+| `usage_limit` | 429 | The monthly or the lifetime limit is spent |
 | `unavailable` | 503 | The server is missing a setting it needs |
 
 ### 8.1 `POST /api/v1/auth/token`
@@ -405,7 +405,7 @@ Revokes the calling token (`revoked_reason = 'signed_out'`). `204`.
 
 ```json
 { "user": { "id": "…", "email": "…", "username": null, "createdAt": "…" },
-  "plan": { "id": "free", "name": "Free", "monthlyLimitMicros": 5000000, "storageLimitBytes": 26214400 },
+  "plan": { "id": "free", "name": "Free", "monthlyLimitMicros": 5000000, "lifetimeLimitMicros": null, "storageLimitBytes": 26214400 },
   "usage": { "month": "2026-11-01", "costMicros": 0, "requests": 0, "inputTokens": 0, "outputTokens": 0 },
   "memory": { "sync": true, "includeSensitive": false, "uploadedAt": null, "bytes": null, "digest": null },
   "device": { "id": "…", "name": "Chrome on macOS" },
@@ -451,7 +451,7 @@ error classes keep working unchanged:
 |---|---|
 | No, unknown or revoked token | `401 {type:'error', error:{type:'authentication_error', message:'signed_out'}}` |
 | Suspended | `403 {…permission_error, message:'account_suspended'}` |
-| Monthly limit spent | `429 {…rate_limit_error, message:'usage_limit', details:{error_code:'enforced_spend_limit_reached'}}`, which the runtime reads as a spend cap and holds until the next month |
+| Monthly or lifetime limit spent | `400 {…invalid_request_error, message:'You have reached your specified monthly usage limit on coere.ai.'}` (or `lifetime`). The runtime reads a message that starts "You have reached your specified" as a spend limit: it holds the queue, tries again every hour and on Try now, so raising the limit in the admin panel lets work go on within the hour |
 | Per minute limit | `429 {…rate_limit_error, message:'rate_limited'}` with `retry-after` |
 | Model not allowed | `404 {…not_found_error, message:'model: <name>'}` |
 | Beta not allowed | `400 {…invalid_request_error, message:'Unexpected value(s) for the \`anthropic-beta\` header.'}` |
@@ -569,7 +569,8 @@ the next step after this build (section 14.5).
 | What | Limit |
 |---|---|
 | Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance |
-| Monthly spend | the plan's `monthly_limit_micros`, checked before every metered call |
+| Monthly spend | the person's own `monthly_limit_micros` when the operator set one, else the plan's, checked before every metered call |
+| Lifetime spend | the person's own `lifetime_limit_micros` when set, else the plan's (null on every seeded plan, meaning none), against `user_totals.cost_micros`, checked before every metered call |
 | Memory file | the plan's `storage_limit_bytes`, and never over 64 MiB |
 | `/auth/token` | 20 a minute per address |
 
@@ -583,7 +584,7 @@ session never opens it. It keeps its own look (`stats.css`). Sections:
 |---|---|
 | `/admin` | **Statistics**: the product's running totals (section 15). Accounts, organizations, total AI cost, tokens used, tokens saved, memories, chats, context imports, transfers, storage. Each by day and in total, with the top accounts and organizations by tokens saved. |
 | `/admin/analytics` | Site analytics, as `/statistics` showed them. |
-| `/admin/users` | Accounts: email, username, plan, status, organization, created, last seen, devices, this month's cost and requests, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals and its knowledge graph. Actions: change plan, suspend or restore, revoke every device. |
+| `/admin/users` | Accounts: email, username, plan, status, organization, created, last seen, devices, this month's cost and requests, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals and its knowledge graph. Actions: change plan, set the person's monthly and lifetime dollar limits (blank means the plan's), suspend or restore, revoke every device. |
 | `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. **Create an organization** (name, plan, first admin picked from existing accounts by email). Opening one shows its members with their roles, access and totals, and the organization's knowledge graph, and lets the operator change its settings, add a member or admin from existing accounts, change roles, remove members and delete it. |
 | `/admin/waitlist` | The developer waitlist (section 16): emails, when they joined, the count by day, and a CSV download. |
 | `/admin/database` | Every table's estimated rows, size, Row Level Security on or off and policy count, and the Storage bucket totals. |
@@ -605,8 +606,8 @@ and is the only thing that writes.
 
 | Table | Columns | Who reads |
 |---|---|---|
-| `plans` | `id text pk, name, monthly_limit_micros bigint, storage_limit_bytes bigint, requests_per_minute int, created_at`. Seeds `free` ($5, 25 MiB, 60), `plus` ($20, 100 MiB, 120), `team` ($100, 500 MiB, 300). | everyone signed in |
-| `profiles` | `id uuid pk references auth.users on delete cascade, email, username unique, display_name, plan_id references plans default 'free', status ('active'\|'suspended'), memory_sync bool default true, include_sensitive bool default false, created_at, updated_at, last_seen_at`. A trigger on `auth.users` insert makes the row and takes the username from the sign up data. | the owner; may update `display_name` only, everything else through the server |
+| `plans` | `id text pk, name, monthly_limit_micros bigint, lifetime_limit_micros bigint (null means none), storage_limit_bytes bigint, requests_per_minute int, created_at`. Seeds `free` ($5, 25 MiB, 60), `plus` ($20, 100 MiB, 120), `team` ($100, 500 MiB, 300). | everyone signed in |
+| `profiles` | `id uuid pk references auth.users on delete cascade, email, username unique, display_name, plan_id references plans default 'free', monthly_limit_micros bigint (null means the plan's), lifetime_limit_micros bigint (null means the plan's), status ('active'\|'suspended'), memory_sync bool default true, include_sensitive bool default false, created_at, updated_at, last_seen_at`. A trigger on `auth.users` insert makes the row and takes the username from the sign up data. | the owner; may update `display_name` only, everything else through the server |
 | `devices` | `id uuid pk, user_id references profiles cascade, name, token_hash unique, token_hint, extension_id, extension_version, created_at, last_used_at, revoked_at, revoked_reason ('signed_out'\|'user'\|'admin'\|'account')` | the owner, every column but `token_hash` |
 | `device_codes` | `code_hash pk, user_id cascade, challenge, extension_id, device_name, created_at, expires_at, used_at` | server only |
 | `usage_events` | `id bigint identity pk, user_id references profiles on delete set null, device_id references devices on delete set null, kind ('message'\|'count_tokens'\|'batch_result'\|'jev'), model, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros bigint, status smallint, duration_ms, request_id, created_at` | the owner |
@@ -858,10 +859,15 @@ The site's code and the migration must agree on these names and types.
 -- daily_totals: day date pk, new_users integer, new_orgs integer
 -- Every counter defaults to 0 and is not null.
 
+-- monthly_limit_micros and lifetime_limit_micros are already resolved:
+-- the person's own value when set, else the plan's. lifetime_limit_micros
+-- null means no lifetime limit. lifetime_cost_micros is user_totals.cost_micros.
 device_auth(p_token_hash text) returns table (
   device_id uuid, user_id uuid, status text, plan_id text,
-  monthly_limit_micros bigint, storage_limit_bytes bigint, requests_per_minute integer,
-  month_cost_micros bigint, memory_sync boolean, include_sensitive boolean, org_id uuid)
+  monthly_limit_micros bigint, lifetime_limit_micros bigint,
+  storage_limit_bytes bigint, requests_per_minute integer,
+  month_cost_micros bigint, lifetime_cost_micros bigint,
+  memory_sync boolean, include_sensitive boolean, org_id uuid)
 
 record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
   p_input integer, p_output integer, p_cache_write integer, p_cache_read integer,
