@@ -485,7 +485,25 @@ Auth and limit errors are the same as 8.4's statuses with a plain
 - **`PUT <url>`** with the zip as the body and
   `content-type: application/vnd.coere.memory+zip`. This goes straight to
   Supabase Storage, so the file never passes through the site's 4.5 MB
-  request limit.
+  request limit. Exactly what `@supabase/storage-js` 2.118's
+  `uploadToSignedUrl` sends, read from its source:
+  - `url` is used as given:
+    `<SUPABASE_URL>/storage/v1/object/upload/sign/memory/<path>?token=<jwt>`.
+    The token in the query is the only permission. Send no
+    `Authorization`, no `apikey` and no device token.
+  - Method `PUT`. The body is the zip's raw bytes (an `ArrayBuffer` or
+    `Uint8Array`), not a form: storage-js sends a `FormData` body only when
+    handed a `Blob`.
+  - Headers: `content-type: application/vnd.coere.memory+zip` (the bucket
+    refuses any other type), `x-upsert: false` and
+    `cache-control: max-age=3600`.
+  - Success is `200` with JSON `{ "Key": "memory/<path>", "Id": "…" }`.
+    A refusal is a 4xx with JSON `{ statusCode, error, message }`: a wrong
+    type or an expired token (the address lives 2 hours), a file over the
+    bucket's 64 MiB, or a second PUT to the same address, which conflicts
+    because the address does not overwrite.
+  - Storage answers the CORS preflight for any origin, so the extension
+    needs no host permission for the Supabase host.
 - **`POST /api/v1/memory/commit`** `{ path }`. The server reads the staged
   file, checks it is a `.coere` zip (the `mimetype` entry) under the limit,
   reads `manifest.json`, takes the counts from it, builds the index
