@@ -228,6 +228,11 @@ section is what the owner sets up by hand.
 - Each sign in path allows 10 tries in 15 minutes per network address and
   per email, and a wrong code or password waits before it answers.
 - `/connect` is the page the extension opens to get its device token.
+- `/sign-in`, `/sign-up` and `/connect` share one frame,
+  `src/site/account/auth-shell.tsx`: Coere and Cori on the dune background
+  beside the form. Cori is `public/preview/images/agents/cori-general.svg`,
+  the happy still that `scripts/agents/build-cori.mts` draws from coere-v2's
+  Cori art.
 
 ### The dashboard
 
