@@ -4,6 +4,7 @@ import { FeatureGrid } from "@/site/blocks/feature-grid";
 import { backgrounds } from "@/site/content/backgrounds";
 import { ALL_FEATURES } from "@/site/content/features";
 import { films } from "@/site/content/films";
+import { demoHref, demoLabel } from "@/site/content/navigation";
 import { solutionsCases, solutionsGrid, solutionsHero } from "@/site/content/pages/solutions";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { Container } from "@/site/ui/container";
@@ -18,7 +19,7 @@ import { ProductSection } from "./product-section";
 export function SolutionsPage() {
   return (
     <>
-      <ProductHero copy={solutionsHero} background={backgrounds.glass} app={<FilmFrame film={films.teams} preview />} secondary={{ href: "#how", label: "How it works" }} />
+      <ProductHero copy={solutionsHero} background={backgrounds.glass} app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
       <ProductSection id="how" title="How your team shares one memory" line="Built from the chats your team already has, sorted into the company and each client.">
         <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.curl} />
       </ProductSection>
@@ -38,7 +39,7 @@ export function SolutionsPage() {
         <FeatureGrid items={asGrid(solutionsGrid)} />
       </ProductSection>
       <OtherProducts current="solutions" />
-      <ClosingCta title="One memory for the whole company." />
+      <ClosingCta title="One memory for the whole company." text="See Coere Solutions on your own team's work. We will show you around." primary={{ href: demoHref, label: demoLabel }} />
     </>
   );
 }

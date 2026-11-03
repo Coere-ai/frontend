@@ -11,3 +11,7 @@ export const navTabs: { id: NavTabId; label: string; href: string }[] = [
 /** The contact button reads Waitlist Coming Soon for now, and emails the team. */
 export const contactHref = "mailto:edisonlaw@berkeley.edu";
 export const contactLabel = "Waitlist Coming Soon";
+
+/** Coere Solutions sells to companies, so its page asks for a demo, which emails the founder. */
+export const demoHref = "mailto:edisonlaw@berkeley.edu?subject=Coere%20Solutions%20demo";
+export const demoLabel = "Book a demo";
