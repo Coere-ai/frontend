@@ -90,6 +90,32 @@ export function faqGraph(faqs: Faq[]) {
   };
 }
 
+/**
+ * A guide page: what it is about, tied to Coere's site and organization so
+ * an answer engine knows whose words they are, with its FAQ beside it.
+ */
+export function guideGraph({ path, title, description, about, faqs }: { path: string; title: string; description: string; about: string[]; faqs: Faq[] }) {
+  const url = `${siteConfig.url}${path}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: title,
+        description,
+        inLanguage: "en",
+        isPartOf: { "@id": `${home}#website` },
+        publisher: { "@id": organizationId },
+        about: about.map((name) => ({ "@type": "Thing", name })),
+        mentions: { "@id": organizationId },
+      },
+      { ...faqGraph(faqs), "@context": undefined, "@id": `${url}#faq` },
+    ],
+  };
+}
+
 /** Writes structured data into the page. It is our own static data, and "<" is escaped so the script can never close early. */
 export function JsonLd({ data }: { data: object }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;

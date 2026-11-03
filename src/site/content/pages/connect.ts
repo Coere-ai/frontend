@@ -29,6 +29,8 @@ export const connectCases: FilmCase[] = [
     text: "Extract all reads each AI you use and saves every chat on your computer. After that, new chats save by themselves.",
     checks: ["A row for each AI as it saves", "Saved on this computer", "Memory follows a chat that changes"],
     film: "extraction",
+    href: "/chatgpt-to-claude-memory",
+    linkLabel: "Bring your ChatGPT memory to Claude",
   },
   {
     key: "memory",

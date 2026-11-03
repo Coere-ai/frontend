@@ -43,7 +43,7 @@ export function ForgePage() {
           <CodeTabs samples={mcpSamples} />
         </Container>
       </section>
-      <ProductSection title="Everything in Coere Forge">
+      <ProductSection title="Everything in Coere Forge" link={{ href: "/ai-agent-memory", linkLabel: "Memory for AI agents" }}>
         <FeatureGrid items={asGrid(forgeGrid)} />
       </ProductSection>
       <OtherProducts current="forge" />
