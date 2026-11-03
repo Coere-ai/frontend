@@ -8,35 +8,29 @@ import { CheckIcon, CloseIcon } from "@/site/ui/icons/interface-icons";
 
 /** A half filled circle, for "partly". */
 const Half = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-    <circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
-    <path d="M7 1.5a5.5 5.5 0 0 0 0 11z" fill="currentColor" />
+  <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+    <circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
+    <path d="M9 2a7 7 0 0 0 0 14z" fill="currentColor" />
   </svg>
 );
 
 /**
- * One mark, in a soft circle of its own colour so a row reads at a glance:
- * green for yes, amber for partly, red for no. Coere's own yes is solid blue,
- * to keep its column apart. Each says its word to a screen reader.
+ * One mark, as a symbol in its own colour so a row reads at a glance:
+ * green for yes, amber for partly, red for no. Coere's own yes is blue, to
+ * keep its column apart. Each says its word to a screen reader.
  */
 function Cell({ mark, coere = false }: { mark: Mark; coere?: boolean }) {
-  const look =
-    mark === "yes"
-      ? coere
-        ? "bg-brand-500 text-white"
-        : "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-      : mark === "part"
-        ? "bg-amber-50 text-amber-500 ring-1 ring-amber-200"
-        : "bg-red-50 text-red-500 ring-1 ring-red-100";
+  const look = mark === "yes" ? (coere ? "text-brand-600" : "text-emerald-500") : mark === "part" ? "text-amber-500" : "text-red-500";
   return (
-    <span className={`inline-grid h-7 w-7 place-items-center rounded-full ${look}`}>
-      {mark === "yes" ? <CheckIcon size={15} /> : mark === "part" ? <Half /> : <CloseIcon size={13} />}
+    <span className={`inline-grid h-6 w-6 place-items-center ${look}`}>
+      {mark === "yes" ? <CheckIcon size={22} strokeWidth={2.4} /> : mark === "part" ? <Half /> : <CloseIcon size={18} strokeWidth={2.4} />}
       <span className="sr-only">{mark === "yes" ? "Yes" : mark === "part" ? "Partly, or by hand" : "No"}</span>
     </span>
   );
 }
 
-const TABLE = "w-full min-w-[620px] border-collapse text-left md:min-w-[820px]";
+// Fixed layout: after the first column, every product gets the same width, whatever its name.
+const TABLE = "w-full min-w-[620px] table-fixed border-collapse text-left md:min-w-[820px]";
 
 /** What goes inside one product's table: its caption, the products across the top and a row per point. */
 function Contents({ table }: { table: Table }) {
