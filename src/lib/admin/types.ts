@@ -41,8 +41,21 @@ export interface UserRow {
   devices: number;
   monthCostMicros: number;
   monthRequests: number;
+  /** user_totals.cost_micros, what the lifetime limit is checked against. */
+  lifetimeCostMicros: number;
+  /** The account's own limits; null means the plan's. */
+  monthlyLimitMicros: number | null;
+  lifetimeLimitMicros: number | null;
   tokensSaved: number;
   memoryBytes: number;
+}
+
+export interface PlanRow {
+  id: string;
+  name: string;
+  monthlyLimitMicros: number;
+  /** Null means no lifetime limit. */
+  lifetimeLimitMicros: number | null;
 }
 
 export interface UsersPayload {
@@ -50,7 +63,7 @@ export interface UsersPayload {
   /** True when there were more accounts than the panel reads. */
   capped: boolean;
   signups: DayPoint[];
-  plans: { id: string; name: string }[];
+  plans: PlanRow[];
 }
 
 export interface Totals {
@@ -87,7 +100,7 @@ export interface UserDetailPayload {
   month: { costMicros: number; requests: number; inputTokens: number; outputTokens: number };
   memory: { bytes: number; memories: number; chats: number; uploadedAt: string | null } | null;
   devices: DeviceRow[];
-  plans: { id: string; name: string }[];
+  plans: PlanRow[];
 }
 
 export interface OrgRow {

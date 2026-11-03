@@ -1,4 +1,5 @@
 import { dayKeys } from "./by-day";
+import type { Totals } from "./types";
 
 /**
  * The product's running totals (docs/accounts.md 15) as the Statistics page
@@ -75,4 +76,24 @@ export function sumDaily(rows: readonly DailyTotalsRow[]): Omit<DayTotals, "date
 /** The `n` rows with the largest value, largest first, ties by name so the order is stable. */
 export function topBy<T extends { name: string }>(rows: readonly T[], value: (r: T) => number, n = 10): T[] {
   return [...rows].filter((r) => value(r) > 0).sort((a, b) => value(b) - value(a) || a.name.localeCompare(b.name)).slice(0, n);
+}
+
+/** A user_totals or org_totals row as the detail pages show it. A missing row reads zero. */
+export function toTotals(r: Record<string, unknown> | null | undefined): Totals {
+  return {
+    requests: num(r?.requests),
+    tokensUsed: num(r?.input_tokens) + num(r?.output_tokens),
+    costMicros: num(r?.cost_micros),
+    tokensSaved: num(r?.tokens_saved),
+    contextImports: num(r?.context_imports),
+    transfers: num(r?.transfers),
+    extractions: num(r?.extractions),
+    coriChats: num(r?.cori_chats),
+    actionRuns: num(r?.action_runs),
+    memories: num(r?.memories),
+    entities: num(r?.entities),
+    links: num(r?.links),
+    chats: num(r?.chats),
+    storageBytes: num(r?.storage_bytes),
+  };
 }

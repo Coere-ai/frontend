@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { dailySeries, num, sumDaily, topBy } from "./totals";
+import { dailySeries, num, sumDaily, toTotals, topBy } from "./totals";
 
 const NOW = Date.parse("2026-11-03T12:00:00Z");
 
@@ -45,4 +45,13 @@ test("top rows are the largest, ties by name, zeros left out", () => {
   ];
   assert.deepEqual(topBy(people, (p) => p.saved, 2).map((p) => p.name), ["c", "a"]);
   assert.equal(topBy(people, (p) => p.saved).length, 3);
+});
+
+test("a totals row becomes the detail page's figures, and a missing one reads zero", () => {
+  const t = toTotals({ input_tokens: "10", output_tokens: 5, cost_micros: "70", cori_chats: 2, storage_bytes: "4096" });
+  assert.equal(t.tokensUsed, 15);
+  assert.equal(t.costMicros, 70);
+  assert.equal(t.coriChats, 2);
+  assert.equal(t.storageBytes, 4096);
+  assert.equal(toTotals(null).memories, 0);
 });
