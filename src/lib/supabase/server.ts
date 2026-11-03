@@ -4,6 +4,10 @@ import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
+import { sessionCookie, sessionCookieOptions } from "./cookie-options";
+
+export { SESSION_COOKIE_MAX_AGE, sessionCookieOptions } from "./cookie-options";
+
 /**
  * The signed in person's Supabase client, made fresh for each request.
  *
@@ -15,18 +19,6 @@ import { cookies } from "next/headers";
  * refreshes the session before render on the private paths, so a failed set
  * there loses nothing.
  */
-
-/** 400 days, Chrome's ceiling, so a session outlives any browser cookie rule. */
-export const SESSION_COOKIE_MAX_AGE = 400 * 24 * 60 * 60;
-
-/** The session cookies' flags: unreadable by scripts, secure outside localhost. */
-export const sessionCookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-  maxAge: SESSION_COOKIE_MAX_AGE,
-};
 
 /** True when the server has what a session client needs. */
 export function accountsConfigured(): boolean {
@@ -44,7 +36,7 @@ export async function sessionClient(): Promise<SupabaseClient> {
       getAll: () => jar.getAll(),
       setAll: (list) => {
         try {
-          for (const { name, value, options } of list) jar.set(name, value, { ...options, ...sessionCookieOptions, maxAge: options.maxAge === 0 ? 0 : SESSION_COOKIE_MAX_AGE });
+          for (const { name, value, options } of list) jar.set(name, value, sessionCookie(options));
         } catch {
           // A Server Component render cannot set cookies; the proxy already refreshed them.
         }

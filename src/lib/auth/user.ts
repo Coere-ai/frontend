@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 
 import { accountsConfigured, sessionClient } from "@/lib/supabase/server";
 
+import { safeNext } from "./next-path";
+
+export { safeNext } from "./next-path";
+
 /**
  * The signed in account, checked on the server.
  *
@@ -34,10 +38,4 @@ export async function requireUser(next = "/dashboard"): Promise<AccountUser> {
   const user = await getUser();
   if (!user) redirect(`/sign-in?next=${encodeURIComponent(safeNext(next))}`);
   return user;
-}
-
-/** A path on this site, never another origin: it starts with one slash, not two, and holds no backslash. */
-export function safeNext(next: string | null | undefined, fallback = "/dashboard"): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//") || next.includes("\\")) return fallback;
-  return next;
 }
