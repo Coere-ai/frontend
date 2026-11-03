@@ -52,7 +52,7 @@ export default function PortableAiMemoryPage() {
         link={{ href: "/products/connect", label: "Explore Coere Connect" }}
       />
       <CompareTable />
-      <TodaySection title="What Coere supports today" items={portable.today} status="Coere is in pre-launch, and the waitlist is coming soon. Here is what Coere Connect does now, as the films on this site show it." />
+      <TodaySection title="What Coere supports today" items={portable.today} status="Coere is in pre-launch, and the waitlist is open. Here is what Coere Connect does now, as the films on this site show it." />
       <FaqSection faqs={portable.faqs} title="Portable AI memory, answered" />
       <RelatedSection
         links={[

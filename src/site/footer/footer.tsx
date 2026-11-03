@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { guides } from "@/site/content/guides";
-import { contactHref } from "@/site/content/navigation";
+import { emailHref } from "@/site/content/navigation";
 import { products } from "@/site/content/products";
 import { Brand } from "@/site/ui/brand";
 import { Container } from "@/site/ui/container";
@@ -12,7 +12,7 @@ const columns = [
     title: "Company",
     links: [
       { href: "/about", label: "About Us" },
-      { href: contactHref, label: "Contact" },
+      { href: emailHref, label: "Contact" },
     ],
   },
   {

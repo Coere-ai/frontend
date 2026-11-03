@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { JoinVisual } from "@/site/careers/join-visual";
-import { contactHref } from "@/site/content/navigation";
+import { emailHref } from "@/site/content/navigation";
 import { Underlined } from "@/site/ui/underlined";
 
 const items = [
@@ -24,7 +24,7 @@ export function AboutPanel() {
           </li>
         ))}
       </ul>
-      <JoinVisual href={contactHref} label="Contact us" />
+      <JoinVisual href={emailHref} label="Contact us" />
     </div>
   );
 }

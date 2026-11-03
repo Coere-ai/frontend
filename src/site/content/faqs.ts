@@ -1,5 +1,5 @@
 import { agents, siteConfig } from "@/lib/site";
-import { contactHref } from "./navigation";
+import { emailHref } from "./navigation";
 
 /**
  * Questions people and AI search ask about Coere, each answered in a few
@@ -18,8 +18,8 @@ export const AI_LIST = `${agents
 
 export const pending: Faq = {
   q: "Can I use Coere today?",
-  a: "Not yet. Coere is in pre-launch and the waitlist is coming soon. Until it opens, you can email the founders about Coere for you, your team or your app.",
-  link: { href: contactHref, label: "Email the founders" },
+  a: "Not yet. Coere is in pre-launch and the waitlist is open. Until launch, you can email the founders about Coere for you, your team or your app.",
+  link: { href: emailHref, label: "Email the founders" },
 };
 
 export const homeFaqs: Faq[] = [

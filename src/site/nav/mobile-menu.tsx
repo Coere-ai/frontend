@@ -7,7 +7,7 @@ import { industries } from "@/site/content/industries";
 import { contactHref, contactLabel, navTabs, type NavTabId } from "@/site/content/navigation";
 import { posts } from "@/site/content/posts";
 import { products } from "@/site/content/products";
-import { ButtonLink } from "@/site/ui/button";
+import { buttonClass } from "@/site/ui/button";
 import { ChevronDownIcon } from "@/site/ui/icons/interface-icons";
 import { AccountLink } from "./account-link";
 
@@ -83,9 +83,10 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
                 ) : null}
               </div>
             ))}
-            <ButtonLink href={contactHref} className="mt-8 w-full">
+            {/* A page on this site now, so the menu closes as it opens, like the tabs above. */}
+            <Link href={contactHref} onClick={onClose} className={buttonClass("primary", "mt-8 w-full")}>
               {contactLabel}
-            </ButtonLink>
+            </Link>
             <AccountLink variant="secondary" className="mt-3 w-full" onNavigate={onClose} />
           </nav>
         </motion.div>
