@@ -90,7 +90,11 @@ export function createCanvasGraph(canvas: HTMLCanvasElement, fontFamily: () => s
     if (e.pointerType === "mouse" && e.button !== 0) return;
     const p = local(e);
     pointers.set(e.pointerId, p);
-    canvas.setPointerCapture(e.pointerId);
+    try {
+      canvas.setPointerCapture(e.pointerId);
+    } catch {
+      // A pointer already gone cannot be captured; the drag still works over the canvas.
+    }
     if (pointers.size === 2) [down, span] = [null, spanOf()];
     else if (pointers.size === 1) down = { x0: p.x, y0: p.y, x: p.x, y: p.y, dragging: false };
   };
