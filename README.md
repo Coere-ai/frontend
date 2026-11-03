@@ -80,3 +80,95 @@ drawn, so it can be checked again when the API changes.
 The blog posts and roles are placeholder content for now; each content file
 says so at the top. The industry stories illustrate what each product does;
 they are not customers.
+
+## Analytics and /statistics
+
+A private dashboard at `/statistics`, backed by Supabase. It is the Optagon
+landing page's analytics, ported whole: the same numbers, charts, world map,
+page picker, section cards and click tracking. Bars, lines, meters and map
+shading are Coere's brand blue; text and controls stay ink on white.
+
+### Settings
+
+| Variable | What it is |
+| --- | --- |
+| `SUPABASE_URL` | The project's address, from Supabase's API settings |
+| `SUPABASE_SECRET_KEY` | The project's secret key. Server only, never `NEXT_PUBLIC_` |
+| `USER` | The username for `/statistics` |
+| `PASSWORD` | The password for `/statistics` |
+
+With either Supabase value missing, the beacon still answers and stores
+nothing, and the dashboard says storage is not configured. With `USER` or
+`PASSWORD` missing, nobody can sign in.
+
+Your shell already sets `USER` to your login name, and Next never overrides a
+variable the shell has set, so a `USER` in `.env.local` is ignored. Locally,
+start the server with both on the command line:
+
+```bash
+USER=owner PASSWORD='a long password' npm run dev
+```
+
+### The database
+
+Paste `supabase/migrations/20261103000000_coere_site_analytics.sql` into the
+Supabase SQL editor and run it. It creates three tables (`site_visits`,
+`site_events`, `site_section_views`) and three write functions, and it is
+safe to run again. `supabase/schema.sql` holds the same statements, to read
+in one place.
+
+The browser never talks to Supabase. Every table has Row Level Security on
+with no policies and no grants to `anon` or `authenticated`, and the
+functions are revoked from them too. Only the server connects, with the
+secret key, through `src/lib/supabase.ts`, which is `server-only`.
+
+### What is recorded
+
+`src/site/tracker/site-tracker.tsx` is mounted by the site layout, so it runs
+on every public page and never on `/statistics`. It records the view, counts
+seconds the tab was in focus, notes the deepest scroll, and reports clicks.
+`data-cta` on a link marks it as a conversion and `data-track` marks anything
+else worth counting; links off the site are counted on their own. It skips
+pages shown inside a frame, and crawlers are labelled by their user agent and
+shown apart from people.
+
+Nothing identifies a person. The visitor id is a random string in
+`localStorage`, no cookie is set, the referrer is cut to its host, and the
+place comes from the edge's own headers.
+
+`POST /api/site/track` is public. It checks the origin, caps the body at 8 KB,
+validates every field, allows 120 requests a minute per address, and always
+answers 204.
+
+### Sections
+
+`src/lib/analytics/sections/discover.ts` splits each page into its outermost
+`<section>` blocks. A block's id is its DOM id; the block holding the page's
+h1 is `hero`; any other is a slug of its heading, its `aria-label` or a short
+first line. `src/lib/sections.ts` names the home page's sections by product
+and gives each a line for its card. A page can also tag elements with
+`data-section` and `data-section-label`.
+
+### Sign-in and the guard
+
+- `src/proxy.ts` runs on `/statistics` and `/api/statistics/*` and nothing
+  else, so public pages stay static. Signed out, `/statistics` is the sign-in
+  form, anything below it goes to the home page, and the data route answers
+  404. The page and the data route check the session again themselves.
+- `USER` and `PASSWORD` are compared as SHA-256 digests with
+  `timingSafeEqual`. A wrong guess waits 800 ms, and one address gets ten
+  tries in fifteen minutes.
+- The session is a cookie signed with HMAC-SHA256 under a key made from
+  `USER` and `PASSWORD`, so changing the password signs everyone out. It is
+  httpOnly, sameSite lax, secure in production, and lasts twelve hours.
+- `/statistics` and the data route are `noindex`, and `robots.txt` disallows
+  `/statistics` and `/api/`.
+
+### Tests
+
+```bash
+npm test
+```
+
+runs the unit tests (`src/**/*.test.ts`) with Node's test runner through
+`tsx`.
