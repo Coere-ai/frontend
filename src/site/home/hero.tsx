@@ -1,14 +1,25 @@
 "use client";
 
 import { motion } from "motion/react";
+import Link from "next/link";
+import { buttonClass, CircleArrowLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
+import { ChromeMark } from "@/site/ui/icons/chrome-mark";
+import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const words = ["Own", "your", "Memory"];
 
+/** The two ways further down the page, to the team and developer products. On a phone the short words keep them on one row. */
+const paths = [
+  { href: "#solutions", label: "Coere for Teams", short: "For Teams" },
+  { href: "#forge", label: "Coere for Developers", short: "For Developers" },
+];
+
 /**
  * The home page's opening: a very large, centered line, each word rising out
- * of a soft blur in turn, and the reason under it.
+ * of a soft blur in turn, the reason under it, then the install button
+ * with a way down to Coere for Teams and Coere for Developers.
  */
 export function Hero() {
   return (
@@ -36,6 +47,20 @@ export function Hero() {
         >
           Coere is a portable AI memory layer that you, your team and your app own. Your context follows you across ChatGPT, Claude, Gemini and more, so every AI knows you on day one.
         </motion.p>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7, ease }} className="mt-10 flex flex-col items-center gap-4">
+          <CircleArrowLink href="/install" size="lg" icon={<ChromeMark size={22} />}>
+            Install Coere
+          </CircleArrowLink>
+          <div className="flex flex-wrap justify-center gap-2.5 sm:gap-3">
+            {paths.map((path) => (
+              <Link key={path.href} href={path.href} className={buttonClass("secondary", "group")}>
+                <span className="sm:hidden">{path.short}</span>
+                <span className="hidden sm:inline">{path.label}</span>
+                <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            ))}
+          </div>
+        </motion.div>
       </Container>
     </section>
   );
