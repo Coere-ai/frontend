@@ -1,21 +1,33 @@
 # Coere
 
-> Coere (Coere AI) is the memory layer you own, across every AI. It saves your chats from ChatGPT, Claude, Gemini and other AIs, builds them into one memory graph, and brings the right context into every new chat. Coere is not Cohere: the name comes from the Latin cohaerere, "to connect". Website: https://www.coere.ai/
+> Coere (Coere AI) is a user-owned, portable AI memory layer. Coere Connect, a Chrome extension, saves your chats from ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Grok, Copilot, Meta AI and Kimi on your computer, builds a memory graph from them, and adds the right context to each new chat as you type. Coere is not Cohere and is not affiliated with it. The name comes from the Latin cohaerere, to connect. Website: https://www.coere.ai/
+
+Coere is in pre-launch. The waitlist is coming soon.
 
 ## Products
 
-- [Coere Connect](https://www.coere.ai/products/connect): a Chrome extension for people. It saves every chat from ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Grok, Copilot, Meta AI and Kimi on your computer, builds a memory graph you own, and adds the right context to each new chat as you type.
-- [Coere Solutions](https://www.coere.ai/products/solutions): one shared memory for a company, its people and its clients, built from the chats the team already has. A draft about one client only ever gets that client's memory.
-- [Coere Forge](https://www.coere.ai/products/forge): the memory API, MCP server, and TypeScript and Python SDKs, so apps and AI agents can use a person's Coere memory with their permission.
-- [Coere Agents](https://www.coere.ai/products/agents): Cori, the helper in Coere. It works from your memory to draft email in Gmail, add calendar events, fix writing, fill forms and split research across workers, and asks before it sends.
+- [Coere Connect](https://www.coere.ai/products/connect): a Chrome extension for people. Extract all saves every chat from each AI you use on your computer, and new chats save by themselves after that. Coere asks what to build memory from, and nothing goes to an AI until you say yes. The memory is a graph of sections and folders, and each memory sits beside the chats it came from. In a new chat on any of those AIs, a line above the chat box says what Coere will add and which AIs it learned it from, and you can change it before you send.
+- [Coere Solutions](https://www.coere.ai/products/solutions): one shared memory of a company, its people and its clients, built from the chats the team already has. A draft about one client only ever gets that client's memory. A client can be exported for a teammate, or deleted when the work ends.
+- [Coere Forge](https://www.coere.ai/products/forge): a user-permissioned memory API for developers. A REST API, an MCP server, and TypeScript and Python SDKs let apps and AI agents read the memory a person already built, with a token the person allows. Six scopes, section limits, expiry and revoke. An app's only write is a suggestion the person accepts or dismisses. Today the API is served by coere-server, which the person runs on their own computer or host; a hosted service is planned and the SDKs are not on a package registry yet.
+- [Coere Agents](https://www.coere.ai/products/agents): Cori, the agent in Coere. It works from your memory to draft email in Gmail, add calendar events, fix writing, fill forms and split research across workers, and asks before it sends.
 
-## Industries
+## Guides
 
-- [All industries](https://www.coere.ai/industries): law firms, financial advisors, software teams, trading companies, consumer brands, manufacturers, energy companies, and teachers and schools.
+- [Portable AI memory](https://www.coere.ai/portable-ai-memory): what portable AI memory is, and how Coere keeps one memory across every AI.
+- [ChatGPT to Claude memory](https://www.coere.ai/chatgpt-to-claude-memory): the ways to move ChatGPT memory to Claude or Gemini, what moves with each, and how Coere does it.
+- [AI agent memory](https://www.coere.ai/ai-agent-memory): how an AI agent reads a person's memory with their permission, over MCP or the API.
 
 ## Developers
 
-- [Developer docs](https://www.coere.ai/resources): tokens and scopes, every endpoint, the MCP server and the SDKs.
+- [Developer docs](https://www.coere.ai/resources): the introduction and quickstart.
+- [Authentication](https://www.coere.ai/resources/authentication): app tokens, the six scopes, and the three ways to get a token.
+- [Endpoints](https://www.coere.ai/resources/endpoints): every route an app may call.
+- [MCP](https://www.coere.ai/resources/mcp): connecting an agent, and every tool and resource.
+- [SDKs](https://www.coere.ai/resources/sdks): the TypeScript client and the Python SDK.
+
+## Industries
+
+- [All industries](https://www.coere.ai/industries): law firms, financial advisors, software teams, trading companies, consumer brands, manufacturers, energy companies, and teachers and schools. The industry stories illustrate what each product does; they are not customers.
 
 ## Team
 
