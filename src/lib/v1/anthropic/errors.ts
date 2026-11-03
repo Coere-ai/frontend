@@ -18,7 +18,8 @@ export type AnthropicCase =
   | "too_large"
   | "unavailable"
   | "not_found"
-  | "bad_request";
+  | "bad_request"
+  | "upstream";
 
 interface ErrorShape {
   status: number;
@@ -59,6 +60,8 @@ export function anthropicErrorShape(c: AnthropicCase, model?: string): ErrorShap
       return { status: 404, type: "not_found_error", message: "not_found" };
     case "bad_request":
       return { status: 400, type: "invalid_request_error", message: "bad_request" };
+    case "upstream":
+      return { status: 502, type: "api_error", message: "upstream_unreachable" };
   }
 }
 
@@ -76,6 +79,6 @@ export function anthropicError(c: AnthropicCase, o: { model?: string; retryAfter
   const shape = anthropicErrorShape(c, o.model);
   const headers = new Headers({ ...API_HEADERS, "content-type": "application/json" });
   if (o.retryAfter !== undefined) headers.set("retry-after", String(Math.max(1, Math.ceil(o.retryAfter))));
-  if (c !== "rate_limited" && c !== "unavailable") headers.set("x-should-retry", "false");
+  if (c !== "rate_limited" && c !== "unavailable" && c !== "upstream") headers.set("x-should-retry", "false");
   return new Response(JSON.stringify(anthropicErrorBody(c, o.model)), { status: shape.status, headers });
 }
