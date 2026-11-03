@@ -13,6 +13,9 @@ export interface Profile {
   email: string | null;
   username: string | null;
   planId: string;
+  /** The operator's limits for this person. Null means the plan's. */
+  monthlyLimitMicros: number | null;
+  lifetimeLimitMicros: number | null;
   memorySync: boolean;
   includeSensitive: boolean;
   createdAt: string | null;
@@ -22,6 +25,8 @@ export interface Plan {
   id: string;
   name: string;
   monthlyLimitMicros: number;
+  /** Null means the plan has no lifetime limit. */
+  lifetimeLimitMicros: number | null;
   storageLimitBytes: number;
 }
 
@@ -69,6 +74,8 @@ export interface Totals {
 }
 
 const n = (v: unknown): number => (typeof v === "number" ? v : Number(v ?? 0)) || 0;
+/** A nullable bigint, where null means "not set" and must not read as zero. */
+const nullable = (v: unknown): number | null => (v === null || v === undefined ? null : n(v));
 
 /** The first day of this month in UTC, as the database keys months. */
 export const thisMonth = (now = new Date()): string => `${now.toISOString().slice(0, 7)}-01`;
@@ -76,7 +83,7 @@ export const thisMonth = (now = new Date()): string => `${now.toISOString().slic
 export async function readProfile(db: SupabaseClient, userId: string): Promise<Profile | null> {
   const { data } = await db
     .from("profiles")
-    .select("email, username, plan_id, memory_sync, include_sensitive, created_at")
+    .select("email, username, plan_id, monthly_limit_micros, lifetime_limit_micros, memory_sync, include_sensitive, created_at")
     .eq("id", userId)
     .maybeSingle();
   if (!data) return null;
@@ -84,6 +91,8 @@ export async function readProfile(db: SupabaseClient, userId: string): Promise<P
     email: data.email,
     username: data.username,
     planId: data.plan_id,
+    monthlyLimitMicros: nullable(data.monthly_limit_micros),
+    lifetimeLimitMicros: nullable(data.lifetime_limit_micros),
     memorySync: data.memory_sync,
     includeSensitive: data.include_sensitive,
     createdAt: data.created_at,
@@ -91,11 +100,12 @@ export async function readProfile(db: SupabaseClient, userId: string): Promise<P
 }
 
 export async function readPlan(db: SupabaseClient, planId: string): Promise<Plan> {
-  const { data } = await db.from("plans").select("id, name, monthly_limit_micros, storage_limit_bytes").eq("id", planId).maybeSingle();
+  const { data } = await db.from("plans").select("id, name, monthly_limit_micros, lifetime_limit_micros, storage_limit_bytes").eq("id", planId).maybeSingle();
   return {
     id: data?.id ?? planId,
     name: data?.name ?? "Free",
     monthlyLimitMicros: n(data?.monthly_limit_micros ?? 5_000_000),
+    lifetimeLimitMicros: nullable(data?.lifetime_limit_micros),
     storageLimitBytes: n(data?.storage_limit_bytes ?? 26_214_400),
   };
 }

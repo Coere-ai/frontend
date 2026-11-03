@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { requireUser } from "@/lib/auth/user";
-import { ago, bytes, compact, dollars, percent, plural, whole } from "@/lib/dashboard/format";
+import { ago, bytes, compact, dollars, plural, whole } from "@/lib/dashboard/format";
+import { resolveLimits, spentShare } from "@/lib/dashboard/limits";
 import { readDevices, readMemoryFile, readMonth, readPlan, readProfile, readTotals } from "@/lib/dashboard/reads";
 import { sessionClient } from "@/lib/supabase/server";
 import { allowedIds } from "@/site/bridge/extension-ids";
@@ -26,6 +27,8 @@ export default async function OverviewPage() {
     readTotals(db, user.id),
   ]);
   const live = devices.filter((d) => !d.revokedAt);
+  const limits = resolveLimits(profile, plan);
+  const covers = limits.ownMonthly ? "Your account covers" : `Your ${plan.name} plan covers`;
   const backupOn = profile?.memorySync ?? true;
   const fresh = live.length === 0 && !file;
 
@@ -38,14 +41,14 @@ export default async function OverviewPage() {
         <StatGrid>
           <Stat label="Memories" value={whole(file?.memories ?? 0)} note={file ? plural(file.chats, "chat") : "No backup yet"} />
           <Stat label="Tokens saved" value={compact(totals.tokensSaved)} note={plural(totals.contextImports + totals.transfers, "import or transfer", "imports and transfers")} />
-          <Stat label="AI cost this month" value={dollars(month.costMicros)} note={`of ${dollars(plan.monthlyLimitMicros)} on ${plan.name}`} />
+          <Stat label="AI cost this month" value={dollars(month.costMicros)} note={`of ${dollars(limits.monthlyMicros)}${limits.ownMonthly ? "" : ` on ${plan.name}`}`} />
           <Stat label="Connected browsers" value={whole(live.length)} />
         </StatGrid>
       </Panel>
 
       <div className="grid gap-8 xl:grid-cols-2">
-        <Panel title="This month" description={`Your ${plan.name} plan covers ${dollars(plan.monthlyLimitMicros)} of AI use a month. Coere pauses memory work when it is spent, until the next month.`}>
-          <Meter value={percent(month.costMicros, plan.monthlyLimitMicros)} label="Share of this month's limit used" />
+        <Panel title="This month" description={`${covers} ${dollars(limits.monthlyMicros)} of AI use a month. Coere pauses memory work when it is spent, until the next month.`}>
+          <Meter value={spentShare(month.costMicros, limits.monthlyMicros)} label="Share of this month's limit used" />
           <div className="mt-6">
             <Row label="Spent">{dollars(month.costMicros)}</Row>
             <Row label="Requests">{whole(month.requests)}</Row>

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 import { requireUser } from "@/lib/auth/user";
-import { compact, dollars, percent, whole } from "@/lib/dashboard/format";
+import { compact, dollars, whole } from "@/lib/dashboard/format";
+import { resolveLimits, spentShare } from "@/lib/dashboard/limits";
 import { readMonth, readPlan, readProfile, readTotals, thisMonth } from "@/lib/dashboard/reads";
 import { KIND_NAMES, MODEL_NAMES, summarize } from "@/lib/dashboard/usage";
 import { readUsageEvents } from "@/lib/dashboard/usage-reads";
@@ -15,8 +16,10 @@ export const metadata: Metadata = { title: "Usage" };
 const DAYS = 30;
 
 /**
- * This month against the plan's limit, the last 30 days by day, model and
- * kind, and the account's running totals. Every read goes through the
+ * This month against the monthly limit, the lifetime spend against the
+ * lifetime limit when there is one, the last 30 days by day, model and kind,
+ * and the account's running totals. The limits are the person's own when
+ * the operator set them, else the plan's. Every read goes through the
  * person's session, so they see only their own rows.
  */
 export default async function UsagePage() {
@@ -34,17 +37,21 @@ export default async function UsagePage() {
   ]);
   const s = summarize(events, from, now);
   const resets = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" });
-  const used = percent(month.costMicros, plan.monthlyLimitMicros);
+  const limits = resolveLimits(profile, plan);
+  const used = spentShare(month.costMicros, limits.monthlyMicros);
+  const lifetime = limits.lifetimeMicros;
+  const lifeUsed = lifetime === null ? 0 : spentShare(totals.costMicros, lifetime);
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Usage" lede="Coere pays for the AI that builds your memory, up to your plan's monthly limit. This is what it used." />
+      <PageHeader title="Usage" lede="Coere pays for the AI that builds your memory, up to your monthly limit. This is what it used." />
 
       <Panel title="This month" description={`The limit starts again on ${resets}.`}>
         <div className="flex items-baseline justify-between gap-4">
           <p className="text-3xl font-medium tracking-[-0.03em] text-neutral-950">{dollars(month.costMicros)}</p>
           <p className="text-[14px] text-neutral-500">
-            {used}% of {dollars(plan.monthlyLimitMicros)} on {plan.name}
+            {used}% of {dollars(limits.monthlyMicros)}
+            {limits.ownMonthly ? "" : ` on ${plan.name}`}
           </p>
         </div>
         <div className="mt-4">
@@ -56,6 +63,20 @@ export default async function UsagePage() {
           <Row label="Output tokens">{compact(month.outputTokens)}</Row>
         </div>
       </Panel>
+
+      {lifetime === null ? null : (
+        <Panel title="Lifetime limit" description="Everything Coere has spent on AI for you since you joined. When it reaches the limit, memory work pauses until the limit is raised.">
+          <div className="flex items-baseline justify-between gap-4">
+            <p className="text-3xl font-medium tracking-[-0.03em] text-neutral-950">{dollars(totals.costMicros)}</p>
+            <p className="text-[14px] text-neutral-500">
+              {lifeUsed}% of {dollars(lifetime)} in all
+            </p>
+          </div>
+          <div className="mt-4">
+            <Meter value={lifeUsed} label="Share of the lifetime limit used" />
+          </div>
+        </Panel>
+      )}
 
       <div className="grid gap-8 xl:grid-cols-2">
         <Panel title="Cost by day" description={`The last ${DAYS} days, ${dollars(s.total.costMicros)} in all.`}>
