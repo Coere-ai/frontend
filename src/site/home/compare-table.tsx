@@ -1,10 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
+import { backgrounds } from "@/site/content/backgrounds";
 import { compareTables, type CompareTable as Table, type Mark } from "@/site/content/compare";
 import { Container } from "@/site/ui/container";
 import { CheckIcon, CloseIcon } from "@/site/ui/icons/interface-icons";
+import { SizedPhoto } from "@/site/ui/sized-photo";
 
 /** A half filled circle, for "partly". */
 const Half = () => (
@@ -14,13 +16,9 @@ const Half = () => (
   </svg>
 );
 
-/**
- * One mark, as a symbol in its own colour so a row reads at a glance:
- * green for yes, amber for partly, red for no. Coere's own yes is blue, to
- * keep its column apart. Each says its word to a screen reader.
- */
+/** One mark as a symbol in its colour: white on Coere's card, green, amber or red elsewhere. */
 function Cell({ mark, coere = false }: { mark: Mark; coere?: boolean }) {
-  const look = mark === "yes" ? (coere ? "text-brand-600" : "text-emerald-500") : mark === "part" ? "text-amber-500" : "text-red-500";
+  const look = coere ? "text-white" : mark === "yes" ? "text-emerald-500" : mark === "part" ? "text-amber-500" : "text-red-400";
   return (
     <span className={`inline-grid h-6 w-6 place-items-center ${look}`}>
       {mark === "yes" ? <CheckIcon size={22} strokeWidth={2.4} /> : mark === "part" ? <Half /> : <CloseIcon size={18} strokeWidth={2.4} />}
@@ -29,52 +27,65 @@ function Cell({ mark, coere = false }: { mark: Mark; coere?: boolean }) {
   );
 }
 
-// Fixed layout: after the first column, every product gets the same width, whatever its name.
-const TABLE = "w-full min-w-[620px] table-fixed border-collapse text-left md:min-w-[820px]";
+/**
+ * Where a cell sits. Every cell is placed by hand, so Coere's card can span
+ * its column underneath them. On a phone the board scrolls sideways and the
+ * points stay pinned on white; on a wide screen they need neither.
+ */
+const at = (row: number, col: number): CSSProperties => ({ gridRow: row, gridColumn: col });
 
-/** What goes inside one product's table: its caption, the products across the top and a row per point. */
-function Contents({ table }: { table: Table }) {
+/**
+ * One product's comparison as a grid: the points down the left, Coere's
+ * column as a card of Coere's own artwork running the full height, and the
+ * other products to its right, every column the same width. It keeps table
+ * semantics for screen readers.
+ */
+function Board({ table }: { table: Table }) {
+  const rows = table.rows.length;
+  const cols = table.others.length + 1;
   return (
-    <>
-      <caption className="sr-only">{`${table.coere} compared with ${table.others.join(", ")}`}</caption>
-      <thead>
-        <tr>
-          <th scope="col" className="sticky left-0 z-10 w-[160px] bg-white px-4 pt-8 pb-5 md:w-[30%] md:px-8" />
-          <th scope="col" className="rounded-t-2xl bg-brand-50 px-4 pt-8 pb-5 text-center">
-            <span className="block text-[14px] font-medium text-brand-600 md:text-[16px]">{table.coere}</span>
-          </th>
-          {table.others.map((name) => (
-            <th key={name} scope="col" className="px-3 pt-8 pb-5 text-center align-top text-[13px] font-medium text-neutral-500 md:px-4 md:text-[15px]">
-              {name}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {table.rows.map((row, r) => (
-          <tr key={row.name} className="border-t border-neutral-100">
-            <th scope="row" className="sticky left-0 z-10 bg-white px-4 py-5 font-normal md:px-8">
-              <span className="block text-[14px] font-medium text-neutral-950 md:text-[16px]">{row.name}</span>
-              <span className="mt-0.5 hidden text-[14px] leading-snug text-neutral-500 sm:block">{row.detail}</span>
-            </th>
-            {row.marks.map((mark, i) => (
-              <td key={i} className={`px-4 py-5 text-center ${i === 0 ? `bg-brand-50 ${r === table.rows.length - 1 ? "rounded-b-2xl" : ""}` : ""}`}>
-                <Cell mark={mark} coere={i === 0} />
-              </td>
-            ))}
-          </tr>
+    <div role="table" aria-label={`${table.coere} compared with ${table.others.join(", ")}`} className="grid min-w-[600px] md:min-w-0" style={{ gridTemplateColumns: `minmax(170px, 1.6fr) repeat(${cols}, minmax(0, 1fr))` }}>
+      {/* Coere's card, behind its column. */}
+      <div aria-hidden="true" className="relative isolate -my-3 overflow-hidden rounded-[28px] bg-neutral-950 shadow-[0_30px_80px_-30px_rgba(63,76,235,0.65)]" style={{ gridRow: `1 / span ${rows + 1}`, gridColumn: 2 }}>
+        <SizedPhoto src={backgrounds.flow.src} alt="" fill sizes="240px" className="-z-10 object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-700/30 via-neutral-950/20 to-brand-700/40" />
+      </div>
+
+      <div role="row" className="contents">
+        <span role="columnheader" className="sticky left-0 z-10 bg-white md:static md:bg-transparent" style={at(1, 1)} />
+        <span role="columnheader" className="relative z-10 grid place-items-center px-3 pt-6 pb-5 text-center text-[15px] font-medium text-white md:text-[17px]" style={at(1, 2)}>
+          {table.coere}
+        </span>
+        {table.others.map((name, i) => (
+          <span key={name} role="columnheader" className="grid place-items-center px-3 pt-6 pb-5 text-center text-[13px] text-neutral-500 md:text-[15px]" style={at(1, i + 3)}>
+            {name}
+          </span>
         ))}
-      </tbody>
-    </>
+      </div>
+
+      {table.rows.map((row, r) => (
+        <div key={row.name} role="row" className="contents">
+          <span role="rowheader" className="sticky left-0 z-10 border-t border-neutral-100 bg-white py-5 pr-6 md:static md:bg-transparent" style={at(r + 2, 1)}>
+            <span className="block text-[15px] font-medium tracking-[-0.01em] text-neutral-950 md:text-[17px]">{row.name}</span>
+            <span className="mt-1 hidden text-[14px] leading-snug text-neutral-500 sm:block">{row.detail}</span>
+          </span>
+          {row.marks.map((mark, i) => (
+            <span key={i} role="cell" className={`relative z-10 grid place-items-center border-t py-5 ${i === 0 ? "border-white/15" : "border-neutral-100"}`} style={at(r + 2, i + 2)}>
+              <Cell mark={mark} coere={i === 0} />
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
 /**
- * How Coere compares: one table per product, picked from a row of pills,
+ * How Coere compares: one board per product, picked from a row of pills,
  * against the products people use for the same job, with ChatGPT and
- * Claude's own memory as the baseline.
- * Every table is in the page, so all of them can be read and found; the
- * ones not picked are hidden until their pill is.
+ * Claude's own memory as the baseline. Every board is in the page, so all
+ * of them can be read and found; the ones not picked stay hidden until
+ * their pill is.
  */
 export function CompareTable({ id = "compare" }: { id?: string }) {
   const [picked, setPicked] = useState(compareTables[0].key);
@@ -106,26 +117,19 @@ export function CompareTable({ id = "compare" }: { id?: string }) {
         </div>
 
         {/* relative: the marks' screen reader words are absolutely placed, and must stay inside this scroller, not widen the page on a phone. */}
-        <div className="relative mt-10 overflow-x-auto rounded-3xl bg-white ring-1 ring-neutral-200 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.3)]">
+        <div className="relative mx-auto mt-14 max-w-6xl overflow-x-auto py-3">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.table key={table.key} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className={TABLE}>
-              <Contents table={table} />
-            </motion.table>
+            <motion.div key={table.key} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+              <Board table={table} />
+            </motion.div>
           </AnimatePresence>
           {compareTables
             .filter((t) => t.key !== table.key)
             .map((t) => (
-              <table key={t.key} hidden className={TABLE}>
-                <Contents table={t} />
-              </table>
+              <div key={t.key} hidden>
+                <Board table={t} />
+              </div>
             ))}
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-neutral-500">
-          <span className="inline-flex items-center gap-2"><Cell mark="yes" /> Yes</span>
-          <span className="inline-flex items-center gap-2"><Cell mark="part" /> Partly, or by hand</span>
-          <span className="inline-flex items-center gap-2"><Cell mark="no" /> No</span>
-          <span>From each product&apos;s public features, November 2026.</span>
         </div>
       </Container>
     </section>
