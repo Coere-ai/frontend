@@ -1,0 +1,184 @@
+{
+  "format": "coere.memory",
+  "version": "2.0",
+  "created": "2026-10-12T10:10:00Z",
+  "generator": {
+    "app": "coere",
+    "version": "0.2.0"
+  },
+  "self": "ent_0199a5c1-8a00-7000-8000-000000000010",
+  "timeZone": "America/Los_Angeles",
+  "catalogVersion": "0123456789abcdef",
+  "files": {
+    "activities.jsonl": {
+      "records": 2,
+      "sha256": "e5200a580cf6f9962399d0066d80cfab12c5ef2f1dcf1e242546bb9f41bb2b17"
+    },
+    "exclusions.jsonl": {
+      "records": 2,
+      "sha256": "bbe13cd233a109bf4ddb522b4112e3f27736acf50a5a16a33158df5d7868e487"
+    },
+    "forget-keys.jsonl": {
+      "records": 1,
+      "sha256": "655eeec35098d30d0ab4871ea2ae5c8e07433e602386a5e05acf8a84af034f1f"
+    },
+    "profiles.jsonl": {
+      "records": 1,
+      "sha256": "f6994cde29c20335abf912a7d4a1494a901886919edb31705295803a4dcb0dec"
+    },
+    "receipts.jsonl": {
+      "records": 1,
+      "sha256": "63af2678dc2011f0f91125705334c75cd5af861d2713d8891e1dfd5d90af9573"
+    },
+    "sections/knowledge/_section.json": {
+      "records": 1,
+      "sha256": "3f003a2d6169782c1c7247b55e318e8d285049a2613af8f393eb1524ef3ef3eb"
+    },
+    "sections/people/_section.json": {
+      "records": 1,
+      "sha256": "5d2ac46d80c88e6ca0f3fdac976ee5fc2e98e1497c7ef85ad6463f25002b641f"
+    },
+    "sections/people/prof-alvarez/_folder.json": {
+      "records": 1,
+      "sha256": "cb8e53dada1aed953b696c110c8230fd981c5434a8b0409ff8269e51878c02ea"
+    },
+    "sections/people/prof-alvarez/_relations.jsonl": {
+      "records": 1,
+      "sha256": "a86fa049ec5598aa5696666a39f079191216b51b87b2e268a195492b3f97f33b"
+    },
+    "sections/people/prof-alvarez/_sources.jsonl": {
+      "records": 1,
+      "sha256": "e021bd65c12c6f0b768f4a412cd7a63e0398d3faf60fa2451065b6378b37d12b"
+    },
+    "sections/personal/_facts.jsonl": {
+      "records": 2,
+      "sha256": "d96d228650acad757959b01b3ccce94341f9dabd5593af84e165e5789dad992d"
+    },
+    "sections/personal/_relations.jsonl": {
+      "records": 2,
+      "sha256": "ce2d6c54eee2e8fbe4acf256d7f76a538879862767551172f9246b6379096db3"
+    },
+    "sections/personal/_section.json": {
+      "records": 1,
+      "sha256": "ebc5bda31588abde31f5fb13a1eed33993d2f8224a47bdd96bd90cebc9268ae7"
+    },
+    "sections/personal/_self.json": {
+      "records": 1,
+      "sha256": "b3f417706250a45a38ebdf1b369db9e8d253041f1dd63c1d39d4efc45d21b1f8"
+    },
+    "sections/personal/_sources.jsonl": {
+      "records": 3,
+      "sha256": "dc87a1f34170e22503cd4f15fb99a3b9bb0e8437285d75ea9f7155a254d2e31e"
+    },
+    "sections/plans/_section.json": {
+      "records": 1,
+      "sha256": "47df1cbcdb21af4b01e5b018e4bd0a449ec9fa4e44b7e1708739e7a7f0000e28"
+    },
+    "sections/plans/lisbon-trip/_facts.jsonl": {
+      "records": 2,
+      "sha256": "2abdd413b4eb19a015eda29b593db442b2516f1dfaceec03cc2413276e69d1df"
+    },
+    "sections/plans/lisbon-trip/_folder.json": {
+      "records": 1,
+      "sha256": "41a958a1853bc29ddcea2c74d6616cfeb327496ea95875c1421cf2382b06fc08"
+    },
+    "sections/plans/lisbon-trip/_sources.jsonl": {
+      "records": 1,
+      "sha256": "fe2b9e7b8bb3ae134dee65efdb1efc5209f2c460b445ecd420a5a22b29f1246f"
+    },
+    "sections/preferences/_facts.jsonl": {
+      "records": 1,
+      "sha256": "1e8d539f3c4c177a039e2f6fae5fe72636a328d89737cafae2480a277541f384"
+    },
+    "sections/preferences/_section.json": {
+      "records": 1,
+      "sha256": "5985b8d8401c47318f11fe11cedc16155f3a673cd6d6b3fb81efb85a4ddc6bd9"
+    },
+    "sections/preferences/_sources.jsonl": {
+      "records": 1,
+      "sha256": "ffbd618a3a68f7506c8feefb8b2fb289742b4532723c71f2d82d6b9e4af507a0"
+    },
+    "sections/projects/_section.json": {
+      "records": 1,
+      "sha256": "323295786b15f8a9ed62451fb05c59d1e6705f3cb0f312599114e069c4860b0b"
+    },
+    "sections/school/_section.json": {
+      "records": 1,
+      "sha256": "3a950ddbd018d12a55fde28184dbddec356f949e7072845153a60285eccdbd0c"
+    },
+    "sections/school/cs-101/_folder.json": {
+      "records": 1,
+      "sha256": "be1192f0773a0d0b9c1a8ea1f097e741f640a737f128777eb0f2e95bfac6f1be"
+    },
+    "sections/school/cs-101/_sources.jsonl": {
+      "records": 1,
+      "sha256": "e021bd65c12c6f0b768f4a412cd7a63e0398d3faf60fa2451065b6378b37d12b"
+    },
+    "sections/school/cs-101/notes.cite.jsonl": {
+      "records": 5,
+      "sha256": "22a5c1e715b619eadb01dd8bfe850731e4a9f3e0ea6a6a34521a9fe09e4a7296"
+    },
+    "sections/school/cs-101/notes.md": {
+      "sha256": "fcb7eedfdce447fc4dd1b196dc8919319974224da1279f6858cd1eaceba2afdb"
+    },
+    "sections/school/cs-101/notes.versions/0001.md": {
+      "sha256": "ab64956f2cec23b5dbfd78239bfa86a058d4fe21c020cfb422fea212a48989e5"
+    },
+    "sections/school/cs-101/project-1/_facts.jsonl": {
+      "records": 6,
+      "sha256": "d0e52a79d6cb48e4d9b02c8e4042521a69aa2330ff7d0c009be050b6583a12d1"
+    },
+    "sections/school/cs-101/project-1/_folder.json": {
+      "records": 1,
+      "sha256": "55c5c1613ab296357130677768f256fd34f9fc8db4b87bed0e9ace9ba9ba4066"
+    },
+    "sections/school/cs-101/project-1/_sources.jsonl": {
+      "records": 1,
+      "sha256": "e021bd65c12c6f0b768f4a412cd7a63e0398d3faf60fa2451065b6378b37d12b"
+    },
+    "sections/school/cs-101/project-1/python-pin.cite.jsonl": {
+      "records": 1,
+      "sha256": "26d4b206e0f14207f17f93b8b2fef7d6fb968927742cbdd34b1d8d5779a3b1a3"
+    },
+    "sections/school/cs-101/project-1/python-pin.md": {
+      "sha256": "851d5379e661d1adfba1f97b6ba9882aaf855e0c8a4f04bf3cdf238221235be6"
+    },
+    "sections/style/_facts.jsonl": {
+      "records": 2,
+      "sha256": "eebe1f37fc41f418f8dce6e41775900ef44bbb1b1526569dae173e6e3f320501"
+    },
+    "sections/style/_section.json": {
+      "records": 1,
+      "sha256": "92d6b79647df40b38ca48b59bae34ce06ab995f1bf11f4fbe3593ea60147412b"
+    },
+    "sections/style/_sources.jsonl": {
+      "records": 1,
+      "sha256": "ffbd618a3a68f7506c8feefb8b2fb289742b4532723c71f2d82d6b9e4af507a0"
+    },
+    "sections/tone/_section.json": {
+      "records": 1,
+      "sha256": "21d74029a2ce4b11b4f5a8d298282037742cdce5c861d78a95201bfd25ba76c5"
+    },
+    "sections/work/_section.json": {
+      "records": 1,
+      "sha256": "52fbe175f5195312c2ecc9d9d7762560a6741eb5a160f29ad1c9e5915bf1f4db"
+    },
+    "sources.jsonl": {
+      "records": 3,
+      "sha256": "63329c5f139ee1529240e3fc86eac0bcd5f370534f400ccdc2ba5fed3daeb624"
+    },
+    "taxonomy.jsonl": {
+      "records": 2,
+      "sha256": "3ec7eeec1e5528f87c404835c2a8a7237f9f916c4315ed3d47c2955fcbc9352e"
+    },
+    "tombstones.jsonl": {
+      "records": 1,
+      "sha256": "736d1cb1da14332ae4d77aa246baa0c2bcea6441f1dcc4d7c5f4bcf4aaa8b874"
+    },
+    "topic-blocks.jsonl": {
+      "records": 1,
+      "sha256": "9401cc5415ae0a8501140d3debeb11521838ee59b03751b49c7195f528f57e50"
+    }
+  },
+  "digest": "91a8a8bfdde568c21fe2bde88bbdff931ed5a1989af2124014add9b2b1cca1ff"
+}

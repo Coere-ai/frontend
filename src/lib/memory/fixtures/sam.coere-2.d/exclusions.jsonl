@@ -1,0 +1,2 @@
+{"t":"exclusion","id":"exc_0199a5c1-8a00-7000-8000-000000000401","at":"2026-10-12T10:05:00Z","scope":"chat","source":"grok:demo-forgotten","throughMsg":12}
+{"t":"exclusion","id":"exc_0199a5c1-8a00-7000-8000-000000000402","at":"2026-10-12T10:06:00Z","scope":"platform","platform":"meta_ai","before":"2026-10-12T10:06:00Z"}

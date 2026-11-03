@@ -1,0 +1,2 @@
+{"t":"catalog","version":"0123456789abcdef"}
+{"t":"learned","id":"food.x_sourdough_baking","parent":"food","name":"Sourdough baking","about":"Starters, loaves and baking schedules.","keywords":["sourdough","starter"],"examples":["My starter doubled overnight."],"state":"proposed","facts":7,"chats":4,"days":3,"proposedAt":"2026-10-11T14:00:00Z"}

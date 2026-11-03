@@ -50,6 +50,12 @@ export interface IndexSource {
   title: string;
   capturedAt: string | null;
   messages: number;
+  /**
+   * The section keys this chat's memories sit in. An organization's graph
+   * keeps only the chats behind its shared sections, so a member's other
+   * chat titles never reach it.
+   */
+  sections?: string[];
 }
 
 export interface IndexDocument {
