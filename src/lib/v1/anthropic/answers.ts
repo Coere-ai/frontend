@@ -4,6 +4,7 @@ import type { DeviceAccount } from "../device-auth";
 import { NO_TOKENS, recordUsage } from "../meter";
 import { costMicros } from "../prices";
 import { claimMetering, ownedBatchIds, storeBatch } from "./batches";
+import { anthropicError } from "./errors";
 import { answerHeaders } from "./headers";
 import type { AnthropicOp } from "./paths";
 import { meteredResults } from "./results-stream";
@@ -35,6 +36,13 @@ function parse(text: string): unknown {
 }
 
 export async function relayAnswer(up: Response, c: AnswerContext): Promise<Response> {
+  // Anthropic refusing Coere's own key must not reach the extension as a 401,
+  // which it reads as the person being signed out.
+  if (up.status === 401) {
+    console.error("anthropic refused the server key");
+    await up.body?.cancel().catch(() => {});
+    return anthropicError("unavailable");
+  }
   const headers = answerHeaders(up.headers);
   const requestId = up.headers.get("request-id");
   const status = up.status;
