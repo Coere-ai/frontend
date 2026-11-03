@@ -25,7 +25,7 @@ export function ForgePage() {
             <h2 className="text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">From a key to context, end to end</h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">A developer makes a token, adds Coere to their app&apos;s AI call and runs it, then points it at any AI.</p>
           </div>
-          <Stage background={backgrounds.light} className="mt-16">
+          <Stage background={backgrounds.prism} className="mt-16">
             <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/45" />
             <div className="relative p-6 md:p-12">
               <FilmFrame film={films.forgeDev} />
