@@ -104,7 +104,8 @@ export function CompareTable({ id = "compare" }: { id?: string }) {
           ))}
         </div>
 
-        <div className="mt-10 overflow-x-auto rounded-3xl bg-white ring-1 ring-neutral-200 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.3)]">
+        {/* relative: the marks' screen reader words are absolutely placed, and must stay inside this scroller, not widen the page on a phone. */}
+        <div className="relative mt-10 overflow-x-auto rounded-3xl bg-white ring-1 ring-neutral-200 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.3)]">
           <AnimatePresence mode="wait" initial={false}>
             <motion.table key={table.key} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className={TABLE}>
               <Contents table={table} />
