@@ -19,7 +19,8 @@ import { getJson, listFolder, putJson, removePaths } from "./storage";
  *   writeMemberPart(orgId, userId, index)  cut and store one member's part
  *   removeMemberPart(orgId, userId)        drop one member's part
  *   rebuildOrgIndex(orgId)                 merge the parts into the graph
- *   refreshMemberPart(orgId, userId)       decide from the member's row, write or remove, then rebuild
+ *   refreshMemberPart(orgId, userId, index?)  decide from the member's row, write or remove, then rebuild
+ *                                          (index: their index if in hand, else read from Storage)
  *   refreshOrgParts(orgId)                 re-cut every member's part (after shared sections change), then rebuild
  * Leave, remove and the share switch: change the row first, then call
  * refreshMemberPart, which removes the part of anyone no longer contributing.
@@ -107,8 +108,8 @@ export async function rebuildOrgIndex(orgId: string): Promise<void> {
   if (totals.error) console.error("set_org_memory_totals failed", totals.error.code);
 }
 
-/** Writes or removes one member's part from their row and stored index, then merges. */
-export async function refreshMemberPart(orgId: string, userId: string): Promise<void> {
+/** Writes or removes one member's part from their row and their index, then merges. */
+export async function refreshMemberPart(orgId: string, userId: string, inHand?: MemoryIndex): Promise<void> {
   const org = await readOrg(orgId);
   if (!org) return;
   const { data: member } = await supabase()
@@ -117,7 +118,7 @@ export async function refreshMemberPart(orgId: string, userId: string): Promise<
     .eq("org_id", orgId)
     .eq("user_id", userId)
     .maybeSingle<MemberRow>();
-  const index = member && memberContributes(member, org) ? await getJson<MemoryIndex>(userIndexPath(userId)) : null;
+  const index = member && memberContributes(member, org) ? (inHand ?? (await getJson<MemoryIndex>(userIndexPath(userId)))) : null;
   if (index) await writeMemberPart(orgId, userId, index);
   else await removeMemberPart(orgId, userId);
   await rebuildOrgIndex(orgId);
