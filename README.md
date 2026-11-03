@@ -18,11 +18,21 @@ npm run lint
 Every page is public and indexed. `src/lib/seo.ts` holds the shared keywords
 and `pageMetadata`, which gives a page its title, description, keywords,
 canonical link and share card in one call; the words for each page are in
-`src/site/content/seo.ts`. The home page carries the WebSite and
-Organization structured data and each product page a SoftwareApplication
-(`src/site/seo/json-ld.tsx`). `src/app/sitemap.ts` lists every page the menus
-link to, `src/app/robots.ts` keeps crawlers out of the live demos' own pages,
-and `public/llms.txt` describes Coere for AI crawlers.
+`src/site/content/seo.ts`. What Coere is, in one line, lives in
+`siteConfig.description` (with a longer `summary` and the `notCohere` line);
+keep the meta, structured data, `public/llms.txt` and page copy in step with
+it. The home page carries the WebSite and Organization structured data, each
+product page a SoftwareApplication, and every page with a visible FAQ
+(`FaqSection`) the same words as FAQPage (`src/site/seo/json-ld.tsx`).
+
+The guide pages (`/portable-ai-memory`, `/chatgpt-to-claude-memory`,
+`/ai-agent-memory`) are listed in `src/site/content/guides.ts`, which the
+sitemap and footer read. `src/app/sitemap.ts` lists every page the menus and
+footer link to, with dates that change only when the words do.
+`src/app/robots.ts` names the search and AI crawlers one by one and keeps all
+of them out of the live demos' own pages, `/statistics` and `/api/`; it says
+how to stop model training without leaving AI search. `docs/seo-report.md`
+has the research and the remaining manual steps.
 
 The blog and careers pages are hidden from the menus for now. They still
 answer at their addresses but are `noindex` and left out of the sitemap.
