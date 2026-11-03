@@ -44,17 +44,21 @@ export function noContent(): Response {
   return new Response(null, { status: 204, headers: headersWith() });
 }
 
-/** The problem details body for a code, kept apart from the Response so the tests can read it. */
-export function problemBody(code: ProblemCode) {
+/**
+ * The problem details body for a code, kept apart from the Response so the
+ * tests can read it. `title` replaces the code's own, for a code that covers
+ * two cases (a spent lifetime limit is still `usage_limit`).
+ */
+export function problemBody(code: ProblemCode, title?: string) {
   const p = PROBLEMS[code];
-  return { type: `${ERRORS_DOC}#${code}`, title: p.title, status: p.status, code };
+  return { type: `${ERRORS_DOC}#${code}`, title: title ?? p.title, status: p.status, code };
 }
 
 /** A problem details answer. `retryAfter` is in whole seconds. */
-export function problem(code: ProblemCode, retryAfter?: number): Response {
+export function problem(code: ProblemCode, retryAfter?: number, title?: string): Response {
   const extra: Record<string, string> = { "content-type": "application/problem+json" };
   if (retryAfter !== undefined) extra["retry-after"] = String(Math.max(1, Math.ceil(retryAfter)));
-  return new Response(JSON.stringify(problemBody(code)), {
+  return new Response(JSON.stringify(problemBody(code, title)), {
     status: PROBLEMS[code].status,
     headers: headersWith(extra),
   });

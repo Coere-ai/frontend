@@ -341,9 +341,11 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
 - Answers are `no-store` and `noindex`, with no CORS headers: the extension
   holds the site as a host, and pages never call these routes.
 - Requests per minute come from the plan and are counted per device in each
-  server instance's memory. The monthly limit is checked before every call
-  that starts new spend.
-- Refused tokens, rate limits and spent months write `security_events`
+  server instance's memory. The monthly and lifetime limits (the person's
+  own when the operator set one, else the plan's) are checked before every
+  call that starts new spend. A spent one answers Anthropic's own spend
+  limit 400 on the Claude routes and a `usage_limit` 429 elsewhere.
+- Refused tokens, rate limits and spent limits write `security_events`
   rows. The token itself is never stored or logged; only its SHA-256 is.
 
 ### Settings

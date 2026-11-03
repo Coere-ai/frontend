@@ -21,16 +21,18 @@ describe("anthropicError", () => {
     }
   });
 
-  it("marks a spent month as Anthropic's spend cap", () => {
+  it("answers a spent limit with Anthropic's spend limit 400, naming the limit", () => {
     assert.deepEqual(anthropicErrorBody("usage_limit"), {
       type: "error",
-      error: {
-        type: "rate_limit_error",
-        message: "usage_limit",
-        details: { error_code: "enforced_spend_limit_reached" },
-      },
+      error: { type: "invalid_request_error", message: "You have reached your specified monthly usage limit on coere.ai." },
     });
-    assert.equal(anthropicError("usage_limit").status, 429);
+    assert.deepEqual(anthropicErrorBody("usage_limit", undefined, "lifetime"), {
+      type: "error",
+      error: { type: "invalid_request_error", message: "You have reached your specified lifetime usage limit on coere.ai." },
+    });
+    const res = anthropicError("usage_limit", { limit: "lifetime" });
+    assert.equal(res.status, 400);
+    assert.equal(res.headers.get("x-should-retry"), "false");
   });
 
   it("names a refused model", () => {

@@ -11,12 +11,12 @@ import { prepareRequest } from "./prepare";
 
 /**
  * The Anthropic proxy (docs/accounts.md 8.4), in the order its checks run:
- * the path, the device (token, suspended, per minute, and the monthly limit
- * for calls that start new spend), the server's key, the request itself,
+ * the path, the device (token, suspended, per minute, and the lifetime and
+ * monthly limits for calls that start new spend), the server's key, the request itself,
  * batch ownership, then the forward and the answer.
  */
 
-/** Calls that start new spend, so the monthly limit is checked first. Results of a batch already paid for are not held back. */
+/** Calls that start new spend, so the spend limits are checked first. Results of a batch already paid for are not held back. */
 const STARTS_SPEND = new Set<AnthropicOp["op"]>(["message", "batch_create"]);
 
 export async function proxyAnthropic(req: Request, segments: string[]): Promise<Response> {
@@ -25,7 +25,7 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   if (!op) return anthropicError("not_found");
 
   const g = await gate(req, { metered: STARTS_SPEND.has(op.op) });
-  if (!g.ok) return anthropicFor(g.refusal, g.retryAfter);
+  if (!g.ok) return anthropicFor(g.refusal, g.retryAfter, g.limit);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return anthropicError("unavailable");
 

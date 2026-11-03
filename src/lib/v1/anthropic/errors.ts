@@ -1,11 +1,13 @@
+import type { SpentLimit } from "../gate-types";
 import { API_HEADERS } from "../http";
 
 /**
  * Errors on the Anthropic routes in Anthropic's own shape (docs/accounts.md
  * 8.4), so the memory runtime's error classes read them as they read the
- * real API's. The spend cap case carries `error_code
- * enforced_spend_limit_reached`, which the runtime treats as a cap and holds
- * until the next month.
+ * real API's. A spent limit is the 400 Anthropic itself sends for a spent
+ * account: the runtime reads a message starting "You have reached your
+ * specified" as a spend limit, holds the queue and tries again every hour,
+ * so an operator raising the limit lets work go on within the hour.
  */
 
 export type AnthropicCase =
@@ -25,11 +27,10 @@ interface ErrorShape {
   status: number;
   type: string;
   message: string;
-  details?: { error_code: string };
 }
 
-/** The status and body of each case. `model` names the refused model in its message. */
-export function anthropicErrorShape(c: AnthropicCase, model?: string): ErrorShape {
+/** The status and body of each case. `model` names the refused model; `limit` the spent limit (the month by default). */
+export function anthropicErrorShape(c: AnthropicCase, model?: string, limit: SpentLimit = "monthly"): ErrorShape {
   switch (c) {
     case "signed_out":
       return { status: 401, type: "authentication_error", message: "signed_out" };
@@ -37,10 +38,9 @@ export function anthropicErrorShape(c: AnthropicCase, model?: string): ErrorShap
       return { status: 403, type: "permission_error", message: "account_suspended" };
     case "usage_limit":
       return {
-        status: 429,
-        type: "rate_limit_error",
-        message: "usage_limit",
-        details: { error_code: "enforced_spend_limit_reached" },
+        status: 400,
+        type: "invalid_request_error",
+        message: `You have reached your specified ${limit} usage limit on coere.ai.`,
       };
     case "rate_limited":
       return { status: 429, type: "rate_limit_error", message: "rate_limited" };
@@ -65,20 +65,20 @@ export function anthropicErrorShape(c: AnthropicCase, model?: string): ErrorShap
   }
 }
 
-/** The body Anthropic sends: `{type:'error', error:{type, message, details?}}`. */
-export function anthropicErrorBody(c: AnthropicCase, model?: string) {
-  const { type, message, details } = anthropicErrorShape(c, model);
-  return { type: "error", error: details ? { type, message, details } : { type, message } };
+/** The body Anthropic sends: `{type:'error', error:{type, message}}`. */
+export function anthropicErrorBody(c: AnthropicCase, model?: string, limit?: SpentLimit) {
+  const { type, message } = anthropicErrorShape(c, model, limit);
+  return { type: "error", error: { type, message } };
 }
 
 /**
  * The answer. A refusal the client should not retry says so in
  * `x-should-retry`, and a rate limit carries `retry-after` in seconds.
  */
-export function anthropicError(c: AnthropicCase, o: { model?: string; retryAfter?: number } = {}): Response {
-  const shape = anthropicErrorShape(c, o.model);
+export function anthropicError(c: AnthropicCase, o: { model?: string; retryAfter?: number; limit?: SpentLimit } = {}): Response {
+  const shape = anthropicErrorShape(c, o.model, o.limit);
   const headers = new Headers({ ...API_HEADERS, "content-type": "application/json" });
   if (o.retryAfter !== undefined) headers.set("retry-after", String(Math.max(1, Math.ceil(o.retryAfter))));
   if (c !== "rate_limited" && c !== "unavailable" && c !== "upstream") headers.set("x-should-retry", "false");
-  return new Response(JSON.stringify(anthropicErrorBody(c, o.model)), { status: shape.status, headers });
+  return new Response(JSON.stringify(anthropicErrorBody(c, o.model, o.limit)), { status: shape.status, headers });
 }

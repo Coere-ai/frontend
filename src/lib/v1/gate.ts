@@ -3,16 +3,18 @@ import "server-only";
 import { logSecurityEvent } from "@/lib/security/events";
 
 import { authenticateDevice, type DeviceAccount } from "./device-auth";
-import type { GateRefusal } from "./gate-types";
+import type { GateRefusal, SpentLimit } from "./gate-types";
 import { deviceLimiter } from "./limiter";
+import { spendRetryAfter, spentLimit } from "./spend";
 
-export type { GateRefusal } from "./gate-types";
+export type { GateRefusal, SpentLimit } from "./gate-types";
 
 /**
  * The checks every bearer route makes before it does anything, in order:
  * the token, a suspended account, the device's per minute limit and, for a
- * metered call, the plan's monthly limit. The route turns a refusal into its
- * own error shape (problem details, or Anthropic's on the proxy).
+ * metered call, the lifetime and monthly spend limits. The route turns a
+ * refusal into its own error shape (problem details, or Anthropic's on the
+ * proxy); `limit` says which spend limit a `usage_limit` is about.
  *
  * `rate_limited` and `usage_limited` are logged once per device per window,
  * so a runaway loop does not write a security row per request.
@@ -20,7 +22,7 @@ export type { GateRefusal } from "./gate-types";
 
 export type GateResult =
   | { ok: true; account: DeviceAccount }
-  | { ok: false; refusal: GateRefusal; retryAfter?: number };
+  | { ok: false; refusal: GateRefusal; retryAfter?: number; limit?: SpentLimit };
 
 const lastLogged = new Map<string, number>();
 
@@ -31,12 +33,6 @@ function firstIn(key: string, ms: number, now = Date.now()): boolean {
   lastLogged.set(key, now);
   if (lastLogged.size > 10_000) for (const [k, t] of lastLogged) if (now - t >= ms) lastLogged.delete(k);
   return true;
-}
-
-/** Seconds until the first day of next month in UTC, for a spent month's retry-after. */
-export function secondsToNextMonth(now = new Date()): number {
-  const next = Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1);
-  return Math.max(1, Math.ceil((next - now.getTime()) / 1000));
 }
 
 export async function gate(req: Request, o: { metered: boolean }): Promise<GateResult> {
@@ -52,9 +48,10 @@ export async function gate(req: Request, o: { metered: boolean }): Promise<GateR
     return { ok: false, refusal: "rate_limited", retryAfter: limit.retryAfterSeconds };
   }
 
-  if (o.metered && account.monthCostMicros >= account.monthlyLimitMicros) {
+  const spent = o.metered ? spentLimit(account) : null;
+  if (spent) {
     if (firstIn(`usage:${account.deviceId}`, 3_600_000)) void logSecurityEvent("usage_limited", who);
-    return { ok: false, refusal: "usage_limit", retryAfter: secondsToNextMonth() };
+    return { ok: false, refusal: "usage_limit", retryAfter: spendRetryAfter(spent), limit: spent };
   }
   return { ok: true, account };
 }

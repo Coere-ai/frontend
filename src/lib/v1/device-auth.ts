@@ -7,9 +7,10 @@ import { parseBearer, tokenHash } from "./token";
 
 /**
  * Who is calling: one `device_auth(token_hash)` call (docs/accounts.md 8,
- * 10) checks the bearer token and returns the account, its plan's limits,
- * this month's spend and the organization. A refused token writes
- * `token_rejected` with the address hash, never the token.
+ * 10) checks the bearer token and returns the account, its limits (already
+ * resolved: the person's own when the operator set one, else the plan's),
+ * this month's and the lifetime spend, and the organization. A refused
+ * token writes `token_rejected` with the address hash, never the token.
  */
 
 export interface DeviceAccount {
@@ -18,9 +19,12 @@ export interface DeviceAccount {
   status: "active" | "suspended";
   planId: string;
   monthlyLimitMicros: number;
+  /** Null means no lifetime limit. */
+  lifetimeLimitMicros: number | null;
   storageLimitBytes: number;
   requestsPerMinute: number;
   monthCostMicros: number;
+  lifetimeCostMicros: number;
   memorySync: boolean;
   includeSensitive: boolean;
   orgId: string | null;
@@ -34,9 +38,11 @@ interface DeviceAuthRow {
   status: string;
   plan_id: string;
   monthly_limit_micros: number | string;
+  lifetime_limit_micros: number | string | null;
   storage_limit_bytes: number | string;
   requests_per_minute: number;
   month_cost_micros: number | string;
+  lifetime_cost_micros: number | string;
   memory_sync: boolean;
   include_sensitive: boolean;
   org_id: string | null;
@@ -49,9 +55,11 @@ function toAccount(r: DeviceAuthRow): DeviceAccount {
     status: r.status === "suspended" ? "suspended" : "active",
     planId: r.plan_id,
     monthlyLimitMicros: Number(r.monthly_limit_micros),
+    lifetimeLimitMicros: r.lifetime_limit_micros === null ? null : Number(r.lifetime_limit_micros),
     storageLimitBytes: Number(r.storage_limit_bytes),
     requestsPerMinute: Number(r.requests_per_minute),
     monthCostMicros: Number(r.month_cost_micros),
+    lifetimeCostMicros: Number(r.lifetime_cost_micros),
     memorySync: r.memory_sync,
     includeSensitive: r.include_sensitive,
     orgId: r.org_id,

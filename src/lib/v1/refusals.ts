@@ -1,20 +1,22 @@
 import { anthropicError } from "./anthropic/errors";
-import type { GateRefusal } from "./gate-types";
+import type { GateRefusal, SpentLimit } from "./gate-types";
 import { json, problem } from "./http";
 
 /**
  * A gate refusal in each route family's own shape: problem details on most
  * routes, Anthropic's error body on the proxy, and Jev's plain
- * `{error}` body (docs/accounts.md 8, 8.4, 8.5).
+ * `{error}` body (docs/accounts.md 8, 8.4, 8.5). `limit` names the spend
+ * limit of a `usage_limit`; without it the month is meant.
  */
 
-export function problemFor(refusal: GateRefusal, retryAfter?: number): Response {
-  return problem(refusal, refusal === "rate_limited" || refusal === "usage_limit" ? retryAfter : undefined);
+export function problemFor(refusal: GateRefusal, retryAfter?: number, limit?: SpentLimit): Response {
+  const title = refusal === "usage_limit" && limit === "lifetime" ? "Lifetime limit reached" : undefined;
+  return problem(refusal, refusal === "rate_limited" || refusal === "usage_limit" ? retryAfter : undefined, title);
 }
 
-export function anthropicFor(refusal: GateRefusal, retryAfter?: number): Response {
+export function anthropicFor(refusal: GateRefusal, retryAfter?: number, limit?: SpentLimit): Response {
   if (refusal === "rate_limited") return anthropicError("rate_limited", { retryAfter });
-  return anthropicError(refusal);
+  return anthropicError(refusal, { limit });
 }
 
 const JEV_MESSAGE: Record<GateRefusal, string> = {
