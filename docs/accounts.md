@@ -795,3 +795,60 @@ credits at launch. A server action checks the address, stores it in
 against 5 tries a minute per address, and shows a thank you in place of the
 form. The page is public and indexed; the form's endpoint is not.
 
+
+## Appendix A. Exact database signatures
+
+The site's code and the migration must agree on these names and types.
+
+```sql
+-- Running totals. user_totals and org_totals share these counter columns;
+-- daily_totals has them too, keyed by day, plus new_users and new_orgs.
+--   requests bigint, input_tokens bigint, output_tokens bigint,
+--   cache_read_tokens bigint, cache_write_tokens bigint, cost_micros bigint,
+--   tokens_saved bigint, context_imports bigint, transfers bigint,
+--   extractions bigint, cori_chats bigint, action_runs bigint,
+--   memories integer, entities integer, links integer, chats integer,
+--   storage_bytes bigint, updated_at timestamptz
+-- user_totals: user_id uuid pk references profiles on delete cascade
+-- org_totals:  org_id uuid pk references organizations on delete cascade, members integer
+-- daily_totals: day date pk, new_users integer, new_orgs integer
+-- Every counter defaults to 0 and is not null.
+
+device_auth(p_token_hash text) returns table (
+  device_id uuid, user_id uuid, status text, plan_id text,
+  monthly_limit_micros bigint, storage_limit_bytes bigint, requests_per_minute integer,
+  month_cost_micros bigint, memory_sync boolean, include_sensitive boolean, org_id uuid)
+
+record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
+  p_input integer, p_output integer, p_cache_write integer, p_cache_read integer,
+  p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text) returns void
+
+-- p_events: [{"kind": "...", "count": 1, "tokensSaved": 0}], already validated by the route
+record_app_events(p_user uuid, p_device uuid, p_events jsonb) returns void
+
+-- Sets the memory columns of user_totals from memory_files, and when the
+-- person is in an organization, its org_totals memory columns from org_memory.
+set_memory_totals(p_user uuid) returns void
+set_org_memory_totals(p_org uuid) returns void
+
+create_organization(p_user uuid, p_name text, p_slug text) returns uuid
+accept_org_invite(p_user uuid, p_token_hash text, p_email text) returns uuid
+
+admin_table_stats() returns table (schema_name text, table_name text,
+  row_estimate bigint, total_bytes bigint, rls_enabled boolean, policy_count integer)
+admin_storage_usage() returns table (bucket_id text, folder text, objects bigint, bytes bigint)
+```
+
+`extractions` grows with `extract_chat` and `extract_all` events,
+`cori_chats` with `cori_chat`, and `action_runs` with `action_run`,
+`rewrite` and `voice`. A person's usage also adds to their organization's
+totals while they are a member. Every function above is `set search_path =
+''`, revoked from `public`, `anon` and `authenticated`, and granted to
+`service_role` only.
+
+Shared site files that already exist: `src/lib/supabase.ts` (`supabase()`,
+the secret key client), `src/lib/supabase/server.ts` (`sessionClient()`,
+`accountsConfigured()`, `sessionCookieOptions`), `src/lib/auth/user.ts`
+(`getUser()`, `requireUser(next)`, `safeNext()`), `src/lib/security/events.ts`
+(`logSecurityEvent(kind, {userId, orgId, headers})`, `ipHash(headers)`) and
+`src/lib/memory/index-types.ts` (the index types and Storage paths).
