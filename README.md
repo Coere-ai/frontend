@@ -30,8 +30,8 @@ The guide pages (`/portable-ai-memory`, `/chatgpt-to-claude-memory`,
 sitemap and footer read. `src/app/sitemap.ts` lists every page the menus and
 footer link to, with dates that change only when the words do.
 `src/app/robots.ts` names the search and AI crawlers one by one and keeps all
-of them out of the live demos' own pages, `/statistics`, `/api/` and the
-account pages; it says
+of them out of the live demos' own pages, `/admin` (and its old address
+`/statistics`), `/api/` and the account pages; it says
 how to stop model training without leaving AI search. `docs/seo-report.md`
 has the research and the remaining manual steps.
 
@@ -100,12 +100,30 @@ The blog posts and roles are placeholder content for now; each content file
 says so at the top. The industry stories illustrate what each product does;
 they are not customers.
 
-## Analytics and /statistics
+## The admin panel at /admin
 
-A private dashboard at `/statistics`, backed by Supabase. It is the Optagon
-landing page's analytics, ported whole: the same numbers, charts, world map,
-page picker, section cards and click tracking. Bars, lines, meters and map
-shading are Coere's brand blue; text and controls stay ink on white.
+A private panel for the operator, backed by Supabase and guarded by its own
+`USER` and `PASSWORD`, never by an account. `/statistics` and anything
+below it redirect to `/admin`, not permanently. `docs/accounts.md` section 9
+lists what each page shows.
+
+| Page | What it is |
+| --- | --- |
+| `/admin` | Statistics: the product's running totals, by day and in total, and the top accounts and organizations by tokens saved |
+| `/admin/analytics` | The site analytics: the Optagon landing page's dashboard, ported whole |
+| `/admin/users` | Every account. One opens to its totals, devices and graph, with its plan, its own monthly and lifetime dollar limits, suspend and restore, and revoke every device |
+| `/admin/organizations` | Every organization, and the only place one is made. One opens to its members, roles, access, settings, invites and graph, and can be deleted |
+| `/admin/waitlist` | The developer waitlist, by day, with a CSV download |
+| `/admin/database` | Each table's estimated rows, size, Row Level Security and policies, and the Storage totals |
+| `/admin/security` | The security log over 7, 30 or 90 days, and any table with Row Level Security off |
+| `/admin/cost` | AI spend by day, model and account, and Storage's cost at $0.021 per GB month |
+
+The pages are in `src/app/admin`, their client panels in `src/admin` (the
+site analytics panel and the charts stay in `src/stats`), and their data in
+`src/lib/admin`. Each panel reads one route under `/api/admin/`, and every
+change is a server action beside its page. Opening a person's or an
+organization's knowledge graph is a click, never automatic, and each one
+writes an `admin_viewed_memory` security event.
 
 ### Settings
 
@@ -113,8 +131,8 @@ shading are Coere's brand blue; text and controls stay ink on white.
 | --- | --- |
 | `SUPABASE_URL` | The project's address, from Supabase's API settings |
 | `SUPABASE_SECRET_KEY` | The project's secret key. Server only, never `NEXT_PUBLIC_` |
-| `USER` | The username for `/statistics` |
-| `PASSWORD` | The password for `/statistics` |
+| `USER` | The username for `/admin` |
+| `PASSWORD` | The password for `/admin` |
 
 With either Supabase value missing, the beacon still answers and stores
 nothing, and the dashboard says storage is not configured. With `USER` or
@@ -164,7 +182,7 @@ any failure. The checks live in `scripts/db`.
 ### What is recorded
 
 `src/site/tracker/site-tracker.tsx` is mounted by the site layout, so it runs
-on every public page and never on `/statistics` or the account pages. It
+on every public page and never on `/admin` or the account pages. It
 records the view, counts seconds the tab was in focus, notes the deepest scroll, and reports clicks.
 `data-cta` on a link marks it as a conversion and `data-track` marks anything
 else worth counting; links off the site are counted on their own. It skips
@@ -190,18 +208,22 @@ and gives each a line for its card. A page can also tag elements with
 
 ### Sign-in and the guard
 
-- `src/proxy.ts` runs on `/statistics` and `/api/statistics/*` and nothing
-  else, so public pages stay static. Signed out, `/statistics` is the sign-in
-  form, anything below it goes to the home page, and the data route answers
-  404. The page and the data route check the session again themselves.
+- `src/proxy.ts` runs on `/admin/*`, `/api/admin/*` and the account pages
+  and nothing else, so public pages stay static. Signed out, `/admin` is the
+  sign-in form, anything below it goes to the home page, and every data
+  route answers 404. Every page, data route and server action checks the
+  session again itself. An account session never opens the panel, and the
+  admin cookie is never an account session.
 - `USER` and `PASSWORD` are compared as SHA-256 digests with
   `timingSafeEqual`. A wrong guess waits 800 ms, and one address gets ten
   tries in fifteen minutes.
 - The session is a cookie signed with HMAC-SHA256 under a key made from
   `USER` and `PASSWORD`, so changing the password signs everyone out. It is
   httpOnly, sameSite lax, secure in production, and lasts twelve hours.
-- `/statistics` and the data route are `noindex`, and `robots.txt` disallows
-  `/statistics` and `/api/`.
+- Sign ins, failures and rate limit hits write security events
+  (`admin_sign_in`, `admin_sign_in_failed`, `rate_limited`).
+- `/admin` and its data routes are `noindex`, and `robots.txt` disallows
+  `/admin`, `/statistics` and `/api/`.
 
 ### Tests
 
