@@ -7,14 +7,15 @@ import type { DeviceAccount } from "./device-auth";
 
 /**
  * Reads everything `GET /api/v1/account` answers, with the secret key and
- * every query scoped to the calling account's own id.
+ * every query scoped to the calling account's own id. The limits come from
+ * device_auth, already resolved, so the answer matches what the gate checks.
  */
 export async function readAccount(a: DeviceAccount): Promise<ReturnType<typeof accountBody> | null> {
   const db = supabase();
   const month = monthKey();
   const [profile, plan, usage, memory, device, member, totals, settings] = await Promise.all([
     db.from("profiles").select("id, email, username, created_at, memory_sync, include_sensitive").eq("id", a.userId).maybeSingle(),
-    db.from("plans").select("id, name, monthly_limit_micros, storage_limit_bytes").eq("id", a.planId).maybeSingle(),
+    db.from("plans").select("id, name, storage_limit_bytes").eq("id", a.planId).maybeSingle(),
     db.from("usage_monthly").select("requests, input_tokens, output_tokens, cost_micros").eq("user_id", a.userId).eq("month", month).maybeSingle(),
     db.from("memory_files").select("uploaded_at, bytes, digest").eq("user_id", a.userId).maybeSingle(),
     db.from("devices").select("id, name").eq("id", a.deviceId).eq("user_id", a.userId).maybeSingle(),
@@ -29,6 +30,7 @@ export async function readAccount(a: DeviceAccount): Promise<ReturnType<typeof a
     month,
     profile: profile.data as AccountRows["profile"],
     plan: plan.data as AccountRows["plan"],
+    limits: { monthlyMicros: a.monthlyLimitMicros, lifetimeMicros: a.lifetimeLimitMicros },
     usage: usage.data as AccountRows["usage"],
     memory: memory.data as AccountRows["memory"],
     device: device.data as AccountRows["device"],

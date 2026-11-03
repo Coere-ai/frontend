@@ -1,13 +1,17 @@
 /**
  * The body of `GET /api/v1/account` (docs/accounts.md 8.3), built from the
  * rows the route reads. Pure, so the shape is pinned by a test. Database
- * bigints may arrive as strings; every number goes through `num`.
+ * bigints may arrive as strings; every number goes through `num`. The plan's
+ * limits are the resolved ones from device_auth (the person's own when the
+ * operator set one), the same numbers the gate checks.
  */
 
 export interface AccountRows {
   month: string;
   profile: { id: string; email: string | null; username: string | null; created_at: string; memory_sync: boolean; include_sensitive: boolean };
-  plan: { id: string; name: string; monthly_limit_micros: number | string; storage_limit_bytes: number | string } | null;
+  plan: { id: string; name: string; storage_limit_bytes: number | string } | null;
+  /** Already resolved. A null lifetime means no lifetime limit. */
+  limits: { monthlyMicros: number; lifetimeMicros: number | null };
   usage: { requests: number | string; input_tokens: number | string; output_tokens: number | string; cost_micros: number | string } | null;
   memory: { uploaded_at: string; bytes: number | string; digest: string } | null;
   device: { id: string; name: string };
@@ -35,7 +39,8 @@ export function accountBody(r: AccountRows) {
       ? {
           id: r.plan.id,
           name: r.plan.name,
-          monthlyLimitMicros: num(r.plan.monthly_limit_micros),
+          monthlyLimitMicros: num(r.limits.monthlyMicros),
+          lifetimeLimitMicros: r.limits.lifetimeMicros === null ? null : num(r.limits.lifetimeMicros),
           storageLimitBytes: num(r.plan.storage_limit_bytes),
         }
       : null,
