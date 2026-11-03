@@ -342,16 +342,19 @@ grant execute on function public.record_sections(text, text, text, jsonb) to ser
 -- What an account may spend. The site reads the limits through device_auth()
 -- on every metered call, so a plan change takes effect on the next request.
 create table if not exists public.plans (
-  id                   text        primary key,
-  name                 text        not null,
+  id                    text        primary key,
+  name                  text        not null,
   -- Integer micro dollars: 1 USD is 1,000,000. Money is never a float here.
-  monthly_limit_micros bigint      not null,
-  storage_limit_bytes  bigint      not null,
-  requests_per_minute  integer     not null,
-  created_at           timestamptz not null default now(),
+  monthly_limit_micros  bigint      not null,
+  -- Null means the plan has no lifetime limit, which is true of every seed.
+  lifetime_limit_micros bigint,
+  storage_limit_bytes   bigint      not null,
+  requests_per_minute   integer     not null,
+  created_at            timestamptz not null default now(),
 
   constraint plans_limits_sane check (
-    monthly_limit_micros >= 0 and storage_limit_bytes >= 0 and requests_per_minute > 0)
+    monthly_limit_micros >= 0 and storage_limit_bytes >= 0 and requests_per_minute > 0
+    and (lifetime_limit_micros is null or lifetime_limit_micros >= 0))
 );
 
 -- The three plans of section 10. do nothing, so an operator's later edit of a
@@ -376,6 +379,10 @@ create table if not exists public.profiles (
   username          text        unique,
   display_name      text,
   plan_id           text        not null default 'free' references public.plans (id),
+  -- The operator's limits for this one person, set in the admin panel. Null
+  -- means the plan's. device_auth() resolves them, so the site never does.
+  monthly_limit_micros  bigint,
+  lifetime_limit_micros bigint,
   status            text        not null default 'active',
   -- The memory backup is on by default (section 13); sensitive memories are
   -- left out of it unless the person turns them on.
@@ -387,7 +394,10 @@ create table if not exists public.profiles (
 
   constraint profiles_status_known   check (status in ('active', 'suspended')),
   constraint profiles_username_shape check (username is null or username ~ '^[a-z0-9_]{3,24}$'),
-  constraint profiles_display_sane   check (display_name is null or char_length(display_name) <= 80)
+  constraint profiles_display_sane   check (display_name is null or char_length(display_name) <= 80),
+  constraint profiles_limits_sane    check (
+    (monthly_limit_micros is null or monthly_limit_micros >= 0)
+    and (lifetime_limit_micros is null or lifetime_limit_micros >= 0))
 );
 
 
@@ -945,8 +955,8 @@ grant select (id, user_id, name, token_hint, extension_id, extension_version,
   on public.devices to authenticated;
 
 -- profiles: a person may change their display name and nothing else. Plan,
--- status, username and the memory switches go through the server, which
--- checks what each change is allowed to be.
+-- their limits, status, username and the memory switches go through the
+-- server, which checks what each change is allowed to be.
 grant update (display_name) on public.profiles to authenticated;
 
 
@@ -1061,15 +1071,19 @@ create policy coere_memory_delete_own on storage.objects
 -- server runs.
 
 -- Checks a device token and returns everything a metered call needs: the
--- account, its plan's limits, this month's spend and the organization.
+-- account, its limits, this month's spend, the lifetime spend and the
+-- organization. Each limit is already resolved: the person's own when the
+-- operator set one, else the plan's. A null lifetime limit means none.
 -- No row means unknown or revoked, and the route answers signed_out.
 -- last_used_at and last_seen_at are touched at most every 5 minutes, so a
 -- busy extension does not write a row on every request.
 create or replace function public.device_auth(p_token_hash text)
 returns table (
   device_id uuid, user_id uuid, status text, plan_id text,
-  monthly_limit_micros bigint, storage_limit_bytes bigint, requests_per_minute integer,
-  month_cost_micros bigint, memory_sync boolean, include_sensitive boolean, org_id uuid)
+  monthly_limit_micros bigint, lifetime_limit_micros bigint,
+  storage_limit_bytes bigint, requests_per_minute integer,
+  month_cost_micros bigint, lifetime_cost_micros bigint,
+  memory_sync boolean, include_sensitive boolean, org_id uuid)
 language plpgsql
 security invoker
 set search_path = ''
@@ -1092,12 +1106,16 @@ begin
 
   return query
     select v_device.id, p.id, p.status, p.plan_id,
-           pl.monthly_limit_micros, pl.storage_limit_bytes, pl.requests_per_minute,
-           coalesce(um.cost_micros, 0)::bigint, p.memory_sync, p.include_sensitive, m.org_id
+           coalesce(p.monthly_limit_micros, pl.monthly_limit_micros),
+           coalesce(p.lifetime_limit_micros, pl.lifetime_limit_micros),
+           pl.storage_limit_bytes, pl.requests_per_minute,
+           coalesce(um.cost_micros, 0)::bigint, coalesce(ut.cost_micros, 0)::bigint,
+           p.memory_sync, p.include_sensitive, m.org_id
       from public.profiles p
       join public.plans pl on pl.id = p.plan_id
       left join public.usage_monthly um
         on um.user_id = p.id and um.month = date_trunc('month', now() at time zone 'utc')::date
+      left join public.user_totals ut on ut.user_id = p.id
       left join public.org_members m on m.user_id = p.id
      where p.id = v_device.user_id;
 end;
