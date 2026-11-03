@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import type { Role } from "@/site/content/roles";
 import { buttonClass } from "@/site/ui/button";
 import { CheckIcon, UploadIcon } from "@/site/ui/icons/interface-icons";
-import { FormField, inputClass } from "./form-field";
+import { FormField, inputClass } from "@/site/ui/form-field";
 import { validateApplication, type Application, type ApplicationErrors } from "./validate";
 
 const EMPTY: Application = { name: "", email: "", link: "", resume: "", why: "" };
