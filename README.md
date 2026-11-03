@@ -55,6 +55,10 @@ src/site/home/        the home page: one part per product
 src/site/products/    one page design per product
 src/site/industries/  the industries page and each industry's page
 src/site/docs/        the docs layout and the Markdown renderer
+src/site/dashboard/, memory/, organization/, settings/
+                      the person's dashboard at /dashboard
+src/site/graph/       the memory graph, ported from coere-v2's graph2d
+src/site/bridge/      messages from dashboard pages to the extension
 src/site/about/, blog/, careers/
                       each page's own sections
 src/site/ui/          shared pieces: container, buttons, icons, film frames,
@@ -220,6 +224,28 @@ section is what the owner sets up by hand.
 - Each sign in path allows 10 tries in 15 minutes per network address and
   per email, and a wrong code or password waits before it answers.
 - `/connect` is the page the extension opens to get its device token.
+
+### The dashboard
+
+`/dashboard` is the person's own: Overview, Memory, Chats, Usage,
+Organization, Settings and Account (`docs/accounts.md` sections 7 and 14).
+
+- Every page renders per request and calls `requireUser` itself. Reads of
+  the person's own rows go through their session, so Row Level Security
+  decides what they see. The memory index, the organization's rows and
+  every write go through the server with the secret key, after the session
+  check, scoped to the person's own id or their own organization.
+- The memory graph is the product's flat graph, ported from coere-v2's
+  `packages/ui/src/graph2d` into `src/site/graph/`. Change it there first,
+  then copy the change here.
+- Pages talk to the extension through `src/site/bridge/`: they find it by
+  the `coere_ext` cookie, else each id in `COERE_EXTENSION_IDS`, and send
+  `coere.hello`, `coere.open`, `coere.backup` and `coere.settings`.
+- Organizations are made in the admin panel, never from the dashboard. An
+  admin invites coworkers by the email or username of their Coere account,
+  and the invite waits on the coworker's Organization page.
+- The Chrome Web Store address in `src/site/dashboard/connect-first.tsx` is
+  a search until the listing is live; put the listing's address there.
 
 ### Settings
 
