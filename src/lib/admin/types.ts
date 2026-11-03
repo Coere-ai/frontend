@@ -186,6 +186,10 @@ export interface CostPayload {
   daily: DayPoint[];
   monthMicros: number;
   last24hMicros: number;
+  /** How many days the by model and by account figures cover. */
+  breakdownDays: number;
+  /** True when the window held more calls than the panel reads. */
+  breakdownCapped: boolean;
   byModel: { model: string; costMicros: number; requests: number }[];
   byAccount: { id: string | null; name: string; costMicros: number; requests: number }[];
   storageBytes: number;
