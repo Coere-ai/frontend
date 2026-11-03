@@ -280,3 +280,43 @@ otherwise. It is not encoded, so its own query runs on into the link's;
 and `next` must stay last in the link. An address on another origin, or the
 bare Site URL, goes to `/dashboard`. `{{ .SiteURL }}` is always the live
 site, so in development type the code instead of opening the link.
+
+## API for the extension
+
+The extension calls the site under `/api/v1` with `Authorization: Bearer
+<device token>`. `docs/accounts.md` section 8 is the contract; the code is in
+`src/app/api/v1` and `src/lib/v1`.
+
+| Route | What it does |
+| --- | --- |
+| `POST /api/v1/auth/token` | Trades a connect code and its PKCE verifier for a device token. No bearer. 20 a minute per address |
+| `POST /api/v1/auth/revoke` | Signs the calling browser out |
+| `GET /api/v1/account` | The account, plan, this month's usage, memory copy, organization and running totals |
+| `/api/v1/anthropic/v1/...` | Claude calls with Coere's key: messages, token counts and batches, metered |
+| `POST /api/v1/jev/v1/systemone` | Jev calls with Coere's key, metered |
+| `POST /api/v1/memory/upload`, `POST /api/v1/memory/commit` | Push the memory file: a signed upload address, then the commit that builds the index |
+| `GET`, `DELETE /api/v1/memory` | A 60 second download link for the stored file, or remove it |
+| `GET`, `PUT /api/v1/settings` | The synced settings |
+| `POST /api/v1/events` | Feature counts and tokens saved |
+| `GET /api/v1/org`, `GET /api/v1/org/index` | The organization and its shared graph, members only |
+
+- Every route checks the token itself through `device_auth`. The proxy does
+  not run on `/api/v1`.
+- Answers are `no-store` and `noindex`, with no CORS headers: the extension
+  holds the site as a host, and pages never call these routes.
+- Requests per minute come from the plan and are counted per device in each
+  server instance's memory. The monthly limit is checked before every call
+  that starts new spend.
+- Refused tokens, rate limits and spent months write `security_events`
+  rows. The token itself is never stored or logged; only its SHA-256 is.
+
+### Settings
+
+| Variable | What it is |
+| --- | --- |
+| `ANTHROPIC_API_KEY` | Coere's Claude key. Server only, never `NEXT_PUBLIC_`. Unset, the Claude routes answer 503 |
+| `JEV_API_KEY` | Coere's Jev key. Server only, and optional: unset, the Jev route answers 403 and the extension classifies with Claude instead |
+
+Any access gate on the deployment (password protection, deployment
+protection, a visitor pass) must not cover `/api/v1`. The extension cannot
+pass a gate made for people, and every call would fail.
