@@ -1,0 +1,56 @@
+/* Statistics.
+ *
+ * The dashboard's tokens, scoped to the `.stats` wrapper so nothing here can
+ * reach a public page. Tailwind itself comes from globals.css, which the root
+ * layout already loads, so this file only names colours.
+ *
+ * Text, rules and grounds are the neutrals the dashboard was designed with.
+ * Every mark that carries a quantity (bars, lines, areas, meters, map shading
+ * and points) is Coere's brand blue, the ramp in globals.css. The values are
+ * repeated here rather than read through var(--color-brand-*), because
+ * Tailwind only emits the theme variables the site's own classes use. */
+.stats {
+  color-scheme: light;
+
+  /* Type and rules. */
+  --color-ink: #172324;
+  --color-muted: #5c6566;
+  --color-muted-soft: #8b9294;
+
+  /* Grounds. Panels are white; one that sits back a step gets a faint wash. */
+  --color-canvas: #ffffff;
+  --color-canvas-soft: #f7f8f8;
+  --color-surface: #ffffff;
+
+  --color-line: rgba(23, 35, 36, 0.14);
+  --color-border: rgba(23, 35, 36, 0.14);
+  --color-rule-subtle: rgba(23, 35, 36, 0.09);
+
+  /* Controls. The "on" state of a switch is emphasis, not data, so it is ink. */
+  --color-accent: #172324;
+  --color-on-ink: #ffffff;
+
+  /* Marks. The main blue for single series, and two more steps of the same
+     ramp for the traffic chart's second and third lines. */
+  --color-chart: #5267f7; /* brand-500 */
+  --color-chart-soft: #a3b0fd; /* brand-300 */
+  --color-chart-deep: #283285; /* brand-900 */
+  --color-chart-track: #eef1ff; /* brand-50 */
+
+  /* The map. Land is the site's own pale sky rather than the lightest step of
+     the ramp, so "nobody came from here" never reads as "a few people did". */
+  --color-map-land: #f2f5fc; /* mist */
+  --color-map-border: rgba(40, 50, 133, 0.42);
+  --color-map-1: #c6cfff; /* brand-200 */
+  --color-map-2: #a3b0fd; /* brand-300 */
+  --color-map-3: #5267f7; /* brand-500 */
+  --color-map-4: #333cd0; /* brand-700 */
+  --color-map-5: #283285; /* brand-900 */
+
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+/* The browser and platform marks keep their real brand colours. They are
+   identifiers, not decoration: Chrome's four colours and Firefox's orange are
+   how you recognise the row at a glance. */
