@@ -1,15 +1,24 @@
--- Coere site analytics: the full schema.
+-- Coere: the full schema of the coere.ai database.
 --
--- The same statements as migrations/20261103000000_coere_site_analytics.sql,
--- kept here so the whole schema can be read in one place. When the schema
--- changes, add a new migration and bring this file up to date with it.
+-- The same statements as migrations/20261103000000_coere.sql, kept here so
+-- the whole schema can be read in one place. When the schema changes, add a
+-- new migration and bring this file up to date with it.
 --
 -- Paste into the Supabase SQL editor and run, or apply the migration with
 -- the Supabase CLI. Safe to run again: every statement is idempotent (create
--- ... if not exists, create or replace, drop before add), so a second run
--- changes nothing.
+-- ... if not exists, create or replace, drop before add, on conflict do
+-- nothing for seeds), so a second run changes nothing.
 --
--- This is the Optagon landing page's four analytics migrations combined, in
+-- It has two parts, in this order:
+--
+--   1. Site analytics, everything behind /admin/analytics. These tables are
+--      anonymous and written only by the server from POST /api/site/track.
+--   2. Accounts (docs/accounts.md sections 10, 14, 15, 16 and Appendix A):
+--      plans, profiles, devices, usage, the memory copy, synced settings,
+--      organizations, the running totals behind the Statistics page, the
+--      developer waitlist, and the private Storage bucket `memory`.
+--
+-- Part 1 is the Optagon landing page's four analytics migrations combined, in
 -- their order:
 --   20260905000000_site_analytics     site_visits and site_events
 --   20260905000100_track_functions    record_heartbeat and record_conversion
@@ -21,16 +30,17 @@
 -- with the table (and still added after it, for a table made before them).
 -- record_sections is created once, in its final form, after every column it
 -- writes: a `language sql` function is checked against the tables and columns
--- it names when it is created, so it can only come after them.
+-- it names when it is created, so it can only come after them. Part 2 follows
+-- the same rule.
 --
--- Everything is anonymous: there are no accounts on this site, so nothing here
--- identifies a person. The visitor id is a random string the browser keeps in
--- localStorage whose only job is to tell a returning browser from a new one.
+-- The analytics are anonymous: nothing in part 1 identifies a person. The
+-- visitor id is a random string the browser keeps in localStorage whose only
+-- job is to tell a returning browser from a new one.
 --
--- Every table is written ONLY by the server, with the secret key, from
--- POST /api/site/track. Row Level Security is enabled with no policies at all,
--- which denies every anon and authenticated request by design: the browser
--- never talks to this database, so there is nothing to grant.
+-- Every analytics table is written ONLY by the server, with the secret key,
+-- from POST /api/site/track. Row Level Security is enabled with no policies at
+-- all, which denies every anon and authenticated request by design: the
+-- browser never talks to this database, so there is nothing to grant.
 
 create extension if not exists pgcrypto;
 
@@ -310,3 +320,1170 @@ revoke all on function public.record_sections(text, text, text, jsonb) from publ
 grant execute on function public.record_heartbeat(text, integer, integer) to service_role;
 grant execute on function public.record_conversion(text) to service_role;
 grant execute on function public.record_sections(text, text, text, jsonb) to service_role;
+
+
+
+-- ===========================================================================
+-- Part 2. Accounts
+-- ===========================================================================
+--
+-- The contract is docs/accounts.md. Every table below has Row Level Security
+-- on. A signed in person reads only their own rows (and their organization's)
+-- through the site's session client; anon gets nothing at all. The server's
+-- secret key bypasses Row Level Security and is the only thing that writes.
+--
+-- Policies call (select auth.uid()) rather than auth.uid(), so Postgres runs
+-- it once per statement instead of once per row.
+--
+-- Tables come first, in the order their foreign keys need. Then the helpers
+-- the policies use, then the policies and grants, then Storage, then the
+-- functions, which are `language sql` or name the tables, so they come last.
+
+
+-- Plans
+
+-- What an account may spend. The site reads the limits through device_auth()
+-- on every metered call, so a plan change takes effect on the next request.
+create table if not exists public.plans (
+  id                   text        primary key,
+  name                 text        not null,
+  -- Integer micro dollars: 1 USD is 1,000,000. Money is never a float here.
+  monthly_limit_micros bigint      not null,
+  storage_limit_bytes  bigint      not null,
+  requests_per_minute  integer     not null,
+  created_at           timestamptz not null default now(),
+
+  constraint plans_limits_sane check (
+    monthly_limit_micros >= 0 and storage_limit_bytes >= 0 and requests_per_minute > 0)
+);
+
+-- The three plans of section 10. do nothing, so an operator's later edit of a
+-- plan's limits survives a second run of this file.
+insert into public.plans (id, name, monthly_limit_micros, storage_limit_bytes, requests_per_minute) values
+  ('free', 'Free',   5000000,  26214400,  60),
+  ('plus', 'Plus',  20000000, 104857600, 120),
+  ('team', 'Team', 100000000, 524288000, 300)
+on conflict (id) do nothing;
+
+
+-- Profiles
+
+-- One row per account, made by the trigger on auth.users below. auth.users
+-- belongs to Supabase Auth; everything Coere knows about a person hangs off
+-- this row instead, so deleting the auth user cascades through all of it.
+create table if not exists public.profiles (
+  id                uuid        primary key references auth.users (id) on delete cascade,
+  email             text,
+  -- Stored lowercase. Sign in by username turns it into the email on the
+  -- server, so it must be unique.
+  username          text        unique,
+  display_name      text,
+  plan_id           text        not null default 'free' references public.plans (id),
+  status            text        not null default 'active',
+  -- The memory backup is on by default (section 13); sensitive memories are
+  -- left out of it unless the person turns them on.
+  memory_sync       boolean     not null default true,
+  include_sensitive boolean     not null default false,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now(),
+  last_seen_at      timestamptz,
+
+  constraint profiles_status_known   check (status in ('active', 'suspended')),
+  constraint profiles_username_shape check (username is null or username ~ '^[a-z0-9_]{3,24}$'),
+  constraint profiles_display_sane   check (display_name is null or char_length(display_name) <= 80)
+);
+
+
+-- Organizations (section 14)
+
+-- Made here, before the tables that point at it. A company and its people
+-- reading from one shared knowledge graph. Only the Coere operator makes one,
+-- from the admin panel, through create_organization().
+--
+-- An access object says what a member may do:
+--   { "read": "all" | [section keys], "contribute": boolean }
+-- read picks the sections of the shared graph they see, contribute whether
+-- their memory goes into it. The checks below hold every stored one to that
+-- shape, so the site can read it without guarding against a stray value.
+create table if not exists public.organizations (
+  id              uuid        primary key default gen_random_uuid(),
+  name            text        not null,
+  slug            text        not null unique,
+  plan_id         text        not null default 'team' references public.plans (id),
+  -- The memory sections members share into the organization's graph.
+  shared_sections text[]      not null default '{work}',
+  -- What a member may do until an admin narrows it: everything.
+  default_access  jsonb       not null default '{"read": "all", "contribute": true}'::jsonb,
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now(),
+
+  constraint organizations_name_sane check (char_length(btrim(name)) between 1 and 80),
+  constraint organizations_slug_shape check (slug ~ '^[a-z0-9][a-z0-9-]{0,62}$'),
+  constraint organizations_access_shape check (coalesce(
+    jsonb_typeof(default_access) = 'object'
+    and (default_access -> 'read' = '"all"'::jsonb or jsonb_typeof(default_access -> 'read') = 'array')
+    and jsonb_typeof(default_access -> 'contribute') = 'boolean', false))
+);
+
+-- A person is in at most one organization: user_id is unique on its own, not
+-- only with org_id. That is what lets device_auth() and the totals functions
+-- find "the person's organization" with a plain lookup. There is no owner
+-- role: admins run the organization, and the operator stands above them.
+create table if not exists public.org_members (
+  org_id       uuid        not null references public.organizations (id) on delete cascade,
+  user_id      uuid        not null unique references public.profiles (id) on delete cascade,
+  role         text        not null,
+  -- Null means the organization's default_access. Admins always read everything.
+  access       jsonb,
+  share_memory boolean     not null default true,
+  added_by     text        not null default 'invite',
+  joined_at    timestamptz not null default now(),
+
+  primary key (org_id, user_id),
+  constraint org_members_role_known  check (role in ('admin', 'member')),
+  constraint org_members_added_known check (added_by in ('operator', 'invite')),
+  constraint org_members_access_shape check (access is null or coalesce(
+    jsonb_typeof(access) = 'object'
+    and (access -> 'read' = '"all"'::jsonb or jsonb_typeof(access -> 'read') = 'array')
+    and jsonb_typeof(access -> 'contribute') = 'boolean', false))
+);
+
+-- An invite goes to an existing account, never to a bare email, so there is
+-- no link to leak: the invited person sees it on their own dashboard and
+-- accepts or declines it there.
+create table if not exists public.org_invites (
+  id          uuid        primary key default gen_random_uuid(),
+  org_id      uuid        not null references public.organizations (id) on delete cascade,
+  user_id     uuid        not null references public.profiles (id) on delete cascade,
+  role        text        not null,
+  invited_by  uuid        references public.profiles (id) on delete set null,
+  created_at  timestamptz not null default now(),
+  expires_at  timestamptz not null default now() + interval '7 days',
+  accepted_at timestamptz,
+  declined_at timestamptz,
+  revoked_at  timestamptz,
+
+  constraint org_invites_role_known check (role in ('admin', 'member'))
+);
+
+create index if not exists org_invites_org_idx  on public.org_invites (org_id);
+-- The organization page lists the signed in person's pending invites.
+create index if not exists org_invites_user_idx on public.org_invites (user_id);
+
+-- The merged graph's place in Storage and its counts. The graph itself is
+-- org/<org id>/index.json in the memory bucket, built by the server.
+create table if not exists public.org_memory (
+  org_id       uuid        primary key references public.organizations (id) on delete cascade,
+  index_path   text,
+  index_bytes  bigint      not null default 0,
+  entities     integer     not null default 0,
+  facts        integer     not null default 0,
+  relations    integer     not null default 0,
+  sources      integer     not null default 0,
+  contributors integer     not null default 0,
+  updated_at   timestamptz not null default now()
+);
+
+
+-- Devices
+
+-- One row per connected browser. The token itself is never stored, only the
+-- hex SHA-256 of it, so a leaked table connects nobody.
+create table if not exists public.devices (
+  id                uuid        primary key default gen_random_uuid(),
+  user_id           uuid        not null references public.profiles (id) on delete cascade,
+  name              text        not null,
+  token_hash        text        not null unique,
+  -- The last 4 characters, so the person can tell their browsers apart.
+  token_hint        text        not null,
+  extension_id      text,
+  extension_version text,
+  created_at        timestamptz not null default now(),
+  last_used_at      timestamptz,
+  revoked_at        timestamptz,
+  revoked_reason    text,
+
+  constraint devices_revoked_known check (
+    revoked_reason is null or revoked_reason in ('signed_out', 'user', 'admin', 'account'))
+);
+
+create index if not exists devices_user_idx on public.devices (user_id);
+
+-- A connect code (section 4): lives 5 minutes, works once, and is bound to
+-- the PKCE challenge and the extension id that asked for it.
+create table if not exists public.device_codes (
+  code_hash    text        primary key,
+  user_id      uuid        not null references public.profiles (id) on delete cascade,
+  challenge    text        not null,
+  extension_id text        not null,
+  device_name  text,
+  created_at   timestamptz not null default now(),
+  expires_at   timestamptz not null,
+  used_at      timestamptz
+);
+
+
+-- Usage
+
+-- One row per metered call. user_id and device_id are set null when the
+-- account goes, so the cost history stays whole and names nobody.
+create table if not exists public.usage_events (
+  id                 bigint      generated always as identity primary key,
+  user_id            uuid        references public.profiles (id) on delete set null,
+  device_id          uuid        references public.devices (id) on delete set null,
+  kind               text        not null,
+  model              text,
+  input_tokens       integer     not null default 0,
+  output_tokens      integer     not null default 0,
+  cache_write_tokens integer     not null default 0,
+  cache_read_tokens  integer     not null default 0,
+  cost_micros        bigint      not null default 0,
+  status             smallint,
+  duration_ms        integer,
+  request_id         text,
+  created_at         timestamptz not null default now(),
+
+  constraint usage_events_kind_known check (kind in ('message', 'count_tokens', 'batch_result', 'jev'))
+);
+
+create index if not exists usage_events_user_idx    on public.usage_events (user_id, created_at desc);
+create index if not exists usage_events_created_idx on public.usage_events (created_at desc);
+
+-- This month's spend per account, kept by record_usage() so the limit check
+-- in device_auth() reads one row instead of adding up the month's events.
+create table if not exists public.usage_monthly (
+  user_id       uuid        not null references public.profiles (id) on delete cascade,
+  -- The first day of the month in UTC.
+  month         date        not null,
+  requests      bigint      not null default 0,
+  input_tokens  bigint      not null default 0,
+  output_tokens bigint      not null default 0,
+  cost_micros   bigint      not null default 0,
+  updated_at    timestamptz not null default now(),
+
+  primary key (user_id, month)
+);
+
+-- A batch id is stored as its caller's, so one account can never read or
+-- cancel another's batch. metered_at makes reading the results twice count once.
+create table if not exists public.ai_batches (
+  id            text        primary key,
+  user_id       uuid        not null references public.profiles (id) on delete cascade,
+  device_id     uuid        references public.devices (id) on delete set null,
+  request_count integer     not null default 0,
+  created_at    timestamptz not null default now(),
+  metered_at    timestamptz
+);
+
+create index if not exists ai_batches_user_idx on public.ai_batches (user_id, created_at desc);
+
+
+-- The memory copy
+
+-- The latest .coere file per account, with the counts read from its manifest.
+-- The file is <user id>/memory.coere in the memory bucket; the index the
+-- dashboard reads is <user id>/index.json.
+create table if not exists public.memory_files (
+  user_id            uuid        primary key references public.profiles (id) on delete cascade,
+  object_path        text        not null,
+  index_path         text,
+  bytes              bigint      not null default 0,
+  index_bytes        bigint      not null default 0,
+  digest             text        not null,
+  format_version     text,
+  generator_version  text,
+  memories           integer     not null default 0,
+  entities           integer     not null default 0,
+  links              integer     not null default 0,
+  chats              integer     not null default 0,
+  documents          integer     not null default 0,
+  sections           integer     not null default 0,
+  includes_quotes    boolean     not null default true,
+  includes_sensitive boolean     not null default false,
+  device_id          uuid        references public.devices (id) on delete set null,
+  uploaded_at        timestamptz not null default now()
+);
+
+
+-- Synced settings
+
+-- One JSON object per account, keyed by the extension's storage keys
+-- (section 6.6). version grows on every write so the extension can tell a
+-- newer record from its own.
+create table if not exists public.user_settings (
+  user_id    uuid        primary key references public.profiles (id) on delete cascade,
+  settings   jsonb       not null default '{}'::jsonb,
+  version    bigint      not null default 0,
+  updated_at timestamptz not null default now(),
+  updated_by text,
+
+  constraint user_settings_object  check (jsonb_typeof(settings) = 'object'),
+  constraint user_settings_size    check (octet_length(settings::text) <= 65536),
+  constraint user_settings_by_known check (updated_by is null or updated_by in ('site', 'extension'))
+);
+
+
+-- Logs
+
+-- Feature counts from the extension (section 6.7). Counts and token numbers
+-- only, never text. tokens_saved is kept per row as well as in the totals, so
+-- a person's imports and transfers can be listed later at no extra cost.
+create table if not exists public.app_events (
+  id           bigint      generated always as identity primary key,
+  user_id      uuid        references public.profiles (id) on delete set null,
+  device_id    uuid        references public.devices (id) on delete set null,
+  kind         text        not null,
+  count        integer     not null,
+  tokens_saved bigint      not null default 0,
+  created_at   timestamptz not null default now(),
+
+  constraint app_events_kind_known check (kind in (
+    'extract_chat', 'extract_all', 'transfer', 'context_import', 'memory_search', 'cori_chat',
+    'action_run', 'rewrite', 'voice', 'file_upload', 'memory_built', 'onboarding_done')),
+  constraint app_events_count_sane check (count between 1 and 100000),
+  constraint app_events_saved_sane check (tokens_saved between 0 and 100000000)
+);
+
+create index if not exists app_events_user_idx    on public.app_events (user_id, created_at desc);
+create index if not exists app_events_created_idx on public.app_events (created_at desc, kind);
+
+-- Who signed in, failed, connected or was refused. ip_hash is the first 16
+-- hex characters of HMAC-SHA256(address, SECURITY_SALT); the address itself
+-- is never stored.
+create table if not exists public.security_events (
+  id         bigint      generated always as identity primary key,
+  user_id    uuid        references public.profiles (id) on delete set null,
+  org_id     uuid        references public.organizations (id) on delete set null,
+  kind       text        not null,
+  ip_hash    text,
+  country    text,
+  created_at timestamptz not null default now(),
+
+  constraint security_events_kind_known check (kind in (
+    'sign_in', 'sign_in_failed', 'code_sent', 'sign_up', 'password_set', 'username_set',
+    'sign_out', 'device_connected', 'device_revoked', 'token_rejected', 'rate_limited',
+    'usage_limited', 'connect_refused', 'memory_deleted', 'account_deleted', 'org_created',
+    'org_deleted', 'org_invite_sent', 'org_joined', 'org_left', 'org_member_removed',
+    'admin_sign_in', 'admin_sign_in_failed', 'admin_viewed_memory'))
+);
+
+create index if not exists security_events_created_idx on public.security_events (created_at desc, kind);
+create index if not exists security_events_user_idx    on public.security_events (user_id, created_at desc);
+
+
+-- Running totals (section 15)
+--
+-- The Statistics page and the dashboards read these instead of adding up the
+-- raw logs. They are written only by the functions at the end of this file,
+-- in the same call as the event that changes them, so they never drift from
+-- the logs by a lost update. The three tables share one set of counters.
+--
+-- tokens_saved is what the person would have pasted by hand minus what Coere
+-- sent, summed over every context import and transfer.
+-- memories, entities, links, chats and storage_bytes are set (not added) from
+-- the latest memory file, by set_memory_totals().
+
+create table if not exists public.user_totals (
+  user_id            uuid        primary key references public.profiles (id) on delete cascade,
+  requests           bigint      not null default 0,
+  input_tokens       bigint      not null default 0,
+  output_tokens      bigint      not null default 0,
+  cache_read_tokens  bigint      not null default 0,
+  cache_write_tokens bigint      not null default 0,
+  cost_micros        bigint      not null default 0,
+  tokens_saved       bigint      not null default 0,
+  context_imports    bigint      not null default 0,
+  transfers          bigint      not null default 0,
+  extractions        bigint      not null default 0,
+  cori_chats         bigint      not null default 0,
+  action_runs        bigint      not null default 0,
+  memories           integer     not null default 0,
+  entities           integer     not null default 0,
+  links              integer     not null default 0,
+  chats              integer     not null default 0,
+  storage_bytes      bigint      not null default 0,
+  updated_at         timestamptz not null default now()
+);
+
+-- An organization's totals grow with each member's usage while they are a
+-- member, and keep those numbers after the member leaves. Its memory counts
+-- are the merged graph's.
+create table if not exists public.org_totals (
+  org_id             uuid        primary key references public.organizations (id) on delete cascade,
+  members            integer     not null default 0,
+  requests           bigint      not null default 0,
+  input_tokens       bigint      not null default 0,
+  output_tokens      bigint      not null default 0,
+  cache_read_tokens  bigint      not null default 0,
+  cache_write_tokens bigint      not null default 0,
+  cost_micros        bigint      not null default 0,
+  tokens_saved       bigint      not null default 0,
+  context_imports    bigint      not null default 0,
+  transfers          bigint      not null default 0,
+  extractions        bigint      not null default 0,
+  cori_chats         bigint      not null default 0,
+  action_runs        bigint      not null default 0,
+  memories           integer     not null default 0,
+  entities           integer     not null default 0,
+  links              integer     not null default 0,
+  chats              integer     not null default 0,
+  storage_bytes      bigint      not null default 0,
+  updated_at         timestamptz not null default now()
+);
+
+-- The whole product, one row per UTC day. No foreign keys, so a deleted
+-- account's numbers stay in the days they happened. The memory columns are
+-- unused today (memory is a level, not a flow) and kept so all three tables
+-- share one shape.
+create table if not exists public.daily_totals (
+  day                date        primary key,
+  new_users          integer     not null default 0,
+  new_orgs           integer     not null default 0,
+  requests           bigint      not null default 0,
+  input_tokens       bigint      not null default 0,
+  output_tokens      bigint      not null default 0,
+  cache_read_tokens  bigint      not null default 0,
+  cache_write_tokens bigint      not null default 0,
+  cost_micros        bigint      not null default 0,
+  tokens_saved       bigint      not null default 0,
+  context_imports    bigint      not null default 0,
+  transfers          bigint      not null default 0,
+  extractions        bigint      not null default 0,
+  cori_chats         bigint      not null default 0,
+  action_runs        bigint      not null default 0,
+  memories           integer     not null default 0,
+  entities           integer     not null default 0,
+  links              integer     not null default 0,
+  chats              integer     not null default 0,
+  storage_bytes      bigint      not null default 0,
+  updated_at         timestamptz not null default now()
+);
+
+
+-- The developer waitlist (section 16)
+
+-- Written by the /developers/waitlist form's server action. The email is
+-- unique and stored lowercase, so a repeat signup is a no-op, not a second row.
+create table if not exists public.developer_waitlist (
+  id         bigint      generated always as identity primary key,
+  email      text        not null unique,
+  source     text,
+  ip_hash    text,
+  created_at timestamptz not null default now(),
+
+  constraint developer_waitlist_email_lower check (email = lower(email)),
+  constraint developer_waitlist_email_sane  check (char_length(email) between 3 and 254),
+  constraint developer_waitlist_source_sane check (source is null or char_length(source) <= 64)
+);
+
+create index if not exists developer_waitlist_created_idx on public.developer_waitlist (created_at desc);
+
+
+-- Organization helpers for the policies
+--
+-- A policy on org_members that asked org_members "which organization is the
+-- caller in?" would run its own policy again and recurse. These two read
+-- org_members as their owner (security definer), outside Row Level Security,
+-- and return only the caller's own organization and role, so nothing leaks.
+
+create or replace function public.my_org_id()
+returns uuid
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select m.org_id from public.org_members m where m.user_id = (select auth.uid());
+$$;
+
+create or replace function public.my_org_role()
+returns text
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select m.role from public.org_members m where m.user_id = (select auth.uid());
+$$;
+
+revoke all on function public.my_org_id() from public, anon;
+revoke all on function public.my_org_role() from public, anon;
+grant execute on function public.my_org_id() to authenticated, service_role;
+grant execute on function public.my_org_role() to authenticated, service_role;
+
+
+-- A new account
+--
+-- Supabase Auth inserts into auth.users on every sign up, by code, link or
+-- password. This makes the profile and the totals row in the same
+-- transaction, so there is never an account without them, and counts the
+-- sign up in today's totals. The username comes from the sign up form
+-- (options.data.username). A username that is malformed or already taken is
+-- dropped rather than failing the sign up: the person can set one later.
+
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_username text := lower(btrim(coalesce(new.raw_user_meta_data ->> 'username', '')));
+begin
+  if v_username !~ '^[a-z0-9_]{3,24}$' then
+    v_username := null;
+  end if;
+
+  begin
+    insert into public.profiles (id, email, username)
+    values (new.id, lower(new.email), v_username)
+    on conflict (id) do nothing;
+  exception when unique_violation then
+    -- The username was taken between the form's check and now.
+    insert into public.profiles (id, email, username)
+    values (new.id, lower(new.email), null)
+    on conflict (id) do nothing;
+  end;
+
+  insert into public.user_totals (user_id) values (new.id) on conflict (user_id) do nothing;
+
+  insert into public.daily_totals (day, new_users)
+  values ((now() at time zone 'utc')::date, 1)
+  on conflict (day) do update
+    set new_users = public.daily_totals.new_users + 1, updated_at = now();
+
+  return new;
+end;
+$$;
+
+-- Keeps profiles.email in step when a person changes their address, since
+-- sign in by username reads the email from the profile.
+create or replace function public.handle_user_email()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.profiles set email = lower(new.email), updated_at = now() where id = new.id;
+  return new;
+end;
+$$;
+
+revoke all on function public.handle_new_user() from public, anon, authenticated;
+revoke all on function public.handle_user_email() from public, anon, authenticated;
+
+drop trigger if exists coere_on_auth_user_created on auth.users;
+create trigger coere_on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+drop trigger if exists coere_on_auth_user_email on auth.users;
+create trigger coere_on_auth_user_email
+  after update of email on auth.users
+  for each row when (old.email is distinct from new.email)
+  execute function public.handle_user_email();
+
+
+-- Row Level Security and grants
+--
+-- Supabase's default privileges grant every new public table to anon and
+-- authenticated. So each table first loses all of that, then gets back only
+-- what section 10 allows. Privileges decide which columns and verbs a role
+-- may use at all; the policies then decide which rows. Tables with no policy
+-- (device_codes, ai_batches, app_events, security_events, daily_totals,
+-- developer_waitlist) are server only: Row Level Security on with no policy
+-- denies every signed in request.
+
+alter table public.plans              enable row level security;
+alter table public.profiles           enable row level security;
+alter table public.organizations      enable row level security;
+alter table public.org_members        enable row level security;
+alter table public.org_invites        enable row level security;
+alter table public.org_memory         enable row level security;
+alter table public.devices            enable row level security;
+alter table public.device_codes       enable row level security;
+alter table public.usage_events       enable row level security;
+alter table public.usage_monthly      enable row level security;
+alter table public.ai_batches         enable row level security;
+alter table public.memory_files       enable row level security;
+alter table public.user_settings      enable row level security;
+alter table public.app_events         enable row level security;
+alter table public.security_events    enable row level security;
+alter table public.user_totals        enable row level security;
+alter table public.org_totals         enable row level security;
+alter table public.daily_totals       enable row level security;
+alter table public.developer_waitlist enable row level security;
+
+revoke all on
+  public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
+  public.org_memory, public.devices, public.device_codes, public.usage_events,
+  public.usage_monthly, public.ai_batches, public.memory_files, public.user_settings,
+  public.app_events, public.security_events, public.user_totals, public.org_totals,
+  public.daily_totals, public.developer_waitlist
+from anon, authenticated;
+
+-- Stated rather than inherited, as in part 1, so the server keeps working on
+-- a project where Supabase's default grants are off.
+grant select, insert, update, delete on
+  public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
+  public.org_memory, public.devices, public.device_codes, public.usage_events,
+  public.usage_monthly, public.ai_batches, public.memory_files, public.user_settings,
+  public.app_events, public.security_events, public.user_totals, public.org_totals,
+  public.daily_totals, public.developer_waitlist
+to service_role;
+
+-- What a signed in person may read. Rows are narrowed by the policies below.
+grant select on
+  public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
+  public.org_memory, public.usage_events, public.usage_monthly, public.memory_files,
+  public.user_settings, public.user_totals, public.org_totals
+to authenticated;
+
+-- devices: every column but token_hash. A column grant, not a policy,
+-- because policies pick rows and cannot hide a column. A select naming
+-- token_hash (or select *) is refused for a signed in person.
+grant select (id, user_id, name, token_hint, extension_id, extension_version,
+              created_at, last_used_at, revoked_at, revoked_reason)
+  on public.devices to authenticated;
+
+-- profiles: a person may change their display name and nothing else. Plan,
+-- status, username and the memory switches go through the server, which
+-- checks what each change is allowed to be.
+grant update (display_name) on public.profiles to authenticated;
+
+
+-- Policies. Each is dropped first so a second run replaces it.
+
+-- Plans are public facts about prices.
+drop policy if exists plans_read on public.plans;
+create policy plans_read on public.plans
+  for select to authenticated using (true);
+
+drop policy if exists profiles_read_own on public.profiles;
+create policy profiles_read_own on public.profiles
+  for select to authenticated using (id = (select auth.uid()));
+
+drop policy if exists profiles_update_own on public.profiles;
+create policy profiles_update_own on public.profiles
+  for update to authenticated
+  using (id = (select auth.uid()))
+  with check (id = (select auth.uid()));
+
+drop policy if exists devices_read_own on public.devices;
+create policy devices_read_own on public.devices
+  for select to authenticated using (user_id = (select auth.uid()));
+
+drop policy if exists usage_events_read_own on public.usage_events;
+create policy usage_events_read_own on public.usage_events
+  for select to authenticated using (user_id = (select auth.uid()));
+
+drop policy if exists usage_monthly_read_own on public.usage_monthly;
+create policy usage_monthly_read_own on public.usage_monthly
+  for select to authenticated using (user_id = (select auth.uid()));
+
+drop policy if exists memory_files_read_own on public.memory_files;
+create policy memory_files_read_own on public.memory_files
+  for select to authenticated using (user_id = (select auth.uid()));
+
+drop policy if exists user_settings_read_own on public.user_settings;
+create policy user_settings_read_own on public.user_settings
+  for select to authenticated using (user_id = (select auth.uid()));
+
+drop policy if exists user_totals_read_own on public.user_totals;
+create policy user_totals_read_own on public.user_totals
+  for select to authenticated using (user_id = (select auth.uid()));
+
+-- Organization rows: members only. my_org_id() is null for a person in no
+-- organization, and null equals nothing, so they see none.
+drop policy if exists organizations_read_member on public.organizations;
+create policy organizations_read_member on public.organizations
+  for select to authenticated using (id = (select public.my_org_id()));
+
+drop policy if exists org_members_read_member on public.org_members;
+create policy org_members_read_member on public.org_members
+  for select to authenticated using (org_id = (select public.my_org_id()));
+
+drop policy if exists org_memory_read_member on public.org_memory;
+create policy org_memory_read_member on public.org_memory
+  for select to authenticated using (org_id = (select public.my_org_id()));
+
+drop policy if exists org_totals_read_member on public.org_totals;
+create policy org_totals_read_member on public.org_totals
+  for select to authenticated using (org_id = (select public.my_org_id()));
+
+-- Invites: the organization's admins, and the invited person, who is not a
+-- member yet and reads only the invites made for their own account.
+drop policy if exists org_invites_read_admin on public.org_invites;
+create policy org_invites_read_admin on public.org_invites
+  for select to authenticated using (
+    org_id = (select public.my_org_id()) and (select public.my_org_role()) = 'admin');
+
+drop policy if exists org_invites_read_own on public.org_invites;
+create policy org_invites_read_own on public.org_invites
+  for select to authenticated using (user_id = (select auth.uid()));
+
+
+-- Storage
+--
+-- One private bucket. Each person's files sit under a folder named by their
+-- user id; the organizations' merged graphs sit under org/. Uploads come only
+-- through signed upload URLs the server makes, so no policy allows insert or
+-- update. A signed in person may read and delete their own folder and
+-- nothing else: org/ never matches a user id, so the shared graphs are read
+-- through the server, which checks membership first.
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('memory', 'memory', false, 67108864,
+        array['application/vnd.coere.memory+zip', 'application/json'])
+on conflict (id) do update
+  set public             = false,
+      file_size_limit    = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists coere_memory_read_own on storage.objects;
+create policy coere_memory_read_own on storage.objects
+  for select to authenticated using (
+    bucket_id = 'memory' and (storage.foldername(name))[1] = (select auth.uid())::text);
+
+drop policy if exists coere_memory_delete_own on storage.objects;
+create policy coere_memory_delete_own on storage.objects
+  for delete to authenticated using (
+    bucket_id = 'memory' and (storage.foldername(name))[1] = (select auth.uid())::text);
+
+
+-- Server functions (Appendix A)
+--
+-- Each turns a read then write into one database call, so concurrent
+-- requests cannot lose an update, and so a counter and the event behind it
+-- are written together or not at all. All are security invoker: the only
+-- caller is the server's secret key (service_role), which bypasses Row Level
+-- Security. They are revoked from everyone else at the end.
+--
+-- Months and days are UTC, so a total means the same thing wherever the
+-- server runs.
+
+-- Checks a device token and returns everything a metered call needs: the
+-- account, its plan's limits, this month's spend and the organization.
+-- No row means unknown or revoked, and the route answers signed_out.
+-- last_used_at and last_seen_at are touched at most every 5 minutes, so a
+-- busy extension does not write a row on every request.
+create or replace function public.device_auth(p_token_hash text)
+returns table (
+  device_id uuid, user_id uuid, status text, plan_id text,
+  monthly_limit_micros bigint, storage_limit_bytes bigint, requests_per_minute integer,
+  month_cost_micros bigint, memory_sync boolean, include_sensitive boolean, org_id uuid)
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+#variable_conflict use_column
+declare
+  v_device public.devices%rowtype;
+begin
+  select d.* into v_device
+    from public.devices d
+   where d.token_hash = p_token_hash and d.revoked_at is null;
+  if not found then
+    return;
+  end if;
+
+  if v_device.last_used_at is null or v_device.last_used_at < now() - interval '5 minutes' then
+    update public.devices d set last_used_at = now() where d.id = v_device.id;
+    update public.profiles p set last_seen_at = now() where p.id = v_device.user_id;
+  end if;
+
+  return query
+    select v_device.id, p.id, p.status, p.plan_id,
+           pl.monthly_limit_micros, pl.storage_limit_bytes, pl.requests_per_minute,
+           coalesce(um.cost_micros, 0)::bigint, p.memory_sync, p.include_sensitive, m.org_id
+      from public.profiles p
+      join public.plans pl on pl.id = p.plan_id
+      left join public.usage_monthly um
+        on um.user_id = p.id and um.month = date_trunc('month', now() at time zone 'utc')::date
+      left join public.org_members m on m.user_id = p.id
+     where p.id = v_device.user_id;
+end;
+$$;
+
+-- Logs one metered call and adds it to this month's spend, the person's
+-- totals, their organization's totals and today's totals. A call with no
+-- user (it should not happen) still counts in the day, so cost is never lost.
+create or replace function public.record_usage(
+  p_user uuid, p_device uuid, p_kind text, p_model text,
+  p_input integer, p_output integer, p_cache_write integer, p_cache_read integer,
+  p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text
+) returns void
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_month  date   := date_trunc('month', now() at time zone 'utc')::date;
+  v_day    date   := (now() at time zone 'utc')::date;
+  v_in     bigint := greatest(coalesce(p_input, 0), 0);
+  v_out    bigint := greatest(coalesce(p_output, 0), 0);
+  v_cw     bigint := greatest(coalesce(p_cache_write, 0), 0);
+  v_cr     bigint := greatest(coalesce(p_cache_read, 0), 0);
+  v_cost   bigint := greatest(coalesce(p_cost_micros, 0), 0);
+  v_org    uuid;
+begin
+  insert into public.usage_events
+    (user_id, device_id, kind, model, input_tokens, output_tokens, cache_write_tokens,
+     cache_read_tokens, cost_micros, status, duration_ms, request_id)
+  values
+    (p_user, p_device, p_kind, p_model, v_in, v_out, v_cw, v_cr, v_cost,
+     p_status::smallint, p_duration_ms, p_request_id);
+
+  if p_user is not null then
+    insert into public.usage_monthly as t (user_id, month, requests, input_tokens, output_tokens, cost_micros)
+    values (p_user, v_month, 1, v_in, v_out, v_cost)
+    on conflict (user_id, month) do update
+      set requests      = t.requests + 1,
+          input_tokens  = t.input_tokens + excluded.input_tokens,
+          output_tokens = t.output_tokens + excluded.output_tokens,
+          cost_micros   = t.cost_micros + excluded.cost_micros,
+          updated_at    = now();
+
+    insert into public.user_totals as t
+      (user_id, requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros)
+    values (p_user, 1, v_in, v_out, v_cw, v_cr, v_cost)
+    on conflict (user_id) do update
+      set requests           = t.requests + 1,
+          input_tokens       = t.input_tokens + excluded.input_tokens,
+          output_tokens      = t.output_tokens + excluded.output_tokens,
+          cache_write_tokens = t.cache_write_tokens + excluded.cache_write_tokens,
+          cache_read_tokens  = t.cache_read_tokens + excluded.cache_read_tokens,
+          cost_micros        = t.cost_micros + excluded.cost_micros,
+          updated_at         = now();
+
+    select m.org_id into v_org from public.org_members m where m.user_id = p_user;
+    if v_org is not null then
+      insert into public.org_totals as t
+        (org_id, requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros)
+      values (v_org, 1, v_in, v_out, v_cw, v_cr, v_cost)
+      on conflict (org_id) do update
+        set requests           = t.requests + 1,
+            input_tokens       = t.input_tokens + excluded.input_tokens,
+            output_tokens      = t.output_tokens + excluded.output_tokens,
+            cache_write_tokens = t.cache_write_tokens + excluded.cache_write_tokens,
+            cache_read_tokens  = t.cache_read_tokens + excluded.cache_read_tokens,
+            cost_micros        = t.cost_micros + excluded.cost_micros,
+            updated_at         = now();
+    end if;
+  end if;
+
+  insert into public.daily_totals as t
+    (day, requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros)
+  values (v_day, 1, v_in, v_out, v_cw, v_cr, v_cost)
+  on conflict (day) do update
+    set requests           = t.requests + 1,
+        input_tokens       = t.input_tokens + excluded.input_tokens,
+        output_tokens      = t.output_tokens + excluded.output_tokens,
+        cache_write_tokens = t.cache_write_tokens + excluded.cache_write_tokens,
+        cache_read_tokens  = t.cache_read_tokens + excluded.cache_read_tokens,
+        cost_micros        = t.cost_micros + excluded.cost_micros,
+        updated_at         = now();
+end;
+$$;
+
+-- Stores one batch of feature counts from the extension and adds it to the
+-- person's, their organization's and today's totals. tokensSaved counts only
+-- on context_import and transfer; the route already refuses it elsewhere,
+-- and this ignores it elsewhere too, so a direct caller cannot inflate it.
+create or replace function public.record_app_events(p_user uuid, p_device uuid, p_events jsonb)
+returns void
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_day         date := (now() at time zone 'utc')::date;
+  v_org         uuid;
+  v_imports     bigint;
+  v_transfers   bigint;
+  v_extractions bigint;
+  v_cori        bigint;
+  v_actions     bigint;
+  v_saved       bigint;
+begin
+  if p_events is null or jsonb_typeof(p_events) <> 'array' or jsonb_array_length(p_events) = 0 then
+    return;
+  end if;
+
+  -- One statement: the CTE stores the rows and the select adds them up, so
+  -- the batch is parsed once.
+  with batch as (
+    select e.kind, e.count,
+           case when e.kind in ('context_import', 'transfer')
+                then greatest(coalesce(e."tokensSaved", 0), 0) else 0 end as saved
+      from jsonb_to_recordset(p_events) as e(kind text, count integer, "tokensSaved" bigint)
+  ), stored as (
+    insert into public.app_events (user_id, device_id, kind, count, tokens_saved)
+    select p_user, p_device, b.kind, b.count, b.saved from batch b
+  )
+  select coalesce(sum(b.count) filter (where b.kind = 'context_import'), 0),
+         coalesce(sum(b.count) filter (where b.kind = 'transfer'), 0),
+         coalesce(sum(b.count) filter (where b.kind in ('extract_chat', 'extract_all')), 0),
+         coalesce(sum(b.count) filter (where b.kind = 'cori_chat'), 0),
+         coalesce(sum(b.count) filter (where b.kind in ('action_run', 'rewrite', 'voice')), 0),
+         coalesce(sum(b.saved), 0)
+    into v_imports, v_transfers, v_extractions, v_cori, v_actions, v_saved
+    from batch b;
+
+  if p_user is not null then
+    insert into public.user_totals as t
+      (user_id, context_imports, transfers, extractions, cori_chats, action_runs, tokens_saved)
+    values (p_user, v_imports, v_transfers, v_extractions, v_cori, v_actions, v_saved)
+    on conflict (user_id) do update
+      set context_imports = t.context_imports + excluded.context_imports,
+          transfers       = t.transfers + excluded.transfers,
+          extractions     = t.extractions + excluded.extractions,
+          cori_chats      = t.cori_chats + excluded.cori_chats,
+          action_runs     = t.action_runs + excluded.action_runs,
+          tokens_saved    = t.tokens_saved + excluded.tokens_saved,
+          updated_at      = now();
+
+    select m.org_id into v_org from public.org_members m where m.user_id = p_user;
+    if v_org is not null then
+      insert into public.org_totals as t
+        (org_id, context_imports, transfers, extractions, cori_chats, action_runs, tokens_saved)
+      values (v_org, v_imports, v_transfers, v_extractions, v_cori, v_actions, v_saved)
+      on conflict (org_id) do update
+        set context_imports = t.context_imports + excluded.context_imports,
+            transfers       = t.transfers + excluded.transfers,
+            extractions     = t.extractions + excluded.extractions,
+            cori_chats      = t.cori_chats + excluded.cori_chats,
+            action_runs     = t.action_runs + excluded.action_runs,
+            tokens_saved    = t.tokens_saved + excluded.tokens_saved,
+            updated_at      = now();
+    end if;
+  end if;
+
+  insert into public.daily_totals as t
+    (day, context_imports, transfers, extractions, cori_chats, action_runs, tokens_saved)
+  values (v_day, v_imports, v_transfers, v_extractions, v_cori, v_actions, v_saved)
+  on conflict (day) do update
+    set context_imports = t.context_imports + excluded.context_imports,
+        transfers       = t.transfers + excluded.transfers,
+        extractions     = t.extractions + excluded.extractions,
+        cori_chats      = t.cori_chats + excluded.cori_chats,
+        action_runs     = t.action_runs + excluded.action_runs,
+        tokens_saved    = t.tokens_saved + excluded.tokens_saved,
+        updated_at      = now();
+end;
+$$;
+
+-- Sets an organization's member count and memory columns from its rows.
+-- Memory counts are the merged graph's (org_memory): facts are its memories,
+-- relations its links, sources its chats. storage_bytes is the merged
+-- index's size. The server calls it after merging the graph, and after a
+-- member joins, leaves or is removed.
+create or replace function public.set_org_memory_totals(p_org uuid)
+returns void
+language sql
+security invoker
+set search_path = ''
+as $$
+  insert into public.org_totals as t (org_id, members, memories, entities, links, chats, storage_bytes)
+  select o.id,
+         (select count(*)::integer from public.org_members m where m.org_id = o.id),
+         coalesce(om.facts, 0), coalesce(om.entities, 0), coalesce(om.relations, 0),
+         coalesce(om.sources, 0), coalesce(om.index_bytes, 0)
+    from public.organizations o
+    left join public.org_memory om on om.org_id = o.id
+   where o.id = p_org
+  on conflict (org_id) do update
+    set members       = excluded.members,
+        memories      = excluded.memories,
+        entities      = excluded.entities,
+        links         = excluded.links,
+        chats         = excluded.chats,
+        storage_bytes = excluded.storage_bytes,
+        updated_at    = now();
+$$;
+
+-- Sets a person's memory columns from their latest memory file (zero when
+-- they have none), then their organization's. Called after a commit and
+-- after the file is deleted. A person with no profile (a deleted account)
+-- is skipped.
+create or replace function public.set_memory_totals(p_user uuid)
+returns void
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_org uuid;
+begin
+  insert into public.user_totals as t (user_id, memories, entities, links, chats, storage_bytes)
+  select p.id, coalesce(f.memories, 0), coalesce(f.entities, 0), coalesce(f.links, 0),
+         coalesce(f.chats, 0), coalesce(f.bytes, 0)
+    from public.profiles p
+    left join public.memory_files f on f.user_id = p.id
+   where p.id = p_user
+  on conflict (user_id) do update
+    set memories      = excluded.memories,
+        entities      = excluded.entities,
+        links         = excluded.links,
+        chats         = excluded.chats,
+        storage_bytes = excluded.storage_bytes,
+        updated_at    = now();
+
+  select m.org_id into v_org from public.org_members m where m.user_id = p_user;
+  if v_org is not null then
+    perform public.set_org_memory_totals(v_org);
+  end if;
+end;
+$$;
+
+-- The operator's call from the admin panel: makes an organization, its
+-- graph and totals rows, and its first admin, all or nothing, and counts it
+-- in today's totals. p_plan null means 'team'. An admin already in an
+-- organization is refused with the message 'already_in_org'. A slug in use
+-- fails with unique_violation (23505) on organizations_slug_key, so the
+-- caller can try another. The unique user_id on org_members also stops two
+-- creates racing for the same person.
+create or replace function public.create_organization(p_name text, p_slug text, p_admin uuid, p_plan text)
+returns uuid
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_org uuid;
+begin
+  if exists (select 1 from public.org_members m where m.user_id = p_admin) then
+    raise exception 'already_in_org' using errcode = 'P0001';
+  end if;
+
+  insert into public.organizations (name, slug, plan_id)
+  values (btrim(p_name), lower(btrim(p_slug)), coalesce(p_plan, 'team'))
+  returning id into v_org;
+
+  insert into public.org_members (org_id, user_id, role, added_by)
+  values (v_org, p_admin, 'admin', 'operator');
+  insert into public.org_memory (org_id) values (v_org) on conflict (org_id) do nothing;
+  insert into public.org_totals (org_id, members) values (v_org, 1)
+  on conflict (org_id) do update set members = 1, updated_at = now();
+
+  insert into public.daily_totals as t (day, new_orgs)
+  values ((now() at time zone 'utc')::date, 1)
+  on conflict (day) do update set new_orgs = t.new_orgs + 1, updated_at = now();
+
+  return v_org;
+end;
+$$;
+
+-- Accepts an invite for the signed in person and returns the organization's
+-- id. The invite row is locked first, so two presses cannot both join.
+-- Refusals, by message:
+--   invite_not_found  no such invite, made for another account, or already
+--                     accepted, declined or revoked (someone else's invite
+--                     looks absent, so ids cannot be probed)
+--   invite_expired    past its 7 days
+--   already_in_org    the person is already in an organization
+create or replace function public.accept_org_invite(p_user uuid, p_invite uuid)
+returns uuid
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_invite public.org_invites%rowtype;
+begin
+  select i.* into v_invite
+    from public.org_invites i
+   where i.id = p_invite
+     for update;
+
+  if not found or v_invite.user_id <> p_user or v_invite.accepted_at is not null
+     or v_invite.declined_at is not null or v_invite.revoked_at is not null then
+    raise exception 'invite_not_found' using errcode = 'P0001';
+  end if;
+  if v_invite.expires_at <= now() then
+    raise exception 'invite_expired' using errcode = 'P0001';
+  end if;
+  if exists (select 1 from public.org_members m where m.user_id = p_user) then
+    raise exception 'already_in_org' using errcode = 'P0001';
+  end if;
+
+  insert into public.org_members (org_id, user_id, role, added_by)
+  values (v_invite.org_id, p_user, v_invite.role, 'invite');
+
+  update public.org_invites i set accepted_at = now() where i.id = v_invite.id;
+
+  perform public.set_org_memory_totals(v_invite.org_id);
+
+  return v_invite.org_id;
+end;
+$$;
+
+-- Each table in public and storage, for /admin/database. row_estimate is the
+-- planner's count, so it costs nothing on a big table; a table never
+-- analyzed reads 0 rather than Postgres's -1.
+create or replace function public.admin_table_stats()
+returns table (schema_name text, table_name text, row_estimate bigint, total_bytes bigint,
+               rls_enabled boolean, policy_count integer)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select n.nspname::text,
+         c.relname::text,
+         greatest(c.reltuples, 0)::bigint,
+         pg_catalog.pg_total_relation_size(c.oid)::bigint,
+         c.relrowsecurity,
+         (select count(*)::integer from pg_catalog.pg_policy p where p.polrelid = c.oid)
+    from pg_catalog.pg_class c
+    join pg_catalog.pg_namespace n on n.oid = c.relnamespace
+   where n.nspname in ('public', 'storage') and c.relkind in ('r', 'p')
+   order by 1, 2;
+$$;
+
+-- Storage use for /admin/database and /admin/cost: one row per bucket with
+-- folder null, then one row per first folder in memory (a user id, or org
+-- for every organization's graphs together).
+create or replace function public.admin_storage_usage()
+returns table (bucket_id text, folder text, objects bigint, bytes bigint)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select b.id::text, null::text, count(o.id)::bigint,
+         coalesce(sum((o.metadata ->> 'size')::bigint), 0)::bigint
+    from storage.buckets b
+    left join storage.objects o on o.bucket_id = b.id
+   group by b.id
+  union all
+  select o.bucket_id::text, (storage.foldername(o.name))[1], count(*)::bigint,
+         coalesce(sum((o.metadata ->> 'size')::bigint), 0)::bigint
+    from storage.objects o
+   where o.bucket_id = 'memory'
+   group by o.bucket_id, (storage.foldername(o.name))[1]
+   order by 1, 2 nulls first;
+$$;
+
+-- PostgREST grants EXECUTE on public functions to anon and authenticated by
+-- default. These change totals and read across accounts, so only the server
+-- may call them.
+revoke all on function public.device_auth(text) from public, anon, authenticated;
+revoke all on function public.record_usage(uuid, uuid, text, text, integer, integer, integer, integer, bigint, integer, integer, text) from public, anon, authenticated;
+revoke all on function public.record_app_events(uuid, uuid, jsonb) from public, anon, authenticated;
+revoke all on function public.set_memory_totals(uuid) from public, anon, authenticated;
+revoke all on function public.set_org_memory_totals(uuid) from public, anon, authenticated;
+revoke all on function public.create_organization(text, text, uuid, text) from public, anon, authenticated;
+revoke all on function public.accept_org_invite(uuid, uuid) from public, anon, authenticated;
+revoke all on function public.admin_table_stats() from public, anon, authenticated;
+revoke all on function public.admin_storage_usage() from public, anon, authenticated;
+grant execute on function public.device_auth(text) to service_role;
+grant execute on function public.record_usage(uuid, uuid, text, text, integer, integer, integer, integer, bigint, integer, integer, text) to service_role;
+grant execute on function public.record_app_events(uuid, uuid, jsonb) to service_role;
+grant execute on function public.set_memory_totals(uuid) to service_role;
+grant execute on function public.set_org_memory_totals(uuid) to service_role;
+grant execute on function public.create_organization(text, text, uuid, text) to service_role;
+grant execute on function public.accept_org_invite(uuid, uuid) to service_role;
+grant execute on function public.admin_table_stats() to service_role;
+grant execute on function public.admin_storage_usage() to service_role;

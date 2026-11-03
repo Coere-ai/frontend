@@ -121,16 +121,23 @@ USER=owner PASSWORD='a long password' npm run dev
 
 ### The database
 
-Paste `supabase/migrations/20261103000000_coere_site_analytics.sql` into the
-Supabase SQL editor and run it. It creates three tables (`site_visits`,
-`site_events`, `site_section_views`) and three write functions, and it is
-safe to run again. `supabase/schema.sql` holds the same statements, to read
-in one place.
+Paste `supabase/migrations/20261103000000_coere.sql` into the Supabase SQL
+editor on a blank project and run it. It is the whole database in one file
+and safe to run again. Part 1 is the site analytics: three tables
+(`site_visits`, `site_events`, `site_section_views`) and three write
+functions. Part 2 is the accounts of `docs/accounts.md`: plans, profiles,
+devices, usage, the memory copy, synced settings, organizations, the running
+totals, the developer waitlist, the private Storage bucket `memory`, and the
+functions the server calls. `supabase/schema.sql` holds the same statements,
+to read in one place.
 
-The browser never talks to Supabase. Every table has Row Level Security on
-with no policies and no grants to `anon` or `authenticated`, and the
-functions are revoked from them too. Only the server connects, with the
-secret key, through `src/lib/supabase.ts`, which is `server-only`.
+The analytics tables have Row Level Security on with no policies and no
+grants to `anon` or `authenticated`. The account tables have Row Level
+Security on too, with policies that let a signed in person read only their
+own rows and their organization's. `anon` gets nothing, and every function
+the server calls is revoked from everyone but `service_role`. Only the
+server writes, with the secret key, through `src/lib/supabase.ts`, which is
+`server-only`.
 
 ### What is recorded
 
