@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState, type FocusEvent } from "react";
-import { contactHref, contactLabel, navTabs } from "@/site/content/navigation";
+import { navTabs } from "@/site/content/navigation";
 import { Brand } from "@/site/ui/brand";
-import { ButtonLink } from "@/site/ui/button";
+import { CircleArrowLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 import { CloseIcon, MenuIcon } from "@/site/ui/icons/interface-icons";
 import { AccountLink } from "./account-link";
@@ -15,7 +15,7 @@ import { useMenu } from "./use-menu";
 
 /**
  * The white navbar: the brand on the left, the tabs centered on the page, and
- * Sign in and the contact button on the right. Three equal grid tracks keep
+ * Sign in and the Install button on the right. Three equal grid tracks keep
  * the tabs truly centered whatever the brand and button widths are.
  */
 export function Navbar() {
@@ -63,7 +63,7 @@ export function Navbar() {
               <AccountLink variant="ghost" />
             </span>
             <span className="hidden lg:block">
-              <ButtonLink href={contactHref}>{contactLabel}</ButtonLink>
+              <CircleArrowLink href="/install">Install</CircleArrowLink>
             </span>
             <button
               type="button"

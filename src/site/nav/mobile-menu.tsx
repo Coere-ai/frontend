@@ -4,10 +4,10 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { industries } from "@/site/content/industries";
-import { contactHref, contactLabel, navTabs, type NavTabId } from "@/site/content/navigation";
+import { navTabs, type NavTabId } from "@/site/content/navigation";
 import { posts } from "@/site/content/posts";
 import { products } from "@/site/content/products";
-import { buttonClass } from "@/site/ui/button";
+import { CircleArrowLink } from "@/site/ui/button";
 import { ChevronDownIcon } from "@/site/ui/icons/interface-icons";
 import { AccountLink } from "./account-link";
 
@@ -83,10 +83,10 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
                 ) : null}
               </div>
             ))}
-            {/* A page on this site now, so the menu closes as it opens, like the tabs above. */}
-            <Link href={contactHref} onClick={onClose} className={buttonClass("primary", "mt-8 w-full")}>
-              {contactLabel}
-            </Link>
+            {/* The same Install as the navbar's; the menu closes as it opens, like the tabs above. */}
+            <CircleArrowLink href="/install" onClick={onClose} wide className="mt-8">
+              Install
+            </CircleArrowLink>
             <AccountLink variant="secondary" className="mt-3 w-full" onNavigate={onClose} />
           </nav>
         </motion.div>
