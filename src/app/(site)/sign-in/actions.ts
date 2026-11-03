@@ -23,7 +23,15 @@ export async function signInStep(prev: SignInState, form: FormData): Promise<Sig
   if (intent === "use-code" || intent === "restart") return { ...state, step: "email", email: "" };
   if (!accountsConfigured()) {
     console.error("[accounts] SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be set for sign in");
-    return { ...state, error: "Signing in is not available right now. Try again later." };
+    // Give back what was typed, since the form resets after every action.
+    const email = form.get("email");
+    const login = form.get("login");
+    return {
+      ...state,
+      email: typeof email === "string" ? email : state.email,
+      login: typeof login === "string" ? login : state.login,
+      error: "Signing in is not available right now. Try again later.",
+    };
   }
 
   const head = await headers();
