@@ -1,19 +1,48 @@
 "use client";
 
-import { useActionState } from "react";
+import { createContext, useActionState, useContext, type ReactNode } from "react";
 
-import { signInState } from "@/lib/auth/sign-in-state";
+import { signInState, type SignInState, type SignInStep } from "@/lib/auth/sign-in-state";
 import { authCardClass, FormStatus } from "@/site/account/auth-shell";
 
 import { signInStep } from "./actions";
 import { CodeStep, EmailStep, PasswordStep } from "./sign-in-fields";
 
 /**
- * The sign in card. The server action decides which step shows, so the form
- * holds no state of its own beyond what the action returned.
+ * The sign in card and the line under the page title. The server action
+ * decides which step shows, so the form holds no state of its own beyond
+ * what the action returned. The line sits above the card in the page's
+ * frame, so the state lives in a provider both of them read.
  */
-export function SignInForm({ next, error }: { next: string; error: string | null }) {
+
+type Flow = { state: SignInState; action: (form: FormData) => void; pending: boolean };
+
+const FlowContext = createContext<Flow | null>(null);
+
+function useFlow(): Flow {
+  const flow = useContext(FlowContext);
+  if (!flow) throw new Error("SignInFlow is missing");
+  return flow;
+}
+
+export function SignInFlow({ next, error, children }: { next: string; error: string | null; children: ReactNode }) {
   const [state, action, pending] = useActionState(signInStep, signInState(next, error));
+  return <FlowContext value={{ state, action, pending }}>{children}</FlowContext>;
+}
+
+/** What each step asks of the person, in one line. */
+const LEDES: Record<SignInStep, string> = {
+  email: "We'll email you a code. No password needed.",
+  code: "One more step and you are in.",
+  password: "Use your email or username and the password you set.",
+};
+
+export function SignInLede() {
+  return <>{LEDES[useFlow().state.step]}</>;
+}
+
+export function SignInForm() {
+  const { state, action, pending } = useFlow();
   // A field's own error shows under the field; the status line takes the rest.
   const formError = state.field ? null : state.error;
   return (
