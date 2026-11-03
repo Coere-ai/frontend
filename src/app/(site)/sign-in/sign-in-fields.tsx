@@ -71,7 +71,7 @@ export function PasswordStep({ state, pending }: StepProps) {
   return (
     <>
       <FormField id="login" label="Email or username" error={loginError}>
-        <input id="login" name="login" autoComplete="username" autoCapitalize="none" spellCheck={false} required aria-invalid={Boolean(loginError)} aria-describedby={loginError ? "login-error" : undefined} className={`${inputClass(Boolean(loginError))} h-12`} />
+        <input id="login" name="login" autoComplete="username" defaultValue={state.login} autoCapitalize="none" spellCheck={false} required aria-invalid={Boolean(loginError)} aria-describedby={loginError ? "login-error" : undefined} className={`${inputClass(Boolean(loginError))} h-12`} />
       </FormField>
       <FormField id="password" label="Password" error={passwordError}>
         <input id="password" name="password" type="password" autoComplete="current-password" required aria-invalid={Boolean(passwordError)} aria-describedby={passwordError ? "password-error" : undefined} className={`${inputClass(Boolean(passwordError))} h-12`} />

@@ -22,8 +22,9 @@ const WRONG_LOGIN = "That email, username or password is wrong.";
 
 export async function sendCode(prev: SignInState, rawEmail: unknown, headers: Headers): Promise<SignInState> {
   const email = normalizeEmail(rawEmail);
-  if (!email) return { ...prev, step: "email", error: "Enter your email address.", field: "email", notice: null };
-  if (await overLimit(headers, email)) return { ...prev, error: TOO_MANY, field: null, notice: null };
+  const typed = typeof rawEmail === "string" ? rawEmail : "";
+  if (!email) return { ...prev, step: "email", email: typed, error: "Enter your email address.", field: "email", notice: null };
+  if (await overLimit(headers, email)) return { ...prev, email: typed, error: TOO_MANY, field: null, notice: null };
 
   const client = await sessionClient();
   const { error } = await client.auth.signInWithOtp({
@@ -35,6 +36,7 @@ export async function sendCode(prev: SignInState, rawEmail: unknown, headers: He
     console.error("sign in code not sent", error.code ?? error.status);
     return {
       ...prev,
+      email: typed,
       error: busy ? "We just sent you an email. Wait a minute before asking for another." : "We could not send the email. Try again in a minute.",
       field: null,
       notice: null,
@@ -66,7 +68,8 @@ export async function verifyCode(prev: SignInState, rawEmail: unknown, rawCode: 
 
 export async function passwordSignIn(prev: SignInState, rawLogin: unknown, rawPassword: unknown, headers: Headers): Promise<SignInState | null> {
   const startedAt = Date.now();
-  const failed = { ...prev, step: "password" as const, error: WRONG_LOGIN, field: null, notice: null };
+  const typed = typeof rawLogin === "string" ? rawLogin : "";
+  const failed = { ...prev, step: "password" as const, login: typed, error: WRONG_LOGIN, field: null, notice: null };
   const login = parseLogin(rawLogin);
   const password = typeof rawPassword === "string" ? rawPassword : "";
   if (!login || !password) {

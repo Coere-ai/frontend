@@ -9,8 +9,10 @@ export type SignInField = "email" | "code" | "login" | "password";
 
 export interface SignInState {
   step: SignInStep;
-  /** The address the code went to, kept for Verify and Resend. */
+  /** The address the code went to, kept for Verify and Resend, or what was typed when it was refused. */
   email: string;
+  /** What was typed in the password way's first field, given back when the form resets. */
+  login: string;
   /** Where to go after signing in, already checked by safeNext. */
   next: string;
   error: string | null;
@@ -20,5 +22,5 @@ export interface SignInState {
 }
 
 export function signInState(next: string, error: string | null = null): SignInState {
-  return { step: "email", email: "", next, error, field: null, notice: null };
+  return { step: "email", email: "", login: "", next, error, field: null, notice: null };
 }
