@@ -4,10 +4,11 @@ import { useActionState } from "react";
 
 import { PASSWORD_MIN } from "@/lib/auth/identity";
 import { signUpState, type SignUpField } from "@/lib/auth/sign-up-state";
-import { FormStatus, textButtonClass } from "@/site/account/auth-shell";
+import { IconInput } from "@/site/account/auth-fields";
+import { authCardClass, FormStatus, textButtonClass } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
-import { FormField, inputClass } from "@/site/ui/form-field";
-import { CheckIcon } from "@/site/ui/icons/interface-icons";
+import { FormField } from "@/site/ui/form-field";
+import { LockIcon, MailIcon, UserIcon } from "@/site/ui/icons/interface-icons";
 import { Underlined } from "@/site/ui/underlined";
 
 import { signUp } from "./actions";
@@ -18,10 +19,10 @@ export function SignUpForm({ next }: { next: string }) {
 
   if (state.sent) {
     return (
-      <form action={action} role="status" className="rounded-3xl bg-neutral-50 p-10 text-center">
+      <form action={action} role="status" className={`${authCardClass} text-center`}>
         <input type="hidden" name="next" value={state.next} />
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-neutral-950 text-white">
-          <CheckIcon size={22} />
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
+          <MailIcon size={22} />
         </span>
         <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">Check your email</p>
         <p className="mt-2 text-[15px] leading-relaxed text-neutral-500">
@@ -39,20 +40,20 @@ export function SignUpForm({ next }: { next: string }) {
     name: id,
     "aria-invalid": Boolean(state.errors[id]),
     "aria-describedby": state.errors[id] ? `${id}-error` : undefined,
-    className: `${inputClass(Boolean(state.errors[id]))} h-12`,
+    invalid: Boolean(state.errors[id]),
   });
 
   return (
-    <form action={action} noValidate className="space-y-6 rounded-3xl border border-neutral-200 p-7 md:p-9">
+    <form action={action} noValidate className={`space-y-6 ${authCardClass}`}>
       <input type="hidden" name="next" value={state.next} />
       <FormField id="email" label="Email" error={state.errors.email}>
-        <input {...field("email")} type="email" autoComplete="email" required defaultValue={state.values.email} />
+        <IconInput icon={MailIcon} {...field("email")} type="email" autoComplete="email" required defaultValue={state.values.email} />
       </FormField>
       <FormField id="username" label="Username" hint="optional" error={state.errors.username}>
-        <input {...field("username")} autoComplete="username" autoCapitalize="none" spellCheck={false} maxLength={24} defaultValue={state.values.username} />
+        <IconInput icon={UserIcon} {...field("username")} autoComplete="username" autoCapitalize="none" spellCheck={false} maxLength={24} defaultValue={state.values.username} />
       </FormField>
       <FormField id="password" label="Password" hint={`at least ${PASSWORD_MIN} characters`} error={state.errors.password}>
-        <input {...field("password")} type="password" autoComplete="new-password" required minLength={PASSWORD_MIN} />
+        <IconInput icon={LockIcon} {...field("password")} type="password" autoComplete="new-password" required minLength={PASSWORD_MIN} />
       </FormField>
       <button type="submit" disabled={pending} className={buttonClass("primary", "w-full disabled:opacity-60")}>
         {pending ? "Making your account" : "Create account"}
