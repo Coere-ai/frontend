@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
+import { FaqSection } from "@/site/blocks/faq";
+import { homeFaqs } from "@/site/content/faqs";
 import { homeSeo } from "@/site/content/seo";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { CompareTable } from "@/site/home/compare-table";
@@ -8,24 +10,27 @@ import { DemoSection } from "@/site/home/demo-section";
 import { ForgeSection } from "@/site/home/forge-section";
 import { Hero } from "@/site/home/hero";
 import { SolutionsSection } from "@/site/home/solutions-section";
-import { JsonLd, siteGraph } from "@/site/seo/json-ld";
+import { faqGraph, JsonLd, siteGraph } from "@/site/seo/json-ld";
 
-export const metadata: Metadata = pageMetadata({ ...homeSeo, path: "/", absolute: true });
+export const metadata: Metadata = pageMetadata({ ...homeSeo, path: "/" });
 
 /**
  * The home page, kept short: the line, the full demo, one part per product,
- * each with its own layout and a way to its page, then how Coere compares.
+ * each with its own layout and a way to its page, then how Coere compares
+ * and the questions people ask first.
  */
 export default function HomePage() {
   return (
     <>
       <JsonLd data={siteGraph} />
+      <JsonLd data={faqGraph(homeFaqs)} />
       <Hero />
       <DemoSection />
       <ConnectSection />
       <SolutionsSection />
       <ForgeSection />
       <CompareTable />
+      <FaqSection faqs={homeFaqs} title="What people ask about Coere" />
       <ClosingCta />
     </>
   );

@@ -1,4 +1,5 @@
 import { executives, founders, siteConfig, type TeamMember } from "@/lib/site";
+import type { Faq } from "@/site/content/faqs";
 import type { Product } from "@/site/content/products";
 
 /**
@@ -73,6 +74,19 @@ export function productGraph(product: Product) {
     operatingSystem: KIND[product.slug].system,
     image: `${siteConfig.url}${product.image}`,
     publisher: { "@id": organizationId },
+  };
+}
+
+/** A page's visible questions and answers as FAQPage, word for word. Use it only where FaqSection shows the same list. */
+export function faqGraph(faqs: Faq[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
   };
 }
 
