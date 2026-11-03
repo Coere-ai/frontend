@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 
 /** Where Try it free leads until Coere for Teams opens. */
 export default function TryTeamsPage() {
-  return <ComingSoon eyebrow="Coere Solutions" title="Coere for Teams is coming soon" line="The free week opens soon. Until then, see Coere at work in the demo." />;
+  return <ComingSoon />;
 }
