@@ -118,7 +118,7 @@ export interface OrgRow {
 
 export interface OrgsPayload {
   rows: OrgRow[];
-  plans: { id: string; name: string }[];
+  plans: PlanRow[];
 }
 
 export interface OrgMemberRow {
@@ -134,7 +134,7 @@ export interface OrgMemberRow {
   joinedAt: string;
   tokensSaved: number;
   memories: number;
-  memoriesShared: number;
+  costMicros: number;
 }
 
 export interface OrgDetailPayload {
@@ -143,7 +143,7 @@ export interface OrgDetailPayload {
   members: OrgMemberRow[];
   invites: { id: string; name: string; role: string; createdAt: string; expiresAt: string }[];
   sections: { key: string; name: string }[];
-  plans: { id: string; name: string }[];
+  plans: PlanRow[];
 }
 
 export interface WaitlistPayload {

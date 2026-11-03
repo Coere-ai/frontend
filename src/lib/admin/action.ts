@@ -9,7 +9,8 @@ import { supabaseConfigured } from "@/lib/supabase";
  * it sits on. A failure answers fixed words and logs the error's code only.
  */
 
-export type AdminResult = { ok: true; notice: string } | { ok: false; error: string };
+/** `id` names a row the action made, such as a new organization, for the page to open. */
+export type AdminResult = { ok: true; notice: string; id?: string } | { ok: false; error: string };
 
 export const UNAVAILABLE = "That did not work. Try again in a minute.";
 export const done = (notice: string): AdminResult => ({ ok: true, notice });
