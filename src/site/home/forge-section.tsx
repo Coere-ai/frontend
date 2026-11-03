@@ -29,7 +29,8 @@ export function ForgeSection() {
                 className="mt-7"
                 items={["Permission first: a token only after the person allows it", "Only what changed: with a chat id, the next message gets what is new", "On record: each app shows what it was sent"]}
               />
-              <div className="mt-9 flex flex-wrap items-center gap-3">
+              <p className="mt-9 text-[15px] font-medium text-white/75">Coere Forge is coming soon.</p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
                 <CircleArrowLink href="/developers/waitlist" tone="light">
                   Join the waitlist
                 </CircleArrowLink>
@@ -37,7 +38,6 @@ export function ForgeSection() {
                   Explore Coere Forge
                 </Link>
               </div>
-              <p className="mt-4 text-[15px] text-white/70">Coere Forge is coming soon.</p>
             </div>
             <FilmFrame film={films.forgeDev} />
           </div>
