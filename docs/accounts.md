@@ -539,10 +539,10 @@ adds it to the totals.
 
 ### 8.11 Organization
 
-**`GET /api/v1/org`** answers `200 { org: { id, name, role, sharedSections } | null }`.
+**`GET /api/v1/org`** answers `200 { org: { id, name, role, sharedSections, access } | null }`.
 **`GET /api/v1/org/index`** answers the organization's merged index (the
-shape of section 8.7, with a `contributor` user id on each fact) or `404`.
-Only members may read it. The extension uses these to show the
+shape of section 8.7, with a `contributor` user id on each fact) or `404`,
+cut to the sections the member may read. Only members may read it. The extension uses these to show the
 organization in Settings; reading the organization graph into context is
 the next step after this build (section 14.5).
 
@@ -566,7 +566,7 @@ session never opens it. It keeps its own look (`stats.css`). Sections:
 | `/admin` | **Statistics**: the product's running totals (section 15). Accounts, organizations, total AI cost, tokens used, tokens saved, memories, chats, context imports, transfers, storage. Each by day and in total, with the top accounts and organizations by tokens saved. |
 | `/admin/analytics` | Site analytics, as `/statistics` showed them. |
 | `/admin/users` | Accounts: email, username, plan, status, organization, created, last seen, devices, this month's cost and requests, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals and its knowledge graph. Actions: change plan, suspend or restore, revoke every device. |
-| `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. Opening one shows its members with their totals, and the organization's knowledge graph. |
+| `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. **Create an organization** (name, plan, first admin picked from existing accounts by email). Opening one shows its members with their roles, access and totals, and the organization's knowledge graph, and lets the operator change its settings, add a member or admin from existing accounts, change roles, remove members and delete it. |
 | `/admin/waitlist` | The developer waitlist (section 16): emails, when they joined, the count by day, and a CSV download. |
 | `/admin/database` | Every table's estimated rows, size, Row Level Security on or off and policy count, and the Storage bucket totals. |
 | `/admin/security` | Sign ins and failures by day, rate limit hits, refused tokens, revoked devices, connect refusals, deleted accounts, and any table with Row Level Security off. |
@@ -598,9 +598,9 @@ and is the only thing that writes.
 | `user_settings` | `user_id pk cascade, settings jsonb (object, at most 64 KiB), version bigint, updated_at, updated_by ('site'\|'extension')` | the owner |
 | `app_events` | `id bigint identity pk, user_id set null, device_id set null, kind (section 6.7), count, created_at` | server only |
 | `security_events` | `id bigint identity pk, user_id set null, org_id set null, kind, ip_hash, country, created_at`. Kinds: `sign_in`, `sign_in_failed`, `code_sent`, `sign_up`, `password_set`, `username_set`, `sign_out`, `device_connected`, `device_revoked`, `token_rejected`, `rate_limited`, `usage_limited`, `connect_refused`, `memory_deleted`, `account_deleted`, `org_created`, `org_deleted`, `org_invite_sent`, `org_joined`, `org_left`, `org_member_removed`, `admin_sign_in`, `admin_sign_in_failed`, `admin_viewed_memory` | server only |
-| `organizations` | `id uuid pk, name (1 to 80), slug unique, plan_id references plans default 'team', shared_sections text[] default '{work}', created_by references profiles set null, created_at, updated_at` | its members |
-| `org_members` | `org_id cascade, user_id references profiles cascade unique, role ('owner'\|'admin'\|'member'), share_memory bool default true, joined_at, pk (org_id, user_id)`. A person is in at most one organization. | members of the same organization |
-| `org_invites` | `id uuid pk, org_id cascade, email, role ('admin'\|'member'), token_hash unique, invited_by set null, created_at, expires_at (7 days), accepted_at, revoked_at` | the organization's owner and admins |
+| `organizations` | `id uuid pk, name (1 to 80), slug unique, plan_id references plans default 'team', shared_sections text[] default '{work}', default_access jsonb default '{"read":"all","contribute":true}', created_at, updated_at`. Made only by the Coere operator in the admin panel. | its members |
+| `org_members` | `org_id cascade, user_id references profiles cascade unique, role ('admin'\|'member'), access jsonb (null means the organization's default_access), share_memory bool default true, added_by ('operator'\|'invite'), joined_at, pk (org_id, user_id)`. A person is in at most one organization. | members of the same organization |
+| `org_invites` | `id uuid pk, org_id cascade, user_id references profiles cascade (the invited account; it must exist), role ('admin'\|'member'), invited_by set null, created_at, expires_at (7 days), accepted_at, declined_at, revoked_at` | the organization's admins, and the invited person |
 | `org_memory` | `org_id pk cascade, index_path, index_bytes, entities, facts, relations, sources, contributors, updated_at` | members |
 | `user_totals` | Running totals for one account (section 15) | the owner |
 | `org_totals` | Running totals for one organization (section 15) | members |
@@ -625,8 +625,8 @@ come through signed upload URLs that the server makes.
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `user_totals`, the person's `org_totals` and today's `daily_totals` in one statement. |
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. |
 | `set_memory_totals(p_user uuid)` | Recomputes the person's memory counts in `user_totals` from `memory_files`, and their organization's from its members, after a commit or a delete. |
-| `create_organization(p_user uuid, p_name text, p_slug text)` | Makes the organization and its owner row in one statement. Refuses a person already in one. |
-| `accept_org_invite(p_user uuid, p_token_hash text, p_email text)` | Checks the invite is live and for this email, adds the member, marks the invite used. |
+| `create_organization(p_name text, p_slug text, p_admin uuid, p_plan text)` | The operator's call: makes the organization, its totals row and its first admin in one statement. Refuses an admin already in an organization. |
+| `accept_org_invite(p_user uuid, p_invite uuid)` | Checks the invite is live and for this account, adds the member with the invite's role, marks the invite accepted. |
 | `admin_table_stats()` | Each table in `public` and `storage`: estimated rows, total bytes, Row Level Security on, policy count. |
 | `admin_storage_usage()` | Bytes and object count per bucket, and per user in `memory`. |
 
@@ -689,28 +689,50 @@ the center, its clients, people, projects and decisions around it).
 
 ### 14.1 The parts
 
-- **An organization** has a name, a slug, a plan (`team` by default) and the
-  memory sections it shares (`work` by default).
-- **A person is in at most one organization**, as owner, admin or member.
-  The person who creates it is its owner. There is always exactly one
-  owner; the owner hands the role on before leaving.
-- **Invites** go to an email with a role. Each has a link,
-  `/join/<token>`, that works once and for 7 days. The person signs in with
-  that email (or makes an account with it) and accepts. When the email has
-  no account yet, the site also sends Supabase's invite email with the same
-  link. Owners and admins can see, copy and revoke pending invites.
-- **Owners and admins** invite, remove members and change roles below their
-  own. Only the owner renames the organization, changes the shared sections
-  or deletes it.
+The owner set these rules on 2026-11-03. They replace every earlier word
+about organizations, in this file and in any builder's brief.
+
+- **Only the Coere operator makes an organization.** A person cannot make
+  one from their dashboard. In the admin panel (section 9) the operator
+  enters the name, picks the plan (`team` by default) and picks an existing
+  account as its first admin. The operator can later change any of the
+  organization's settings, add or remove admins, and delete it.
+- **Two roles: admin and member.** The first person added is an admin.
+  - A **member** adds to the shared memory (their shared sections go into
+    the organization's graph) and reads the graph.
+  - An **admin** does what a member does, and also controls the
+    organization's settings (name, shared sections), invites coworkers,
+    removes members, makes a member an admin or an admin a member, and
+    decides what each member can access.
+  - There is no owner role. An organization always keeps at least one
+    admin: the last admin cannot leave or be made a member, except by the
+    operator.
+- **Access.** What a member may do is an `access` object:
+  `{ "read": "all" | [section keys], "contribute": boolean }`. The
+  organization's `default_access` is `{ "read": "all", "contribute": true }`,
+  so a new member can do everything until an admin narrows it. A member's
+  own `access` (null means the default) overrides it. `read` decides which
+  sections of the shared graph they see; `contribute` decides whether their
+  memory goes into it. Admins always read everything.
+- **A person is in at most one organization.**
+- **Invites go only to existing accounts.** An admin invites a coworker by
+  the email or username of their Coere account, with a role. With no such
+  account, the site says the coworker must first make a Coere account (and
+  gives the sign up link to send them); nothing is stored and no email is
+  sent. A coworker already in an organization cannot be invited. The
+  invited person sees the invite on `/dashboard/organization` and accepts or
+  declines it. Invites expire after 7 days, and admins can see and revoke
+  pending ones.
 
 ### 14.2 The shared knowledge graph
 
 There is one graph per organization, built on the server from what its
 members share.
 
-1. When a member's memory file is committed (section 8.6), the server
-   takes the part of their index that sits in the organization's shared
-   sections, drops every sensitive memory, and writes it to
+1. When a member's memory file is committed (section 8.6) and their access
+   lets them contribute, the server takes the part of their index that sits
+   in the organization's shared sections, drops every sensitive memory, and
+   writes it to
    `org/<org id>/members/<user id>.json` in the `memory` bucket.
 2. It then merges every member's part into `org/<org id>/index.json`.
    Entities with the same section, kind and name (compared without case or
@@ -733,21 +755,25 @@ In the site's style. It holds:
   month, members
 - the shared graph, drawn like the person's own graph with the organization
   at the center, and a searchable list of its memories with who brought
-  each
+  each, limited to the sections the person may read
 - members with role, joined date, tokens saved and memories shared
-- invites (owners and admins)
-- settings: name, shared sections, delete (owner); share my memory, leave
-  (everyone)
+- for admins: invite a coworker, pending invites, each member's role and
+  access (which sections they read, whether they contribute), remove a
+  member, and the organization's settings (name, shared sections, default
+  access)
+- for everyone: share my memory, leave
 
-With no organization, the page offers **Create an organization** (a name)
-and lists any pending invites for the person's email.
+With no organization, the page lists the person's pending invites with
+Accept and Decline, and otherwise says their organization's admin adds
+them, with a Book a demo link for a company that has no organization yet.
 
 ### 14.4 Deleting
 
-Deleting an organization removes its `org/` folder, its rows and its
-invites. Members keep their own accounts and memory. Deleting an account
-first removes that person's part from their organization's graph; an owner
-must hand the organization on or delete it before deleting their account.
+Only the operator deletes an organization. It removes its `org/` folder,
+its rows and its invites. Members keep their own accounts and memory.
+Deleting an account first removes that person's part from their
+organization's graph; the last admin of an organization cannot delete
+their account until another admin is named.
 
 ### 14.5 Next steps, not in this build
 
@@ -831,8 +857,8 @@ record_app_events(p_user uuid, p_device uuid, p_events jsonb) returns void
 set_memory_totals(p_user uuid) returns void
 set_org_memory_totals(p_org uuid) returns void
 
-create_organization(p_user uuid, p_name text, p_slug text) returns uuid
-accept_org_invite(p_user uuid, p_token_hash text, p_email text) returns uuid
+create_organization(p_name text, p_slug text, p_admin uuid, p_plan text) returns uuid
+accept_org_invite(p_user uuid, p_invite uuid) returns uuid
 
 admin_table_stats() returns table (schema_name text, table_name text,
   row_estimate bigint, total_bytes bigint, rls_enabled boolean, policy_count integer)
