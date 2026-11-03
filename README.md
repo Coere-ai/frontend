@@ -221,7 +221,7 @@ section is what the owner sets up by hand.
 - Every Supabase call runs on the server. The browser never talks to
   Supabase, so the content security policy keeps `connect-src 'self'`.
 - `src/proxy.ts` refreshes the session on the private paths only (`/sign-in`,
-  `/sign-up`, `/auth/*`, `/connect`, `/dashboard/*`, `/join/*`), and gives
+  `/sign-up`, `/auth/*`, `/connect` and `/dashboard/*`), and gives
   them the nonce policy and noindex. Public pages stay static.
 - The session cookies are httpOnly and last 400 days. A second cookie,
   `coere_signed_in=1`, is readable by scripts so the navbar can say

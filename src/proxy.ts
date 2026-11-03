@@ -73,7 +73,7 @@ function notFound(): NextResponse {
 }
 
 /** The private account paths. Keep in step with the matcher below. */
-const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect)$|^\/(auth|dashboard|join)(\/|$)/;
+const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect)$|^\/(auth|dashboard)(\/|$)/;
 
 /** A fresh 16 byte nonce, well past the 128 bits the CSP spec asks for. */
 function newNonce(): string {
@@ -135,6 +135,5 @@ export const config = {
     "/auth/:path*",
     "/connect",
     "/dashboard/:path*",
-    "/join/:path*",
   ],
 };
