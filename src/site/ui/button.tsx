@@ -56,22 +56,24 @@ const pillTones: Record<PillTone, { pill: string; circle: string }> = {
   light: { pill: "bg-white text-neutral-950 hover:bg-neutral-100 focus-visible:outline-white", circle: "bg-neutral-950 text-white" },
 };
 
-const pillSizes: Record<PillSize, { pill: string; circle: string; arrow: number }> = {
-  md: { pill: "h-11 gap-2.5 pl-5 pr-1.5 text-[15px]", circle: "h-8 w-8", arrow: 15 },
-  lg: { pill: "h-14 gap-3 pl-6 pr-2 text-[16px]", circle: "h-10 w-10", arrow: 18 },
+const pillSizes: Record<PillSize, { pill: string; inset: string; circle: string; arrow: number }> = {
+  md: { pill: "h-11 gap-2.5 pr-1.5 text-[15px]", inset: "pl-5", circle: "h-8 w-8", arrow: 15 },
+  lg: { pill: "h-14 gap-3 pr-2 text-[16px]", inset: "pl-6", circle: "h-10 w-10", arrow: 18 },
 };
 
 /**
  * A pill with its label and, inside on the right, a round circle holding an
  * arrow that nudges right on hover. Dark is a black pill with a white
  * circle; light is the reverse, for dark artwork. An optional mark sits
- * before the label.
+ * before the label. Wide fills its row with the label centered, the way
+ * full width buttons sit in the mobile menu.
  */
 export function CircleArrowLink({
   href,
   tone = "dark",
   size = "md",
   icon,
+  wide = false,
   className = "",
   onClick,
   children,
@@ -80,6 +82,7 @@ export function CircleArrowLink({
   tone?: PillTone;
   size?: PillSize;
   icon?: ReactNode;
+  wide?: boolean;
   className?: string;
   onClick?: () => void;
   children: ReactNode;
@@ -90,9 +93,11 @@ export function CircleArrowLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`group inline-flex items-center justify-between rounded-full font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${look.pill} ${fit.pill} ${className}`}
+      className={`group inline-flex items-center rounded-full font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${look.pill} ${fit.pill} ${wide ? "w-full pl-1.5" : fit.inset} ${className}`}
     >
-      <span className="inline-flex items-center gap-2.5">
+      {/* Wide: an empty circle's width on the left keeps the label in the middle. */}
+      {wide ? <span aria-hidden="true" className={`shrink-0 ${fit.circle}`} /> : null}
+      <span className={`inline-flex items-center gap-2.5 ${wide ? "flex-1 justify-center" : ""}`}>
         {icon}
         {children}
       </span>
