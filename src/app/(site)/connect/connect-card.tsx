@@ -5,9 +5,9 @@ import { useState, useTransition } from "react";
 import { extensionRuntime, sendToExtension } from "@/lib/connect/bridge";
 import { deviceName } from "@/lib/connect/device-name";
 import type { ConnectParams } from "@/lib/connect/params";
-import { FormStatus } from "@/site/account/auth-shell";
+import { authCardClass, FormStatus } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
-import { CheckIcon } from "@/site/ui/icons/interface-icons";
+import { CheckIcon, UserIcon } from "@/site/ui/icons/interface-icons";
 
 import { connectExtension } from "./actions";
 
@@ -60,8 +60,8 @@ export function ConnectCard({ email, params }: { email: string; params: ConnectP
 
   if (done) {
     return (
-      <div role="status" className="rounded-3xl bg-neutral-50 p-10 text-center">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-neutral-950 text-white">
+      <div role="status" className={`${authCardClass} text-center`}>
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
           <CheckIcon size={22} />
         </span>
         <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">Connected</p>
@@ -71,11 +71,18 @@ export function ConnectCard({ email, params }: { email: string; params: ConnectP
   }
 
   return (
-    <div className="space-y-6 rounded-3xl border border-neutral-200 p-7 md:p-9">
+    <div className={`space-y-6 ${authCardClass}`}>
       <div>
-        <p className="text-[13px] text-neutral-500">Signed in as</p>
-        <p className="mt-1 text-xl font-medium tracking-[-0.02em] break-all text-neutral-950">{email}</p>
-        <p className="mt-2 text-[14px] leading-relaxed text-neutral-500">
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
+            <UserIcon size={20} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] text-neutral-500">Signed in as</p>
+            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{email}</p>
+          </div>
+        </div>
+        <p className="mt-4 text-[14px] leading-relaxed text-neutral-500">
           Coere in this browser will use this account. Only connect if you opened this page from Coere.
         </p>
       </div>
