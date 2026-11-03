@@ -20,7 +20,7 @@ async function fetchPayload(days: number, audience: Audience, page: string | nul
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
     const query = new URLSearchParams({ days: String(days), tz, audience });
     if (page) query.set("page", page);
-    const res = await fetch(`/api/statistics/data?${query}`, { cache: "no-store" });
+    const res = await fetch(`/api/admin/analytics?${query}`, { cache: "no-store" });
     const body = (await res.json().catch(() => ({}))) as {
       analytics?: SiteAnalytics;
       hourlySeries?: HourlyTraffic;

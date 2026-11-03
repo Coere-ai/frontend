@@ -1,4 +1,4 @@
-import { signOut } from "@/app/statistics/actions";
+import { signOut } from "@/app/admin/actions";
 
 import { AnalyticsPanel } from "./panel/analytics-panel";
 

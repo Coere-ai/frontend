@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
       { source: "/developers", destination: "/developers/waitlist", permanent: false },
       { source: "/developer", destination: "/developers/waitlist", permanent: false },
       { source: "/developer/waitlist", destination: "/developers/waitlist", permanent: true },
+      // The operator's panel moved from /statistics to /admin. Not permanent,
+      // so no browser keeps the old address as gone for good. These run
+      // before the proxy, which then guards /admin as usual.
+      { source: "/statistics", destination: "/admin", permanent: false },
+      { source: "/statistics/:path*", destination: "/admin/:path*", permanent: false },
     ];
   },
 };

@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
 /**
- * The one sign-in for /statistics: the `USER` and `PASSWORD` set in the deploy.
+ * The one sign-in for /admin: the `USER` and `PASSWORD` set in the deploy.
  *
  * The owner chose plain values over a stored hash, so the defence is in how
  * they are compared. Each side is hashed to a fixed-length digest first:

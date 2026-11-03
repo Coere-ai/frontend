@@ -1,24 +1,31 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { adminGate } from "@/lib/auth/admin-gate";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/session-token";
 import { refreshSession } from "@/lib/supabase/refresh";
 
 /**
- * The gate in front of the private dashboard, and nothing else.
+ * The gate in front of the private pages, and nothing else.
  *
- * The matcher below covers /statistics and /api/statistics alone, so every
- * public page is served exactly as it was built: static, untouched, never seen
- * by this file. This is a second gate, never the only one. The page and the
- * data route check the session again on the server.
+ * The matcher below covers the admin panel, its data routes and the account
+ * pages alone, so every public page is served exactly as it was built:
+ * static, untouched, never seen by this file. This is a second gate, never
+ * the only one. Every admin page, action and data route checks the admin
+ * session again on the server.
  *
- * Signed out:
- *   /statistics             passes, because signed out that page IS the form
- *   /statistics/anything    goes to the home page, not to a login screen or a
- *                           401, either of which would confirm something is there
- *   /api/statistics/...     answers 404, not 401, for the same reason
+ * The admin panel, signed out:
+ *   /admin             passes, because signed out that page IS the form
+ *   /admin/anything    goes to the home page, not to a login screen or a
+ *                      401, either of which would confirm something is there
+ *   /api/admin/...     answers 404, not 401, for the same reason
  *
- * Everything here is also marked noindex, and the dashboard's document gets a
- * per-request nonce Content-Security-Policy.
+ * Only the admin cookie (USER and PASSWORD) opens the panel. An account
+ * session never does, and the admin paths never refresh one. The old
+ * /statistics addresses are sent to /admin by next.config.ts, which runs
+ * before this file.
+ *
+ * Everything here is also marked noindex, and every page gets a per-request
+ * nonce Content-Security-Policy.
  *
  * The account pages (sign in, sign up, the emailed link, /connect, the
  * person's dashboard) pass through here too, for two things only: the
@@ -83,40 +90,12 @@ function newNonce(): string {
  */
 async function accountPage(request: NextRequest): Promise<NextResponse> {
   const refreshed = await refreshSession(request);
-  const nonce = newNonce();
-  const csp = buildCsp(nonce, process.env.NODE_ENV === "development");
-
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", nonce);
-  requestHeaders.set("content-security-policy", csp);
-
-  const response = NextResponse.next({ request: { headers: requestHeaders } });
-  response.headers.set("content-security-policy", csp);
-  response.headers.set("x-robots-tag", NOINDEX);
-  return refreshed.apply(response);
+  return refreshed.apply(withNonce(request));
 }
 
-export async function proxy(request: NextRequest): Promise<NextResponse> {
-  const { pathname } = request.nextUrl;
-  if (ACCOUNT_PATH.test(pathname)) return accountPage(request);
-
-  const signedIn = verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
-
-  if (pathname.startsWith("/api/statistics")) {
-    if (!signedIn) return notFound();
-    const response = NextResponse.next();
-    response.headers.set("x-robots-tag", NOINDEX);
-    return response;
-  }
-
-  if (pathname !== "/statistics" && !signedIn) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // 16 bytes of CSPRNG entropy, well past the 128 bits the CSP spec asks for.
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  const nonce = btoa(String.fromCharCode(...bytes));
+/** Passes the request on with a fresh nonce policy on the request and the answer, and noindex. */
+function withNonce(request: NextRequest): NextResponse {
+  const nonce = newNonce();
   const csp = buildCsp(nonce, process.env.NODE_ENV === "development");
 
   const requestHeaders = new Headers(request.headers);
@@ -129,13 +108,28 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   return response;
 }
 
+export async function proxy(request: NextRequest): Promise<NextResponse> {
+  const { pathname } = request.nextUrl;
+  if (ACCOUNT_PATH.test(pathname)) return accountPage(request);
+
+  const gate = adminGate(pathname, verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value));
+  if (gate === "not_found") return notFound();
+  if (gate === "home") return NextResponse.redirect(new URL("/", request.url));
+  if (gate === "api") {
+    const response = NextResponse.next();
+    response.headers.set("x-robots-tag", NOINDEX);
+    return response;
+  }
+  return withNonce(request);
+}
+
 export const config = {
   // Only the private pages and their data, so public pages stay static.
-  // `:path*` matches zero or more segments, so "/statistics/:path*" covers
-  // /statistics itself as well.
+  // `:path*` matches zero or more segments, so "/admin/:path*" covers /admin
+  // itself as well.
   matcher: [
-    "/statistics/:path*",
-    "/api/statistics/:path*",
+    "/admin/:path*",
+    "/api/admin/:path*",
     "/sign-in",
     "/sign-up",
     "/auth/:path*",

@@ -10,7 +10,7 @@ import { framed, send, uuid, visitorId } from "@/lib/analytics/beacon/transport"
 // Site analytics, client side.
 //
 // Mounted once, in the site layout, so it runs on every public page and never
-// on /statistics, which lives outside that layout. It records the view, counts
+// on /admin, which lives outside that layout. It records the view, counts
 // how long the visitor actually spent reading, notes how far down they got,
 // reports what they clicked, and measures which SECTIONS of the page they read
 // and for how long. Sections are found automatically on every page (see
@@ -25,12 +25,12 @@ const FLUSH_SECONDS = 15;
  *  a page with many sections. */
 const SECTIONS_PER_BEACON = 20;
 
-/** The dashboard is not the site. Counting our own visits to /statistics would
+/** The admin panel is not the site. Counting our own visits to /admin would
  *  put the operator in their own numbers. Checked here as well as by where the
  *  tracker is mounted, so moving it cannot start counting them. The account
  *  pages sit inside the site's layout but are private, so they are left out
  *  too. */
-const IGNORED = /^\/(statistics|sign-in|sign-up|auth|connect|dashboard|join)(\/|$)/;
+const IGNORED = /^\/(admin|statistics|sign-in|sign-up|auth|connect|dashboard|join)(\/|$)/;
 
 export function SiteTracker() {
   const pathname = usePathname();

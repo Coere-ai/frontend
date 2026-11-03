@@ -1,7 +1,7 @@
 // The site-analytics contract
 //
 // One set of shapes shared by the read layer (lib/analytics/query), the route
-// that serves them (/api/statistics/data) and the panel that draws them. They
+// that serves them (/api/admin/analytics) and the panel that draws them. They
 // live apart from the queries because the panel is a client component, and the
 // query layer holds the server's database key.
 

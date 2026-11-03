@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { signIn, type SignInState } from "@/app/statistics/actions";
+import { signIn, type SignInState } from "@/app/admin/actions";
 
 const initial: SignInState = { error: null };
 

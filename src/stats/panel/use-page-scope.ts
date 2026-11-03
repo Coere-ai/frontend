@@ -7,7 +7,7 @@ const PARAM = "page";
 /**
  * The page the dashboard is scoped to, kept in the address bar.
  *
- * `/statistics?page=/products/connect` opens straight on that page, so a scoped
+ * `/admin/analytics?page=/products/connect` opens straight on that page, so a scoped
  * view can be bookmarked or sent to a colleague. Read once, on the first
  * client render, and written back with replaceState so picking pages does not
  * pile up history entries. The server render has no address bar and starts

@@ -3,7 +3,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { configuredCredentials } from "./credentials";
 
 /**
- * The /statistics session token, as plain functions.
+ * The /admin session token, as plain functions.
  *
  * Kept apart from session.ts, which reads the cookie jar, so the proxy can
  * verify the same token without pulling in anything that only works inside a
@@ -36,6 +36,7 @@ type Payload = {
 function signingKey(): Buffer | null {
   const creds = configuredCredentials();
   if (!creds) return null;
+  // The label keeps its old name: changing it would sign the operator out.
   return createHmac("sha256", "coere-statistics-session")
     .update(`${creds.user.normalize("NFKC")}\u0000${creds.password.normalize("NFKC")}`)
     .digest();

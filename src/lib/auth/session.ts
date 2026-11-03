@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE, verifySessionToken } from "./session-token";
 
 /**
- * The /statistics session, read from the request's cookies.
+ * The /admin session, read from the request's cookies.
  *
  * The page and the data route both call isSignedIn() themselves even though
  * the proxy has already checked: the proxy is a second gate, never the only

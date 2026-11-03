@@ -10,7 +10,7 @@ import { products } from "@/site/content/products";
  * The same pages the sitemap lists, named from the same content files, so a
  * new product or industry is in the page picker the day it ships. Server side
  * on purpose: the content files carry far more than names, and pulling them
- * into the dashboard's client bundle would ship all of it to /statistics. The
+ * into the dashboard's client bundle would ship all of it to /admin. The
  * read layer stamps the label onto each page row instead.
  *
  * A page missing from this list still shows up in the dashboard as soon as it
