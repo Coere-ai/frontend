@@ -7,6 +7,7 @@ import { Brand } from "@/site/ui/brand";
 import { ButtonLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 import { CloseIcon, MenuIcon } from "@/site/ui/icons/interface-icons";
+import { AccountLink } from "./account-link";
 import { MegaPanel, MenuBackdrop } from "./mega-panel";
 import { MobileMenu } from "./mobile-menu";
 import { NavTab } from "./nav-tab";
@@ -14,8 +15,8 @@ import { useMenu } from "./use-menu";
 
 /**
  * The white navbar: the brand on the left, the tabs centered on the page, and
- * the contact button on the right. Three equal grid tracks keep the tabs truly
- * centered whatever the brand and button widths are.
+ * Sign in and the contact button on the right. Three equal grid tracks keep
+ * the tabs truly centered whatever the brand and button widths are.
  */
 export function Navbar() {
   const menu = useMenu();
@@ -58,6 +59,9 @@ export function Navbar() {
 
           <div className="col-start-3 flex items-center gap-2 justify-self-end" onMouseEnter={() => menu.hide(0)}>
             {/* Wrapped, because the button's own display class would beat "hidden". */}
+            <span className="hidden lg:block">
+              <AccountLink variant="ghost" />
+            </span>
             <span className="hidden lg:block">
               <ButtonLink href={contactHref}>{contactLabel}</ButtonLink>
             </span>
