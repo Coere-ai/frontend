@@ -5,6 +5,13 @@ import { SignOutButton } from "@/site/account/sign-out-button";
 import { DashboardRail } from "@/site/dashboard/rail";
 import { Container } from "@/site/ui/container";
 
+/**
+ * Every dashboard page renders per request: it reads the session, and the
+ * proxy gives these paths a nonce policy that a prebuilt page's scripts
+ * would not carry.
+ */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: { default: "Dashboard", template: "%s | Coere dashboard" },
   robots: { index: false, follow: false },
