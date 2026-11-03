@@ -23,7 +23,7 @@ export function FormField({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-[14px] font-medium text-neutral-950">
+      <label id={`${id}-label`} htmlFor={id} className="block text-[14px] font-medium text-neutral-950">
         {label}
         {hint ? <span className="ml-1.5 font-normal text-neutral-500">{hint}</span> : null}
       </label>
