@@ -156,9 +156,10 @@ proves the migration works without a Supabase project. It boots PGlite
 (Postgres in WebAssembly), adds stand ins for what Supabase provides (the
 `anon`, `authenticated` and `service_role` roles, `auth.users` with
 `auth.uid()`, and Storage's buckets and objects), runs the migration twice,
-then checks the sign up trigger, every server function, the running totals,
-and the Row Level Security rules as one person against another. It exits
-non zero on any failure. The checks live in `scripts/db`.
+then checks that the second run changed nothing, the sign up trigger, every
+server function, the running totals, the per account limits, and the Row
+Level Security rules as one person against another. It exits non zero on
+any failure. The checks live in `scripts/db`.
 
 ### What is recorded
 

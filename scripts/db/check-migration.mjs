@@ -10,6 +10,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { checkCreateOrganization, checkDeviceAuth, checkSignUp } from "./checks-accounts.mjs";
+import { checkLimitColumns, checkLimitResolution, checkOwnLimitsLocked, checkSameFingerprint, schemaFingerprint } from "./checks-limits.mjs";
 import { checkOrganizationRows, checkOwnRows, checkServerWrites, checkStorage } from "./checks-rls.mjs";
 import { checkAdminReaders, checkAppEvents, checkInvites, checkMemoryTotals, checkRecordUsage } from "./checks-totals.mjs";
 import { bootDatabase, check, equal, failureCount, one, passCount } from "./harness.mjs";
@@ -30,7 +31,9 @@ async function main() {
   const sql = await readFile(MIGRATION, "utf8");
   const db = await bootDatabase();
   await migrate(db, sql, 1);
+  const first = await schemaFingerprint(db);
   await migrate(db, sql, 2);
+  checkSameFingerprint("a second run changes nothing", first, await schemaFingerprint(db));
   equal("seeds are not doubled", await one(db, "plans", "select count(*)::int from public.plans"), 3);
   equal("the bucket is private", await one(db, "bucket", "select public from storage.buckets where id = 'memory'"), false);
 
@@ -38,6 +41,9 @@ async function main() {
   await checkDeviceAuth(db);
   const org = await checkCreateOrganization(db);
   await checkRecordUsage(db, org);
+  await checkLimitColumns(db);
+  await checkLimitResolution(db);
+  await checkOwnLimitsLocked(db);
   await checkAppEvents(db, org);
   await checkInvites(db, org);
   await checkMemoryTotals(db, org);
@@ -48,7 +54,9 @@ async function main() {
   await checkServerWrites(db);
 
   // A third run over real rows must keep them all.
+  const before = await schemaFingerprint(db);
   await migrate(db, sql, 3);
+  checkSameFingerprint("a third run over real rows changes nothing", before, await schemaFingerprint(db));
   equal("a rerun keeps the accounts", await one(db, "profiles", "select count(*)::int from public.profiles"), 3);
 
   await db.close();
