@@ -3,11 +3,11 @@ import { siteConfig } from "@/lib/site";
 
 /**
  * Kept out for every crawler: the live demos' own pages, which only make
- * sense inside the site's frames, and the private statistics and API
- * routes. Pages hidden from the menus say noindex themselves, so crawlers
- * must still be let in to read that.
+ * sense inside the site's frames, the private statistics and API routes,
+ * and the account pages. Pages hidden from the menus say noindex
+ * themselves, so crawlers must still be let in to read that.
  */
-const PRIVATE = ["/preview/live/", "/statistics", "/api/"];
+const PRIVATE = ["/preview/live/", "/statistics", "/api/", "/sign-in", "/sign-up", "/auth", "/connect", "/dashboard", "/join"];
 
 /**
  * Crawlers named one by one. A crawler with a group of its own reads only

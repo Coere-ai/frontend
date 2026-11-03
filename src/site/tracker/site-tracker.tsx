@@ -27,8 +27,10 @@ const SECTIONS_PER_BEACON = 20;
 
 /** The dashboard is not the site. Counting our own visits to /statistics would
  *  put the operator in their own numbers. Checked here as well as by where the
- *  tracker is mounted, so moving it cannot start counting them. */
-const IGNORED = /^\/statistics(\/|$)/;
+ *  tracker is mounted, so moving it cannot start counting them. The account
+ *  pages sit inside the site's layout but are private, so they are left out
+ *  too. */
+const IGNORED = /^\/(statistics|sign-in|sign-up|auth|connect|dashboard|join)(\/|$)/;
 
 export function SiteTracker() {
   const pathname = usePathname();
