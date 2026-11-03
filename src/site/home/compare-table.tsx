@@ -4,26 +4,34 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { compareTables, type CompareTable as Table, type Mark } from "@/site/content/compare";
 import { Container } from "@/site/ui/container";
-import { CheckIcon } from "@/site/ui/icons/interface-icons";
+import { CheckIcon, CloseIcon } from "@/site/ui/icons/interface-icons";
 
-/** One mark, drawn so it reads at a glance and to a screen reader. */
+/** A half filled circle, for "partly". */
+const Half = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+    <circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" strokeWidth="2" />
+    <path d="M7 1.5a5.5 5.5 0 0 0 0 11z" fill="currentColor" />
+  </svg>
+);
+
+/**
+ * One mark, in a soft circle of its own colour so a row reads at a glance:
+ * green for yes, amber for partly, red for no. Coere's own yes is solid blue,
+ * to keep its column apart. Each says its word to a screen reader.
+ */
 function Cell({ mark, coere = false }: { mark: Mark; coere?: boolean }) {
-  if (mark === "yes")
-    return (
-      <span className={`inline-grid h-7 w-7 place-items-center rounded-full ${coere ? "bg-brand-500 text-white" : "bg-neutral-950 text-white"}`}>
-        <CheckIcon size={15} />
-        <span className="sr-only">Yes</span>
-      </span>
-    );
-  if (mark === "part")
-    return (
-      <span className="inline-block h-[18px] w-[18px] rounded-full border-2 border-neutral-400 bg-[linear-gradient(90deg,var(--color-neutral-400)_50%,transparent_50%)]">
-        <span className="sr-only">Partly, or by hand</span>
-      </span>
-    );
+  const look =
+    mark === "yes"
+      ? coere
+        ? "bg-brand-500 text-white"
+        : "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+      : mark === "part"
+        ? "bg-amber-50 text-amber-500 ring-1 ring-amber-200"
+        : "bg-red-50 text-red-500 ring-1 ring-red-100";
   return (
-    <span className="inline-block h-0.5 w-4 rounded-full bg-neutral-300">
-      <span className="sr-only">No</span>
+    <span className={`inline-grid h-7 w-7 place-items-center rounded-full ${look}`}>
+      {mark === "yes" ? <CheckIcon size={15} /> : mark === "part" ? <Half /> : <CloseIcon size={13} />}
+      <span className="sr-only">{mark === "yes" ? "Yes" : mark === "part" ? "Partly, or by hand" : "No"}</span>
     </span>
   );
 }
@@ -40,7 +48,6 @@ function Contents({ table }: { table: Table }) {
           <th scope="col" className="sticky left-0 z-10 w-[160px] bg-white px-4 pt-8 pb-5 md:w-[30%] md:px-8" />
           <th scope="col" className="rounded-t-2xl bg-brand-50 px-4 pt-8 pb-5 text-center">
             <span className="block text-[14px] font-medium text-brand-600 md:text-[16px]">{table.coere}</span>
-            <span className="mt-1.5 inline-block rounded-full bg-white px-2.5 py-0.5 text-[12px] font-medium text-brand-600 ring-1 ring-brand-200">{table.price}</span>
           </th>
           {table.others.map((name) => (
             <th key={name} scope="col" className="px-3 pt-8 pb-5 text-center align-top text-[13px] font-medium text-neutral-500 md:px-4 md:text-[15px]">
@@ -71,7 +78,7 @@ function Contents({ table }: { table: Table }) {
 /**
  * How Coere compares: one table per product, picked from a row of pills,
  * against the products people use for the same job, with ChatGPT and
- * Claude's own memory as the baseline. Coere's column carries its price.
+ * Claude's own memory as the baseline.
  * Every table is in the page, so all of them can be read and found; the
  * ones not picked are hidden until their pill is.
  */

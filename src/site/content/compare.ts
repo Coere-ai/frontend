@@ -14,8 +14,6 @@ export type CompareTable = {
   label: string;
   /** The Coere product, first column. */
   coere: string;
-  /** What it costs, under its name. */
-  price: string;
   others: string[];
   rows: { name: string; detail: string; marks: Mark[] }[];
 };
@@ -25,7 +23,6 @@ export const compareTables: CompareTable[] = [
     key: "connect",
     label: "Coere Connect",
     coere: "Coere Connect",
-    price: "Free",
     others: ["ChatGPT memory", "Claude memory", "Gemini", "OpenMemory"],
     rows: [
       { name: "Knows you on day one", detail: "Reads every chat you already had, on every AI", marks: ["yes", "no", "part", "part", "no"] },
@@ -34,13 +31,14 @@ export const compareTables: CompareTable[] = [
       { name: "Shows what goes in", detail: "The line above the box, yours to change before you send", marks: ["yes", "no", "no", "no", "no"] },
       { name: "Browser use from your memory", detail: "Email, calendar, forms and research in your tabs", marks: ["yes", "part", "part", "part", "no"] },
       { name: "Yours to keep", detail: "Saved on your computer, exported whenever you like", marks: ["yes", "no", "no", "no", "part"] },
+      // ChatGPT's free plan has a lighter memory than its paid ones; Claude made memory free in March 2026.
+      { name: "Free", detail: "The whole product, with no paid plan", marks: ["yes", "part", "yes", "yes", "yes"] },
     ],
   },
   {
     key: "forge",
     label: "Coere Forge",
     coere: "Coere Forge",
-    price: "Usage based",
     others: ["ChatGPT memory", "Claude memory", "mem0", "Zep"],
     rows: [
       { name: "Knows your user on day one", detail: "Reads the memory they already built across every AI", marks: ["yes", "no", "no", "no", "no"] },
@@ -54,7 +52,6 @@ export const compareTables: CompareTable[] = [
     key: "solutions",
     label: "Coere Solutions",
     coere: "Coere Solutions",
-    price: "Per seat",
     others: ["ChatGPT memory", "Claude memory", "Glean"],
     rows: [
       { name: "Built from the team's AI chats", detail: "Every chat your team already had, on every AI", marks: ["yes", "no", "no", "no"] },
