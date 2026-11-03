@@ -9,7 +9,7 @@ export function FeaturedPost({ post }: { post: Post }) {
   return (
     <Link href={`/blog/${post.slug}`} className="group grid items-center gap-8 rounded-3xl bg-neutral-50 p-3 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-12">
       <div className="overflow-hidden rounded-2xl">
-        <Image src={post.image} alt="" width={754} height={421} unoptimized priority className="aspect-[754/421] w-full object-cover" />
+        <Image src={post.image} alt="" width={754} height={421} unoptimized preload className="aspect-[754/421] w-full object-cover" />
       </div>
       <div className="px-4 pb-6 md:px-0 md:pr-10 md:pb-0">
         <p className="text-[13px] text-neutral-500">

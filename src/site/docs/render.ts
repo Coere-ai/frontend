@@ -62,6 +62,11 @@ export function renderDoc(slug: string): RenderedDoc {
   if (kept) return kept;
   const toc: TocEntry[] = [];
   const nextId = idMaker();
+  // The docs were one document, so a page may open on ### headings. Each
+  // page's top level becomes h2 under its h1, and keeps its look through a
+  // class named for its depth in the source (d2, d3, d4).
+  const top = Math.min(...[...source(slug).matchAll(/^(#{2,6})\s/gm)].map((m) => m[1].length), 6);
+  const lift = Math.max(0, top - 2);
   const marked = new Marked({
     gfm: true,
     renderer: {
@@ -69,7 +74,8 @@ export function renderDoc(slug: string): RenderedDoc {
         const id = nextId(text);
         const inner = withoutNumber(this.parser.parseInline(tokens));
         if (depth <= 3) toc.push({ id, text: withoutNumber(text.replace(/`/g, "")), depth });
-        return `<h${depth} id="${id}"><a href="#${id}">${inner}</a></h${depth}>\n`;
+        const tag = depth - lift;
+        return `<h${tag} id="${id}" class="d${depth}"><a href="#${id}">${inner}</a></h${tag}>\n`;
       },
       link({ href, tokens }: Tokens.Link) {
         const inner = this.parser.parseInline(tokens);

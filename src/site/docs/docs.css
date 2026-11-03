@@ -5,18 +5,19 @@
   line-height: 1.7;
 }
 .docs-prose > * + * { margin-top: 1.1em; }
-.docs-prose h2, .docs-prose h3, .docs-prose h4 {
+.docs-prose :is(h2, h3, h4, h5) {
   color: var(--color-neutral-950);
   font-weight: 500;
   letter-spacing: -0.02em;
   scroll-margin-top: 7rem;
 }
-.docs-prose h2 { margin-top: 2.6em; font-size: 1.75rem; line-height: 1.2; letter-spacing: -0.03em; }
-.docs-prose h3 { margin-top: 2.2em; font-size: 1.3rem; line-height: 1.3; }
-.docs-prose h4 { margin-top: 2em; font-size: 1.05rem; font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); letter-spacing: 0; }
-.docs-prose h2 + *, .docs-prose h3 + *, .docs-prose h4 + * { margin-top: 0.7em; }
+.docs-prose .d2 { margin-top: 2.6em; font-size: 1.75rem; line-height: 1.2; letter-spacing: -0.03em; }
+.docs-prose .d3 { margin-top: 2.2em; font-size: 1.3rem; line-height: 1.3; }
+.docs-prose .d4 { margin-top: 2em; font-size: 1.05rem; font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); letter-spacing: 0; }
+/* As specific as the depth classes, so a heading right under another keeps the short gap. */
+.docs-prose :is(h2, h3, h4, h5) + :is(*, .d2) { margin-top: 0.7em; }
 /* Heading anchors underline from the middle out on hover, like the rest of the site. */
-.docs-prose :is(h2, h3, h4) a {
+.docs-prose :is(h2, h3, h4, h5) a {
   color: inherit;
   text-decoration: none;
   background: linear-gradient(currentColor, currentColor) no-repeat 50% 100% / 0% 2px;
@@ -25,7 +26,7 @@
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
-.docs-prose :is(h2, h3, h4) a:hover { background-size: 100% 2px; }
+.docs-prose :is(h2, h3, h4, h5) a:hover { background-size: 100% 2px; }
 .docs-prose a { color: var(--color-neutral-950); text-decoration: underline; text-decoration-color: var(--color-neutral-300); text-underline-offset: 3px; }
 .docs-prose a:hover { text-decoration-color: var(--color-neutral-950); }
 .docs-prose strong { color: var(--color-neutral-950); font-weight: 500; }

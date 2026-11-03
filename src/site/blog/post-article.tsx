@@ -18,7 +18,7 @@ export function PostArticle({ post }: { post: Post }) {
           </p>
         </div>
         <div className="mx-auto mt-12 max-w-4xl overflow-hidden rounded-3xl">
-          <Image src={post.image} alt="" width={754} height={421} unoptimized priority className="aspect-[754/421] w-full object-cover" />
+          <Image src={post.image} alt="" width={754} height={421} unoptimized preload className="aspect-[754/421] w-full object-cover" />
         </div>
         <div className="mx-auto mt-14 max-w-2xl space-y-6 text-[18px] leading-[1.75] text-neutral-700">
           {post.body.map((paragraph) => (
