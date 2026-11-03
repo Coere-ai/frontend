@@ -2,46 +2,12 @@ import type { Metadata } from "next";
 import { siteConfig } from "./site";
 
 /**
- * What people search to find Coere: its names, what it is, the AIs it works
- * across, and what each product does. Every page carries these in its
- * keywords, ahead of its own.
+ * Coere's names and what it is, after each page's own phrases. Kept short
+ * on purpose: Google ignores the keywords tag and Bing reads a long one as
+ * stuffing. What a page ranks for comes from its title, headings and words,
+ * so the phrases people search belong there (src/site/content/seo.ts).
  */
-export const KEYWORDS = [
-  "Coere",
-  "Coere AI",
-  "coere.ai",
-  "AI memory",
-  "memory layer for AI",
-  "AI memory layer",
-  "own your AI memory",
-  "portable AI memory",
-  "memory across every AI",
-  "cross AI memory",
-  "persistent memory for AI",
-  "long term memory for LLMs",
-  "ChatGPT memory",
-  "Claude memory",
-  "Gemini memory",
-  "AI context",
-  "context engineering",
-  "smart context",
-  "knowledge graph",
-  "personal knowledge graph",
-  "AI chat history",
-  "save ChatGPT chats",
-  "AI memory Chrome extension",
-  "team AI memory",
-  "company knowledge base",
-  "memory API",
-  "MCP server",
-  "Model Context Protocol",
-  "AI agents",
-  "Coere Connect",
-  "Coere Solutions",
-  "Coere Forge",
-  "Coere Agents",
-  "Cori",
-];
+export const KEYWORDS = ["Coere", "Coere AI", "coere.ai", "portable AI memory", "AI memory layer"];
 
 type PageSeo = {
   /** The page's own title; the layout adds "| Coere" unless `absolute` is set. */

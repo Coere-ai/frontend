@@ -1,4 +1,5 @@
 import { executives, founders, siteConfig, type TeamMember } from "@/lib/site";
+import type { Faq } from "@/site/content/faqs";
 import type { Product } from "@/site/content/products";
 
 /**
@@ -38,10 +39,12 @@ export const siteGraph = {
       "@id": organizationId,
       url: home,
       name: siteConfig.name,
-      alternateName: siteConfig.legalName,
+      alternateName: [siteConfig.legalName, siteConfig.domain],
       legalName: siteConfig.legalName,
-      description: `${siteConfig.description} Coere is not Cohere: the name comes from the Latin cohaerere, "to connect".`,
+      description: siteConfig.summary,
+      disambiguatingDescription: siteConfig.notCohere,
       slogan: siteConfig.tagline,
+      knowsAbout: ["Portable AI memory", "AI memory layer", "Cross-AI memory", "Personal knowledge graph", "Model Context Protocol"],
       email: siteConfig.email,
       logo: { "@type": "ImageObject", url: `${siteConfig.url}/coere-logo.png`, width: 1024, height: 1024 },
       sameAs: siteConfig.profiles,
@@ -71,6 +74,45 @@ export function productGraph(product: Product) {
     operatingSystem: KIND[product.slug].system,
     image: `${siteConfig.url}${product.image}`,
     publisher: { "@id": organizationId },
+  };
+}
+
+/** A page's visible questions and answers as FAQPage, word for word. Use it only where FaqSection shows the same list. */
+export function faqGraph(faqs: Faq[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
+  };
+}
+
+/**
+ * A guide page: what it is about, tied to Coere's site and organization so
+ * an answer engine knows whose words they are, with its FAQ beside it.
+ */
+export function guideGraph({ path, title, description, about, faqs }: { path: string; title: string; description: string; about: string[]; faqs: Faq[] }) {
+  const url = `${siteConfig.url}${path}`;
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: title,
+        description,
+        inLanguage: "en",
+        isPartOf: { "@id": `${home}#website` },
+        publisher: { "@id": organizationId },
+        about: about.map((name) => ({ "@type": "Thing", name })),
+        mentions: { "@id": organizationId },
+      },
+      { ...faqGraph(faqs), "@context": undefined, "@id": `${url}#faq` },
+    ],
   };
 }
 

@@ -1,43 +1,53 @@
+import { siteConfig } from "@/lib/site";
 import type { Product } from "./products";
 
 /**
- * What each page says in search results and link previews: a title, a
- * description of about 160 characters at most, and the phrases it answers
- * best. Every claim here is one the page itself shows.
+ * What each page says in search results and link previews: a title of
+ * about 60 characters at most, a description of about 155, and the phrases
+ * it answers best. Each page leads with a phrase of its own, so no two
+ * compete for the same search. Every claim here is one the page itself
+ * shows. A title that already starts with Coere is `absolute`, so it isn't
+ * followed by "| Coere" as well.
  */
-type Seo = { title: string; description: string; keywords: string[] };
+type Seo = { title: string; description: string; keywords: string[]; absolute?: boolean };
 
+/** Home: the brand, and what Coere is. */
 export const homeSeo: Seo = {
-  title: "Coere | The memory layer you own, across every AI",
-  description:
-    "Coere is the AI memory layer you own. It saves your chats from ChatGPT, Claude, Gemini and more, and brings the right context into every new chat.",
-  keywords: ["AI memory app", "memory for ChatGPT Claude and Gemini", "one memory across every AI"],
+  title: siteConfig.title,
+  description: siteConfig.description,
+  keywords: ["Coere memory", "Coere AI memory layer", "cross-AI memory", "user-owned AI memory", "AI memory across apps"],
+  absolute: true,
 };
 
+/** Each product's own phrase: Connect cross-AI memory, Solutions team memory, Forge the memory API, Agents the agent. */
 export const productSeo: Record<Product["slug"], Seo> = {
   connect: {
-    title: "Coere Connect: one memory across ChatGPT, Claude and Gemini",
+    title: "Coere Connect: one AI memory for ChatGPT, Claude and Gemini",
     description:
-      "A Chrome extension that saves your chats from every AI, builds a memory graph you own, and adds the right context to each new chat as you type.",
-    keywords: ["AI memory Chrome extension", "ChatGPT memory extension", "save Claude chats", "export ChatGPT conversations", "context as you type", "AI voice mode"],
+      "A Chrome extension that saves your chats from ChatGPT, Claude, Gemini and six more AIs on your computer and adds the right context to each new chat.",
+    keywords: ["AI memory Chrome extension", "memory across ChatGPT Claude and Gemini", "same memory across AI assistants", "save AI chats", "context as you type"],
+    absolute: true,
   },
   solutions: {
     title: "Coere Solutions: shared AI memory for teams and clients",
     description:
       "One memory of your company, its people and its clients, built from the chats your team already has. One client per send, with a source on every answer.",
-    keywords: ["shared AI memory for teams", "company AI knowledge base", "client memory", "AI for agencies", "confidential AI context", "team ChatGPT memory"],
+    keywords: ["shared AI memory for teams", "team AI memory", "client memory", "AI for agencies", "company AI knowledge"],
+    absolute: true,
   },
   forge: {
-    title: "Coere Forge: memory API, MCP server and SDKs for AI apps",
+    title: "Coere Forge: AI memory API, MCP server and SDKs",
     description:
-      "Give your apps and AI agents a memory layer: the Coere API, an MCP server, and TypeScript and Python SDKs, with the person's permission on every call.",
-    keywords: ["memory API for AI apps", "MCP memory server", "AI agent memory", "LLM long term memory", "RAG memory", "TypeScript SDK", "Python SDK"],
+      "A user-permissioned AI memory API: REST, an MCP server, and TypeScript and Python SDKs that let your apps and agents read a person's Coere memory.",
+    keywords: ["AI memory API", "user context API", "memory SDK for developers", "MCP memory server", "TypeScript SDK", "Python SDK"],
+    absolute: true,
   },
   agents: {
-    title: "Coere Agents: one worker, infinite possibilities",
+    title: "Coere Agents: Cori, the AI agent that works from your memory",
     description:
-      "Cori works from your memory: it drafts email in Gmail, adds calendar events, fixes writing, fills forms and splits research across workers, asking before it sends.",
-    keywords: ["AI agent", "browser agent", "AI email assistant", "AI calendar assistant", "AI research agent", "AI form filler", "AI writing assistant"],
+      "Cori, the agent in Coere, works from your memory. It drafts email in Gmail, adds calendar events, fixes writing, fills forms and asks before it sends.",
+    keywords: ["AI agent with memory", "browser agent", "AI email assistant", "AI research agent", "AI form filler"],
+    absolute: true,
   },
 };
 
@@ -63,13 +73,14 @@ export const industriesSeo: Seo = {
 export const docsSeo: Seo = {
   title: "Developer docs: Coere memory API, MCP server and SDKs",
   description:
-    "How to read and write a person's Coere memory from your app or agent: tokens and scopes, every endpoint, the MCP server, and the TypeScript and Python SDKs.",
+    "How to read a person's Coere memory from your app or agent: tokens and scopes, every endpoint, the MCP server, and the TypeScript and Python SDKs.",
   keywords: ["Coere API docs", "memory API documentation", "MCP server docs", "AI memory SDK"],
 };
 
 export const aboutSeo: Seo = {
   title: "About Coere: the team building the memory layer you own",
   description:
-    "Why Coere exists, and the people building it. Coere is the memory layer you own, across every AI. Coere is not Cohere.",
-  keywords: ["Coere team", "Coere founders", "about Coere AI"],
+    "Why Coere exists and who is building it. Coere is the portable AI memory layer you own. It is not Cohere and is not affiliated with it.",
+  keywords: ["Coere team", "Coere founders", "about Coere AI", "Coere not Cohere"],
+  absolute: true,
 };

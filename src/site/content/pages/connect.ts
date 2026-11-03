@@ -6,7 +6,7 @@ import type { FilmCase, GridItem, HeroCopy } from "./types";
 export const connectHero: HeroCopy = {
   eyebrow: "Coere Connect",
   title: "Your memory, across every AI",
-  line: "A Chrome extension that saves your chats from every AI, builds a memory you own from them, and brings it into each new chat.",
+  line: "A Chrome extension that saves your chats from ChatGPT, Claude, Gemini and six more AIs, builds a memory you own from them, and brings it into each new chat.",
   checks: [
     "Every AI: ChatGPT, Claude, Gemini and six more feed one memory",
     "As you type: a line above the chat box says what goes with your message",
@@ -29,6 +29,8 @@ export const connectCases: FilmCase[] = [
     text: "Extract all reads each AI you use and saves every chat on your computer. After that, new chats save by themselves.",
     checks: ["A row for each AI as it saves", "Saved on this computer", "Memory follows a chat that changes"],
     film: "extraction",
+    href: "/chatgpt-to-claude-memory",
+    linkLabel: "Bring your ChatGPT memory to Claude",
   },
   {
     key: "memory",

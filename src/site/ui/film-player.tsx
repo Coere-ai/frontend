@@ -85,7 +85,8 @@ export function FilmPlayer({ film, className }: { film: Film; className?: string
         </span>
         <FilmTimeline film={film.slug} spans={spans} now={now} onSeek={seek} />
       </div>
-      <nav aria-label="Parts of the film" className="mt-4 flex gap-6 overflow-x-auto pb-1 md:justify-center">
+      {/* The parts arrive once the film reports them; the row keeps their height from the start so nothing below it moves. */}
+      <nav aria-label="Parts of the film" className="mt-4 flex min-h-[43px] gap-6 overflow-x-auto pb-1 md:justify-center">
         {spans.map((s) => (
           <button key={s.id} type="button" onClick={() => seek(s.start)} aria-current={s.id === showing?.id} className="group shrink-0 text-left text-[14px] text-white/70 hover:text-white aria-[current=true]:text-white">
             <span className="block text-[12px] text-white/45 tabular-nums">{clock(s.start)}</span>

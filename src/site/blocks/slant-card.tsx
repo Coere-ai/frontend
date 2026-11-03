@@ -53,9 +53,14 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
 
   const words = (
     <div aria-live="polite">
-      <p className="text-[15px] font-medium text-brand-500">{slide.label}</p>
-      <p className="mt-5 text-[24px] leading-snug tracking-[-0.02em] text-neutral-950 text-pretty xl:text-[28px]">{slide.text}</p>
-      {slide.byline ? <p className="mt-6 text-[15px] text-neutral-600">{slide.byline}</p> : null}
+      {/* Every slide's words are in the page; the others wait hidden until their turn. */}
+      {slides.map((s, i) => (
+        <div key={s.label} hidden={i !== index}>
+          <p className="text-[15px] font-medium text-brand-500">{s.label}</p>
+          <p className="mt-5 text-[24px] leading-snug tracking-[-0.02em] text-neutral-950 text-pretty xl:text-[28px]">{s.text}</p>
+          {s.byline ? <p className="mt-6 text-[15px] text-neutral-600">{s.byline}</p> : null}
+        </div>
+      ))}
       <div className="mt-8 flex gap-2" aria-hidden="true">
         {slides.map((s, i) => (
           <span key={s.label} className={`h-1 rounded-full transition-all duration-500 ${i === index ? "w-8 bg-neutral-950" : "w-3 bg-neutral-300"}`} />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { guides } from "@/site/content/guides";
 import { contactHref } from "@/site/content/navigation";
 import { products } from "@/site/content/products";
 import { Brand } from "@/site/ui/brand";
@@ -6,6 +7,7 @@ import { Container } from "@/site/ui/container";
 
 const columns = [
   { title: "Products", links: products.map((p) => ({ href: `/products/${p.slug}`, label: p.name })) },
+  { title: "Guides", links: guides.map((g) => ({ href: `/${g.slug}`, label: g.name })) },
   {
     title: "Company",
     links: [
@@ -34,7 +36,7 @@ function currentYear(): number {
 export function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-white">
-      <Container className="grid gap-12 py-16 md:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
+      <Container className="grid gap-12 py-16 sm:grid-cols-2 md:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,1fr))]">
         <div>
           <Brand />
           <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-neutral-500">

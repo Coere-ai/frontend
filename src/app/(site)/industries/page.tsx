@@ -24,7 +24,7 @@ export default function IndustriesPage() {
       </section>
       <section className="border-t border-neutral-100 bg-neutral-50 py-24">
         <Container>
-          <p className="text-sm font-medium text-neutral-500">Who it&apos;s for</p>
+          <h2 className="text-sm font-medium text-neutral-500">Who it&apos;s for</h2>
           <div className="mt-6">
             <ApplicationsGrid />
           </div>
@@ -32,7 +32,7 @@ export default function IndustriesPage() {
       </section>
       <section className="py-24">
         <Container>
-          <p className="text-sm font-medium text-neutral-500">Industries</p>
+          <h2 className="text-sm font-medium text-neutral-500">Industries</h2>
           <div className="mt-6">
             <IndustryGrid />
           </div>

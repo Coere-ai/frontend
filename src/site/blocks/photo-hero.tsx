@@ -50,7 +50,7 @@ export function PhotoHero({
   if (appFit === "centered") {
     return (
       <section className="relative isolate overflow-hidden bg-neutral-950">
-        <SizedPhoto src={photo} alt={alt} fill priority sizes="100vw" className="-z-20 object-cover" />
+        <SizedPhoto src={photo} alt={alt} fill preload sizes="100vw" className="-z-20 object-cover" />
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-neutral-950/75 via-neutral-950/45 to-neutral-950/25" />
         <div className="mx-auto max-w-[1200px] px-6 pt-16 pb-20 text-center text-white md:px-10 md:pt-20 md:pb-24">
           {eyebrow ? <p className="text-[15px] font-medium text-white/80">{eyebrow}</p> : null}
@@ -66,7 +66,7 @@ export function PhotoHero({
 
   return (
     <section className="relative isolate overflow-hidden bg-neutral-950">
-      <SizedPhoto src={photo} alt={alt} fill priority sizes="100vw" className="-z-20 object-cover" />
+      <SizedPhoto src={photo} alt={alt} fill preload sizes="100vw" className="-z-20 object-cover" />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-r from-neutral-950/75 via-neutral-950/35 to-neutral-950/10" />
       <div className={`mx-auto grid min-h-[calc(100svh-73px)] max-w-[1440px] gap-12 px-6 md:px-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] py-20`}>
         {/* The words and the app both sit in the middle of the screen's height, the app whole in its frame. */}

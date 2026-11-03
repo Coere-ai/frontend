@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { compareTables, type Mark } from "@/site/content/compare";
+import { compareTables, type CompareTable as Table, type Mark } from "@/site/content/compare";
 import { Container } from "@/site/ui/container";
 import { CheckIcon } from "@/site/ui/icons/interface-icons";
 
@@ -28,17 +28,59 @@ function Cell({ mark, coere = false }: { mark: Mark; coere?: boolean }) {
   );
 }
 
+const TABLE = "w-full min-w-[620px] border-collapse text-left md:min-w-[820px]";
+
+/** What goes inside one product's table: its caption, the products across the top and a row per point. */
+function Contents({ table }: { table: Table }) {
+  return (
+    <>
+      <caption className="sr-only">{`${table.coere} compared with ${table.others.join(", ")}`}</caption>
+      <thead>
+        <tr>
+          <th scope="col" className="sticky left-0 z-10 w-[160px] bg-white px-4 pt-8 pb-5 md:w-[30%] md:px-8" />
+          <th scope="col" className="rounded-t-2xl bg-brand-50 px-4 pt-8 pb-5 text-center">
+            <span className="block text-[14px] font-medium text-brand-600 md:text-[16px]">{table.coere}</span>
+            <span className="mt-1.5 inline-block rounded-full bg-white px-2.5 py-0.5 text-[12px] font-medium text-brand-600 ring-1 ring-brand-200">{table.price}</span>
+          </th>
+          {table.others.map((name) => (
+            <th key={name} scope="col" className="px-3 pt-8 pb-5 text-center align-top text-[13px] font-medium text-neutral-500 md:px-4 md:text-[15px]">
+              {name}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {table.rows.map((row, r) => (
+          <tr key={row.name} className="border-t border-neutral-100">
+            <th scope="row" className="sticky left-0 z-10 bg-white px-4 py-5 font-normal md:px-8">
+              <span className="block text-[14px] font-medium text-neutral-950 md:text-[16px]">{row.name}</span>
+              <span className="mt-0.5 hidden text-[14px] leading-snug text-neutral-500 sm:block">{row.detail}</span>
+            </th>
+            {row.marks.map((mark, i) => (
+              <td key={i} className={`px-4 py-5 text-center ${i === 0 ? `bg-brand-50 ${r === table.rows.length - 1 ? "rounded-b-2xl" : ""}` : ""}`}>
+                <Cell mark={mark} coere={i === 0} />
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </>
+  );
+}
+
 /**
  * How Coere compares: one table per product, picked from a row of pills,
  * against the products people use for the same job, with ChatGPT and
  * Claude's own memory as the baseline. Coere's column carries its price.
+ * Every table is in the page, so all of them can be read and found; the
+ * ones not picked are hidden until their pill is.
  */
-export function CompareTable() {
+export function CompareTable({ id = "compare" }: { id?: string }) {
   const [picked, setPicked] = useState(compareTables[0].key);
   const table = compareTables.find((t) => t.key === picked) ?? compareTables[0];
 
   return (
-    <section id="compare" className="scroll-mt-24 pb-28 md:pb-36">
+    <section id={id} className="scroll-mt-24 pb-28 md:pb-36">
       <Container>
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[15px] font-medium text-brand-500">How Coere compares</p>
@@ -62,48 +104,20 @@ export function CompareTable() {
           ))}
         </div>
 
-        <div className="mt-10 overflow-x-auto rounded-3xl bg-white ring-1 ring-neutral-200 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.3)]">
+        {/* relative: the marks' screen reader words are absolutely placed, and must stay inside this scroller, not widen the page on a phone. */}
+        <div className="relative mt-10 overflow-x-auto rounded-3xl bg-white ring-1 ring-neutral-200 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.3)]">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.table
-              key={table.key}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="w-full min-w-[620px] border-collapse text-left md:min-w-[820px]"
-            >
-              <caption className="sr-only">{`${table.coere} compared with ${table.others.join(", ")}`}</caption>
-              <thead>
-                <tr>
-                  <th scope="col" className="sticky left-0 z-10 w-[160px] bg-white px-4 pt-8 pb-5 md:w-[30%] md:px-8" />
-                  <th scope="col" className="rounded-t-2xl bg-brand-50 px-4 pt-8 pb-5 text-center">
-                    <span className="block text-[14px] font-medium text-brand-600 md:text-[16px]">{table.coere}</span>
-                    <span className="mt-1.5 inline-block rounded-full bg-white px-2.5 py-0.5 text-[12px] font-medium text-brand-600 ring-1 ring-brand-200">{table.price}</span>
-                  </th>
-                  {table.others.map((name) => (
-                    <th key={name} scope="col" className="px-3 pt-8 pb-5 text-center align-top text-[13px] font-medium text-neutral-500 md:px-4 md:text-[15px]">
-                      {name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {table.rows.map((row, r) => (
-                  <tr key={row.name} className="border-t border-neutral-100">
-                    <th scope="row" className="sticky left-0 z-10 bg-white px-4 py-5 font-normal md:px-8">
-                      <span className="block text-[14px] font-medium text-neutral-950 md:text-[16px]">{row.name}</span>
-                      <span className="mt-0.5 hidden text-[14px] leading-snug text-neutral-500 sm:block">{row.detail}</span>
-                    </th>
-                    {row.marks.map((mark, i) => (
-                      <td key={i} className={`px-4 py-5 text-center ${i === 0 ? `bg-brand-50 ${r === table.rows.length - 1 ? "rounded-b-2xl" : ""}` : ""}`}>
-                        <Cell mark={mark} coere={i === 0} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
+            <motion.table key={table.key} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className={TABLE}>
+              <Contents table={table} />
             </motion.table>
           </AnimatePresence>
+          {compareTables
+            .filter((t) => t.key !== table.key)
+            .map((t) => (
+              <table key={t.key} hidden className={TABLE}>
+                <Contents table={t} />
+              </table>
+            ))}
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] text-neutral-500">

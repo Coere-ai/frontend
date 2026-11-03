@@ -5,7 +5,7 @@ import type { FilmCase, GridItem, HeroCopy } from "./types";
 export const solutionsHero: HeroCopy = {
   eyebrow: "Coere Solutions",
   title: "One memory for the whole company",
-  line: "Coere for Teams builds one memory of the company, its people and its clients from the chats your team already has.",
+  line: "Coere Solutions gives your team shared AI memory: one memory of the company, its people and its clients, built from the chats your team already has.",
   checks: [
     "Company: the team, its way of working and its tools",
     "Clients: a folder for each, with contacts and promises",

@@ -6,8 +6,8 @@ import type { GridItem, HeroCopy } from "./types";
  */
 export const forgeHero: HeroCopy = {
   eyebrow: "Coere Forge",
-  title: "Memory infrastructure for your apps",
-  line: "A REST API, an MCP server and TypeScript and Python clients that let your apps and agents read a person's Coere memory, with their permission.",
+  title: "The memory API for your apps and agents",
+  line: "Build personalized AI experiences with a user-permissioned memory API. A REST API, an MCP server and TypeScript and Python SDKs let your apps and agents read the memory a person already built across their AIs.",
   checks: [
     "Context for a draft: the memories a new chat would get, ready to put in front",
     "Permission first: the person presses Allow, and the token comes once",
