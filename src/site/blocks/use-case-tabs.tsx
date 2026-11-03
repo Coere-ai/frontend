@@ -39,17 +39,21 @@ export function UseCaseTabs({ cases }: { cases: UseCase[] }) {
         ))}
       </div>
 
-      <div role="tabpanel" className="mt-16 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:gap-20">
-        <div>
-          <h3 className="text-3xl font-medium tracking-[-0.03em] text-neutral-950 text-balance">{active.title}</h3>
-          <p className="mt-4 text-[17px] leading-relaxed text-neutral-600">{active.text}</p>
-          {active.checks ? <CheckList items={active.checks} className="mt-7" /> : null}
-          {active.href ? <ArrowLink href={active.href} className="mt-7 text-neutral-950">{active.linkLabel ?? "Learn more"}</ArrowLink> : null}
-        </div>
-        <div key={active.key} className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.3)]">
-          {active.visual}
-        </div>
-      </div>
+      {/* Every case's words are in the page, so all of them can be read and found; only the picked one shows, and only its demo is mounted. */}
+      {cases.map((c) => {
+        const on = c.key === active.key;
+        return (
+          <div key={c.key} role="tabpanel" aria-label={c.label} hidden={!on} className="mt-16 grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] lg:gap-20">
+            <div>
+              <h3 className="text-3xl font-medium tracking-[-0.03em] text-neutral-950 text-balance">{c.title}</h3>
+              <p className="mt-4 text-[17px] leading-relaxed text-neutral-600">{c.text}</p>
+              {c.checks ? <CheckList items={c.checks} className="mt-7" /> : null}
+              {c.href ? <ArrowLink href={c.href} className="mt-7 text-neutral-950">{c.linkLabel ?? "Learn more"}</ArrowLink> : null}
+            </div>
+            {on ? <div className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.3)]">{c.visual}</div> : null}
+          </div>
+        );
+      })}
     </div>
   );
 }

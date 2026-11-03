@@ -84,21 +84,15 @@ export function Capabilities() {
                       <span className="hidden w-6 text-[12px] text-white/35 tabular-nums lg:inline">{String(i + 1).padStart(2, "0")}</span>
                       <span className="text-[15px] font-medium lg:text-[20px] lg:tracking-[-0.02em]">{feature.name}</span>
                     </span>
-                    <AnimatePresence initial={false}>
-                      {on ? (
-                        <motion.span
-                          key="more"
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                          className="hidden overflow-hidden pl-10 lg:block"
-                        >
-                          <span className="block pt-2 text-[15px] font-medium text-white/90">{feature.title}</span>
-                          <span className="block pt-1.5 text-[14px] leading-relaxed text-white/55">{feature.description}</span>
-                        </motion.span>
-                      ) : null}
-                    </AnimatePresence>
+                    {/* Every feature's words are in the page; the picked one opens, the others fold shut. */}
+                    <span
+                      className={`hidden pl-10 transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid ${on ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                    >
+                      <span className="min-h-0 overflow-hidden">
+                        <span className="block pt-2 text-[15px] font-medium text-white/90">{feature.title}</span>
+                        <span className="block pt-1.5 text-[14px] leading-relaxed text-white/55">{feature.description}</span>
+                      </span>
+                    </span>
                   </button>
                 </li>
               );
