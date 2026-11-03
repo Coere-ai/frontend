@@ -84,3 +84,11 @@ export const aboutSeo: Seo = {
   keywords: ["Coere team", "Coere founders", "about Coere AI", "Coere not Cohere"],
   absolute: true,
 };
+
+/** The developer waitlist: memory for an app's users, and the launch credits. */
+export const waitlistSeo: Seo = {
+  title: "Developer waitlist: give your app's users memory",
+  description:
+    "Join the Coere Forge waitlist to give your app's users memory from day one, with their permission. Get 1,000 free credits at launch.",
+  keywords: ["Coere Forge waitlist", "AI memory API waitlist", "user memory for apps", "Coere developer access"],
+};

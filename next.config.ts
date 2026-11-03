@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
         destination: "https://www.coere.ai/:path*",
         permanent: true,
       },
+      // The developer waitlist has one address; the short and singular forms
+      // people type lead to it. /developers has no page of its own yet.
+      { source: "/developers", destination: "/developers/waitlist", permanent: false },
+      { source: "/developer", destination: "/developers/waitlist", permanent: false },
+      { source: "/developer/waitlist", destination: "/developers/waitlist", permanent: true },
     ];
   },
 };

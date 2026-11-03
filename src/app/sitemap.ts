@@ -35,6 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...industries.map((i) => page(`/industries/${i.slug}`, 0.7)),
     page("/resources", 0.8, UPDATED.docs),
     ...docPages.filter((d) => d.slug !== "overview").map((d) => page(`/resources/${d.slug}`, 0.6, UPDATED.docs, "monthly")),
+    page("/developers/waitlist", 0.7),
     page("/about", 0.6, UPDATED.site, "monthly"),
   ];
 }
