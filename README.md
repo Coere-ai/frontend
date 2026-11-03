@@ -38,6 +38,10 @@ has the research and the remaining manual steps.
 The blog and careers pages are hidden from the menus for now. They still
 answer at their addresses but are `noindex` and left out of the sitemap.
 
+`/install` and `/try-teams` say Coere and Coere for Teams are coming soon.
+Every Install and Try it free button leads there until the extension is in
+the Chrome Web Store. They are `noindex` and left out of the sitemap too.
+
 ## Where things live
 
 ```
