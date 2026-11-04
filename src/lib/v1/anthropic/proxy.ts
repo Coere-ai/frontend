@@ -37,5 +37,5 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   const url = upstreamUrl(segments, upstreamSearch(new URL(req.url).searchParams));
   const up = await forwardToAnthropic(req, { url, apiKey, beta: prepared.beta, body: prepared.body });
   if (!up) return anthropicError("upstream");
-  return relayAnswer(up, { account: g.account, op, started, requestCount: prepared.requestCount });
+  return relayAnswer(up, { account: g.account, op, started, requestCount: prepared.requestCount, model: prepared.model ?? null });
 }

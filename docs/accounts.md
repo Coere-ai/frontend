@@ -468,8 +468,11 @@ error classes keep working unchanged:
 | Body too large | `413 {…request_too_large, message:'request_too_large'}` |
 | Server has no key | `503 {…api_error, message:'unavailable'}` |
 
-**Metering.** A successful message writes one usage row from its `usage`
-(input, output, cache write, cache read) priced by the table in section 11.
+**Metering.** A successful message writes one usage row per model from its
+`usage` (input, output, cache write, cache read) priced by the table in
+section 11. With a refusal fallback, each entry of `usage.iterations` is
+priced at its own model, the declined attempt included, as the extension's
+own counter does.
 Batch results are read as they stream through; when the stream ends, one
 row per model is written at half price and the batch is marked metered, so
 reading the results twice counts once.

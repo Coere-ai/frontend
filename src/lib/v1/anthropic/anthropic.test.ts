@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { answerHeaders, upstreamHeaders } from "./headers";
 import { checkBatchBody, checkBeta, checkParams } from "./params";
 import { matchAnthropicPath, upstreamSearch, upstreamUrl } from "./paths";
-import { createBatchTally, usageOf } from "./usage";
+import { attemptsOf, byModel, createBatchTally, usageOf } from "./usage";
 
 const seg = (p: string) => p.split("/");
 
@@ -158,6 +158,47 @@ describe("usage", () => {
       cacheRead: 0,
     });
     assert.equal(usageOf({}), null);
+  });
+
+  // The shape of coere-v2 tests/fake-claude/rules.ts viaFallback: Opus declined, Sonnet served.
+  const fallback = {
+    model: "claude-sonnet-5-5",
+    usage: {
+      input_tokens: 1000,
+      output_tokens: 400,
+      iterations: [
+        { type: "message", model: "claude-opus-5-5", input_tokens: 1000, output_tokens: 10 },
+        { type: "fallback_message", model: "claude-sonnet-5-5", input_tokens: 1000, output_tokens: 400 },
+      ],
+    },
+  };
+
+  it("prices each fallback attempt at its own model, the declined one included", () => {
+    const attempts = attemptsOf(fallback, "claude-opus-5-5");
+    assert.deepEqual(attempts, [
+      { model: "claude-opus-5-5", tokens: { input: 1000, output: 10, cacheWrite: 0, cacheRead: 0 } },
+      { model: "claude-sonnet-5-5", tokens: { input: 1000, output: 400, cacheWrite: 0, cacheRead: 0 } },
+    ]);
+    assert.equal(byModel(attempts).size, 2);
+  });
+
+  it("uses the asked model for an iteration that names none, and the top level without iterations", () => {
+    const bare = { model: "claude-sonnet-5-5", usage: { input_tokens: 5, output_tokens: 1, iterations: [{ input_tokens: 5, output_tokens: 1 }] } };
+    assert.equal(attemptsOf(bare, "claude-opus-5-5")[0]?.model, "claude-opus-5-5");
+    assert.deepEqual(attemptsOf({ model: "claude-haiku-5-5", usage: { input_tokens: 3, output_tokens: 2 } }, "claude-haiku-5-5"), [
+      { model: "claude-haiku-5-5", tokens: { input: 3, output: 2, cacheWrite: 0, cacheRead: 0 } },
+    ]);
+    assert.deepEqual(attemptsOf({}, "claude-opus-5-5"), []);
+  });
+
+  it("meters a fallback inside batch results too", () => {
+    const text = JSON.stringify({ custom_id: "c", result: { type: "succeeded", message: fallback } });
+    const tally = createBatchTally();
+    tally.push(new TextEncoder().encode(text));
+    const totals = tally.end();
+    assert.equal(totals.get("claude-opus-5-5")?.costMicros, 2100);
+    assert.equal(totals.get("claude-opus-5-5")?.items, 0);
+    assert.equal(totals.get("claude-sonnet-5-5")?.items, 1);
   });
 
   it("tallies batch results by model at half price, across any chunking", () => {

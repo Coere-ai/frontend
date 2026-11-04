@@ -8,7 +8,7 @@ import { anthropicError } from "./errors";
 import { answerHeaders } from "./headers";
 import type { AnthropicOp } from "./paths";
 import { meteredResults } from "./results-stream";
-import { usageOf } from "./usage";
+import { attemptsOf, byModel } from "./usage";
 
 /**
  * What the proxy does with Anthropic's answer, by path (docs/accounts.md
@@ -22,6 +22,8 @@ interface AnswerContext {
   op: AnthropicOp;
   started: number;
   requestCount: number;
+  /** The model the request asked for, for a fallback attempt that names none. */
+  model: string | null;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -72,17 +74,20 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
   const data = parse(text);
 
   if (op.op === "message") {
-    const tokens = usageOf(data) ?? NO_TOKENS;
-    const model = isRecord(data) && typeof data.model === "string" ? data.model : null;
-    await recordUsage(c.account, {
-      kind: "message",
-      model,
-      tokens,
-      costMicros: costMicros(model ?? "", tokens, "direct"),
-      status,
-      durationMs: Date.now() - c.started,
-      requestId,
-    });
+    // One row per model that ran, so a declined fallback attempt is paid for too.
+    const models = byModel(attemptsOf(data, c.model));
+    if (models.size === 0) models.set(c.model ?? "", NO_TOKENS);
+    for (const [model, tokens] of models) {
+      await recordUsage(c.account, {
+        kind: "message",
+        model: model || null,
+        tokens,
+        costMicros: costMicros(model, tokens, "direct"),
+        status,
+        durationMs: Date.now() - c.started,
+        requestId,
+      });
+    }
   } else if (op.op === "count_tokens") {
     // Counting is free; the row counts the request without adding tokens to the totals.
     await recordUsage(c.account, { kind: "count_tokens", model: null, tokens: NO_TOKENS, costMicros: 0, status, durationMs: Date.now() - c.started, requestId });

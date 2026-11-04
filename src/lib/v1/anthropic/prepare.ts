@@ -12,7 +12,7 @@ import type { AnthropicOp } from "./paths";
 export const BODY_CAP = 4 * 1024 * 1024;
 
 export type Prepared =
-  | { ok: true; beta: string | null; body: Uint8Array | null; requestCount: number }
+  | { ok: true; beta: string | null; body: Uint8Array | null; requestCount: number; model?: string }
   | { ok: false; error: AnthropicCase; model?: string };
 
 const WITH_PARAMS = new Set(["message", "count_tokens", "batch_create"]);
@@ -33,5 +33,6 @@ export async function prepareRequest(req: Request, op: AnthropicOp): Promise<Pre
   const check = op.op === "batch_create" ? checkBatchBody(parsed) : checkParams(parsed);
   if (!check.ok) return check.reason === "model" ? { ok: false, error: "model", model: check.model } : { ok: false, error: "bad_request" };
   const requestCount = op.op === "batch_create" ? ((check as { count?: number }).count ?? 0) : 1;
-  return { ok: true, beta, body: read.bytes, requestCount };
+  const model = op.op === "message" ? ((parsed as { model?: string }).model ?? undefined) : undefined;
+  return { ok: true, beta, body: read.bytes, requestCount, ...(model ? { model } : {}) };
 }
