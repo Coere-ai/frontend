@@ -74,10 +74,15 @@ redeploy:
 
 ## 4. Before anyone else installs it
 
-The free plan's monthly limit is $5 and the hidden daily limit is $2, so a
-free person reaches the month's limit on the third day. Decide the plan
-limits on `/admin/limits` (for example $60 a month to let $2 a day run all
-month), and check the first build allowance ($10).
+The limits are decided: the monthly limit governs, and the person never
+sees a limit. Every account gets a $10 first build allowance until its
+first memory build finishes, in place of the monthly limit. After it, the
+monthly limit applies, counting only spend after the build: $5 on Free, $20
+on Plus, $100 on Team. There is no daily limit on any plan; the operator
+can still set one on `/admin/limits`, or for one account on its page under
+`/admin/users`, and blank means off. The lifetime limit applies always, and
+no plan has one. On `/admin/limits`, check these are the values you want
+before anyone else installs it.
 
 ## 5. The launch countdown
 

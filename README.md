@@ -120,14 +120,14 @@ lists what each page shows.
 | --- | --- |
 | `/admin` | Statistics: the product's running totals, by day and in total, and the top accounts and organizations by tokens saved |
 | `/admin/analytics` | The site analytics: the Optagon landing page's dashboard, ported whole |
-| `/admin/users` | Every account, and whether its free first build is used. One opens to its totals, devices and graph, with its plan, its own daily, first build, monthly and lifetime dollar limits, today's spend against its daily limit, a reset of the free first build, suspend and restore, and revoke every device |
+| `/admin/users` | Every account, and whether its free first build is used. One opens to its totals, devices and graph, with its plan, its own daily, first build, monthly and lifetime dollar limits, each limit in force with its spend, a reset of the free first build, suspend and restore, and revoke every device |
 | `/admin/organizations` | Every organization, and the only place one is made. One opens to its members, roles, access, settings, invites and graph, and can be deleted |
 | `/admin/interested` | Who is interested: the developer waitlist, Coere Connect and Coere for Teams, each by day with a CSV download, and Export all. `/admin/waitlist` leads here |
 | `/admin/launch` | The launch countdowns on `/install` and `/try-teams`: the moment, whether the timer shows, and a live preview |
 | `/admin/database` | Each table's estimated rows, size, Row Level Security and policies, and the Storage totals |
 | `/admin/security` | The security log over 7, 30 or 90 days, and any table with Row Level Security off |
 | `/admin/cost` | AI spend by day, and for today, this month, the last 30 days or all time each model's requests, tokens and cost with a total, and the top accounts by cost, tokens or requests. Storage's cost at $0.021 per GB month |
-| `/admin/limits` | Each plan's daily, first build, monthly and lifetime limits, one daily limit for every plan at once, and how many accounts override each, with Clear all |
+| `/admin/limits` | Each plan's daily (off by default), first build, monthly and lifetime limits, one daily limit for every plan at once (blank for off), and how many accounts override each, with Clear all |
 
 The pages are in `src/app/admin`, their client panels in `src/admin` (the
 site analytics panel and the charts stay in `src/stats`), and their data in
@@ -285,6 +285,10 @@ Organization, Settings and Account (`docs/accounts.md` sections 7 and 14).
 - Pages talk to the extension through `src/site/bridge/`: they find it by
   the `coere_ext` cookie, else each id in `COERE_EXTENSION_IDS`, and send
   `coere.hello`, `coere.open`, `coere.backup` and `coere.settings`.
+- No page shows a spend limit, a plan limit or a meter against one. While a
+  limit is reached, the Overview and Usage pages say so in one line, which
+  `src/lib/dashboard/paused.ts` reads from `spend_state()` with the secret
+  key (`docs/accounts.md` 7).
 - Organizations are made in the admin panel, never from the dashboard. An
   admin invites coworkers by the email or username of their Coere account,
   and the invite waits on the coworker's Organization page.
@@ -375,13 +379,15 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
 - Answers are `no-store` and `noindex`, with no CORS headers: the extension
   holds the site as a host, and pages never call these routes.
 - Requests per minute come from the plan and are counted per device in each
-  server instance's memory. The monthly and lifetime limits (the person's
-  own when the operator set one, else the plan's) are checked before every
-  call that starts new spend. So is a hidden daily limit, $2 per UTC day by
-  default, which starts once the account's first memory build has finished;
-  until then a $10 first build allowance applies instead
-  (`docs/accounts.md` 8.10). A spent one answers Anthropic's own spend
-  limit 400 on the Claude routes and a `usage_limit` 429 elsewhere.
+  server instance's memory. The spend limits (the person's own when the
+  operator set one, else the plan's) are checked before every call that
+  starts new spend: a $10 first build allowance until the account's first
+  memory build has finished, then the monthly limit ($5 on Free), counting
+  only spend after that build. There is no daily limit unless the operator
+  sets one, and the lifetime limit applies always (`docs/accounts.md` 8.10).
+  A spent one answers Anthropic's own spend limit 400 on the Claude routes
+  and a `usage_limit` 429 elsewhere. The person never sees a limit: the
+  dashboard says only that their AI use is paused, while it is.
 - Refused tokens, rate limits and spent limits write `security_events`
   rows. The token itself is never stored or logged; only its SHA-256 is.
 
