@@ -9,6 +9,7 @@ import { inviteByLogin } from "@/lib/org/invite";
 import { countAdmins, memberRole } from "@/lib/org/queries";
 import { cleanAccess, cleanOrgName, cleanSections, mayChangeRole, mayRemove, parseRole } from "@/lib/org/roles";
 import { logSecurityEvent } from "@/lib/security/events";
+import { dropMember } from "@/lib/org/drop-member";
 import { supabase } from "@/lib/supabase";
 
 /**
@@ -71,7 +72,13 @@ export async function changeRole(userId: string, to: string): Promise<OrgResult>
   const target = isUuid(userId) ? await memberRole(orgId, userId) : null;
   if (!role || !target) return failed(UNAVAILABLE);
   const verdict = mayChangeRole({ actor: ctx.membership.role, target, to: role, admins: await countAdmins(orgId) });
-  if (!verdict.ok) return verdict.reason === "last_admin" ? failed("An organization needs an admin. Make someone else an admin first.") : { ok: true };
+  const lastAdmin = "An organization needs an admin. Make someone else an admin first.";
+  if (!verdict.ok) return verdict.reason === "last_admin" ? failed(lastAdmin) : { ok: true };
+  if (role === "member") {
+    // Counted again under a lock, so two admins demoting each other cannot both pass.
+    const dropped = await dropMember(orgId, userId, "demote");
+    return dropped === "ok" ? { ok: true } : failed(dropped === "last_admin" ? lastAdmin : UNAVAILABLE);
+  }
   const { error } = await supabase().from("org_members").update({ role }).eq("org_id", orgId).eq("user_id", userId);
   return error ? failed(UNAVAILABLE) : { ok: true };
 }
@@ -98,8 +105,9 @@ export async function removeMember(userId: string): Promise<OrgResult> {
   if (!target) return failed(UNAVAILABLE);
   const verdict = mayRemove({ actor: ctx.membership.role, actorId: ctx.user.id, targetId: userId, target, admins: await countAdmins(orgId) });
   if (!verdict.ok) return failed(verdict.reason === "self" ? "To remove yourself, leave the organization." : "An organization needs an admin.");
-  const { error } = await supabase().from("org_members").delete().eq("org_id", orgId).eq("user_id", userId);
-  if (error) return failed(UNAVAILABLE);
+  const dropped = await dropMember(orgId, userId, "remove");
+  if (dropped === "last_admin") return failed("An organization needs an admin.");
+  if (dropped !== "ok") return failed(UNAVAILABLE);
   await refreshMemberPart(orgId, userId).catch(() => console.error("organization graph not updated"));
   await logSecurityEvent("org_member_removed", { userId, orgId, headers: await headers() });
   return { ok: true };

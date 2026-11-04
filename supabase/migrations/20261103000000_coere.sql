@@ -1592,6 +1592,45 @@ begin
 end;
 $$;
 
+-- Demotes or removes a member while keeping the rule that an organization
+-- always has an admin (section 14.1). The organization row is locked, so
+-- two admins demoting each other, or leaving, at the same moment are
+-- counted one after the other instead of both seeing two admins. Answers
+-- 'ok', 'last_admin' or 'not_member'. The operator's own actions do not go
+-- through here.
+create or replace function public.org_drop_member(p_org uuid, p_user uuid, p_action text)
+returns text
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_role   text;
+  v_admins integer;
+begin
+  if p_action not in ('demote', 'remove') then
+    raise exception 'unknown action %', p_action;
+  end if;
+  perform 1 from public.organizations o where o.id = p_org for update;
+  select m.role into v_role from public.org_members m where m.org_id = p_org and m.user_id = p_user;
+  if not found then
+    return 'not_member';
+  end if;
+  if v_role = 'admin' then
+    select count(*) into v_admins from public.org_members m where m.org_id = p_org and m.role = 'admin';
+    if v_admins <= 1 then
+      return 'last_admin';
+    end if;
+  end if;
+  if p_action = 'demote' then
+    update public.org_members m set role = 'member' where m.org_id = p_org and m.user_id = p_user;
+  else
+    delete from public.org_members m where m.org_id = p_org and m.user_id = p_user;
+  end if;
+  return 'ok';
+end;
+$$;
+
 -- Accepts an invite for the signed in person and returns the organization's
 -- id. The invite row is locked first, so two presses cannot both join.
 -- Refusals, by message:
@@ -1695,6 +1734,7 @@ revoke all on function public.record_app_events(uuid, uuid, jsonb) from public, 
 revoke all on function public.set_memory_totals(uuid) from public, anon, authenticated;
 revoke all on function public.set_org_memory_totals(uuid) from public, anon, authenticated;
 revoke all on function public.create_organization(text, text, uuid, text) from public, anon, authenticated;
+revoke all on function public.org_drop_member(uuid, uuid, text) from public, anon, authenticated;
 revoke all on function public.accept_org_invite(uuid, uuid) from public, anon, authenticated;
 revoke all on function public.admin_table_stats() from public, anon, authenticated;
 revoke all on function public.admin_storage_usage() from public, anon, authenticated;
@@ -1707,6 +1747,7 @@ grant execute on function public.record_app_events(uuid, uuid, jsonb) to service
 grant execute on function public.set_memory_totals(uuid) to service_role;
 grant execute on function public.set_org_memory_totals(uuid) to service_role;
 grant execute on function public.create_organization(text, text, uuid, text) to service_role;
+grant execute on function public.org_drop_member(uuid, uuid, text) to service_role;
 grant execute on function public.accept_org_invite(uuid, uuid) to service_role;
 grant execute on function public.admin_table_stats() to service_role;
 grant execute on function public.admin_storage_usage() to service_role;

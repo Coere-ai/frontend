@@ -103,6 +103,22 @@ export async function checkCreateOrganization(db) {
   await refused(db, "a malformed access is refused", `update public.org_members set access = '{"read": "some"}' where user_id = $1`, /org_members_access_shape/, [A]);
   await rows(db, "a section list access is allowed", `update public.org_members set access = '{"read": ["work"], "contribute": false}' where user_id = $1`, [A]);
   await db.query("update public.org_members set access = null where user_id = $1", [A]);
+  // org_drop_member keeps one admin. Rolled back, so A stays the only admin for the checks after.
+  await db.exec("begin");
+  await as(db, "service_role", null, async () => {
+    const drop = (user, action) => one(db, `drop ${action}`, "select public.org_drop_member($1, $2, $3)", [org, user, action]);
+    equal("the only admin cannot be demoted", await drop(A, "demote"), "last_admin");
+    equal("the only admin cannot leave", await drop(A, "remove"), "last_admin");
+    equal("someone outside answers not_member", await drop(B, "remove"), "not_member");
+  });
+  await db.query("insert into public.org_members (org_id, user_id, role) values ($1, $2, 'admin')", [org, B]);
+  await as(db, "service_role", null, async () => {
+    equal("with two admins one may be demoted", await one(db, "demote B", "select public.org_drop_member($1, $2, 'demote')", [org, B]), "ok");
+    equal("then the last one still cannot", await one(db, "demote A", "select public.org_drop_member($1, $2, 'demote')", [org, A]), "last_admin");
+    equal("a member may leave", await one(db, "remove B", "select public.org_drop_member($1, $2, 'remove')", [org, B]), "ok");
+  });
+  equal("one admin is left", await one(db, "admins", "select count(*)::int from public.org_members where org_id = $1 and role = 'admin'", [org]), 1);
+  await db.exec("rollback");
   await as(db, "service_role", null, async () => {
     equal("device_auth now names the org", (await rows(db, "org via auth", "select org_id from public.device_auth('hash_a')"))?.[0]?.org_id, org);
   });

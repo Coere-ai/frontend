@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { getUser } from "@/lib/auth/user";
 import { refreshMemberPart } from "@/lib/memory/org-index";
 import { failed, isUuid, memberContext, SIGNED_OUT, UNAVAILABLE, type OrgResult } from "@/lib/org/action-context";
+import { dropMember } from "@/lib/org/drop-member";
 import { countAdmins } from "@/lib/org/queries";
 import { mayLeave } from "@/lib/org/roles";
 import { logSecurityEvent } from "@/lib/security/events";
@@ -65,11 +66,12 @@ export async function leaveOrganization(): Promise<OrgResult> {
   const ctx = await memberContext();
   if (!ctx.ok) return ctx.result;
   const { orgId, role } = ctx.membership;
-  if (!mayLeave({ role, admins: role === "admin" ? await countAdmins(orgId) : 2 }).ok) {
-    return failed("You are the only admin. Make another member an admin before you leave.");
-  }
-  const { error } = await supabase().from("org_members").delete().eq("org_id", orgId).eq("user_id", ctx.user.id);
-  if (error) return failed(UNAVAILABLE);
+  const onlyAdmin = "You are the only admin. Make another member an admin before you leave.";
+  if (!mayLeave({ role, admins: role === "admin" ? await countAdmins(orgId) : 2 }).ok) return failed(onlyAdmin);
+  // Counted again under a lock, so two admins leaving at once cannot both pass.
+  const dropped = await dropMember(orgId, ctx.user.id, "remove");
+  if (dropped === "last_admin") return failed(onlyAdmin);
+  if (dropped !== "ok") return failed(UNAVAILABLE);
   await refreshMemberPart(orgId, ctx.user.id).catch(() => console.error("organization graph not updated"));
   await logSecurityEvent("org_left", { userId: ctx.user.id, orgId, headers: await headers() });
   return { ok: true };

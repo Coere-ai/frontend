@@ -3,6 +3,7 @@ import "server-only";
 import { refreshMemberPart } from "@/lib/memory/org-index";
 import { listFolder, removePaths } from "@/lib/memory/storage";
 import { clearIncoming, deleteMemory } from "@/lib/memory/user-memory";
+import { dropMember } from "@/lib/org/drop-member";
 import { readMembership } from "@/lib/org/membership";
 import { countAdmins } from "@/lib/org/queries";
 import { mayLeave } from "@/lib/org/roles";
@@ -28,8 +29,10 @@ export async function deleteAccount(userId: string): Promise<DeleteResult> {
   }
 
   if (membership) {
-    const { error } = await db.from("org_members").delete().eq("org_id", membership.orgId).eq("user_id", userId);
-    if (error) return { ok: false, reason: "unavailable" };
+    // Counted again under a lock, so two admins deleting their accounts at once cannot both pass.
+    const dropped = await dropMember(membership.orgId, userId, "remove");
+    if (dropped === "last_admin") return { ok: false, reason: "last_admin" };
+    if (dropped !== "ok" && dropped !== "not_member") return { ok: false, reason: "unavailable" };
     await refreshMemberPart(membership.orgId, userId).catch(() => console.error("organization graph not updated"));
   }
 

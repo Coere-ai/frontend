@@ -695,6 +695,7 @@ come through signed upload URLs that the server makes.
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. |
 | `set_memory_totals(p_user uuid)` | Recomputes the person's memory counts in `user_totals` from `memory_files`, and their organization's from its members, after a commit or a delete. |
 | `create_organization(p_name text, p_slug text, p_admin uuid, p_plan text)` | The operator's call: makes the organization, its totals row and its first admin in one statement. Refuses an admin already in an organization. |
+| `org_drop_member(p_org uuid, p_user uuid, p_action text)` | Demotes (`demote`) or removes (`remove`) a member with the organization row locked, refusing with `last_admin` when they are its only admin, so two admins acting at once cannot leave it with none. Answers `ok`, `last_admin` or `not_member`. |
 | `accept_org_invite(p_user uuid, p_invite uuid)` | Checks the invite is live and for this account, adds the member with the invite's role, marks the invite accepted. |
 | `admin_table_stats()` | Each table in `public` and `storage`: estimated rows, total bytes, Row Level Security on, policy count. |
 | `admin_storage_usage()` | Bytes and object count per bucket, and per user in `memory`. |
