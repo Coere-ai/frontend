@@ -13,7 +13,9 @@
 --   2. Accounts (docs/accounts.md sections 10, 14, 15, 16 and Appendix A):
 --      plans, profiles, devices, usage, the memory copy, synced settings,
 --      organizations, the running totals behind the Statistics page, the
---      developer waitlist, and the private Storage bucket `memory`.
+--      developer waitlist, who is interested in Coere Connect and Coere for
+--      Teams, the site's settings (the launch countdowns), and the private
+--      Storage bucket `memory`.
 --
 -- Part 1 is the Optagon landing page's four analytics migrations combined, in
 -- their order:
@@ -803,6 +805,50 @@ create table if not exists public.developer_waitlist (
 create index if not exists developer_waitlist_created_idx on public.developer_waitlist (created_at desc);
 
 
+-- Who is interested in a product that is not out yet (section 16)
+
+-- Written by the I'm interested form on /install (connect) and /try-teams
+-- (teams). One row per address and product, stored lowercase, so saying it
+-- twice is a no-op, not a second row.
+create table if not exists public.product_interest (
+  id         bigint      generated always as identity primary key,
+  email      text        not null,
+  product    text        not null,
+  source     text,
+  ip_hash    text,
+  created_at timestamptz not null default now(),
+
+  constraint product_interest_email_product_key unique (email, product),
+  constraint product_interest_email_lower check (email = lower(email)),
+  constraint product_interest_email_format check (char_length(email) between 3 and 254 and email ~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$'),
+  constraint product_interest_product_known check (product in ('connect', 'teams')),
+  constraint product_interest_source_sane check (source is null or char_length(source) <= 64)
+);
+
+create index if not exists product_interest_product_created_idx on public.product_interest (product, created_at desc);
+
+
+-- The site's own settings (section 16)
+
+-- Small values the operator changes in /admin without a deploy. Today the
+-- launch countdowns: launch.connect for /install and launch.teams for
+-- /try-teams, each {"at": "<ISO moment>", "show": true}.
+create table if not exists public.site_settings (
+  key        text        primary key,
+  value      jsonb       not null,
+  updated_at timestamptz not null default now(),
+
+  constraint site_settings_key_sane check (key ~ '^[a-z0-9_.]{1,64}$'),
+  constraint site_settings_value_object check (jsonb_typeof(value) = 'object' and pg_column_size(value) <= 8192)
+);
+
+-- do nothing, so a moment the operator set survives a rerun.
+insert into public.site_settings (key, value) values
+  ('launch.connect', '{"at": "2026-11-23T17:00:00.000Z", "show": true}'),
+  ('launch.teams',   '{"at": "2026-11-23T17:00:00.000Z", "show": true}')
+on conflict (key) do nothing;
+
+
 -- Organization helpers for the policies
 --
 -- A policy on org_members that asked org_members "which organization is the
@@ -954,8 +1000,9 @@ create trigger coere_on_auth_user_email
 -- what section 10 allows. Privileges decide which columns and verbs a role
 -- may use at all; the policies then decide which rows. Tables with no policy
 -- (device_codes, ai_batches, spend_holds, app_events, security_events,
--- daily_totals, developer_waitlist) are server only: Row Level Security on with no policy
--- denies every signed in request.
+-- daily_totals, developer_waitlist, product_interest, site_settings) are
+-- server only: Row Level Security on with no policy denies every signed in
+-- request.
 
 alter table public.plans              enable row level security;
 alter table public.profiles           enable row level security;
@@ -977,13 +1024,15 @@ alter table public.user_totals        enable row level security;
 alter table public.org_totals         enable row level security;
 alter table public.daily_totals       enable row level security;
 alter table public.developer_waitlist enable row level security;
+alter table public.product_interest   enable row level security;
+alter table public.site_settings      enable row level security;
 
 revoke all on
   public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
   public.org_memory, public.devices, public.device_codes, public.usage_events,
   public.usage_monthly, public.ai_batches, public.spend_holds, public.memory_files, public.user_settings,
   public.app_events, public.security_events, public.user_totals, public.org_totals,
-  public.daily_totals, public.developer_waitlist
+  public.daily_totals, public.developer_waitlist, public.product_interest, public.site_settings
 from anon, authenticated;
 
 -- Stated rather than inherited, as in part 1, so the server keeps working on
@@ -993,7 +1042,7 @@ grant select, insert, update, delete on
   public.org_memory, public.devices, public.device_codes, public.usage_events,
   public.usage_monthly, public.ai_batches, public.spend_holds, public.memory_files, public.user_settings,
   public.app_events, public.security_events, public.user_totals, public.org_totals,
-  public.daily_totals, public.developer_waitlist
+  public.daily_totals, public.developer_waitlist, public.product_interest, public.site_settings
 to service_role;
 
 -- What a signed in person may read. Rows are narrowed by the policies below.

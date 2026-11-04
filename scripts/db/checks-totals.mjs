@@ -171,7 +171,8 @@ export async function checkAdminReaders(db) {
   await as(db, "service_role", null, async () => {
     const tables = await rows(db, "admin_table_stats", "select * from public.admin_table_stats()");
     const pub = (tables ?? []).filter((t) => t.schema_name === "public");
-    equal("admin_table_stats lists every public table", pub.length, 23);
+    equal("admin_table_stats lists every public table", pub.length, 25);
+    check("admin_table_stats lists product_interest and site_settings", ["product_interest", "site_settings"].every((name) => pub.some((t) => t.table_name === name)));
     equal("every public table has Row Level Security on", pub.filter((t) => !t.rls_enabled).map((t) => t.table_name), []);
     equal("admin_table_stats counts policies", pub.find((t) => t.table_name === "profiles")?.policy_count, 2);
     check("admin_table_stats sees storage.objects", (tables ?? []).some((t) => t.schema_name === "storage" && t.table_name === "objects" && t.policy_count >= 2));

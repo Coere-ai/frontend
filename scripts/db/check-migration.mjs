@@ -10,6 +10,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { checkCreateOrganization, checkDeviceAuth, checkSignUp } from "./checks-accounts.mjs";
+import { checkInterestKept, checkInterestTables } from "./checks-interest.mjs";
 import { checkLimitColumns, checkLimitResolution, checkOwnLimitsLocked, checkSameFingerprint, schemaFingerprint } from "./checks-limits.mjs";
 import { checkOrganizationRows, checkOwnRows, checkServerWrites, checkStorage } from "./checks-rls.mjs";
 import { checkAdminReaders, checkAppEvents, checkInvites, checkMemoryTotals, checkRecordUsage } from "./checks-totals.mjs";
@@ -52,12 +53,14 @@ async function main() {
   await checkOrganizationRows(db, org);
   await checkStorage(db);
   await checkServerWrites(db);
+  await checkInterestTables(db);
 
   // A third run over real rows must keep them all.
   const before = await schemaFingerprint(db);
   await migrate(db, sql, 3);
   checkSameFingerprint("a third run over real rows changes nothing", before, await schemaFingerprint(db));
   equal("a rerun keeps the accounts", await one(db, "profiles", "select count(*)::int from public.profiles"), 3);
+  await checkInterestKept(db);
 
   await db.close();
   const failed = failureCount();
