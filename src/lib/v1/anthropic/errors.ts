@@ -1,4 +1,4 @@
-import type { SpentLimit } from "../gate-types";
+import { limitWord, type SpentLimit } from "../gate-types";
 import { API_HEADERS } from "../http";
 
 /**
@@ -40,7 +40,7 @@ export function anthropicErrorShape(c: AnthropicCase, model?: string, limit: Spe
       return {
         status: 400,
         type: "invalid_request_error",
-        message: `You have reached your specified ${limit} usage limit on coere.ai.`,
+        message: `You have reached your specified ${limitWord(limit)} usage limit on coere.ai.`,
       };
     case "rate_limited":
       return { status: 429, type: "rate_limit_error", message: "rate_limited" };

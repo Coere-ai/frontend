@@ -10,7 +10,8 @@ import { parseBearer, tokenHash } from "./token";
  * Who is calling: one `device_auth(token_hash)` call (docs/accounts.md 8,
  * 10) checks the bearer token and returns the account, its limits (already
  * resolved: the person's own when the operator set one, else the plan's),
- * this month's and the lifetime spend, and the organization. A refused
+ * this month's and the lifetime spend, the hidden daily limit with today's
+ * spend, and the organization. A refused
  * token writes `token_rejected` with the address hash, never the token.
  */
 
@@ -29,6 +30,11 @@ export interface DeviceAccount {
   memorySync: boolean;
   includeSensitive: boolean;
   orgId: string | null;
+  /** The daily limit, or the first build allowance until the first memory build finishes. Never shown to the person. */
+  dailyLimitMicros: number;
+  /** Today's spend (UTC) against it, or the first build's spend so far. */
+  dayCostMicros: number;
+  firstBuildDone: boolean;
 }
 
 export type DeviceAuth = { ok: true; account: DeviceAccount } | { ok: false; reason: "signed_out" | "unavailable" };
@@ -47,6 +53,9 @@ interface DeviceAuthRow {
   memory_sync: boolean;
   include_sensitive: boolean;
   org_id: string | null;
+  daily_limit_micros: number | string;
+  day_cost_micros: number | string;
+  first_build_done: boolean;
 }
 
 function toAccount(r: DeviceAuthRow): DeviceAccount {
@@ -64,6 +73,9 @@ function toAccount(r: DeviceAuthRow): DeviceAccount {
     memorySync: r.memory_sync,
     includeSensitive: r.include_sensitive,
     orgId: r.org_id,
+    dailyLimitMicros: Number(r.daily_limit_micros),
+    dayCostMicros: Number(r.day_cost_micros),
+    firstBuildDone: r.first_build_done === true,
   };
 }
 

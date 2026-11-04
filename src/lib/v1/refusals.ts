@@ -1,5 +1,5 @@
 import { anthropicError } from "./anthropic/errors";
-import type { GateRefusal, SpentLimit } from "./gate-types";
+import { limitWord, type GateRefusal, type SpentLimit } from "./gate-types";
 import { json, problem } from "./http";
 
 /**
@@ -9,8 +9,11 @@ import { json, problem } from "./http";
  * limit of a `usage_limit`; without it the month is meant.
  */
 
+const LIMIT_TITLES: Record<"lifetime" | "daily", string> = { lifetime: "Lifetime limit reached", daily: "Daily limit reached" };
+
 export function problemFor(refusal: GateRefusal, retryAfter?: number, limit?: SpentLimit): Response {
-  const title = refusal === "usage_limit" && limit === "lifetime" ? "Lifetime limit reached" : undefined;
+  const word = limit ? limitWord(limit) : "monthly";
+  const title = refusal === "usage_limit" && word !== "monthly" ? LIMIT_TITLES[word] : undefined;
   return problem(refusal, refusal === "rate_limited" || refusal === "usage_limit" ? retryAfter : undefined, title);
 }
 

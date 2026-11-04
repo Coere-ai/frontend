@@ -25,6 +25,18 @@ describe("refusals", () => {
     assert.equal((await jevFor("usage_limit", 3600).json() as { error: string }).error, "usage_limit");
   });
 
+  it("title a spent day, or a spent first build, as the daily limit", async () => {
+    const day = problemFor("usage_limit", 7200, "daily");
+    assert.equal(day.status, 429);
+    assert.equal(day.headers.get("retry-after"), "7200");
+    assert.deepEqual(await day.json(), {
+      type: "https://www.coere.ai/docs/errors#usage_limit", title: "Daily limit reached", status: 429, code: "usage_limit",
+    });
+    assert.equal(((await problemFor("usage_limit", 3600, "first_build").json()) as { title: string }).title, "Daily limit reached");
+    const jev = jevFor("usage_limit", 7200);
+    assert.deepEqual([jev.status, jev.headers.get("retry-after")], [429, "7200"]);
+  });
+
   it("are Anthropic's shape on the proxy", async () => {
     const res = anthropicFor("usage_limit", 3600, "lifetime");
     assert.equal(res.status, 400);
@@ -33,6 +45,14 @@ describe("refusals", () => {
     assert.ok(body.error.message.startsWith("You have reached your specified lifetime"));
     const month = (await anthropicFor("usage_limit").json()) as { error: { message: string } };
     assert.ok(month.error.message.startsWith("You have reached your specified monthly"));
+    for (const limit of ["daily", "first_build"] as const) {
+      const day = anthropicFor("usage_limit", 7200, limit);
+      assert.equal(day.status, 400);
+      assert.deepEqual(await day.json(), {
+        type: "error",
+        error: { type: "invalid_request_error", message: "You have reached your specified daily usage limit on coere.ai." },
+      });
+    }
     assert.equal(anthropicFor("rate_limited", 5).headers.get("retry-after"), "5");
     assert.equal(anthropicFor("suspended").status, 403);
   });

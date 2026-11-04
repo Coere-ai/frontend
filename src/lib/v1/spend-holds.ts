@@ -3,6 +3,7 @@ import "server-only";
 import { supabase } from "@/lib/supabase";
 
 import type { SpentLimit } from "./gate-types";
+import { refusedLimit } from "./spend";
 
 /**
  * Spend reservations (docs/accounts.md 8.10). The gate's check reads only
@@ -31,7 +32,7 @@ export async function reserveSpend(userId: string, amountMicros: number, o: { ba
   }
   const row = (Array.isArray(data) ? data[0] : data) as { hold_id: string | null; refused: string | null } | undefined;
   if (row?.hold_id) return { ok: true, holdId: row.hold_id };
-  return { ok: false, refused: row?.refused === "lifetime" ? "lifetime" : "monthly" };
+  return { ok: false, refused: refusedLimit(row?.refused) };
 }
 
 /** Lets a hold go once its call's cost is recorded, or the call failed. A failure only leaves it to run out. */

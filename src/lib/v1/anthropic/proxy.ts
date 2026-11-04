@@ -1,6 +1,6 @@
 import "server-only";
 
-import { gate } from "../gate";
+import { gate, noteUsageLimited } from "../gate";
 import { releaseHold, reserveSpend } from "../spend-holds";
 import { anthropicFor } from "../refusals";
 import { relayAnswer } from "./answers";
@@ -13,8 +13,8 @@ import { prepareRequest } from "./prepare";
 
 /**
  * The Anthropic proxy (docs/accounts.md 8.4), in the order its checks run:
- * the path, the device (token, suspended, per minute, and the lifetime and
- * monthly limits for calls that start new spend), the server's key, the
+ * the path, the device (token, suspended, per minute, and the spend limits
+ * for calls that start new spend), the server's key, the
  * request itself, batch ownership, the hold on the call's worst case, then
  * the forward and the answer.
  */
@@ -50,7 +50,11 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   let holdId: string | null = null;
   if (STARTS_SPEND.has(op.op)) {
     const held = await reserveSpend(g.account.userId, prepared.worstMicros, { batch: op.op === "batch_create" });
-    if (!held.ok) return held.refused ? anthropicError("usage_limit", { limit: held.refused }) : anthropicError("unavailable");
+    if (!held.ok && !held.refused) return anthropicError("unavailable");
+    if (!held.ok) {
+      noteUsageLimited(g.account, req.headers);
+      return anthropicError("usage_limit", { limit: held.refused ?? undefined });
+    }
     holdId = held.holdId;
   }
   try {

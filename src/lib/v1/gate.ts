@@ -14,7 +14,8 @@ export type { GateRefusal, SpentLimit } from "./gate-types";
 /**
  * The checks every bearer route makes before it does anything, in order:
  * the token, a suspended account, the device's per minute limit and, for a
- * metered call, the lifetime and monthly spend limits. The route turns a
+ * metered call, the spend limits: lifetime, the first build allowance or the
+ * hidden daily limit, and monthly (spend.ts). The route turns a
  * refusal into its own error shape (problem details, or Anthropic's on the
  * proxy); `limit` says which spend limit a `usage_limit` is about.
  *
@@ -42,8 +43,15 @@ export async function gate(req: Request, o: { metered: boolean; lane?: Lane }): 
 
   const spent = o.metered ? spentLimit(account) : null;
   if (spent) {
-    if (securityOnce.firstIn(`usage:${account.deviceId}`, 3_600_000)) logSecurityEventAfter("usage_limited", who);
+    noteUsageLimited(account, req.headers);
     return { ok: false, refusal: "usage_limit", retryAfter: spendRetryAfter(spent), limit: spent };
   }
   return { ok: true, account };
+}
+
+/** Logs `usage_limited` once an hour per device, for the gate and for a refused spend reservation alike. */
+export function noteUsageLimited(account: DeviceAccount, headers: Headers): void {
+  if (securityOnce.firstIn(`usage:${account.deviceId}`, 3_600_000)) {
+    logSecurityEventAfter("usage_limited", { userId: account.userId, orgId: account.orgId, headers });
+  }
 }
