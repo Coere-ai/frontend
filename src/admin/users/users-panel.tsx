@@ -13,11 +13,13 @@ import { fieldClass, fieldStyle } from "../controls";
 import { DayChart } from "../day-chart";
 import { useAdminData } from "../use-admin-data";
 
-const HEAD = ["Email", "Username", "Plan", "Status", "Organization", "Created", "Last seen", "Devices", "Month cost", "Requests", "Lifetime cost", "Tokens saved", "Memory"];
+const HEAD = ["Email", "Username", "Plan", "Status", "Organization", "Created", "Last seen", "Devices", "Month cost", "Requests", "Lifetime cost", "First build", "Tokens saved", "Memory"];
 
 /**
  * Every account, with sign ups by day. Typing filters by email, username
- * or organization; a row opens the account.
+ * or organization; a row opens the account. First build says whether the
+ * account's free first memory build is used, after which its daily limit
+ * applies; the account's page can give it back.
  */
 export function UsersPanel() {
   const router = useRouter();
@@ -89,6 +91,7 @@ export function UsersPanel() {
                   dollars(r.monthCostMicros),
                   whole(r.monthRequests),
                   dollars(r.lifetimeCostMicros),
+                  r.firstBuildAt ? `Used ${day(r.firstBuildAt)}` : "Free",
                   compact(r.tokensSaved),
                   r.memoryBytes ? bytes(r.memoryBytes) : "",
                 ])}

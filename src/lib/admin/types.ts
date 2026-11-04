@@ -47,6 +47,10 @@ export interface UserRow {
   /** The account's own limits; null means the plan's. */
   monthlyLimitMicros: number | null;
   lifetimeLimitMicros: number | null;
+  dailyLimitMicros: number | null;
+  firstBuildLimitMicros: number | null;
+  /** When the free first memory build finished; null while it is still to come. */
+  firstBuildAt: string | null;
   tokensSaved: number;
   memoryBytes: number;
 }
@@ -57,6 +61,10 @@ export interface PlanRow {
   monthlyLimitMicros: number;
   /** Null means no lifetime limit. */
   lifetimeLimitMicros: number | null;
+  /** The hidden daily limit, once an account's first build is done. */
+  dailyLimitMicros: number;
+  /** What the free first build may spend before the daily limit starts. */
+  firstBuildLimitMicros: number;
 }
 
 export interface UsersPayload {
@@ -102,6 +110,8 @@ export interface UserDetailPayload {
   memory: { bytes: number; memories: number; chats: number; uploadedAt: string | null } | null;
   devices: DeviceRow[];
   plans: PlanRow[];
+  /** daily_spend(): the limit in force (the first build allowance until the first build is done) and the spend against it. */
+  day: { limitMicros: number; spentMicros: number; firstBuildDone: boolean };
 }
 
 export interface OrgRow {

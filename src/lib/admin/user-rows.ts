@@ -18,6 +18,9 @@ export interface ProfileRow {
   last_seen_at: string | null;
   monthly_limit_micros?: number | string | null;
   lifetime_limit_micros?: number | string | null;
+  daily_limit_micros?: number | string | null;
+  first_build_limit_micros?: number | string | null;
+  first_build_at?: string | null;
 }
 
 export interface UserParts {
@@ -58,6 +61,9 @@ export function joinUsers(profiles: readonly ProfileRow[], parts: UserParts): Us
       lifetimeCostMicros: num(totals.get(p.id)?.cost_micros),
       monthlyLimitMicros: numOrNull(p.monthly_limit_micros),
       lifetimeLimitMicros: numOrNull(p.lifetime_limit_micros),
+      dailyLimitMicros: numOrNull(p.daily_limit_micros),
+      firstBuildLimitMicros: numOrNull(p.first_build_limit_micros),
+      firstBuildAt: p.first_build_at ?? null,
       tokensSaved: num(totals.get(p.id)?.tokens_saved),
       memoryBytes: num(files.get(p.id)?.bytes),
     };
@@ -65,8 +71,17 @@ export function joinUsers(profiles: readonly ProfileRow[], parts: UserParts): Us
 }
 
 /** The plans table as the forms show it. */
-export function toPlans(rows: readonly { id: string; name: string; monthly_limit_micros: unknown; lifetime_limit_micros?: unknown }[]): PlanRow[] {
-  return rows.map((r) => ({ id: r.id, name: r.name, monthlyLimitMicros: num(r.monthly_limit_micros), lifetimeLimitMicros: numOrNull(r.lifetime_limit_micros) }));
+export function toPlans(
+  rows: readonly { id: string; name: string; monthly_limit_micros: unknown; lifetime_limit_micros?: unknown; daily_limit_micros?: unknown; first_build_limit_micros?: unknown }[],
+): PlanRow[] {
+  return rows.map((r) => ({
+    id: r.id,
+    name: r.name,
+    monthlyLimitMicros: num(r.monthly_limit_micros),
+    lifetimeLimitMicros: numOrNull(r.lifetime_limit_micros),
+    dailyLimitMicros: num(r.daily_limit_micros),
+    firstBuildLimitMicros: num(r.first_build_limit_micros),
+  }));
 }
 
 /** The first day of this month in UTC, as usage_monthly keys it. */

@@ -2,25 +2,42 @@
 
 import { revokeAllDevices, setLimits, setPlan, setStatus } from "@/app/admin/users/actions";
 import { dollarField } from "@/lib/admin/money";
+import { fieldName, LIMIT_KINDS, type LimitKind } from "@/lib/admin/limit-input";
 import type { PlanRow, UserDetailPayload } from "@/lib/admin/types";
 import { dollars } from "@/lib/dashboard/format";
 
 import { Button, Card, fieldClass, fieldStyle, Label, Status } from "../controls";
 import { useAction } from "../use-action";
 
+import { DailyCard } from "./daily-card";
+
+const LABELS: Record<LimitKind, string> = { daily: "Daily, $", first_build: "First build, $", monthly: "Monthly, $", lifetime: "Lifetime, $" };
+
+/** The account's own value for a limit, and the plan's, which applies while the account's is blank. */
+function limitsOf(user: UserDetailPayload["user"], plan: PlanRow | undefined): Record<LimitKind, { own: number | null; plan: number | null | undefined }> {
+  return {
+    daily: { own: user.dailyLimitMicros, plan: plan?.dailyLimitMicros },
+    first_build: { own: user.firstBuildLimitMicros, plan: plan?.firstBuildLimitMicros },
+    monthly: { own: user.monthlyLimitMicros, plan: plan?.monthlyLimitMicros },
+    lifetime: { own: user.lifetimeLimitMicros, plan: plan?.lifetimeLimitMicros },
+  };
+}
+
 /**
  * What the operator changes on one account. The limits show the plan's
  * own as placeholders, so a blank field says what applies, and the
- * lifetime spend sits beside them, since that is what the lifetime limit
- * is checked against.
+ * spend sits beside them. The daily and first build limits are hidden from
+ * the person; only this panel shows them.
  */
-export function AccountActions({ user, plans, reload }: { user: UserDetailPayload["user"]; plans: PlanRow[]; reload: () => void }) {
+export function AccountActions({ data, reload }: { data: UserDetailPayload; reload: () => void }) {
+  const { user, plans } = data;
   const { run, pending, message } = useAction(reload);
   const plan = plans.find((p) => p.id === user.plan);
+  const limits = limitsOf(user, plan);
   const suspended = user.status === "suspended";
 
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
+    <div className="grid gap-4 lg:grid-cols-2">
       <Card title="Plan">
         <form action={(fd) => run(() => setPlan(user.id, fd))} className="flex items-end gap-2">
           <div className="flex-1">
@@ -42,33 +59,27 @@ export function AccountActions({ user, plans, reload }: { user: UserDetailPayloa
       <Card title="Dollar limits">
         <form action={(fd) => run(() => setLimits(user.id, fd))} className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label htmlFor="monthly">Monthly, $</Label>
-              <input
-                id="monthly"
-                name="monthly"
-                inputMode="decimal"
-                defaultValue={dollarField(user.monthlyLimitMicros)}
-                placeholder={plan ? `${dollarField(plan.monthlyLimitMicros)} (plan)` : "Plan's"}
-                className={fieldClass}
-                style={fieldStyle}
-              />
-            </div>
-            <div>
-              <Label htmlFor="lifetime">Lifetime, $</Label>
-              <input
-                id="lifetime"
-                name="lifetime"
-                inputMode="decimal"
-                defaultValue={dollarField(user.lifetimeLimitMicros)}
-                placeholder={plan?.lifetimeLimitMicros != null ? `${dollarField(plan.lifetimeLimitMicros)} (plan)` : "None (plan)"}
-                className={fieldClass}
-                style={fieldStyle}
-              />
-            </div>
+            {LIMIT_KINDS.map((kind) => {
+              const { own, plan: fromPlan } = limits[kind];
+              return (
+                <div key={kind}>
+                  <Label htmlFor={`limit-${kind}`}>{LABELS[kind]}</Label>
+                  <input
+                    id={`limit-${kind}`}
+                    name={fieldName(kind)}
+                    inputMode="decimal"
+                    defaultValue={dollarField(own)}
+                    placeholder={fromPlan === undefined ? "Plan's" : fromPlan === null ? "None (plan)" : `${dollarField(fromPlan)} (plan)`}
+                    className={fieldClass}
+                    style={fieldStyle}
+                  />
+                </div>
+              );
+            })}
           </div>
           <p className="text-[12px] text-[color:var(--color-ink)]">
-            Spent {dollars(user.monthCostMicros)} this month and {dollars(user.lifetimeCostMicros)} in all. Leave a field blank for the plan&apos;s limit.
+            Spent {dollars(user.monthCostMicros)} this month and {dollars(user.lifetimeCostMicros)} in all. Leave a field blank for the plan&apos;s limit; a value here overrides
+            the plan&apos;s. The daily limit starts once the free first build finishes, and the person never sees either.
           </p>
           <Button strong disabled={pending}>
             Save limits
@@ -95,7 +106,8 @@ export function AccountActions({ user, plans, reload }: { user: UserDetailPayloa
           {suspended ? "Suspended: every request from this account is refused." : `Active, with ${user.devices} live ${user.devices === 1 ? "device" : "devices"}.`}
         </p>
       </Card>
-      <div className="lg:col-span-3">
+      <DailyCard data={data} pending={pending} run={run} />
+      <div className="lg:col-span-2">
         <Status text={message} />
       </div>
     </div>

@@ -4,14 +4,15 @@ import { headers } from "next/headers";
 
 import { adminAction, check, done, refused, type AdminResult } from "@/lib/admin/action";
 import { isUuid } from "@/lib/admin/http";
-import { parseDollars } from "@/lib/admin/money";
+import { LIMIT_COLUMNS, LIMIT_KINDS, readAccountLimits } from "@/lib/admin/limit-input";
 import { logSecurityEvent } from "@/lib/security/events";
 import { supabase } from "@/lib/supabase";
 
 /**
  * What the operator changes on an account: its plan, its own dollar
- * limits, suspend or restore, and revoking every device. Each re-checks the
- * admin session and writes only the one account it names.
+ * limits (daily, first build, monthly and lifetime), its free first build,
+ * suspend or restore, and revoking every device. Each re-checks the admin
+ * session and writes only the one account it names.
  */
 
 const NO_ACCOUNT = "That account is gone. Reload the page.";
@@ -33,17 +34,27 @@ export async function setPlan(userId: string, form: FormData): Promise<AdminResu
 export async function setLimits(userId: string, form: FormData): Promise<AdminResult> {
   return adminAction("setLimits", async () => {
     if (!isUuid(userId)) return refused(NO_ACCOUNT);
-    const monthly = parseDollars(form.get("monthly"));
-    if (!monthly.ok) return refused(`Monthly limit: ${monthly.error}`);
-    const lifetime = parseDollars(form.get("lifetime"));
-    if (!lifetime.ok) return refused(`Lifetime limit: ${lifetime.error}`);
-    const { data, error } = await supabase()
-      .from("profiles")
-      .update({ monthly_limit_micros: monthly.micros, lifetime_limit_micros: lifetime.micros, updated_at: new Date().toISOString() })
-      .eq("id", userId)
-      .select("id");
+    const input = readAccountLimits((name) => form.get(name));
+    if (!input.ok) return refused(input.error);
+    const row: Record<string, number | string | null> = { updated_at: new Date().toISOString() };
+    for (const kind of LIMIT_KINDS) row[LIMIT_COLUMNS[kind]] = input.limits[kind];
+    const { data, error } = await supabase().from("profiles").update(row).eq("id", userId).select("id");
     check(error, "profiles update");
     return data?.length ? done("Limits saved.") : refused(NO_ACCOUNT);
+  });
+}
+
+/**
+ * Gives the account its free first build again: the daily limit waits for
+ * its next finished memory build, and the first build allowance counts only
+ * what it spends from now on (reset_first_build).
+ */
+export async function resetFirstBuild(userId: string): Promise<AdminResult> {
+  return adminAction("resetFirstBuild", async () => {
+    if (!isUuid(userId)) return refused(NO_ACCOUNT);
+    const { data, error } = await supabase().rpc("reset_first_build", { p_user: userId });
+    check(error, "reset_first_build");
+    return data === true ? done("The free first build is available again.") : refused(NO_ACCOUNT);
   });
 }
 

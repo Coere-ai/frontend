@@ -48,7 +48,7 @@ export function UserPanel({ id }: { id: string }) {
             {data.memory?.uploadedAt ? ` Memory last backed up ${ago(data.memory.uploadedAt)}.` : ""} Backup {u.memorySync ? "on" : "off"}, sensitive memories{" "}
             {u.includeSensitive ? "included" : "left out"}.
           </p>
-          <AccountActions user={u} plans={data.plans} reload={reload} />
+          <AccountActions data={data} reload={reload} />
           <Section title="Devices">
             <div className="overflow-x-auto whitespace-nowrap">
               <Table

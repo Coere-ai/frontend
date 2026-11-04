@@ -47,10 +47,19 @@ test("a limit of zero is a limit, not the plan's", () => {
   assert.equal(numOrNull(undefined), null);
 });
 
-test("plans keep a null lifetime limit as none", () => {
-  assert.deepEqual(toPlans([{ id: "free", name: "Free", monthly_limit_micros: "5000000", lifetime_limit_micros: null }]), [
-    { id: "free", name: "Free", monthlyLimitMicros: 5_000_000, lifetimeLimitMicros: null },
-  ]);
+test("plans keep a null lifetime limit as none, and carry the daily and first build limits", () => {
+  assert.deepEqual(
+    toPlans([{ id: "free", name: "Free", monthly_limit_micros: "5000000", lifetime_limit_micros: null, daily_limit_micros: "2000000", first_build_limit_micros: 10_000_000 }]),
+    [{ id: "free", name: "Free", monthlyLimitMicros: 5_000_000, lifetimeLimitMicros: null, dailyLimitMicros: 2_000_000, firstBuildLimitMicros: 10_000_000 }],
+  );
+});
+
+test("an account's own daily limits and its first build are kept, null when unset", () => {
+  const parts = { members: [], devices: [], month: [], totals: [], files: [] };
+  const [own] = joinUsers([{ ...profile, daily_limit_micros: "3000000", first_build_limit_micros: "0", first_build_at: "2026-11-02T10:00:00Z" }], parts);
+  assert.deepEqual([own?.dailyLimitMicros, own?.firstBuildLimitMicros, own?.firstBuildAt], [3_000_000, 0, "2026-11-02T10:00:00Z"]);
+  const [plain] = joinUsers([profile], parts);
+  assert.deepEqual([plain?.dailyLimitMicros, plain?.firstBuildLimitMicros, plain?.firstBuildAt], [null, null, null]);
 });
 
 test("the month is the first of the month in UTC", () => {
