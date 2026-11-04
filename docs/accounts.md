@@ -393,6 +393,7 @@ Errors outside the Anthropic routes are problem details
 | `bad_request` | 400 | A body that does not match |
 | `not_found` | 404 | Nothing there |
 | `memory_sync_off` | 409 | A memory upload while the backup is off |
+| `sensitive_off` | 412 | A memory commit whose file holds sensitive memories while the person has them turned off; the extension refreshes its account and exports again |
 | `too_large` | 413 | A body or file over its limit |
 | `rate_limited` | 429 | Too many requests this minute, with `Retry-After` |
 | `usage_limit` | 429 | The monthly or the lifetime limit is spent |
@@ -532,7 +533,9 @@ Auth and limit errors are the same as 8.4's statuses with a plain
   (section 8.7), writes the bytes over `<user id>/memory.coere` in one
   upsert (so a failed write keeps the old copy), writes
   `<user id>/index.json`, removes its own staged file, and upserts
-  `memory_files`. Answer
+  `memory_files`. A file holding sensitive memories while the person has
+  them off is removed and answered `412 sensitive_off`, so the stored copy
+  never holds what they opted out of. Answer
   `200 { bytes, digest, uploadedAt, counts: { memories, entities, links, chats, documents, sections } }`.
 - **`GET /api/v1/memory`** answers `200 { url }`, a download link that lives
   60 seconds, or `404`.

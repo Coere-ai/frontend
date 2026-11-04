@@ -25,6 +25,7 @@ describe("problem", () => {
       bad_request: 400,
       not_found: 404,
       memory_sync_off: 409,
+      sensitive_off: 412,
       too_large: 413,
       rate_limited: 429,
       usage_limit: 429,

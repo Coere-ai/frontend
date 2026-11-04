@@ -20,7 +20,7 @@ import { fileLimit } from "./upload-rules";
 
 export type Committed =
   | { ok: true; bytes: number; digest: string; uploadedAt: string; counts: MemoryCounts }
-  | { ok: false; reason: "not_found" | "too_large" | "bad_request" | "memory_sync_off" | "unavailable" };
+  | { ok: false; reason: "not_found" | "too_large" | "bad_request" | "memory_sync_off" | "sensitive_off" | "unavailable" };
 
 export async function commitMemory(a: DeviceAccount, staged: string): Promise<Committed> {
   if (!a.memorySync) {
@@ -43,6 +43,14 @@ export async function commitMemory(a: DeviceAccount, staged: string): Promise<Co
   const { manifest, files } = opened;
   const built = buildIndex(manifest, files, { includeSensitive: a.includeSensitive });
   const counts = countsFromManifest(manifest);
+  // The person turned sensitive memories off, but this file was exported
+  // with them (an extension with an older copy of the setting, or a push
+  // already under way). The file is what is stored and served, so it is
+  // refused rather than kept with what the person opted out of.
+  if (!a.includeSensitive && built.includesSensitive) {
+    await removePaths([staged]);
+    return { ok: false, reason: "sensitive_off" };
+  }
 
   // The bytes are already here, so they are written over the stored copy
   // directly: a failed write leaves the old copy, where a move would first
@@ -66,7 +74,7 @@ export async function commitMemory(a: DeviceAccount, staged: string): Promise<Co
       generator_version: manifest.generator?.version ?? null,
       ...counts,
       includes_quotes: built.includesQuotes,
-      includes_sensitive: built.includesSensitive && a.includeSensitive,
+      includes_sensitive: built.includesSensitive,
       device_id: a.deviceId,
       uploaded_at: uploadedAt,
     },

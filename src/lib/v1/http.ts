@@ -19,6 +19,7 @@ export const PROBLEMS = {
   bad_request: { status: 400, title: "Request not understood" },
   not_found: { status: 404, title: "Not found" },
   memory_sync_off: { status: 409, title: "Memory backup is off" },
+  sensitive_off: { status: 412, title: "Sensitive memories are off" },
   too_large: { status: 413, title: "Too large" },
   rate_limited: { status: 429, title: "Too many requests" },
   usage_limit: { status: 429, title: "Monthly limit reached" },
