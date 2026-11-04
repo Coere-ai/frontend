@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { requireUser } from "@/lib/auth/user";
 import { compact, dollars, whole } from "@/lib/dashboard/format";
+import { readPausedToday } from "@/lib/dashboard/day-paused";
 import { resolveLimits, spentShare } from "@/lib/dashboard/limits";
 import { readMonth, readPlan, readProfile, readTotals, thisMonth } from "@/lib/dashboard/reads";
 import { KIND_NAMES, MODEL_NAMES, summarize } from "@/lib/dashboard/usage";
@@ -20,7 +21,9 @@ const DAYS = 30;
  * lifetime limit when there is one, the last 30 days by day, model and kind,
  * and the account's running totals. The limits are the person's own when
  * the operator set them, else the plan's. Every read goes through the
- * person's session, so they see only their own rows.
+ * person's session, so they see only their own rows, except whether today's
+ * AI use is paused: that one yes or no comes from the server, and only
+ * while it is true does the page say so.
  */
 export default async function UsagePage() {
   const user = await requireUser("/dashboard/usage");
@@ -29,11 +32,12 @@ export default async function UsagePage() {
   const from = new Date(now.getTime() - (DAYS - 1) * 86_400_000);
   const since = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate())).toISOString();
   const profile = await readProfile(db, user.id);
-  const [plan, month, totals, events] = await Promise.all([
+  const [plan, month, totals, events, paused] = await Promise.all([
     readPlan(db, profile?.planId ?? "free"),
     readMonth(db, user.id, thisMonth(now)),
     readTotals(db, user.id),
     readUsageEvents(db, user.id, since),
+    readPausedToday(user.id),
   ]);
   const s = summarize(events, from, now);
   const resets = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "UTC" });
@@ -45,6 +49,12 @@ export default async function UsagePage() {
   return (
     <div className="space-y-8">
       <PageHeader title="Usage" lede="Coere pays for the AI that builds your memory, up to your monthly limit. This is what it used." />
+
+      {paused ? (
+        <p role="status" className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-[14px] text-neutral-700">
+          Today&apos;s AI use is paused until tomorrow.
+        </p>
+      ) : null}
 
       <Panel title="This month" description={`The limit starts again on ${resets}.`}>
         <div className="flex items-baseline justify-between gap-4">

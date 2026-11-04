@@ -32,3 +32,15 @@ export function resolveLimits(
 export function spentShare(used: number, limit: number): number {
   return limit <= 0 ? 100 : percent(used, limit);
 }
+
+/**
+ * True only while the daily limit is reached: the free first build is done
+ * and today's spend is at the limit. A spent first build allowance is not
+ * "until tomorrow", so it reads false, as does a missing row.
+ */
+export function pausedToday(row: { daily_limit_micros?: unknown; day_cost_micros?: unknown; first_build_done?: unknown } | null | undefined): boolean {
+  if (!row || row.first_build_done !== true) return false;
+  const limit = Number(row.daily_limit_micros);
+  const spent = Number(row.day_cost_micros);
+  return Number.isFinite(limit) && Number.isFinite(spent) && spent >= limit;
+}
