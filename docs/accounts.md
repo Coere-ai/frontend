@@ -632,7 +632,8 @@ session never opens it. It keeps its own look (`stats.css`). Sections:
 | `/admin/analytics` | Site analytics, as `/statistics` showed them. |
 | `/admin/users` | Accounts: email, username, plan, status, organization, created, last seen, devices, this month's cost and requests, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals and its knowledge graph. Actions: change plan, set the person's monthly and lifetime dollar limits (blank means the plan's), suspend or restore, revoke every device. |
 | `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. **Create an organization** (name, plan, first admin picked from existing accounts by email). Opening one shows its members with their roles, access and totals, and the organization's knowledge graph, and lets the operator change its settings, add a member or admin from existing accounts, change roles, remove members and delete it. |
-| `/admin/waitlist` | The developer waitlist (section 16): emails, when they joined, the count by day, and a CSV download. |
+| `/admin/interested` | **Interested** (section 16): three lists behind one switch, Developers (`developer_waitlist`), Coere Connect and Coere for Teams (`product_interest` by product). Each shows its count, the count by day, the newest entries and a CSV download; **Export all** is every list in one CSV with a product column. `/admin/waitlist` redirects to the Developers list. |
+| `/admin/launch` | **Launch countdown** (section 16): for `/install` and `/try-teams`, the moment in the operator's own time zone, +1 day, +1 week and 20 days from now, a show countdown switch, and a live preview drawn by the page's own component. A moment in the past saves only after a confirm. |
 | `/admin/database` | Every table's estimated rows, size, Row Level Security on or off and policy count, and the Storage bucket totals. |
 | `/admin/security` | Sign ins and failures by day, rate limit hits, refused tokens, revoked devices, connect refusals, deleted accounts, and any table with Row Level Security off. |
 | `/admin/cost` | AI spend by day, model and account, this month and the last 24 hours, storage bytes and their cost at $0.021 per GB month. |
@@ -672,6 +673,8 @@ and is the only thing that writes.
 | `org_totals` | Running totals for one organization (section 15) | members |
 | `daily_totals` | Running totals for the whole product, one row per day (section 15) | server only |
 | `developer_waitlist` | `id bigint identity pk, email unique (stored lowercase), source, ip_hash, created_at` | server only |
+| `product_interest` | `id bigint identity pk, email (stored lowercase, checked as an address), product ('connect'\|'teams'), source, ip_hash, created_at, unique (email, product)` | server only |
+| `site_settings` | `key text pk, value jsonb (an object, at most 8 KiB), updated_at`. Seeds `launch.connect` and `launch.teams`, each `{"at": "2026-11-23T17:00:00.000Z", "show": true}`; a rerun keeps a saved moment. | server only |
 
 `ip_hash` is the first 16 hex characters of HMAC-SHA256(address,
 `SECURITY_SALT`). The address itself is never stored.
@@ -877,7 +880,7 @@ past totals keep its numbers.
 The raw logs (`usage_events`, `app_events`, `security_events`) stay too.
 They are small: a row is a few numbers.
 
-## 16. The developer waitlist
+## 16. The developer waitlist and the coming soon pages
 
 The developer marketing pages stay as they are. The site's waitlist button,
 which today emails the team, links to `/developers/waitlist` instead and
@@ -891,6 +894,28 @@ credits at launch. A server action checks the address, stores it in
 `developer_waitlist` (a repeat signup answers the same thanks), counts
 against 5 tries a minute per address, and shows a thank you in place of the
 form. The page is public and indexed; the form's endpoint is not.
+
+**Coming soon and I'm interested.** `/install` (Coere Connect) and
+`/try-teams` (Coere for Teams) share one page design. `/install` shows the
+Chrome mark in its round chip and "Coming soon on the Chrome Web Store";
+`/try-teams` says "Coere for Teams is coming soon". Under the heading, a
+large countdown in days, hours, minutes and seconds, drawn on the visitor's
+clock after the page loads, rolls each changing digit (a plain change with
+reduced motion), and at the moment says the product is here. Under it, **I'm
+interested** opens an email field in place. A server action checks the
+address, counts against 5 tries a minute per network address and per email,
+and stores it in `product_interest` with the product (`connect` or
+`teams`); a repeat answers the same thanks. Then the form turns into a thank
+you line. Watch the demo stays as the other way on. Both pages are `noindex`
+and left out of the sitemap.
+
+**The launch moment.** Each page counts to its row in `site_settings`
+(`launch.connect`, `launch.teams`), read on the server with the secret key
+through a cache tagged `launch`, so no visitor waits on the database. Saving
+in `/admin/launch` expires the tag and both pages, so a change shows at
+once. Without Supabase or a saved row, both count to `LAUNCH_AT` in
+`src/site/content/launch.ts`. With `show` off, the page says coming soon
+without the timer.
 
 
 ## Appendix A. Exact database signatures

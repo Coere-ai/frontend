@@ -38,9 +38,13 @@ has the research and the remaining manual steps.
 The blog and careers pages are hidden from the menus for now. They still
 answer at their addresses but are `noindex` and left out of the sitemap.
 
-`/install` and `/try-teams` say Coere and Coere for Teams are coming soon.
+`/install` and `/try-teams` say Coere Connect and Coere for Teams are coming
+soon, with a countdown and an I'm interested button that takes an email.
 Every Install and Try it free button leads there until the extension is in
 the Chrome Web Store. They are `noindex` and left out of the sitemap too.
+The operator sets each countdown in `/admin/launch`. Without Supabase, or
+before a moment is saved, both count to `LAUNCH_AT` in
+`src/site/content/launch.ts`.
 
 ## Where things live
 
@@ -113,7 +117,8 @@ lists what each page shows.
 | `/admin/analytics` | The site analytics: the Optagon landing page's dashboard, ported whole |
 | `/admin/users` | Every account. One opens to its totals, devices and graph, with its plan, its own monthly and lifetime dollar limits, suspend and restore, and revoke every device |
 | `/admin/organizations` | Every organization, and the only place one is made. One opens to its members, roles, access, settings, invites and graph, and can be deleted |
-| `/admin/waitlist` | The developer waitlist, by day, with a CSV download |
+| `/admin/interested` | Who is interested: the developer waitlist, Coere Connect and Coere for Teams, each by day with a CSV download, and Export all. `/admin/waitlist` leads here |
+| `/admin/launch` | The launch countdowns on `/install` and `/try-teams`: the moment, whether the timer shows, and a live preview |
 | `/admin/database` | Each table's estimated rows, size, Row Level Security and policies, and the Storage totals |
 | `/admin/security` | The security log over 7, 30 or 90 days, and any table with Row Level Security off |
 | `/admin/cost` | AI spend by day, model and account, and Storage's cost at $0.021 per GB month |
@@ -154,8 +159,9 @@ and safe to run again. Part 1 is the site analytics: three tables
 (`site_visits`, `site_events`, `site_section_views`) and three write
 functions. Part 2 is the accounts of `docs/accounts.md`: plans, profiles,
 devices, usage, the memory copy, synced settings, organizations, the running
-totals, the developer waitlist, the private Storage bucket `memory`, and the
-functions the server calls. `supabase/schema.sql` holds the same statements,
+totals, the developer waitlist, who is interested in Coere Connect and Coere
+for Teams, the site's settings (the launch countdowns), the private Storage
+bucket `memory`, and the functions the server calls. `supabase/schema.sql` holds the same statements,
 to read in one place.
 
 The analytics tables have Row Level Security on with no policies and no
