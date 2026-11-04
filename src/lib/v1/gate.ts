@@ -1,6 +1,6 @@
 import "server-only";
 
-import { logSecurityEvent } from "@/lib/security/events";
+import { logSecurityEventAfter } from "@/lib/security/events";
 
 import { authenticateDevice, type DeviceAccount } from "./device-auth";
 import type { GateRefusal, SpentLimit } from "./gate-types";
@@ -44,13 +44,13 @@ export async function gate(req: Request, o: { metered: boolean }): Promise<GateR
 
   const limit = deviceLimiter.hit(account.deviceId, account.requestsPerMinute);
   if (!limit.ok) {
-    if (firstIn(`rate:${account.deviceId}`, 60_000)) void logSecurityEvent("rate_limited", who);
+    if (firstIn(`rate:${account.deviceId}`, 60_000)) logSecurityEventAfter("rate_limited", who);
     return { ok: false, refusal: "rate_limited", retryAfter: limit.retryAfterSeconds };
   }
 
   const spent = o.metered ? spentLimit(account) : null;
   if (spent) {
-    if (firstIn(`usage:${account.deviceId}`, 3_600_000)) void logSecurityEvent("usage_limited", who);
+    if (firstIn(`usage:${account.deviceId}`, 3_600_000)) logSecurityEventAfter("usage_limited", who);
     return { ok: false, refusal: "usage_limit", retryAfter: spendRetryAfter(spent), limit: spent };
   }
   return { ok: true, account };

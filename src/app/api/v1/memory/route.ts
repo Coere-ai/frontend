@@ -1,5 +1,5 @@
 import { deleteMemory, downloadLink } from "@/lib/memory/user-memory";
-import { logSecurityEvent } from "@/lib/security/events";
+import { logSecurityEventAfter } from "@/lib/security/events";
 import { gate } from "@/lib/v1/gate";
 import { json, noContent, problem } from "@/lib/v1/http";
 import { problemFor } from "@/lib/v1/refusals";
@@ -28,6 +28,6 @@ export async function DELETE(req: Request): Promise<Response> {
   } catch {
     return problem("unavailable");
   }
-  void logSecurityEvent("memory_deleted", { userId, orgId, headers: req.headers });
+  logSecurityEventAfter("memory_deleted", { userId, orgId, headers: req.headers });
   return noContent();
 }

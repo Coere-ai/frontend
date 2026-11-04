@@ -1,4 +1,4 @@
-import { logSecurityEvent } from "@/lib/security/events";
+import { logSecurityEventAfter } from "@/lib/security/events";
 import { supabase } from "@/lib/supabase";
 import { authenticateDevice } from "@/lib/v1/device-auth";
 import { noContent, problem } from "@/lib/v1/http";
@@ -26,6 +26,6 @@ export async function POST(req: Request): Promise<Response> {
     console.error("revoke failed", error.code);
     return problem("unavailable");
   }
-  void logSecurityEvent("device_revoked", { userId, orgId, headers: req.headers });
+  logSecurityEventAfter("device_revoked", { userId, orgId, headers: req.headers });
   return noContent();
 }

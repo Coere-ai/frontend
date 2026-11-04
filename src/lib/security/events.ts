@@ -2,6 +2,8 @@ import "server-only";
 
 import { createHmac } from "node:crypto";
 
+import { after } from "next/server";
+
 import { supabase, supabaseConfigured } from "@/lib/supabase";
 
 /**
@@ -71,5 +73,19 @@ export async function logSecurityEvent(
     if (error) console.error("security event not stored", kind, error.code);
   } catch {
     console.error("security event not stored", kind);
+  }
+}
+
+/**
+ * Logs once the answer is sent, for the API routes that must not wait on
+ * the write. A bare unawaited promise can be lost on Vercel, which may freeze
+ * the function as soon as the response is out; `after` keeps it alive until
+ * the row is written. Outside a request (a script) it simply writes.
+ */
+export function logSecurityEventAfter(kind: SecurityKind, o: { userId?: string | null; orgId?: string | null; headers?: Headers } = {}): void {
+  try {
+    after(() => logSecurityEvent(kind, o));
+  } catch {
+    void logSecurityEvent(kind, o);
   }
 }

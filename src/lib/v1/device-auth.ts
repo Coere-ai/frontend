@@ -1,7 +1,7 @@
 import "server-only";
 
 import { supabase, supabaseConfigured } from "@/lib/supabase";
-import { logSecurityEvent } from "@/lib/security/events";
+import { logSecurityEventAfter } from "@/lib/security/events";
 
 import { parseBearer, tokenHash } from "./token";
 
@@ -72,7 +72,7 @@ export async function authenticateDevice(req: Request): Promise<DeviceAuth> {
   const token = parseBearer(header);
   if (!token) {
     // No header is the extension's signed out state and says nothing; a header that is not a token is worth noting.
-    if (header) void logSecurityEvent("token_rejected", { headers: req.headers });
+    if (header) logSecurityEventAfter("token_rejected", { headers: req.headers });
     return { ok: false, reason: "signed_out" };
   }
   const { data, error } = await supabase().rpc("device_auth", { p_token_hash: tokenHash(token) });
@@ -82,7 +82,7 @@ export async function authenticateDevice(req: Request): Promise<DeviceAuth> {
   }
   const row = (Array.isArray(data) ? data[0] : data) as DeviceAuthRow | undefined;
   if (!row) {
-    void logSecurityEvent("token_rejected", { headers: req.headers });
+    logSecurityEventAfter("token_rejected", { headers: req.headers });
     return { ok: false, reason: "signed_out" };
   }
   return { ok: true, account: toAccount(row) };

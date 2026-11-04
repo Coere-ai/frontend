@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cleanDeviceName } from "@/lib/connect/device-name";
-import { logSecurityEvent } from "@/lib/security/events";
+import { logSecurityEventAfter } from "@/lib/security/events";
 import { supabase } from "@/lib/supabase";
 
 import { newDeviceToken, pkceMatches, sha256Hex, tokenHint } from "./token";
@@ -72,6 +72,6 @@ export async function exchangeCode(req: TokenRequest, headers: Headers): Promise
     console.error("device not stored", error?.code);
     return null;
   }
-  void logSecurityEvent("device_connected", { userId: profile.id, headers });
+  logSecurityEventAfter("device_connected", { userId: profile.id, headers });
   return { token, device, user: { id: profile.id, email: profile.email, username: profile.username } };
 }
