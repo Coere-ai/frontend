@@ -1,4 +1,4 @@
-import { strFromU8, unzipSync } from "fflate";
+import { strFromU8, Unzip, UnzipInflate, type UnzipFile } from "fflate";
 
 /**
  * Opening a `.coere` file on the server (docs/accounts.md 8.6). It must be
@@ -6,8 +6,9 @@ import { strFromU8, unzipSync } from "fflate";
  * coere-v2's `format/zip.ts` writes it, with a `manifest.json`. Only the
  * entries the index needs are inflated: records, section files and
  * documents. Chat text, citations, earlier versions and forget keys stay
- * packed. Each entry inflates into a buffer of its declared size, so the
- * declared sizes bound the memory used, and their total is capped.
+ * packed. The bytes each entry really inflates to are counted as they come,
+ * against its declared size and the total cap, so a file that lies about
+ * its sizes (a zip bomb) stops within the cap instead of decoding gigabytes.
  */
 
 export const COERE_MIMETYPE = "application/vnd.coere.memory+zip";
@@ -69,19 +70,77 @@ export function parseManifest(text: string): CoereManifest | null {
   };
 }
 
+/** Compressed bytes fed to the inflater at a time, so the size checks run often. */
+const FEED = 64 * 1024;
+
+function joined(chunks: Uint8Array[], length: number): Uint8Array {
+  const out = new Uint8Array(length);
+  let at = 0;
+  for (const c of chunks) {
+    out.set(c, at);
+    at += c.length;
+  }
+  return out;
+}
+
+/**
+ * Inflates the wanted entries, counting real output. Throws "too_large"
+ * past an entry's declared size or the total cap, and "not_coere" for a
+ * method other than stored or deflate or a broken stream. A limit is noted
+ * and the feeding stops, since fflate does not survive a throw from inside
+ * its own callbacks.
+ */
+function inflateWanted(bytes: Uint8Array): Record<string, Uint8Array> {
+  const out: Record<string, Uint8Array> = {};
+  let declared = 0;
+  let total = 0;
+  let failed: "too_large" | "not_coere" | null = null;
+  const unzip = new Unzip((file: UnzipFile) => {
+    if (failed || !wantedEntry(file.name)) return;
+    if (file.compression !== 0 && file.compression !== 8) {
+      failed = "not_coere";
+      return;
+    }
+    const limit = file.originalSize ?? MAX_UNZIPPED_BYTES;
+    declared += limit;
+    if (declared > MAX_UNZIPPED_BYTES) {
+      failed = "too_large";
+      return;
+    }
+    const chunks: Uint8Array[] = [];
+    let got = 0;
+    file.ondata = (err, chunk, final) => {
+      if (failed) return;
+      if (err) {
+        failed = "not_coere";
+        return;
+      }
+      got += chunk.length;
+      total += chunk.length;
+      if (got > limit || total > MAX_UNZIPPED_BYTES) {
+        failed = "too_large";
+        return;
+      }
+      chunks.push(chunk);
+      if (final) out[file.name] = joined(chunks, got);
+    };
+    file.start();
+  });
+  unzip.register(UnzipInflate);
+  try {
+    for (let at = 0; at < bytes.length && !failed; at += FEED) unzip.push(bytes.subarray(at, at + FEED), at + FEED >= bytes.length);
+  } catch {
+    failed ??= "not_coere";
+  }
+  if (failed) throw new Error(failed);
+  return out;
+}
+
 export function openCoere(bytes: Uint8Array): OpenedCoere {
   if (!startsWithMimetype(bytes)) return { ok: false, reason: "not_coere" };
-  let total = 0;
   let raw: Record<string, Uint8Array>;
   try {
-    raw = unzipSync(bytes, {
-      filter: (f) => {
-        if (!wantedEntry(f.name)) return false;
-        total += f.originalSize;
-        if (total > MAX_UNZIPPED_BYTES) throw new Error("too_large");
-        return true;
-      },
-    });
+    raw = inflateWanted(bytes);
   } catch (err) {
     return { ok: false, reason: (err as Error).message === "too_large" ? "too_large" : "not_coere" };
   }

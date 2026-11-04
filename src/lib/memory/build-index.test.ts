@@ -28,6 +28,25 @@ describe("openCoere", () => {
     assert.ok(!opened.files.has("sections/school/cs-101/notes.versions/0001.md"));
   });
 
+  it("stops a zip whose entry inflates past its declared size, before decoding it all", () => {
+    const zip = zipSync({
+      mimetype: [strToU8("application/vnd.coere.memory+zip"), { level: 0 }],
+      "manifest.json": strToU8("{}"),
+      "x.jsonl": new Uint8Array(8 * 1024 * 1024),
+    });
+    // Declare 1 KiB for x.jsonl in its local header and its central directory entry.
+    const view = new DataView(zip.buffer, zip.byteOffset, zip.byteLength);
+    const name = strToU8("x.jsonl");
+    for (let i = 0; i + name.length <= zip.length; i++) {
+      if (!name.every((b, j) => zip[i + j] === b)) continue;
+      if (view.getUint32(i - 30, true) === 0x04034b50) view.setUint32(i - 30 + 22, 1024, true);
+      if (i >= 46 && view.getUint32(i - 46, true) === 0x02014b50) view.setUint32(i - 46 + 24, 1024, true);
+    }
+    const started = Date.now();
+    assert.deepEqual(openCoere(zip), { ok: false, reason: "too_large" });
+    assert.ok(Date.now() - started < 2000);
+  });
+
   it("refuses a zip without mimetype first, or with the wrong type or no manifest", () => {
     const plain = zipSync({ "manifest.json": strToU8("{}"), mimetype: [strToU8("application/vnd.coere.memory+zip"), { level: 0 }] });
     assert.deepEqual(openCoere(plain), { ok: false, reason: "not_coere" });
