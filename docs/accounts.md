@@ -280,10 +280,20 @@ access hook at `memory.changed`.
   after the first), 10 seconds after `memory.built`, an import, a forget or
   a chat deletion, at browser start when the last push is over 24 hours
   old, and on the bridge's `coere.backup`.
-- It skips when the manifest's `digest` equals the last pushed digest, when
-  the person turned the backup off, or when the file is over 50 MiB.
+- It skips when the manifest's `digest` equals the one the site holds
+  (from `GET /api/v1/account`, kept up to date by its own commit and skip
+  answers), when the person turned the backup off, or when the file is over
+  50 MiB (the site's cap, section 8.10).
 - Steps: `POST /api/v1/memory/upload`, then a `PUT` of the zip to the
   signed URL it returns, then `POST /api/v1/memory/commit`.
+- How it reads a refusal at any step: `401` signs out; `409` turns its copy
+  of the backup switch off and waits; `412 sensitive_off` means its copy of
+  the account is older than the site's, so it reads `GET /api/v1/account`
+  again and exports once more with the current `includeSensitive` (a
+  second `412` in the same push backs off); `413`, from the site or from
+  Storage's `PUT`, waits for a smaller file; `400` and `403` wait for the
+  next change. A `404` at the commit, a `429`, a `503`, any other Storage
+  refusal or no answer at all back off.
 - Failures back off from 1 minute, doubling to 30 minutes.
 
 ### 6.6 Settings sync
@@ -330,6 +340,7 @@ the person's running total (section 15).
 | `statistics` | `<site>/dashboard/usage` |
 | `settings` with no part | `<site>/dashboard/settings` |
 | `library`, `cori`, Settings parts `folder`, `import`, `logs`, `transfer`, `ais` | the local `console.html` as today |
+| `settings` with `local: true`, sent by voice, whose microphone permission only the extension's own page can ask for | the local `console.html` Settings |
 
 Signed out, any of the site ones opens the connect page instead. The
 toolbar popup's dashboard button goes to the site. Settings in the
@@ -621,7 +632,10 @@ far above what it costs and a small plan could otherwise never batch; its
 reservation then holds every other call back until its results are metered.
 A batch never metered within 30 days (its results expire after 29), or
 deleted before its results were read, is charged its reservation. So a limit can be passed by at most one batch's
-worst case, never by an unbounded amount.
+worst case, never by an unbounded amount. While a spend limit holds the
+extension's queue, it still polls and reads the batches it already sent,
+and tests the limit again as soon as one is read (with one batch create
+when no direct call is queued), so a reservation never holds it for good.
 
 The daily limit (or the first build allowance) is held the same way:
 today's spend plus every pending hold and reservation, plus a message's
