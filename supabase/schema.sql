@@ -353,21 +353,29 @@ create table if not exists public.plans (
   monthly_limit_micros  bigint      not null,
   -- Null means the plan has no lifetime limit, which is true of every seed.
   lifetime_limit_micros bigint,
+  -- The daily AI spend limit (section 8.10), per UTC day. It starts once the
+  -- account's first memory build has finished; until then the first build
+  -- allowance applies instead, so the first build is free of the daily one.
+  -- Neither is shown to the person.
+  daily_limit_micros       bigint   not null default 2000000,
+  first_build_limit_micros bigint   not null default 10000000,
   storage_limit_bytes   bigint      not null,
   requests_per_minute   integer     not null,
   created_at            timestamptz not null default now(),
 
   constraint plans_limits_sane check (
     monthly_limit_micros >= 0 and storage_limit_bytes >= 0 and requests_per_minute > 0
-    and (lifetime_limit_micros is null or lifetime_limit_micros >= 0))
+    and (lifetime_limit_micros is null or lifetime_limit_micros >= 0)
+    and daily_limit_micros >= 0 and first_build_limit_micros >= 0)
 );
 
--- The three plans of section 10. do nothing, so an operator's later edit of a
--- plan's limits survives a second run of this file.
-insert into public.plans (id, name, monthly_limit_micros, storage_limit_bytes, requests_per_minute) values
-  ('free', 'Free',   5000000,  26214400,  60),
-  ('plus', 'Plus',  20000000, 104857600, 120),
-  ('team', 'Team', 100000000, 524288000, 300)
+-- The three plans of section 10, each $2 a day after a $10 first build. do
+-- nothing, so an operator's later edit of a plan's limits survives a second
+-- run of this file.
+insert into public.plans (id, name, monthly_limit_micros, daily_limit_micros, first_build_limit_micros, storage_limit_bytes, requests_per_minute) values
+  ('free', 'Free',   5000000, 2000000, 10000000,  26214400,  60),
+  ('plus', 'Plus',  20000000, 2000000, 10000000, 104857600, 120),
+  ('team', 'Team', 100000000, 2000000, 10000000, 524288000, 300)
 on conflict (id) do nothing;
 
 
@@ -388,6 +396,16 @@ create table if not exists public.profiles (
   -- means the plan's. device_auth() resolves them, so the site never does.
   monthly_limit_micros  bigint,
   lifetime_limit_micros bigint,
+  daily_limit_micros       bigint,
+  first_build_limit_micros bigint,
+  -- When the first memory build finished: the first memory_built event, set
+  -- by record_app_events(). Null until then, and the daily limit waits for it.
+  first_build_at          timestamptz,
+  -- user_totals.cost_micros at the last turn of the first build: when the
+  -- free build began (0, or when the operator reset it) while first_build_at
+  -- is null, and when it finished after. The first build allowance counts
+  -- spend above it, and so does the daily limit on the day the build finished.
+  first_build_mark_micros bigint      not null default 0,
   status            text        not null default 'active',
   -- The memory backup is on by default (section 13); sensitive memories are
   -- left out of it unless the person turns them on.
@@ -402,7 +420,10 @@ create table if not exists public.profiles (
   constraint profiles_display_sane   check (display_name is null or char_length(display_name) <= 80),
   constraint profiles_limits_sane    check (
     (monthly_limit_micros is null or monthly_limit_micros >= 0)
-    and (lifetime_limit_micros is null or lifetime_limit_micros >= 0))
+    and (lifetime_limit_micros is null or lifetime_limit_micros >= 0)
+    and (daily_limit_micros is null or daily_limit_micros >= 0)
+    and (first_build_limit_micros is null or first_build_limit_micros >= 0)
+    and first_build_mark_micros >= 0)
 );
 
 
@@ -574,6 +595,43 @@ create table if not exists public.usage_monthly (
   updated_at    timestamptz not null default now(),
 
   primary key (user_id, month)
+);
+
+-- Each account's spend per UTC day, kept by record_usage() so the daily limit
+-- reads one row. Server only: the daily limit is not shown to the person.
+create table if not exists public.usage_daily (
+  user_id            uuid        not null references public.profiles (id) on delete cascade,
+  day                date        not null,
+  requests           bigint      not null default 0,
+  input_tokens       bigint      not null default 0,
+  output_tokens      bigint      not null default 0,
+  cache_write_tokens bigint      not null default 0,
+  cache_read_tokens  bigint      not null default 0,
+  cost_micros        bigint      not null default 0,
+  updated_at         timestamptz not null default now(),
+
+  primary key (user_id, day)
+);
+
+-- The admin Cost page adds up a range of days across every account.
+create index if not exists usage_daily_day_idx on public.usage_daily (day);
+
+-- The whole product's use per UTC day and model, kept by record_usage(), so
+-- the Cost page splits any range by model without reading usage_events. No
+-- foreign key, so a deleted account's use stays. model is '' for a row that
+-- names none (a batch charged its reservation).
+create table if not exists public.usage_model_daily (
+  day                date        not null,
+  model              text        not null,
+  requests           bigint      not null default 0,
+  input_tokens       bigint      not null default 0,
+  output_tokens      bigint      not null default 0,
+  cache_write_tokens bigint      not null default 0,
+  cache_read_tokens  bigint      not null default 0,
+  cost_micros        bigint      not null default 0,
+  updated_at         timestamptz not null default now(),
+
+  primary key (day, model)
 );
 
 -- A batch id is stored as its caller's, so one account can never read or
@@ -1002,10 +1060,10 @@ create trigger coere_on_auth_user_email
 -- authenticated. So each table first loses all of that, then gets back only
 -- what section 10 allows. Privileges decide which columns and verbs a role
 -- may use at all; the policies then decide which rows. Tables with no policy
--- (device_codes, ai_batches, spend_holds, app_events, security_events,
--- daily_totals, developer_waitlist, product_interest, site_settings) are
--- server only: Row Level Security on with no policy denies every signed in
--- request.
+-- (device_codes, usage_daily, usage_model_daily, ai_batches, spend_holds,
+-- app_events, security_events, daily_totals, developer_waitlist,
+-- product_interest, site_settings) are server only: Row Level Security on
+-- with no policy denies every signed in request.
 
 alter table public.plans              enable row level security;
 alter table public.profiles           enable row level security;
@@ -1017,6 +1075,8 @@ alter table public.devices            enable row level security;
 alter table public.device_codes       enable row level security;
 alter table public.usage_events       enable row level security;
 alter table public.usage_monthly      enable row level security;
+alter table public.usage_daily        enable row level security;
+alter table public.usage_model_daily  enable row level security;
 alter table public.ai_batches         enable row level security;
 alter table public.spend_holds        enable row level security;
 alter table public.memory_files       enable row level security;
@@ -1033,7 +1093,8 @@ alter table public.site_settings      enable row level security;
 revoke all on
   public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
   public.org_memory, public.devices, public.device_codes, public.usage_events,
-  public.usage_monthly, public.ai_batches, public.spend_holds, public.memory_files, public.user_settings,
+  public.usage_monthly, public.usage_daily, public.usage_model_daily, public.ai_batches, public.spend_holds,
+  public.memory_files, public.user_settings,
   public.app_events, public.security_events, public.user_totals, public.org_totals,
   public.daily_totals, public.developer_waitlist, public.product_interest, public.site_settings
 from anon, authenticated;
@@ -1043,17 +1104,29 @@ from anon, authenticated;
 grant select, insert, update, delete on
   public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
   public.org_memory, public.devices, public.device_codes, public.usage_events,
-  public.usage_monthly, public.ai_batches, public.spend_holds, public.memory_files, public.user_settings,
+  public.usage_monthly, public.usage_daily, public.usage_model_daily, public.ai_batches, public.spend_holds,
+  public.memory_files, public.user_settings,
   public.app_events, public.security_events, public.user_totals, public.org_totals,
   public.daily_totals, public.developer_waitlist, public.product_interest, public.site_settings
 to service_role;
 
 -- What a signed in person may read. Rows are narrowed by the policies below.
 grant select on
-  public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
+  public.organizations, public.org_members, public.org_invites,
   public.org_memory, public.usage_events, public.usage_monthly, public.memory_files,
   public.user_settings, public.user_totals, public.org_totals
 to authenticated;
+
+-- plans and profiles: every column but the daily limit and the first build.
+-- Column grants, as for devices below, so the hidden limit stays on the
+-- server: a select naming one of them (or select *) is refused.
+grant select (id, name, monthly_limit_micros, lifetime_limit_micros, storage_limit_bytes,
+              requests_per_minute, created_at)
+  on public.plans to authenticated;
+grant select (id, email, username, display_name, plan_id, monthly_limit_micros,
+              lifetime_limit_micros, status, memory_sync, include_sensitive, created_at,
+              updated_at, last_seen_at)
+  on public.profiles to authenticated;
 
 -- devices: every column but token_hash. A column grant, not a policy,
 -- because policies pick rows and cannot hide a column. A select naming
@@ -1063,8 +1136,8 @@ grant select (id, user_id, name, token_hint, extension_id, extension_version,
   on public.devices to authenticated;
 
 -- profiles: a person may change their display name and nothing else. Plan,
--- their limits, status, username and the memory switches go through the
--- server, which checks what each change is allowed to be.
+-- their limits, the first build, status, username and the memory switches go
+-- through the server, which checks what each change is allowed to be.
 grant update (display_name) on public.profiles to authenticated;
 
 
@@ -1178,10 +1251,41 @@ create policy coere_memory_delete_own on storage.objects
 -- Months and days are UTC, so a total means the same thing wherever the
 -- server runs.
 
+-- The hidden daily limit of one account (section 8.10), resolved, with the
+-- spend it is checked against. Before the first memory build has finished,
+-- the limit is the first build allowance and the spend is everything since
+-- the free build began. After, the limit is the daily one and the spend is
+-- this UTC day's, less what the first build spent earlier on the day it
+-- finished, so the free build never counts against the day. The person's own
+-- value wins over the plan's, as for the other limits. No row for no account.
+create or replace function public.daily_spend(p_user uuid)
+returns table (daily_limit_micros bigint, day_cost_micros bigint, first_build_done boolean)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select case when p.first_build_at is null
+              then coalesce(p.first_build_limit_micros, pl.first_build_limit_micros)
+              else coalesce(p.daily_limit_micros, pl.daily_limit_micros) end,
+         (case when p.first_build_at is null
+                 or p.first_build_at >= date_trunc('day', now() at time zone 'utc') at time zone 'utc'
+               then greatest(coalesce(ut.cost_micros, 0) - p.first_build_mark_micros, 0)
+               else coalesce(ud.cost_micros, 0) end)::bigint,
+         p.first_build_at is not null
+    from public.profiles p
+    join public.plans pl on pl.id = p.plan_id
+    left join public.user_totals ut on ut.user_id = p.id
+    left join public.usage_daily ud on ud.user_id = p.id and ud.day = (now() at time zone 'utc')::date
+   where p.id = p_user;
+$$;
+
 -- Checks a device token and returns everything a metered call needs: the
--- account, its limits, this month's spend, the lifetime spend and the
--- organization. Each limit is already resolved: the person's own when the
+-- account, its limits, this month's spend, the lifetime spend, the daily
+-- limit with today's spend, and the organization. Each limit is already resolved: the person's own when the
 -- operator set one, else the plan's. A null lifetime limit means none.
+-- daily_limit_micros and day_cost_micros are daily_spend()'s, so the gate
+-- needs no second call; first_build_done says which limit they are.
 -- No row means unknown or revoked, and the route answers signed_out.
 -- last_used_at and last_seen_at are touched at most every 5 minutes, so a
 -- busy extension does not write a row on every request.
@@ -1191,7 +1295,8 @@ returns table (
   monthly_limit_micros bigint, lifetime_limit_micros bigint,
   storage_limit_bytes bigint, requests_per_minute integer,
   month_cost_micros bigint, lifetime_cost_micros bigint,
-  memory_sync boolean, include_sensitive boolean, org_id uuid)
+  memory_sync boolean, include_sensitive boolean, org_id uuid,
+  daily_limit_micros bigint, day_cost_micros bigint, first_build_done boolean)
 language plpgsql
 security invoker
 set search_path = ''
@@ -1218,20 +1323,23 @@ begin
            coalesce(p.lifetime_limit_micros, pl.lifetime_limit_micros),
            pl.storage_limit_bytes, pl.requests_per_minute,
            coalesce(um.cost_micros, 0)::bigint, coalesce(ut.cost_micros, 0)::bigint,
-           p.memory_sync, p.include_sensitive, m.org_id
+           p.memory_sync, p.include_sensitive, m.org_id,
+           ds.daily_limit_micros, ds.day_cost_micros, ds.first_build_done
       from public.profiles p
       join public.plans pl on pl.id = p.plan_id
       left join public.usage_monthly um
         on um.user_id = p.id and um.month = date_trunc('month', now() at time zone 'utc')::date
       left join public.user_totals ut on ut.user_id = p.id
       left join public.org_members m on m.user_id = p.id
+      left join lateral public.daily_spend(p.id) ds on true
      where p.id = v_device.user_id;
 end;
 $$;
 
--- Logs one metered call and adds it to this month's spend, the person's
--- totals, their organization's totals and today's totals. A call with no
--- user (it should not happen) still counts in the day, so cost is never lost.
+-- Logs one metered call and adds it to this month's and today's spend, the
+-- person's totals, their organization's totals, today's totals and today's
+-- row for its model. A call with no user (it should not happen) still counts
+-- in the day, so cost is never lost.
 create or replace function public.record_usage(
   p_user uuid, p_device uuid, p_kind text, p_model text,
   p_input bigint, p_output bigint, p_cache_write bigint, p_cache_read bigint,
@@ -1268,6 +1376,18 @@ begin
           cost_micros   = t.cost_micros + excluded.cost_micros,
           updated_at    = now();
 
+    insert into public.usage_daily as t
+      (user_id, day, requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros)
+    values (p_user, v_day, 1, v_in, v_out, v_cw, v_cr, v_cost)
+    on conflict (user_id, day) do update
+      set requests           = t.requests + 1,
+          input_tokens       = t.input_tokens + excluded.input_tokens,
+          output_tokens      = t.output_tokens + excluded.output_tokens,
+          cache_write_tokens = t.cache_write_tokens + excluded.cache_write_tokens,
+          cache_read_tokens  = t.cache_read_tokens + excluded.cache_read_tokens,
+          cost_micros        = t.cost_micros + excluded.cost_micros,
+          updated_at         = now();
+
     insert into public.user_totals as t
       (user_id, requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros)
     values (p_user, 1, v_in, v_out, v_cw, v_cr, v_cost)
@@ -1300,6 +1420,18 @@ begin
     (day, requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros)
   values (v_day, 1, v_in, v_out, v_cw, v_cr, v_cost)
   on conflict (day) do update
+    set requests           = t.requests + 1,
+        input_tokens       = t.input_tokens + excluded.input_tokens,
+        output_tokens      = t.output_tokens + excluded.output_tokens,
+        cache_write_tokens = t.cache_write_tokens + excluded.cache_write_tokens,
+        cache_read_tokens  = t.cache_read_tokens + excluded.cache_read_tokens,
+        cost_micros        = t.cost_micros + excluded.cost_micros,
+        updated_at         = now();
+
+  insert into public.usage_model_daily as t
+    (day, model, requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros)
+  values (v_day, coalesce(left(p_model, 64), ''), 1, v_in, v_out, v_cw, v_cr, v_cost)
+  on conflict (day, model) do update
     set requests           = t.requests + 1,
         input_tokens       = t.input_tokens + excluded.input_tokens,
         output_tokens      = t.output_tokens + excluded.output_tokens,
@@ -1354,7 +1486,11 @@ $$;
 -- refuse every batch of a small plan; its reservation then holds everything
 -- else back until its results are metered. A batch whose results were never
 -- read in 30 days (they expire after 29) is charged its reservation here.
--- Answers the hold's id, or which limit refused it.
+-- The daily limit (or the first build allowance, before the first build has
+-- finished) is checked the same way, against daily_spend() plus every
+-- pending hold and reservation, so the day too can be passed by one batch at
+-- most. Answers the hold's id, or which limit refused it: lifetime,
+-- first_build, monthly or daily, the one that lasts longest first.
 create or replace function public.reserve_spend(
   p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean
 ) returns table (hold_id uuid, refused text)
@@ -1369,6 +1505,9 @@ declare
   v_month    bigint;
   v_total    bigint;
   v_pending  bigint;
+  v_daily    bigint;
+  v_today    bigint;
+  v_built    boolean;
   v_id       uuid;
   r          record;
 begin
@@ -1402,6 +1541,9 @@ begin
   select coalesce(sum(h.amount_micros), 0) into v_pending from public.spend_holds h where h.user_id = p_user;
   v_pending := v_pending + (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b
                              where b.user_id = p_user and b.metered_at is null);
+  select ds.daily_limit_micros, ds.day_cost_micros, ds.first_build_done
+    into v_daily, v_today, v_built
+    from public.daily_spend(p_user) ds;
 
   if p_batch then
     -- Nothing may already be at a limit.
@@ -1409,8 +1551,16 @@ begin
       return query select null::uuid, 'lifetime'::text;
       return;
     end if;
+    if not v_built and v_today + v_pending >= v_daily then
+      return query select null::uuid, 'first_build'::text;
+      return;
+    end if;
     if v_month + v_pending >= v_monthly then
       return query select null::uuid, 'monthly'::text;
+      return;
+    end if;
+    if v_built and v_today + v_pending >= v_daily then
+      return query select null::uuid, 'daily'::text;
       return;
     end if;
   else
@@ -1419,8 +1569,16 @@ begin
       return query select null::uuid, 'lifetime'::text;
       return;
     end if;
+    if not v_built and v_today + v_pending + v_amount > v_daily then
+      return query select null::uuid, 'first_build'::text;
+      return;
+    end if;
     if v_month + v_pending + v_amount > v_monthly then
       return query select null::uuid, 'monthly'::text;
+      return;
+    end if;
+    if v_built and v_today + v_pending + v_amount > v_daily then
+      return query select null::uuid, 'daily'::text;
       return;
     end if;
   end if;
@@ -1460,6 +1618,8 @@ $$;
 -- person's, their organization's and today's totals. tokensSaved counts only
 -- on context_import and transfer; the route already refuses it elsewhere,
 -- and this ignores it elsewhere too, so a direct caller cannot inflate it.
+-- The first memory_built marks the free first build done (first_build_at),
+-- which starts the daily limit; a later one changes nothing.
 create or replace function public.record_app_events(p_user uuid, p_device uuid, p_events jsonb)
 returns void
 language plpgsql
@@ -1475,6 +1635,7 @@ declare
   v_cori        bigint;
   v_actions     bigint;
   v_saved       bigint;
+  v_builds      bigint;
 begin
   if p_events is null or jsonb_typeof(p_events) <> 'array' or jsonb_array_length(p_events) = 0 then
     return;
@@ -1496,9 +1657,17 @@ begin
          coalesce(sum(b.count) filter (where b.kind in ('extract_chat', 'extract_all')), 0),
          coalesce(sum(b.count) filter (where b.kind = 'cori_chat'), 0),
          coalesce(sum(b.count) filter (where b.kind in ('action_run', 'rewrite', 'voice')), 0),
-         coalesce(sum(b.saved), 0)
-    into v_imports, v_transfers, v_extractions, v_cori, v_actions, v_saved
+         coalesce(sum(b.saved), 0),
+         coalesce(sum(b.count) filter (where b.kind = 'memory_built'), 0)
+    into v_imports, v_transfers, v_extractions, v_cori, v_actions, v_saved, v_builds
     from batch b;
+
+  if p_user is not null and v_builds > 0 then
+    update public.profiles p
+       set first_build_at = now(),
+           first_build_mark_micros = coalesce((select ut.cost_micros from public.user_totals ut where ut.user_id = p_user), 0)
+     where p.id = p_user and p.first_build_at is null;
+  end if;
 
   if p_user is not null then
     insert into public.user_totals as t
@@ -1774,6 +1943,90 @@ as $$
    order by 1, 2 nulls first;
 $$;
 
+-- The operator gives an account its free first build again: the daily limit
+-- waits for the next memory_built, and the first build allowance counts from
+-- what the account has spent so far, so spend before the reset never uses it
+-- up. False when there is no such account.
+create or replace function public.reset_first_build(p_user uuid)
+returns boolean
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+begin
+  update public.profiles p
+     set first_build_at = null,
+         first_build_mark_micros = coalesce((select ut.cost_micros from public.user_totals ut where ut.user_id = p_user), 0),
+         updated_at = now()
+   where p.id = p_user;
+  return found;
+end;
+$$;
+
+-- /admin/cost by model: requests, the four token counts and cost per model,
+-- from the days on or after p_from (every day when null). It reads
+-- usage_model_daily, a row per day and model, so any range costs the same
+-- few rows however busy the product is. model is '' for a charged
+-- reservation that names none.
+create or replace function public.admin_usage_by_model(p_from date)
+returns table (model text, requests bigint, input_tokens bigint, output_tokens bigint,
+               cache_write_tokens bigint, cache_read_tokens bigint, cost_micros bigint)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  select u.model, sum(u.requests)::bigint, sum(u.input_tokens)::bigint, sum(u.output_tokens)::bigint,
+         sum(u.cache_write_tokens)::bigint, sum(u.cache_read_tokens)::bigint, sum(u.cost_micros)::bigint
+    from public.usage_model_daily u
+   where p_from is null or u.day >= p_from
+   group by u.model
+   order by 7 desc, 2 desc, 1;
+$$;
+
+-- /admin/cost's top accounts over the days on or after p_from (all time from
+-- user_totals when null): the p_limit largest by cost, by tokens (input plus
+-- output) and by requests, together, so the page can sort by any of the three
+-- and still show the true top of each. Each comes with daily_spend(), what
+-- the account spent today against its daily limit (or its first build
+-- against the allowance). A deleted account's use is left out.
+create or replace function public.admin_top_accounts(p_from date, p_limit integer)
+returns table (user_id uuid, email text, requests bigint, input_tokens bigint, output_tokens bigint,
+               cache_write_tokens bigint, cache_read_tokens bigint, cost_micros bigint,
+               day_cost_micros bigint, daily_limit_micros bigint, first_build_done boolean)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+  with sums as (
+    select ud.user_id, sum(ud.requests)::bigint as requests, sum(ud.input_tokens)::bigint as input_tokens,
+           sum(ud.output_tokens)::bigint as output_tokens, sum(ud.cache_write_tokens)::bigint as cache_write_tokens,
+           sum(ud.cache_read_tokens)::bigint as cache_read_tokens, sum(ud.cost_micros)::bigint as cost_micros
+      from public.usage_daily ud
+     where p_from is not null and ud.day >= p_from
+     group by ud.user_id
+    union all
+    select ut.user_id, ut.requests, ut.input_tokens, ut.output_tokens, ut.cache_write_tokens,
+           ut.cache_read_tokens, ut.cost_micros
+      from public.user_totals ut
+     where p_from is null and ut.requests > 0
+  ), ranked as (
+    select s.*,
+           row_number() over (order by s.cost_micros desc, s.requests desc, s.user_id) as by_cost,
+           row_number() over (order by s.input_tokens + s.output_tokens desc, s.user_id) as by_tokens,
+           row_number() over (order by s.requests desc, s.user_id) as by_requests
+      from sums s
+  )
+  select r.user_id, p.email, r.requests, r.input_tokens, r.output_tokens, r.cache_write_tokens,
+         r.cache_read_tokens, r.cost_micros, ds.day_cost_micros, ds.daily_limit_micros, ds.first_build_done
+    from ranked r
+    join public.profiles p on p.id = r.user_id
+    left join lateral public.daily_spend(r.user_id) ds on true
+   where least(r.by_cost, r.by_tokens, r.by_requests) <= least(greatest(coalesce(p_limit, 50), 1), 500)
+   order by r.cost_micros desc, r.requests desc, r.user_id;
+$$;
+
 -- PostgREST grants EXECUTE on public functions to anon and authenticated by
 -- default. These change totals and read across accounts, so only the server
 -- may call them.
@@ -1790,6 +2043,10 @@ revoke all on function public.org_drop_member(uuid, uuid, text) from public, ano
 revoke all on function public.accept_org_invite(uuid, uuid) from public, anon, authenticated;
 revoke all on function public.admin_table_stats() from public, anon, authenticated;
 revoke all on function public.admin_storage_usage() from public, anon, authenticated;
+revoke all on function public.daily_spend(uuid) from public, anon, authenticated;
+revoke all on function public.reset_first_build(uuid) from public, anon, authenticated;
+revoke all on function public.admin_usage_by_model(date) from public, anon, authenticated;
+revoke all on function public.admin_top_accounts(date, integer) from public, anon, authenticated;
 grant execute on function public.device_auth(text) to service_role;
 grant execute on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) to service_role;
 grant execute on function public.meter_batch(uuid, uuid, text, jsonb, integer, integer, text) to service_role;
@@ -1803,3 +2060,7 @@ grant execute on function public.org_drop_member(uuid, uuid, text) to service_ro
 grant execute on function public.accept_org_invite(uuid, uuid) to service_role;
 grant execute on function public.admin_table_stats() to service_role;
 grant execute on function public.admin_storage_usage() to service_role;
+grant execute on function public.daily_spend(uuid) to service_role;
+grant execute on function public.reset_first_build(uuid) to service_role;
+grant execute on function public.admin_usage_by_model(date) to service_role;
+grant execute on function public.admin_top_accounts(date, integer) to service_role;

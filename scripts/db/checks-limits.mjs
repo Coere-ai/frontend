@@ -17,6 +17,7 @@ const DEVICE_AUTH_COLUMNS = [
   "storage_limit_bytes", "requests_per_minute",
   "month_cost_micros", "lifetime_cost_micros",
   "memory_sync", "include_sensitive", "org_id",
+  "daily_limit_micros", "day_cost_micros", "first_build_done",
 ];
 
 const LIMITS = "select monthly_limit_micros, lifetime_limit_micros, lifetime_cost_micros from public.device_auth('hash_a')";

@@ -55,8 +55,11 @@ async function checkMeterBatch(db) {
 }
 
 // reserve_spend on C, a free account ($5 a month) with no spend. Rolled back at the end.
+// C's first build is done and its daily limit set far out of the way, so
+// these checks are about the month; checks-daily.mjs covers the day.
 async function checkReserveSpend(db) {
   await db.exec("begin");
+  await db.query("update public.profiles set first_build_at = now() - interval '2 days', daily_limit_micros = 1000000000 where id = $1", [C]);
   const reserve = (amount, batch = false) =>
     as(db, "service_role", null, async () => (await rows(db, `reserve ${amount}`, "select * from public.reserve_spend($1, $2, 900, $3)", [C, amount, batch]))?.[0]);
   check("a message that fits is held", (await reserve(1_000_000))?.hold_id !== null);
@@ -171,7 +174,7 @@ export async function checkAdminReaders(db) {
   await as(db, "service_role", null, async () => {
     const tables = await rows(db, "admin_table_stats", "select * from public.admin_table_stats()");
     const pub = (tables ?? []).filter((t) => t.schema_name === "public");
-    equal("admin_table_stats lists every public table", pub.length, 25);
+    equal("admin_table_stats lists every public table", pub.length, 27);
     check("admin_table_stats lists product_interest and site_settings", ["product_interest", "site_settings"].every((name) => pub.some((t) => t.table_name === name)));
     equal("every public table has Row Level Security on", pub.filter((t) => !t.rls_enabled).map((t) => t.table_name), []);
     equal("admin_table_stats counts policies", pub.find((t) => t.table_name === "profiles")?.policy_count, 2);
