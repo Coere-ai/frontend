@@ -17,6 +17,16 @@ describe("safeNext", () => {
     }
   });
 
+  it("refuses control characters a browser drops from an address", () => {
+    for (const bad of ["/\t/evil.com", "/\n/evil.com", "/\r/evil.com", "/\t\t//evil.com", "/\u0000x"]) {
+      assert.equal(safeNext(bad), "/dashboard");
+    }
+  });
+
+  it("percent encodes characters a header cannot carry", () => {
+    assert.equal(safeNext("/dashboard/caf\u00e9\u4e2d"), "/dashboard/caf%C3%A9%E4%B8%AD");
+  });
+
   it("uses the given fallback", () => {
     assert.equal(safeNext("//x", "/sign-in"), "/sign-in");
   });
@@ -50,6 +60,11 @@ describe("nextFromLink", () => {
     assert.equal(nextFromLink("?token_hash=abc&next=", SITE), "/dashboard");
     assert.equal(nextFromLink("?next=%E0%A4%A", SITE), "/dashboard");
     assert.equal(nextFromLink("?xnext=/dashboard/usage", SITE), "/dashboard");
+  });
+
+  it("refuses an encoded tab before a second slash", () => {
+    assert.equal(nextFromLink("?token_hash=abc&type=email&next=%2F%09%2Fevil.com", SITE), "/dashboard");
+    assert.equal(nextFromLink(`?next=${encodeURIComponent("https://www.coere.ai/\t/evil.com")}`, SITE), "/dashboard");
   });
 
   it("takes a plain path too", () => {
