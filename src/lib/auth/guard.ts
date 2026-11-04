@@ -24,6 +24,19 @@ export async function overLimit(headers: Headers, email: string | null): Promise
 }
 
 /**
+ * Counts one more attempt against an account address alone. A password
+ * typed with a username is counted against `username:<name>` before the
+ * lookup; once the name turns into its email, this counts it against that
+ * email too, so guesses by username and by email share one budget. The
+ * network address was counted already, so it is left alone here.
+ */
+export async function overEmailLimit(headers: Headers, email: string): Promise<boolean> {
+  const spent = limiter.hit(`email:${email}`);
+  if (spent) await logSecurityEvent("rate_limited", { headers });
+  return spent;
+}
+
+/**
  * The wait before a wrong answer. At least 800 ms, and long enough that every
  * wrong answer takes about the same total time, so a username that does not
  * exist (no Supabase call) answers no faster than a wrong password (one call).

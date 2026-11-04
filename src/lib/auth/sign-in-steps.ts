@@ -3,7 +3,7 @@ import "server-only";
 import { logSecurityEvent } from "@/lib/security/events";
 import { sessionClient } from "@/lib/supabase/server";
 
-import { overLimit, wrongAnswerDelay } from "./guard";
+import { overEmailLimit, overLimit, wrongAnswerDelay } from "./guard";
 import { markSignedIn } from "./hint-cookie";
 import { normalizeCode, normalizeEmail, parseLogin } from "./identity";
 import { emailForUsername } from "./lookup";
@@ -84,6 +84,9 @@ export async function passwordSignIn(prev: SignInState, rawLogin: unknown, rawPa
     await logSecurityEvent("sign_in_failed", { headers });
     await wrongAnswerDelay(startedAt);
     return failed;
+  }
+  if ("username" in login && (await overEmailLimit(headers, email))) {
+    return { ...failed, error: TOO_MANY };
   }
 
   const client = await sessionClient();
