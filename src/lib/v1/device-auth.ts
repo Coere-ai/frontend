@@ -1,7 +1,8 @@
 import "server-only";
 
 import { supabase, supabaseConfigured } from "@/lib/supabase";
-import { logSecurityEventAfter } from "@/lib/security/events";
+import { ipHash, logSecurityEventAfter } from "@/lib/security/events";
+import { securityOnce } from "@/lib/security/once";
 
 import { parseBearer, tokenHash } from "./token";
 
@@ -66,13 +67,22 @@ function toAccount(r: DeviceAuthRow): DeviceAccount {
   };
 }
 
+/**
+ * Logs a refused token once a minute per address. Anyone can send junk
+ * tokens before any limit applies, so a row per request would let one loop
+ * grow the security log without end and bury the panel that should show it.
+ */
+function noteRejected(headers: Headers): void {
+  if (securityOnce.firstIn(`token_rejected:${ipHash(headers) ?? "unknown"}`, 60_000)) logSecurityEventAfter("token_rejected", { headers });
+}
+
 export async function authenticateDevice(req: Request): Promise<DeviceAuth> {
   if (!supabaseConfigured()) return { ok: false, reason: "unavailable" };
   const header = req.headers.get("authorization");
   const token = parseBearer(header);
   if (!token) {
     // No header is the extension's signed out state and says nothing; a header that is not a token is worth noting.
-    if (header) logSecurityEventAfter("token_rejected", { headers: req.headers });
+    if (header) noteRejected(req.headers);
     return { ok: false, reason: "signed_out" };
   }
   const { data, error } = await supabase().rpc("device_auth", { p_token_hash: tokenHash(token) });
@@ -82,7 +92,7 @@ export async function authenticateDevice(req: Request): Promise<DeviceAuth> {
   }
   const row = (Array.isArray(data) ? data[0] : data) as DeviceAuthRow | undefined;
   if (!row) {
-    logSecurityEventAfter("token_rejected", { headers: req.headers });
+    noteRejected(req.headers);
     return { ok: false, reason: "signed_out" };
   }
   return { ok: true, account: toAccount(row) };

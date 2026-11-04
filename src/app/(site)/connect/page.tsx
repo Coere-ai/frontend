@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 
 import { getUser } from "@/lib/auth/user";
 import { checkConnectParams, connectPath, type ConnectRefusal } from "@/lib/connect/params";
-import { logSecurityEvent } from "@/lib/security/events";
+import { ipHash, logSecurityEvent } from "@/lib/security/events";
+import { securityOnce } from "@/lib/security/once";
 import { AuthShell } from "@/site/account/auth-shell";
 import { SignOutButton } from "@/site/account/sign-out-button";
 import { ButtonLink } from "@/site/ui/button";
@@ -37,7 +38,11 @@ export default async function ConnectPage({ searchParams }: PageProps<"/connect"
   const user = await getUser();
 
   if (!checked.ok) {
-    await logSecurityEvent("connect_refused", { userId: user?.id ?? null, headers: await headers() });
+    // Once a minute per address: anyone can load bad links in a loop, and a row each would bury the log.
+    const head = await headers();
+    if (securityOnce.firstIn(`connect_refused:${ipHash(head) ?? "unknown"}`, 60_000)) {
+      await logSecurityEvent("connect_refused", { userId: user?.id ?? null, headers: head });
+    }
     return (
       <AuthShell eyebrow="Connect Coere" title="This link can't connect Coere" lede={REFUSED[checked.reason]}>
         <ButtonLink href="/" variant="secondary">
