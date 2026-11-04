@@ -67,3 +67,9 @@ export async function meterBatch(
   });
   if (error) console.error("meter_batch failed", error.code);
 }
+
+/** A batch deleted before it was metered is charged its worst case, since its results can no longer be read. */
+export async function chargeUnmeteredBatch(userId: string, id: string): Promise<void> {
+  const { error } = await supabase().rpc("charge_unmetered_batch", { p_user: userId, p_batch: id });
+  if (error) console.error("charge_unmetered_batch failed", error.code);
+}

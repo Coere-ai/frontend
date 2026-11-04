@@ -18,8 +18,14 @@ export const ALLOWED_BETAS: ReadonlySet<string> = new Set([
 ]);
 
 export const MAX_TOKENS_CAP = 64_000;
-/** Anthropic's own ceiling for one batch. */
-export const MAX_BATCH_REQUESTS = 100_000;
+/**
+ * A batch's ceilings: the extension's own (BATCH_MAX_REQUESTS and
+ * MAX_TOKENS in coere-v2's memory runtime). A batch may start past a spend
+ * limit's headroom (docs/accounts.md 8.10), so these bound how far its
+ * worst case can reach.
+ */
+export const MAX_BATCH_REQUESTS = 500;
+export const BATCH_MAX_TOKENS = 16_000;
 
 export type ParamsCheck =
   | { ok: true }
@@ -78,7 +84,7 @@ export function checkParams(params: unknown): ParamsCheck {
   return { ok: true };
 }
 
-/** A batch create body: every entry's params pass, and the count is kept for the batch row. */
+/** A batch create body: at most 500 entries, each passing with max_tokens at most 16,000; the count is kept for the batch row. */
 export function checkBatchBody(body: unknown): ParamsCheck & { count?: number } {
   if (!isRecord(body) || !Array.isArray(body.requests)) return { ok: false, reason: "bad_request" };
   const requests = body.requests as unknown[];
@@ -87,6 +93,8 @@ export function checkBatchBody(body: unknown): ParamsCheck & { count?: number } 
     if (!isRecord(entry)) return { ok: false, reason: "bad_request" };
     const check = checkParams(entry.params);
     if (!check.ok) return check;
+    const maxTokens = (entry.params as Record<string, unknown>).max_tokens;
+    if (typeof maxTokens !== "number" || maxTokens > BATCH_MAX_TOKENS) return { ok: false, reason: "bad_request" };
   }
   return { ok: true, count: requests.length };
 }

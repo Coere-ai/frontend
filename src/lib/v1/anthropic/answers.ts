@@ -3,7 +3,7 @@ import "server-only";
 import type { DeviceAccount } from "../device-auth";
 import { NO_TOKENS, recordUsage } from "../meter";
 import { costMicros } from "../prices";
-import { meterBatch, ownedBatchIds, storeBatch } from "./batches";
+import { chargeUnmeteredBatch, meterBatch, ownedBatchIds, storeBatch } from "./batches";
 import { anthropicError } from "./errors";
 import { answerHeaders } from "./headers";
 import type { AnthropicOp } from "./paths";
@@ -92,6 +92,8 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
     await recordUsage(c.account, { kind: "count_tokens", model: null, tokens: NO_TOKENS, costMicros: 0, status, durationMs: Date.now() - c.started, requestId });
   } else if (op.op === "batch_create" && isRecord(data) && typeof data.id === "string") {
     await storeBatch(c.account, data.id, c.requestCount, c.worstMicros);
+  } else if (op.op === "batch_delete") {
+    await chargeUnmeteredBatch(c.account.userId, op.batchId);
   } else if (op.op === "batch_list" && isRecord(data) && Array.isArray(data.data)) {
     const items = data.data.filter(isRecord);
     const ids = items.map((b) => b.id).filter((id): id is string => typeof id === "string");

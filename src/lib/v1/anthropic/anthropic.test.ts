@@ -90,6 +90,10 @@ describe("checkParams", () => {
     assert.deepEqual(checkBatchBody({ requests: [] }), { ok: false, reason: "bad_request" });
     assert.deepEqual(checkBatchBody({}), { ok: false, reason: "bad_request" });
     assert.deepEqual(checkBatchBody({ requests: [1] }), { ok: false, reason: "bad_request" });
+    assert.deepEqual(checkBatchBody({ requests: Array.from({ length: 500 }, () => entry(ok)) }), { ok: true, count: 500 });
+    assert.deepEqual(checkBatchBody({ requests: Array.from({ length: 501 }, () => entry(ok)) }), { ok: false, reason: "bad_request" });
+    assert.deepEqual(checkBatchBody({ requests: [entry({ ...ok, max_tokens: 16_001 })] }), { ok: false, reason: "bad_request" });
+    assert.deepEqual(checkBatchBody({ requests: [entry({ model: "claude-haiku-5-5", messages: [] })] }), { ok: false, reason: "bad_request" });
   });
 });
 

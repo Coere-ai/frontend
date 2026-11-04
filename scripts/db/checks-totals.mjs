@@ -80,6 +80,10 @@ async function checkReserveSpend(db) {
   check("a batch never read in 30 days is metered", await one(db, "charged", "select metered_at is not null from public.ai_batches where id = 'msgbatch_r'"));
   equal("and charged its reservation", num(await one(db, "charged cost", "select cost_micros from public.usage_monthly where user_id = $1", [C])), 40_000_000);
 
+  await db.query("insert into public.ai_batches (id, user_id, reserved_micros) values ('msgbatch_d', $1, 7)", [C]);
+  await as(db, "service_role", null, () => rows(db, "charge", "select public.charge_unmetered_batch($1, 'msgbatch_d')", [C]));
+  await as(db, "service_role", null, () => rows(db, "charge again", "select public.charge_unmetered_batch($1, 'msgbatch_d')", [C]));
+  equal("a batch deleted unread is charged its reservation once", num(await one(db, "deleted cost", "select cost_micros from public.usage_monthly where user_id = $1", [C])), 40_000_007);
   await db.query("update public.profiles set lifetime_limit_micros = 1000 where id = $1", [A]);
   equal("a lifetime limit refuses too", (await as(db, "service_role", null, () => rows(db, "lifetime", "select * from public.reserve_spend($1, 1, 900, false)", [A])))?.[0]?.refused, "lifetime");
   await db.exec("rollback");

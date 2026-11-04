@@ -433,7 +433,7 @@ The paths the extension uses, and nothing else:
 | GET | `v1/messages/batches` | answers only the caller's own batches |
 | GET | `v1/messages/batches/{id}` | own batches only |
 | POST | `v1/messages/batches/{id}/cancel` | own batches only |
-| DELETE | `v1/messages/batches/{id}` | own batches only |
+| DELETE | `v1/messages/batches/{id}` | own batches only; a batch deleted before its results were metered is charged its reservation |
 | GET | `v1/messages/batches/{id}/results` | own batches only, streamed, metered once at batch price |
 
 Another path answers 404. Before forwarding:
@@ -446,6 +446,9 @@ Another path answers 404. Before forwarding:
   server tool's per use fee is not in `usage`; and no `cache_control`
   asks for a `ttl` other than `5m`, since the price table has only the 5
   minute cache write.
+- **A batch** has at most 500 entries, and each names `max_tokens` of at
+  most 16,000: the extension's own ceilings, which bound how far one batch's
+  worst case can reach past a limit (section 8.10).
 - **Headers forwarded:** `anthropic-version`, `content-type`, and
   `anthropic-beta` when each of its values is one of
   `message-batches-2024-09-24`, `token-counting-2024-11-01`,
@@ -604,8 +607,8 @@ the limit, the same for the lifetime limit, or it gets the `usage_limit`
 400. A batch may start while nothing is at a limit, since its worst case is
 far above what it costs and a small plan could otherwise never batch; its
 reservation then holds every other call back until its results are metered.
-A batch never metered within 30 days (its results expire after 29) is
-charged its reservation. So a limit can be passed by at most one batch's
+A batch never metered within 30 days (its results expire after 29), or
+deleted before its results were read, is charged its reservation. So a limit can be passed by at most one batch's
 worst case, never by an unbounded amount.
 
 ## 9. The admin panel
@@ -676,6 +679,7 @@ come through signed upload URLs that the server makes.
 | Function | What it does |
 |---|---|
 | `device_auth(p_token_hash text)` | One row for a live token: `device_id, user_id, status, plan_id, monthly_limit_micros, storage_limit_bytes, requests_per_minute, month_cost_micros, memory_sync, include_sensitive`. Touches `last_used_at` and `last_seen_at` when older than 5 minutes. No row for an unknown or revoked token. |
+| `charge_unmetered_batch(p_user uuid, p_batch text)` | Marks a batch deleted before it was metered as metered, and records its reservation as its cost. |
 | `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under the limits with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit. |
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `user_totals`, the person's `org_totals` and today's `daily_totals` in one statement. |
 | `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |

@@ -1383,6 +1383,30 @@ begin
 end;
 $$;
 
+-- A batch deleted before its results were metered can never be read again,
+-- so it is charged its reservation, its worst case. The extension deletes a
+-- batch only after reading its results through the proxy, which meters it
+-- first, so this charges only a batch someone chose not to read.
+create or replace function public.charge_unmetered_batch(p_user uuid, p_batch text)
+returns void
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_device   uuid;
+  v_reserved bigint;
+begin
+  update public.ai_batches b set metered_at = now()
+   where b.id = p_batch and b.user_id = p_user and b.metered_at is null
+  returning b.device_id, b.reserved_micros into v_device, v_reserved;
+  if found and v_reserved > 0 then
+    perform public.record_usage(p_user, v_device, 'batch_result', null, 0, 0, 0, 0,
+      v_reserved, 200, 0, left(p_batch, 120));
+  end if;
+end;
+$$;
+
 -- Stores one batch of feature counts from the extension and adds it to the
 -- person's, their organization's and today's totals. tokensSaved counts only
 -- on context_import and transfer; the route already refuses it elsewhere,
@@ -1669,6 +1693,7 @@ revoke all on function public.device_auth(text) from public, anon, authenticated
 revoke all on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) from public, anon, authenticated;
 revoke all on function public.meter_batch(uuid, uuid, text, jsonb, integer, integer, text) from public, anon, authenticated;
 revoke all on function public.reserve_spend(uuid, bigint, integer, boolean) from public, anon, authenticated;
+revoke all on function public.charge_unmetered_batch(uuid, text) from public, anon, authenticated;
 revoke all on function public.record_app_events(uuid, uuid, jsonb) from public, anon, authenticated;
 revoke all on function public.set_memory_totals(uuid) from public, anon, authenticated;
 revoke all on function public.set_org_memory_totals(uuid) from public, anon, authenticated;
@@ -1680,6 +1705,7 @@ grant execute on function public.device_auth(text) to service_role;
 grant execute on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) to service_role;
 grant execute on function public.meter_batch(uuid, uuid, text, jsonb, integer, integer, text) to service_role;
 grant execute on function public.reserve_spend(uuid, bigint, integer, boolean) to service_role;
+grant execute on function public.charge_unmetered_batch(uuid, text) to service_role;
 grant execute on function public.record_app_events(uuid, uuid, jsonb) to service_role;
 grant execute on function public.set_memory_totals(uuid) to service_role;
 grant execute on function public.set_org_memory_totals(uuid) to service_role;
