@@ -61,17 +61,42 @@ export async function removeMemberPart(orgId: string, userId: string): Promise<v
   await removePaths([orgMemberPartPath(orgId, userId)]);
 }
 
+/** Rebuilds after one whose members changed while it ran, before giving up on a busy organization. */
+const REBUILD_ROUNDS = 3;
+
+/** The members who contribute now, as a sorted key to compare two reads by. */
+async function liveMembers(orgId: string): Promise<{ live: Set<string>; key: string } | null> {
+  const org = await readOrg(orgId);
+  if (!org) return null;
+  const members = await readMembers(orgId);
+  const live = new Set(members.filter((m) => memberContributes(m, org)).map((m) => m.user_id));
+  return { live, key: [...live].sort().join(",") + `|${(org.shared_sections ?? []).join(",")}` };
+}
+
 /**
  * Merges the parts of the members who contribute now. A part left by
  * someone who no longer does (they left, were removed or turned sharing
  * off) is deleted here, so the graph heals even if a removal was missed.
+ *
+ * Rebuilds are not serialised, so one that read the members before someone
+ * left could write last and put their facts back. Each run reads the members
+ * again after writing and runs once more when they changed, so the last
+ * writer always matches the members as they are.
  */
 export async function rebuildOrgIndex(orgId: string): Promise<void> {
+  for (let round = 0; round < REBUILD_ROUNDS; round++) {
+    const before = await liveMembers(orgId);
+    if (!before) return;
+    await mergeOnce(orgId, before.live);
+    const after = await liveMembers(orgId);
+    if (!after || after.key === before.key) return;
+  }
+}
+
+async function mergeOnce(orgId: string, live: Set<string>): Promise<void> {
   const db = supabase();
   const org = await readOrg(orgId);
   if (!org) return;
-  const members = await readMembers(orgId);
-  const live = new Set(members.filter((m) => memberContributes(m, org)).map((m) => m.user_id));
   const stored = await listFolder(`org/${orgId}/members`);
   const stale = stored.filter((name) => !live.has(name.replace(/\.json$/, "")));
   await removePaths(stale.map((name) => `org/${orgId}/members/${name}`));
