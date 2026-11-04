@@ -5,6 +5,7 @@ import { NO_TOKENS, recordUsage } from "../meter";
 import { costMicros } from "../prices";
 import { chargeUnmeteredBatch, meterBatch, ownedBatchIds, storeBatch } from "./batches";
 import { anthropicError } from "./errors";
+import { cancelUpstreamBatch } from "./forward";
 import { answerHeaders } from "./headers";
 import type { AnthropicOp } from "./paths";
 import { meteredResults } from "./results-stream";
@@ -27,6 +28,8 @@ interface AnswerContext {
   model: string | null;
   /** A new batch's worst case, stored as its reservation. */
   worstMicros: number;
+  /** What a follow up call to Anthropic needs: Coere's key and the caller's version and beta. */
+  upstream: { apiKey: string; version: string | null; beta: string | null };
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -91,7 +94,12 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
     // Counting is free; the row counts the request without adding tokens to the totals.
     await recordUsage(c.account, { kind: "count_tokens", model: null, tokens: NO_TOKENS, costMicros: 0, status, durationMs: Date.now() - c.started, requestId });
   } else if (op.op === "batch_create" && isRecord(data) && typeof data.id === "string") {
-    await storeBatch(c.account, data.id, c.requestCount, c.worstMicros);
+    if (!(await storeBatch(c.account, data.id, c.requestCount, c.worstMicros))) {
+      // Unrecorded, the batch would run and bill while every read of it
+      // answered 404. Stop it and answer 503, so the extension submits again.
+      await cancelUpstreamBatch(data.id, c.upstream);
+      return anthropicError("unavailable");
+    }
   } else if (op.op === "batch_delete") {
     await chargeUnmeteredBatch(c.account.userId, op.batchId);
   } else if (op.op === "batch_list" && isRecord(data) && Array.isArray(data.data)) {

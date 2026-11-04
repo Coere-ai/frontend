@@ -34,7 +34,11 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   const prepared = await prepareRequest(req, op);
   if (!prepared.ok) return anthropicError(prepared.error, { model: prepared.model });
 
-  if ("batchId" in op && !(await ownsBatch(g.account.userId, op.batchId))) return anthropicError("not_found");
+  if ("batchId" in op) {
+    const owned = await ownsBatch(g.account.userId, op.batchId);
+    if (owned === null) return anthropicError("unavailable");
+    if (!owned) return anthropicError("not_found");
+  }
 
   // The gate saw spend already recorded; this holds the call's worst case
   // against what is left, counting every other call still in flight.
@@ -55,6 +59,7 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
       requestCount: prepared.requestCount,
       model: prepared.model ?? null,
       worstMicros: prepared.worstMicros,
+      upstream: { apiKey, version: req.headers.get("anthropic-version"), beta: prepared.beta },
     });
   } finally {
     // A message's cost is recorded and a batch's reservation stored by now.

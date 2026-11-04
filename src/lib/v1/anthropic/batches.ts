@@ -12,20 +12,28 @@ import type { TokenCounts } from "../prices";
  * twice count once.
  */
 
-/** Stores a new batch as the caller's, with its worst case, which counts against the limits until it is metered. */
-export async function storeBatch(a: DeviceAccount, id: string, requestCount: number, reservedMicros: number): Promise<void> {
-  const { error } = await supabase()
-    .from("ai_batches")
-    .upsert(
-      { id, user_id: a.userId, device_id: a.deviceId, request_count: requestCount, reserved_micros: Math.max(0, Math.ceil(reservedMicros)) },
-      { onConflict: "id", ignoreDuplicates: true },
-    );
-  if (error) console.error("batch not stored", error.code);
+/**
+ * Stores a new batch as the caller's, with its worst case, which counts
+ * against the limits until it is metered. Tried twice, since a batch that is
+ * not stored can never be read through the proxy. False when both failed.
+ */
+export async function storeBatch(a: DeviceAccount, id: string, requestCount: number, reservedMicros: number): Promise<boolean> {
+  const row = { id, user_id: a.userId, device_id: a.deviceId, request_count: requestCount, reserved_micros: Math.max(0, Math.ceil(reservedMicros)) };
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const { error } = await supabase().from("ai_batches").upsert(row, { onConflict: "id", ignoreDuplicates: true });
+    if (!error) return true;
+    console.error("batch not stored", error.code);
+  }
+  return false;
 }
 
-export async function ownsBatch(userId: string, id: string): Promise<boolean> {
+/** Whether the batch is the caller's; null when the lookup failed, which must not read as a final 404. */
+export async function ownsBatch(userId: string, id: string): Promise<boolean | null> {
   const { data, error } = await supabase().from("ai_batches").select("id").eq("id", id).eq("user_id", userId).maybeSingle();
-  if (error) console.error("batch lookup failed", error.code);
+  if (error) {
+    console.error("batch lookup failed", error.code);
+    return null;
+  }
   return Boolean(data);
 }
 

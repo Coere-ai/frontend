@@ -24,3 +24,25 @@ export async function forwardToAnthropic(
     return null;
   }
 }
+
+/**
+ * Cancels a batch with Coere's key, for a batch the proxy could not record
+ * as its caller's: nobody could read its results, so it should not run on.
+ * Best effort; a failure is only logged.
+ */
+export async function cancelUpstreamBatch(id: string, o: { apiKey: string; version: string | null; beta: string | null }): Promise<void> {
+  const headers = new Headers({ "x-api-key": o.apiKey, "anthropic-version": o.version ?? "2023-06-01" });
+  if (o.beta) headers.set("anthropic-beta", o.beta);
+  try {
+    const res = await fetch(`https://api.anthropic.com/v1/messages/batches/${encodeURIComponent(id)}/cancel`, {
+      method: "POST",
+      headers,
+      cache: "no-store",
+      redirect: "manual",
+    });
+    if (!res.ok) console.error("unrecorded batch not cancelled", res.status);
+    await res.body?.cancel().catch(() => {});
+  } catch {
+    console.error("unrecorded batch not cancelled");
+  }
+}
