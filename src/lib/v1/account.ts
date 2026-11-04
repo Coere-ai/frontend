@@ -9,6 +9,8 @@ import type { DeviceAccount } from "./device-auth";
  * Reads everything `GET /api/v1/account` answers, with the secret key and
  * every query scoped to the calling account's own id. The limits come from
  * device_auth, already resolved, so the answer matches what the gate checks.
+ * Null only when the reads worked and the device or profile is gone (revoked
+ * or deleted since the gate); a failed read throws.
  */
 export async function readAccount(a: DeviceAccount): Promise<ReturnType<typeof accountBody> | null> {
   const db = supabase();
@@ -23,6 +25,11 @@ export async function readAccount(a: DeviceAccount): Promise<ReturnType<typeof a
     db.from("user_totals").select("tokens_saved, input_tokens, output_tokens, cost_micros, memories, chats").eq("user_id", a.userId).maybeSingle(),
     db.from("user_settings").select("version").eq("user_id", a.userId).maybeSingle(),
   ]);
+  // supabase-js reports a failed query in its result rather than throwing.
+  // A failed read must not look like a missing row: null below means signed
+  // out, and the extension forgets its account on that.
+  const failed = [profile, plan, usage, memory, device, member, totals, settings].find((r) => r.error);
+  if (failed) throw new Error(`readAccount: ${failed.error?.code ?? "failed"}`);
   if (!profile.data || !device.data) return null;
   const orgRow = member.data as { role: string; organizations: { id: string; name: string } | { id: string; name: string }[] | null } | null;
   const org = Array.isArray(orgRow?.organizations) ? orgRow?.organizations[0] : orgRow?.organizations;
