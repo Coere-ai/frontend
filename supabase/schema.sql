@@ -1243,6 +1243,41 @@ begin
 end;
 $$;
 
+-- Meters a batch's results once: marks the batch metered and writes one
+-- usage row per model in the same transaction. If any write fails, the mark
+-- rolls back with it, so the next full read of the results meters again
+-- rather than the cost being lost. False when the batch is not the caller's
+-- or was metered already. p_rows: [{"model", "input", "output",
+-- "cacheWrite", "cacheRead", "costMicros"}], one per model.
+create or replace function public.meter_batch(
+  p_user uuid, p_device uuid, p_batch text, p_rows jsonb,
+  p_status integer, p_duration_ms integer, p_request_id text
+) returns boolean
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  r record;
+begin
+  update public.ai_batches set metered_at = now()
+   where id = p_batch and user_id = p_user and metered_at is null;
+  if not found then
+    return false;
+  end if;
+
+  for r in
+    select * from jsonb_to_recordset(coalesce(p_rows, '[]'::jsonb)) as x(
+      model text, input bigint, output bigint, "cacheWrite" bigint, "cacheRead" bigint, "costMicros" bigint)
+  loop
+    perform public.record_usage(p_user, p_device, 'batch_result', r.model,
+      r.input, r.output, r."cacheWrite", r."cacheRead", r."costMicros",
+      p_status, p_duration_ms, p_request_id);
+  end loop;
+  return true;
+end;
+$$;
+
 -- Stores one batch of feature counts from the extension and adds it to the
 -- person's, their organization's and today's totals. tokensSaved counts only
 -- on context_import and transfer; the route already refuses it elsewhere,
@@ -1527,6 +1562,7 @@ $$;
 -- may call them.
 revoke all on function public.device_auth(text) from public, anon, authenticated;
 revoke all on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) from public, anon, authenticated;
+revoke all on function public.meter_batch(uuid, uuid, text, jsonb, integer, integer, text) from public, anon, authenticated;
 revoke all on function public.record_app_events(uuid, uuid, jsonb) from public, anon, authenticated;
 revoke all on function public.set_memory_totals(uuid) from public, anon, authenticated;
 revoke all on function public.set_org_memory_totals(uuid) from public, anon, authenticated;
@@ -1536,6 +1572,7 @@ revoke all on function public.admin_table_stats() from public, anon, authenticat
 revoke all on function public.admin_storage_usage() from public, anon, authenticated;
 grant execute on function public.device_auth(text) to service_role;
 grant execute on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) to service_role;
+grant execute on function public.meter_batch(uuid, uuid, text, jsonb, integer, integer, text) to service_role;
 grant execute on function public.record_app_events(uuid, uuid, jsonb) to service_role;
 grant execute on function public.set_memory_totals(uuid) to service_role;
 grant execute on function public.set_org_memory_totals(uuid) to service_role;

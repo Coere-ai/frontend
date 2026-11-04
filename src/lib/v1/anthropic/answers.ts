@@ -3,7 +3,7 @@ import "server-only";
 import type { DeviceAccount } from "../device-auth";
 import { NO_TOKENS, recordUsage } from "../meter";
 import { costMicros } from "../prices";
-import { claimMetering, ownedBatchIds, storeBatch } from "./batches";
+import { meterBatch, ownedBatchIds, storeBatch } from "./batches";
 import { anthropicError } from "./errors";
 import { answerHeaders } from "./headers";
 import type { AnthropicOp } from "./paths";
@@ -59,18 +59,9 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
   if (op.op === "batch_results") {
     if (failure !== null || !up.body) return new Response(failure, { status, headers });
     const body = meteredResults(up.body, async (totals) => {
-      if (totals.size === 0 || !(await claimMetering(c.account.userId, op.batchId))) return;
-      for (const [model, t] of totals) {
-        await recordUsage(c.account, {
-          kind: "batch_result",
-          model,
-          tokens: t.tokens,
-          costMicros: t.costMicros,
-          status,
-          durationMs: Date.now() - c.started,
-          requestId,
-        });
-      }
+      // A batch whose every item failed costs nothing, and is marked metered all the same.
+      const rows = [...totals].map(([model, t]) => ({ model, tokens: t.tokens, costMicros: t.costMicros }));
+      await meterBatch(c.account, op.batchId, rows, { status, durationMs: Date.now() - c.started, requestId });
     });
     return new Response(body, { status, headers });
   }

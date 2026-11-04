@@ -28,9 +28,29 @@ export async function checkRecordUsage(db, org) {
   await as(db, "service_role", null, () => rows(db, "record_usage big", call, [C, "batch_result", 5, 3000000000, 0, 0, 1]));
   equal("token counts past int4 are kept", num(await one(db, "big", "select output_tokens from public.usage_events where user_id = $1", [C])), 3000000000);
   await db.exec("rollback");
+  await checkMeterBatch(db, call);
   await as(db, "service_role", null, async () => {
     equal("device_auth reads this month's spend", num((await rows(db, "spend", "select month_cost_micros from public.device_auth('hash_a')"))?.[0]?.month_cost_micros), 1500);
   });
+}
+
+// meter_batch claims and writes in one transaction. Rolled back at the end, so the totals checked elsewhere stay.
+async function checkMeterBatch(db) {
+  await db.exec("begin");
+  await db.query("insert into public.ai_batches (id, user_id, request_count) values ('msgbatch_m', $1, 2)", [C]);
+  const meter = "select public.meter_batch($1, null, 'msgbatch_m', $2::jsonb, 200, 10, 'req_b')";
+  const good = JSON.stringify([{ model: "claude-sonnet-5-5", input: 10, output: 5, cacheWrite: 0, cacheRead: 0, costMicros: 70 }]);
+  await db.exec("savepoint s");
+  await refused(db, "a failed row write fails the whole call", meter, /invalid input syntax/, [C, '[{"model": "m", "input": "x"}]']);
+  await db.exec("rollback to savepoint s");
+  check("a failed write leaves the batch unmetered", await one(db, "unmetered", "select metered_at is null from public.ai_batches where id = 'msgbatch_m'"));
+  await as(db, "service_role", null, async () => {
+    equal("meter_batch meters the caller's batch", await one(db, "meter", meter, [C, good]), true);
+    equal("meter_batch meters once", await one(db, "meter again", meter, [C, good]), false);
+    equal("meter_batch refuses another's batch", await one(db, "meter other", "select public.meter_batch($1, null, 'msgbatch_m', '[]'::jsonb, 200, 10, null)", [A]), false);
+  });
+  equal("meter_batch writes the usage row", num(await one(db, "batch usage", "select cost_micros from public.usage_monthly where user_id = $1", [C])), 70);
+  await db.exec("rollback");
 }
 
 export async function checkAppEvents(db, org) {

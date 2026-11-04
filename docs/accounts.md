@@ -659,6 +659,7 @@ come through signed upload URLs that the server makes.
 |---|---|
 | `device_auth(p_token_hash text)` | One row for a live token: `device_id, user_id, status, plan_id, monthly_limit_micros, storage_limit_bytes, requests_per_minute, month_cost_micros, memory_sync, include_sensitive`. Touches `last_used_at` and `last_seen_at` when older than 5 minutes. No row for an unknown or revoked token. |
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `user_totals`, the person's `org_totals` and today's `daily_totals` in one statement. |
+| `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. |
 | `set_memory_totals(p_user uuid)` | Recomputes the person's memory counts in `user_totals` from `memory_files`, and their organization's from its members, after a commit or a delete. |
 | `create_organization(p_name text, p_slug text, p_admin uuid, p_plan text)` | The operator's call: makes the organization, its totals row and its first admin in one statement. Refuses an admin already in an organization. |
@@ -889,6 +890,10 @@ device_auth(p_token_hash text) returns table (
 record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
   p_input bigint, p_output bigint, p_cache_write bigint, p_cache_read bigint,
   p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text) returns void
+
+-- p_rows: [{"model", "input", "output", "cacheWrite", "cacheRead", "costMicros"}], one per model
+meter_batch(p_user uuid, p_device uuid, p_batch text, p_rows jsonb,
+  p_status integer, p_duration_ms integer, p_request_id text) returns boolean
 
 -- p_events: [{"kind": "...", "count": 1, "tokensSaved": 0}], already validated by the route
 record_app_events(p_user uuid, p_device uuid, p_events jsonb) returns void

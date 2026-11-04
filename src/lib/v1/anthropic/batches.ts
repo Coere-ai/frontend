@@ -3,6 +3,7 @@ import "server-only";
 import { supabase } from "@/lib/supabase";
 
 import type { DeviceAccount } from "../device-auth";
+import type { TokenCounts } from "../prices";
 
 /**
  * Batch ownership (docs/accounts.md 8.4). Every batch runs under Coere's one
@@ -32,20 +33,33 @@ export async function ownedBatchIds(userId: string, ids: string[]): Promise<Set<
   return new Set((data ?? []).map((r: { id: string }) => r.id));
 }
 
+/** One model's share of a batch's results, as meter_batch takes it. */
+export interface BatchRow {
+  model: string;
+  tokens: TokenCounts;
+  costMicros: number;
+}
+
 /**
- * Marks the batch metered, and says whether this call was the one that did
- * it. The update only matches a row not yet metered, so two readers racing
- * to the end of the results meter once between them.
+ * Meters a batch's results once. The claim and the usage rows are one
+ * transaction (meter_batch), so a failed write leaves the batch unmetered
+ * and the next full read of the results meters it again; two readers racing
+ * to the end meter once between them.
  */
-export async function claimMetering(userId: string, id: string): Promise<boolean> {
-  const { data, error } = await supabase()
-    .from("ai_batches")
-    .update({ metered_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("user_id", userId)
-    .is("metered_at", null)
-    .select("id")
-    .maybeSingle();
-  if (error) console.error("batch metering claim failed", error.code);
-  return Boolean(data);
+export async function meterBatch(
+  a: Pick<DeviceAccount, "userId" | "deviceId">,
+  id: string,
+  rows: BatchRow[],
+  o: { status: number; durationMs: number; requestId: string | null },
+): Promise<void> {
+  const { error } = await supabase().rpc("meter_batch", {
+    p_user: a.userId,
+    p_device: a.deviceId,
+    p_batch: id,
+    p_rows: rows.map((r) => ({ model: r.model, input: r.tokens.input, output: r.tokens.output, cacheWrite: r.tokens.cacheWrite, cacheRead: r.tokens.cacheRead, costMicros: r.costMicros })),
+    p_status: o.status,
+    p_duration_ms: Math.max(0, Math.round(o.durationMs)),
+    p_request_id: o.requestId?.slice(0, 120) ?? null,
+  });
+  if (error) console.error("meter_batch failed", error.code);
 }
