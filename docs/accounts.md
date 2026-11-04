@@ -430,10 +430,10 @@ The paths the extension uses, and nothing else:
 | POST | `v1/messages` | metered |
 | POST | `v1/messages/count_tokens` | counted, cost 0 |
 | POST | `v1/messages/batches` | the batch id is stored as the caller's |
-| GET | `v1/messages/batches` | answers only the caller's own batches |
+| GET | `v1/messages/batches` | answered from the caller's own `ai_batches` rows of the last 30 days, newest first, each item fetched from Anthropic by id (one gone there is left out); `limit` at most 100, `after_id` pages on, and `first_id`, `last_id` and `has_more` describe the caller's own rows only |
 | GET | `v1/messages/batches/{id}` | own batches only |
 | POST | `v1/messages/batches/{id}/cancel` | own batches only |
-| DELETE | `v1/messages/batches/{id}` | own batches only; a batch deleted before its results were metered is charged its reservation |
+| DELETE | `v1/messages/batches/{id}` | own batches only; a batch deleted before its results were metered is charged its reservation, then its row goes |
 | GET | `v1/messages/batches/{id}/results` | own batches only, streamed, metered once at batch price |
 
 Another path answers 404. Before forwarding:

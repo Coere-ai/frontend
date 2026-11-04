@@ -4,6 +4,7 @@ import { gate } from "../gate";
 import { releaseHold, reserveSpend } from "../spend-holds";
 import { anthropicFor } from "../refusals";
 import { relayAnswer } from "./answers";
+import { listOwnBatches } from "./batch-list";
 import { ownsBatch } from "./batches";
 import { anthropicError } from "./errors";
 import { forwardToAnthropic } from "./forward";
@@ -38,6 +39,10 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
     const owned = await ownsBatch(g.account.userId, op.batchId);
     if (owned === null) return anthropicError("unavailable");
     if (!owned) return anthropicError("not_found");
+  }
+
+  if (op.op === "batch_list") {
+    return listOwnBatches(g.account.userId, new URL(req.url).searchParams, { apiKey, version: req.headers.get("anthropic-version"), beta: prepared.beta });
   }
 
   // The gate saw spend already recorded; this holds the call's worst case

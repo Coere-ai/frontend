@@ -3,7 +3,7 @@ import "server-only";
 import type { DeviceAccount } from "../device-auth";
 import { NO_TOKENS, recordUsage } from "../meter";
 import { costMicros } from "../prices";
-import { chargeUnmeteredBatch, meterBatch, ownedBatchIds, storeBatch } from "./batches";
+import { forgetBatch, meterBatch, storeBatch } from "./batches";
 import { anthropicError } from "./errors";
 import { cancelUpstreamBatch } from "./forward";
 import { answerHeaders } from "./headers";
@@ -14,8 +14,8 @@ import { attemptsOf, byModel } from "./usage";
 
 /**
  * What the proxy does with Anthropic's answer, by path (docs/accounts.md
- * 8.4): meter a message, store a new batch as the caller's, cut a batch list
- * to the caller's own, and meter batch results as they stream through. Only
+ * 8.4): meter a message, store a new batch as the caller's, forget a
+ * deleted one, and meter batch results as they stream through. Only
  * the kept answer headers go back.
  */
 
@@ -101,13 +101,7 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
       return anthropicError("unavailable");
     }
   } else if (op.op === "batch_delete") {
-    await chargeUnmeteredBatch(c.account.userId, op.batchId);
-  } else if (op.op === "batch_list" && isRecord(data) && Array.isArray(data.data)) {
-    const items = data.data.filter(isRecord);
-    const ids = items.map((b) => b.id).filter((id): id is string => typeof id === "string");
-    const own = await ownedBatchIds(c.account.userId, ids);
-    const cut = { ...data, data: items.filter((b) => typeof b.id === "string" && own.has(b.id)) };
-    return new Response(JSON.stringify(cut), { status, headers });
+    await forgetBatch(c.account.userId, op.batchId);
   }
   return new Response(text, { status, headers });
 }

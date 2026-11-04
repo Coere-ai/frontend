@@ -37,14 +37,6 @@ export async function ownsBatch(userId: string, id: string): Promise<boolean | n
   return Boolean(data);
 }
 
-/** Which of these batch ids are the caller's. */
-export async function ownedBatchIds(userId: string, ids: string[]): Promise<Set<string>> {
-  if (ids.length === 0) return new Set();
-  const { data, error } = await supabase().from("ai_batches").select("id").eq("user_id", userId).in("id", ids);
-  if (error) console.error("batch lookup failed", error.code);
-  return new Set((data ?? []).map((r: { id: string }) => r.id));
-}
-
 /** One model's share of a batch's results, as meter_batch takes it. */
 export interface BatchRow {
   model: string;
@@ -76,8 +68,18 @@ export async function meterBatch(
   if (error) console.error("meter_batch failed", error.code);
 }
 
-/** A batch deleted before it was metered is charged its worst case, since its results can no longer be read. */
-export async function chargeUnmeteredBatch(userId: string, id: string): Promise<void> {
+/**
+ * After a delete at Anthropic: a batch not yet metered is charged its worst
+ * case, since its results can no longer be read, then its row goes, so the
+ * caller's list stops naming it. The row stays when the charge failed, so
+ * the reservation keeps counting rather than vanishing.
+ */
+export async function forgetBatch(userId: string, id: string): Promise<void> {
   const { error } = await supabase().rpc("charge_unmetered_batch", { p_user: userId, p_batch: id });
-  if (error) console.error("charge_unmetered_batch failed", error.code);
+  if (error) {
+    console.error("charge_unmetered_batch failed", error.code);
+    return;
+  }
+  const { error: gone } = await supabase().from("ai_batches").delete().eq("id", id).eq("user_id", userId);
+  if (gone) console.error("deleted batch row kept", gone.code);
 }
