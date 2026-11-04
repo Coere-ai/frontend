@@ -9,22 +9,38 @@ export const B = "00000000-0000-4000-8000-00000000000b";
 export const C = "00000000-0000-4000-8000-00000000000c";
 
 export async function checkSignUp(db) {
+  // B is confirmed at once (the operator made it); A and C sign up unconfirmed, as by code or form.
   await db.query(
-    `insert into auth.users (id, email, raw_user_meta_data) values
-       ($1, 'Alice@Example.com', '{"username":"Alice_1"}'),
-       ($2, 'b@example.com', '{"username":"alice_1"}'),
-       ($3, 'c@example.com', '{"username":"x"}')`,
+    `insert into auth.users (id, email, raw_user_meta_data, email_confirmed_at) values
+       ($1, 'Alice@Example.com', '{"username":"Alice_1"}', null),
+       ($2, 'b@example.com', '{"username":"bob_1"}', now()),
+       ($3, 'c@example.com', '{"username":"x"}', null)`,
     [A, B, C],
   );
-  const profiles = await rows(db, "profiles made", "select id, email, username, plan_id, status from public.profiles order by id");
-  equal("signup makes a profile each", profiles?.length, 3);
-  equal("profile takes lowercase email and username", profiles?.[0], {
+  const before = await rows(db, "profiles made", "select id, email, username, plan_id, status from public.profiles order by id");
+  equal("signup makes a profile each", before?.length, 3);
+  equal("an unconfirmed signup holds no username", before?.[0]?.username, null);
+  equal("a signup confirmed at once takes its username", before?.[1]?.username, "bob_1");
+  equal("signup makes user_totals rows", await one(db, "user_totals", "select count(*)::int from public.user_totals"), 3);
+  equal("only a confirmed signup counts in new_users", await one(db, "daily new_users", "select new_users from public.daily_totals"), 1);
+
+  await db.query("update auth.users set email_confirmed_at = now() where id = any($1)", [[A, C]]);
+  const profiles = await rows(db, "profiles confirmed", "select id, email, username, plan_id, status from public.profiles order by id");
+  equal("confirming takes the lowercase email and username", profiles?.[0], {
     id: A, email: "alice@example.com", username: "alice_1", plan_id: "free", status: "active",
   });
-  equal("a taken username is dropped", profiles?.[1]?.username, null);
   equal("a malformed username is dropped", profiles?.[2]?.username, null);
-  equal("signup makes user_totals rows", await one(db, "user_totals", "select count(*)::int from public.user_totals"), 3);
-  equal("signup counts new_users today", await one(db, "daily new_users", "select new_users from public.daily_totals"), 3);
+  equal("confirming counts new_users today", await one(db, "daily new_users", "select new_users from public.daily_totals"), 3);
+  await db.query("update auth.users set email_confirmed_at = now() where id = $1", [A]);
+  equal("a second confirmation counts nothing", await one(db, "daily new_users", "select new_users from public.daily_totals"), 3);
+
+  // A username already taken when the address is confirmed is dropped, not an error.
+  const D = "00000000-0000-4000-8000-00000000000d";
+  await db.query(`insert into auth.users (id, email, raw_user_meta_data) values ($1, 'd@example.com', '{"username":"alice_1"}')`, [D]);
+  await db.query("update auth.users set email_confirmed_at = now() where id = $1", [D]);
+  equal("a taken username is dropped", await one(db, "taken", "select username from public.profiles where id = $1", [D]), null);
+  await db.query("delete from auth.users where id = $1", [D]);
+  await db.query("update public.daily_totals set new_users = new_users - 1");
 
   await db.query("update auth.users set email = 'Alice2@Example.com' where id = $1", [A]);
   equal("an email change reaches the profile", await one(db, "email sync", "select email from public.profiles where id = $1", [A]), "alice2@example.com");

@@ -825,11 +825,41 @@ grant execute on function public.my_org_role() to authenticated, service_role;
 -- A new account
 --
 -- Supabase Auth inserts into auth.users on every sign up, by code, link or
--- password. This makes the profile and the totals row in the same
--- transaction, so there is never an account without them, and counts the
--- sign up in today's totals. The username comes from the sign up form
+-- password, before the address is proven. This makes the profile and the
+-- totals row in the same transaction, so there is never an account without
+-- them. The username and the count in today's sign ups wait until the email
+-- is confirmed (public.welcome_user below), so an address nobody confirms
+-- never holds a username or counts as a sign up. An account made already
+-- confirmed (by the operator, or with confirmation off) is welcomed at once.
+
+-- The confirmed half of a sign up. The username comes from the sign up form
 -- (options.data.username). A username that is malformed or already taken is
--- dropped rather than failing the sign up: the person can set one later.
+-- dropped rather than failing the confirmation: the person can set one later.
+create or replace function public.welcome_user(p_user uuid, p_meta jsonb)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_username text := lower(btrim(coalesce(p_meta ->> 'username', '')));
+begin
+  if v_username ~ '^[a-z0-9_]{3,24}$' then
+    begin
+      update public.profiles set username = v_username, updated_at = now()
+      where id = p_user and username is null;
+    exception when unique_violation then
+      -- The username was taken between the form's check and now.
+      null;
+    end;
+  end if;
+
+  insert into public.daily_totals (day, new_users)
+  values ((now() at time zone 'utc')::date, 1)
+  on conflict (day) do update
+    set new_users = public.daily_totals.new_users + 1, updated_at = now();
+end;
+$$;
 
 create or replace function public.handle_new_user()
 returns trigger
@@ -837,31 +867,31 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
-declare
-  v_username text := lower(btrim(coalesce(new.raw_user_meta_data ->> 'username', '')));
 begin
-  if v_username !~ '^[a-z0-9_]{3,24}$' then
-    v_username := null;
-  end if;
-
-  begin
-    insert into public.profiles (id, email, username)
-    values (new.id, lower(new.email), v_username)
-    on conflict (id) do nothing;
-  exception when unique_violation then
-    -- The username was taken between the form's check and now.
-    insert into public.profiles (id, email, username)
-    values (new.id, lower(new.email), null)
-    on conflict (id) do nothing;
-  end;
+  insert into public.profiles (id, email, username)
+  values (new.id, lower(new.email), null)
+  on conflict (id) do nothing;
 
   insert into public.user_totals (user_id) values (new.id) on conflict (user_id) do nothing;
 
-  insert into public.daily_totals (day, new_users)
-  values ((now() at time zone 'utc')::date, 1)
-  on conflict (day) do update
-    set new_users = public.daily_totals.new_users + 1, updated_at = now();
+  if new.email_confirmed_at is not null then
+    perform public.welcome_user(new.id, new.raw_user_meta_data);
+  end if;
 
+  return new;
+end;
+$$;
+
+-- The first time an address is confirmed: by the emailed code, the link or
+-- an accepted invite.
+create or replace function public.handle_user_confirmed()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  perform public.welcome_user(new.id, new.raw_user_meta_data);
   return new;
 end;
 $$;
@@ -880,13 +910,21 @@ begin
 end;
 $$;
 
+revoke all on function public.welcome_user(uuid, jsonb) from public, anon, authenticated;
 revoke all on function public.handle_new_user() from public, anon, authenticated;
+revoke all on function public.handle_user_confirmed() from public, anon, authenticated;
 revoke all on function public.handle_user_email() from public, anon, authenticated;
 
 drop trigger if exists coere_on_auth_user_created on auth.users;
 create trigger coere_on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+drop trigger if exists coere_on_auth_user_confirmed on auth.users;
+create trigger coere_on_auth_user_confirmed
+  after update of email_confirmed_at on auth.users
+  for each row when (old.email_confirmed_at is null and new.email_confirmed_at is not null)
+  execute function public.handle_user_confirmed();
 
 drop trigger if exists coere_on_auth_user_email on auth.users;
 create trigger coere_on_auth_user_email
