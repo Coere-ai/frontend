@@ -18,6 +18,7 @@ export const ADMIN_SECTIONS = [
   { href: "/admin/database", label: "Database" },
   { href: "/admin/security", label: "Security" },
   { href: "/admin/cost", label: "Cost" },
+  { href: "/admin/limits", label: "Limits" },
 ] as const;
 
 /** /admin is only its own page; every other section also owns the pages under it. */

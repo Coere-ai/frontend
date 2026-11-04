@@ -75,6 +75,16 @@ export function isLimitKind(raw: unknown): raw is LimitKind {
   return typeof raw === "string" && (LIMIT_KINDS as readonly string[]).includes(raw);
 }
 
+/**
+ * "Clear every account's own <kind> limit", which needs the operator's
+ * confirm, since it changes every account that has one at once.
+ */
+export function checkClear(kind: unknown, confirmed: unknown): { ok: true; column: string } | { ok: false; error: string } {
+  if (!isLimitKind(kind)) return { ok: false, error: "That limit does not exist. Reload the page." };
+  if (confirmed !== true) return { ok: false, error: "Confirm first: this clears the limit on every account that has its own." };
+  return { ok: true, column: LIMIT_COLUMNS[kind] };
+}
+
 /** A plan id as the plans table holds them. */
 export function isPlanId(raw: unknown): raw is string {
   return typeof raw === "string" && /^[a-z0-9_-]{1,40}$/.test(raw);

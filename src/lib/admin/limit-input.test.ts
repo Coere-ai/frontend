@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { isLimitKind, isPlanId, LIMIT_COLUMNS, readAccountLimits, readPlanLimits, readRequiredDollars } from "./limit-input";
+import { checkClear, isLimitKind, isPlanId, LIMIT_COLUMNS, readAccountLimits, readPlanLimits, readRequiredDollars } from "./limit-input";
 
 const form = (values: Record<string, string>) => {
   const fd = new FormData();
@@ -54,4 +54,13 @@ test("a plan id is the shape the plans table holds", () => {
   assert.ok(isPlanId("free"));
   assert.ok(isPlanId("team_2"));
   for (const bad of ["", "Free", "a b", "x".repeat(41), null, "free;drop"]) assert.equal(isPlanId(bad), false, String(bad));
+});
+
+test("clearing every override needs a known kind and the operator's confirm", () => {
+  assert.deepEqual(checkClear("daily", true), { ok: true, column: "daily_limit_micros" });
+  assert.deepEqual(checkClear("first_build", true), { ok: true, column: "first_build_limit_micros" });
+  assert.equal(checkClear("daily", false).ok, false);
+  assert.equal(checkClear("daily", "true").ok, false);
+  assert.equal(checkClear("status", true).ok, false);
+  assert.equal(checkClear(undefined, true).ok, false);
 });

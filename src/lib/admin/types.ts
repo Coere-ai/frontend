@@ -3,6 +3,7 @@ import type { OrgAccess } from "@/lib/org/access";
 
 import type { DayPoint } from "./by-day";
 import type { AccountUsage, CostRange, ModelUsage, TokenCounts } from "./cost";
+import type { LimitKind } from "./limit-input";
 import type { DayTotals } from "./totals";
 
 /**
@@ -217,6 +218,15 @@ export interface CostPayload {
   accounts: AccountUsage[];
   storageBytes: number;
   storageMonthMicros: number;
+}
+
+/** /admin/limits: each plan's limits, and how many accounts override each with their own. */
+export interface LimitsPayload {
+  plans: PlanRow[];
+  accounts: number;
+  /** Accounts whose free first build has finished, so the daily limit applies to them. */
+  firstBuildsUsed: number;
+  overrides: Record<LimitKind, number>;
 }
 
 export interface MemoryPayload {
