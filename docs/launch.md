@@ -42,9 +42,10 @@ redeploy:
 | `USER`, `PASSWORD` | the admin panel's sign in |
 | `COERE_EXTENSION_IDS` | the extension's id, from step 3 |
 
-- The Claude route asks for `maxDuration` 800 seconds, so a long answer is
-  not cut off. That needs Vercel Pro or above; on Hobby the deploy is
-  refused, and the route must go back to 300.
+- Every route asks for `maxDuration` 300 seconds, which works on every
+  Vercel plan, Hobby included. On Pro, a team may raise the Claude route to
+  800 (`src/app/api/v1/anthropic/[...path]/route.ts`), so an answer that
+  takes longer than 300 seconds is not cut off.
 - Any deployment protection or password gate must leave `/api/v1` open, or
   the extension cannot reach the site.
 

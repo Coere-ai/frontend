@@ -4,14 +4,15 @@ import { proxyAnthropic } from "@/lib/v1/anthropic/proxy";
 //
 // The extension's Claude calls, with Coere's key added on the server. Only
 // the paths the memory runtime uses pass; see src/lib/v1/anthropic/proxy.ts.
-// A long answer can take minutes: the extension waits up to 600 seconds for
-// a non streaming call of 16,000 tokens, so the function must outlast that
-// or a cut off answer is billed by Anthropic and never metered. 800 seconds
-// is Vercel's ceiling with Fluid compute, on Pro or Enterprise.
+// A long answer can take minutes. 300 seconds is the most Vercel's Hobby
+// plan allows and Pro's default with Fluid compute, so it deploys on every
+// plan. The extension waits up to 600 seconds for a non streaming call, so a
+// rare answer that takes longer than 300 is cut off, billed by Anthropic and
+// never metered. A Pro team may raise this to 800, Vercel's ceiling there.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 800;
+export const maxDuration = 300;
 
 type Ctx = RouteContext<"/api/v1/anthropic/[...path]">;
 

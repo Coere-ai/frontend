@@ -14,7 +14,7 @@ import { refusedLimit } from "./spend";
  * and then simply stops counting, so a killed call never blocks for long.
  */
 
-/** Longer than the proxy's 800 second ceiling, so a hold never lapses while its call can still run. */
+/** Longer than the proxy's 300 second ceiling, and the 800 a Pro team may raise it to, so a hold never lapses while its call can still run. */
 export const HOLD_SECONDS = 900;
 
 export type Reservation = { ok: true; holdId: string } | { ok: false; refused: SpentLimit } | { ok: false; refused: null };

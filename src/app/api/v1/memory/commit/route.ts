@@ -9,11 +9,12 @@ import { problemFor } from "@/lib/v1/refusals";
 //
 // The last step of a memory push: the staged file becomes the stored copy,
 // with its index, its row, the totals and the organization graph updated.
-// A 50 MiB file takes a while to read, hence the longer ceiling.
+// A 50 MiB file takes a while to read, hence the longer ceiling: 300
+// seconds, the most every Vercel plan allows.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 export async function POST(req: Request): Promise<Response> {
   const g = await gate(req, { metered: false });
