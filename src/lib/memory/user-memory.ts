@@ -18,7 +18,31 @@ export async function storedDigest(userId: string): Promise<string | null> {
   return data?.digest ?? null;
 }
 
+/** Rounds of list and remove, at 1,000 names a list, before giving up on an absurd folder. */
+const CLEAR_ROUNDS = 20;
+
+/**
+ * Empties the person's `incoming/` folder. A list answers at most 1,000
+ * names, so it lists and removes until the folder is empty.
+ */
+export async function clearIncoming(userId: string): Promise<void> {
+  const prefix = userIncomingPrefix(userId);
+  for (let round = 0; round < CLEAR_ROUNDS; round++) {
+    const names = await listFolder(prefix.slice(0, -1));
+    if (names.length === 0) return;
+    await removePaths(names.map((n) => `${prefix}${n}`));
+  }
+}
+
+/**
+ * A fresh staged path and its signed upload address. Anything staged
+ * before is removed first, so an account holds at most one staged file: a
+ * client that uploads and never commits cannot fill Storage outside its
+ * plan's limit. A second device's upload in flight is lost too; its commit
+ * answers not_found and it simply uploads again.
+ */
 export async function stageUpload(userId: string): Promise<{ path: string; url: string } | null> {
+  await clearIncoming(userId);
   const path = stagedPath(userId);
   const url = await signedUpload(path);
   return url ? { path, url } : null;
@@ -37,9 +61,8 @@ export async function downloadLink(userId: string): Promise<string | null> {
  * The dashboard's backup switch and account deletion call this too.
  */
 export async function deleteMemory(userId: string, orgId: string | null): Promise<void> {
-  const prefix = userIncomingPrefix(userId);
-  const staged = (await listFolder(prefix.slice(0, -1))).map((n) => `${prefix}${n}`);
-  await removePaths([userMemoryPath(userId), userIndexPath(userId), ...staged]);
+  await removePaths([userMemoryPath(userId), userIndexPath(userId)]);
+  await clearIncoming(userId);
   const db = supabase();
   const { error } = await db.from("memory_files").delete().eq("user_id", userId);
   if (error) throw new Error(`memory_files delete failed: ${error.code}`);

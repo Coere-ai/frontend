@@ -1,9 +1,8 @@
 import "server-only";
 
-import { userIncomingPrefix } from "@/lib/memory/index-types";
 import { refreshMemberPart } from "@/lib/memory/org-index";
 import { listFolder, removePaths } from "@/lib/memory/storage";
-import { deleteMemory } from "@/lib/memory/user-memory";
+import { clearIncoming, deleteMemory } from "@/lib/memory/user-memory";
 import { readMembership } from "@/lib/org/membership";
 import { countAdmins } from "@/lib/org/queries";
 import { mayLeave } from "@/lib/org/roles";
@@ -40,8 +39,8 @@ export async function deleteAccount(userId: string): Promise<DeleteResult> {
     console.error("memory copy not deleted");
   }
   const left = await listFolder(userId);
-  const incoming = await listFolder(userIncomingPrefix(userId).slice(0, -1));
-  await removePaths([...left.map((n) => `${userId}/${n}`), ...incoming.map((n) => `${userIncomingPrefix(userId)}${n}`)]);
+  await removePaths(left.map((n) => `${userId}/${n}`));
+  await clearIncoming(userId);
 
   const revoked = await db.from("devices").update({ revoked_at: new Date().toISOString(), revoked_reason: "account" }).eq("user_id", userId).is("revoked_at", null);
   if (revoked.error) console.error("devices not revoked", revoked.error.code);

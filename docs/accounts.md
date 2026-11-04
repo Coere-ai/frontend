@@ -501,7 +501,9 @@ Auth and limit errors are the same as 8.4's statuses with a plain
   `409 memory_sync_off`. Over the plan's storage limit or 64 MiB,
   `413 too_large`. With the same digest already stored, `200 { skip: true }`.
   Otherwise `200 { skip: false, path, url }`, where `url` is a signed upload
-  URL for `<user id>/incoming/<random>.coere` that lives 2 hours.
+  URL for `<user id>/incoming/<random>.coere` that lives 2 hours. Anything
+  staged before is removed first, so an account holds at most one staged
+  file, and an upload never committed cannot fill Storage.
 - **`PUT <url>`** with the zip as the body and
   `content-type: application/vnd.coere.memory+zip`. This goes straight to
   Supabase Storage, so the file never passes through the site's 4.5 MB
