@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   ...hiddenPage,
 };
 
+// Static, with the launch moment read through a tagged cache. Saving it in
+// /admin/launch expires both pages; this hour is only a floor.
+export const revalidate = 3600;
+
 /** Where every Install button leads until Coere is in the Chrome Web Store. */
 export default function InstallPage() {
-  return <ComingSoon />;
+  return <ComingSoon product="connect" />;
 }
