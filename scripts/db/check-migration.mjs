@@ -9,7 +9,7 @@
 
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { checkCostReaders, checkDailyColumns, checkDailyKept, checkDailyLocked, checkDailyReserve, checkDailyResolution, checkDailyRows, setDailyValues } from "./checks-daily.mjs";
+import { checkCostReaders, checkDailyRows, checkSpendColumns, checkSpendKept, checkSpendLocked, checkSpendReserve, checkSpendResolution, setSpendValues } from "./checks-spend.mjs";
 import { checkCreateOrganization, checkDeviceAuth, checkSignUp } from "./checks-accounts.mjs";
 import { checkInterestKept, checkInterestTables } from "./checks-interest.mjs";
 import { checkLimitColumns, checkLimitResolution, checkOwnLimitsLocked, checkSameFingerprint, schemaFingerprint } from "./checks-limits.mjs";
@@ -46,12 +46,12 @@ async function main() {
   await checkLimitColumns(db);
   await checkLimitResolution(db);
   await checkOwnLimitsLocked(db);
-  await checkDailyColumns(db);
+  await checkSpendColumns(db);
   await checkDailyRows(db);
-  await checkDailyResolution(db);
-  await checkDailyReserve(db);
+  await checkSpendResolution(db);
+  await checkSpendReserve(db);
   await checkCostReaders(db);
-  await checkDailyLocked(db);
+  await checkSpendLocked(db);
   await checkAppEvents(db, org);
   await checkInvites(db, org);
   await checkMemoryTotals(db, org);
@@ -63,13 +63,13 @@ async function main() {
   await checkInterestTables(db);
 
   // A third run over real rows must keep them all.
-  await setDailyValues(db);
+  await setSpendValues(db);
   const before = await schemaFingerprint(db);
   await migrate(db, sql, 3);
   checkSameFingerprint("a third run over real rows changes nothing", before, await schemaFingerprint(db));
   equal("a rerun keeps the accounts", await one(db, "profiles", "select count(*)::int from public.profiles"), 3);
   await checkInterestKept(db);
-  await checkDailyKept(db);
+  await checkSpendKept(db);
 
   await db.close();
   const failed = failureCount();

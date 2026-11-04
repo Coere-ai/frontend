@@ -79,7 +79,7 @@ export function toPlans(
     name: r.name,
     monthlyLimitMicros: num(r.monthly_limit_micros),
     lifetimeLimitMicros: numOrNull(r.lifetime_limit_micros),
-    dailyLimitMicros: num(r.daily_limit_micros),
+    dailyLimitMicros: numOrNull(r.daily_limit_micros),
     firstBuildLimitMicros: num(r.first_build_limit_micros),
   }));
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { ACCOUNT_SORTS, sortAccounts, type AccountSort, type AccountUsage, type ModelUsage, type TokenCounts } from "@/lib/admin/cost";
+import { limitsInForce, paused } from "@/lib/admin/limits-in-force";
 import { compact, dollars, whole } from "@/lib/dashboard/format";
 import { MODEL_NAMES } from "@/lib/dashboard/usage";
 import { Section, Segmented, Table } from "@/stats/panel/ui";
@@ -27,12 +28,12 @@ export function ModelTable({ title, models, total }: { title: string; models: Mo
   );
 }
 
-/** Today's spend against the account's limit: the daily one, or the free first build's allowance while it runs. */
-function todayCell(a: AccountUsage) {
-  const over = a.todayMicros >= a.dailyLimitMicros;
-  const text = `${dollars(a.todayMicros)} of ${dollars(a.dailyLimitMicros)}`;
-  const label = a.firstBuildDone ? text : `First build: ${text}`;
-  return over ? <strong key="today">{label}, paused</strong> : label;
+/** The account's limits in force, each with its spend: the first build allowance while it runs, else the month (and the day when set). */
+function limitsCell(a: AccountUsage) {
+  const label = limitsInForce(a.spend)
+    .map((l) => `${l.label}: ${dollars(l.spentMicros)} of ${dollars(l.limitMicros)}`)
+    .join(", ");
+  return paused(a.spend) ? <strong key="limits">{label}, paused</strong> : label;
 }
 
 /** The range's heaviest accounts, sorted by cost, tokens or requests. */
@@ -43,7 +44,7 @@ export function AccountTable({ title, accounts }: { title: string; accounts: Acc
     <Section title={title} control={<Segmented value={sort} onChange={(v) => setSort(v as AccountSort)} options={ACCOUNT_SORTS.map((s) => ({ ...s }))} />}>
       <div className="overflow-x-auto whitespace-nowrap">
         <Table
-          head={["Account", "Requests", "Tokens", "Cost", "Today"]}
+          head={["Account", "Requests", "Tokens", "Cost", "Limits"]}
           empty="No account used AI in this range."
           rows={shown.map((a) => [
             <Link key="a" href={`/admin/users/${a.id}`} className="underline-offset-2 hover:underline">
@@ -52,11 +53,14 @@ export function AccountTable({ title, accounts }: { title: string; accounts: Acc
             whole(a.requests),
             compact(a.tokens),
             dollars(a.costMicros),
-            todayCell(a),
+            limitsCell(a),
           ])}
         />
       </div>
-      <p className="mt-2 text-[12px] text-[color:var(--color-muted)]">Tokens are input plus output. Today is the UTC day; before an account&apos;s first memory build finishes, its first build allowance applies instead of the daily limit.</p>
+      <p className="mt-2 text-[12px] text-[color:var(--color-muted)]">
+        Tokens are input plus output. Before an account&apos;s first memory build finishes, its first build allowance applies in place of the monthly limit; after it, the month
+        (UTC) counts only spend after the build. Today shows only for an account with a daily limit.
+      </p>
     </Section>
   );
 }

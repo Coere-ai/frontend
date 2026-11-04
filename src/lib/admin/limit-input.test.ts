@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { checkClear, isLimitKind, isPlanId, LIMIT_COLUMNS, readAccountLimits, readPlanLimits, readRequiredDollars } from "./limit-input";
+import { checkClear, isLimitKind, isPlanId, LIMIT_COLUMNS, readAccountLimits, readDailyForAll, readPlanLimits } from "./limit-input";
 
 const form = (values: Record<string, string>) => {
   const fd = new FormData();
@@ -26,22 +26,27 @@ test("a bad amount is refused, naming the field", () => {
   assert.match((readAccountLimits(form({ monthly: "100001" })) as { error: string }).error, /^Monthly limit: A limit can be at most/);
 });
 
-test("a plan needs a daily, first build and monthly amount, and may have no lifetime limit", () => {
+test("a plan needs a first build and monthly amount, and may have no daily or lifetime limit", () => {
   assert.deepEqual(readPlanLimits(form({ daily: "2", firstBuild: "10", monthly: "5", lifetime: "" })), {
     ok: true,
     limits: { daily: 2_000_000, first_build: 10_000_000, monthly: 5_000_000, lifetime: null },
   });
-  assert.deepEqual(readPlanLimits(form({ daily: "", firstBuild: "10", monthly: "5" })), { ok: false, error: "Daily limit: type an amount in dollars, like 2 or 2.50." });
+  assert.deepEqual(readPlanLimits(form({ daily: "", firstBuild: "10", monthly: "5" })), {
+    ok: true,
+    limits: { daily: null, first_build: 10_000_000, monthly: 5_000_000, lifetime: null },
+  });
+  assert.match((readPlanLimits(form({ daily: "x", firstBuild: "10", monthly: "5" })) as { error: string }).error, /^Daily limit:/);
   assert.match((readPlanLimits(form({ daily: "2", firstBuild: "", monthly: "5" })) as { error: string }).error, /^First build allowance:/);
   assert.match((readPlanLimits(form({ daily: "2", firstBuild: "10", monthly: "" })) as { error: string }).error, /^Monthly limit:/);
   assert.match((readPlanLimits(form({ daily: "2", firstBuild: "10", monthly: "5", lifetime: "x" })) as { error: string }).error, /^Lifetime limit:/);
 });
 
-test("the one amount for every plan must be there", () => {
-  assert.deepEqual(readRequiredDollars("3.25", "Daily limit"), { ok: true, micros: 3_250_000 });
-  assert.equal(readRequiredDollars("", "Daily limit").ok, false);
-  assert.equal(readRequiredDollars(null, "Daily limit").ok, false);
-  assert.equal(readRequiredDollars("-2", "Daily limit").ok, false);
+test("the daily limit for every plan is an amount, or blank for off", () => {
+  assert.deepEqual(readDailyForAll("3.25"), { ok: true, micros: 3_250_000 });
+  assert.deepEqual(readDailyForAll(""), { ok: true, micros: null });
+  assert.deepEqual(readDailyForAll(null), { ok: true, micros: null });
+  assert.deepEqual(readDailyForAll("0"), { ok: true, micros: 0 });
+  assert.match((readDailyForAll("-2") as { error: string }).error, /^Daily limit:/);
 });
 
 test("only the four kinds can be cleared, each by its own column", () => {

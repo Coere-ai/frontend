@@ -1,3 +1,5 @@
+import { toSpend, type Spend } from "@/lib/v1/spend";
+
 import { num } from "./totals";
 
 /**
@@ -46,16 +48,13 @@ export interface ModelUsage extends TokenCounts {
   model: string;
 }
 
-/** One account's use in the range, with today's spend against its daily limit. */
+/** One account's use in the range, with its limits and the spend against each (spend_state). */
 export interface AccountUsage extends TokenCounts {
   id: string;
   email: string | null;
   /** Input plus output, as tokens used are counted everywhere else. */
   tokens: number;
-  todayMicros: number;
-  /** The daily limit, or the first build allowance while `firstBuildDone` is false. */
-  dailyLimitMicros: number;
-  firstBuildDone: boolean;
+  spend: Spend;
 }
 
 type Raw = Record<string, unknown>;
@@ -96,9 +95,7 @@ export function toAccountUsage(rows: readonly Raw[]): AccountUsage[] {
         email: typeof r.email === "string" ? r.email : null,
         ...c,
         tokens: c.inputTokens + c.outputTokens,
-        todayMicros: num(r.day_cost_micros),
-        dailyLimitMicros: num(r.daily_limit_micros),
-        firstBuildDone: r.first_build_done === true,
+        spend: toSpend(r),
       };
     });
 }

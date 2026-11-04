@@ -9,7 +9,7 @@ import { dollars } from "@/lib/dashboard/format";
 import { Button, Card, fieldClass, fieldStyle, Label, Status } from "../controls";
 import { useAction } from "../use-action";
 
-import { DailyCard } from "./daily-card";
+import { SpendCard } from "./spend-card";
 
 const LABELS: Record<LimitKind, string> = { daily: "Daily, $", first_build: "First build, $", monthly: "Monthly, $", lifetime: "Lifetime, $" };
 
@@ -23,11 +23,18 @@ function limitsOf(user: UserDetailPayload["user"], plan: PlanRow | undefined): R
   };
 }
 
+/** What a blank field means: the plan's value, "off" for a daily limit the plan does not set, "none" for a lifetime limit. */
+function planPlaceholder(kind: LimitKind, fromPlan: number | null | undefined): string {
+  if (fromPlan === undefined) return "Plan's";
+  if (fromPlan === null) return kind === "daily" ? "Off (plan)" : "None (plan)";
+  return `${dollarField(fromPlan)} (plan)`;
+}
+
 /**
  * What the operator changes on one account. The limits show the plan's
  * own as placeholders, so a blank field says what applies, and the
- * spend sits beside them. The daily and first build limits are hidden from
- * the person; only this panel shows them.
+ * spend sits beside them. The person never sees any of the limits; only
+ * the admin panel shows them.
  */
 export function AccountActions({ data, reload }: { data: UserDetailPayload; reload: () => void }) {
   const { user, plans } = data;
@@ -69,7 +76,7 @@ export function AccountActions({ data, reload }: { data: UserDetailPayload; relo
                     name={fieldName(kind)}
                     inputMode="decimal"
                     defaultValue={dollarField(own)}
-                    placeholder={fromPlan === undefined ? "Plan's" : fromPlan === null ? "None (plan)" : `${dollarField(fromPlan)} (plan)`}
+                    placeholder={planPlaceholder(kind, fromPlan)}
                     className={fieldClass}
                     style={fieldStyle}
                   />
@@ -79,7 +86,8 @@ export function AccountActions({ data, reload }: { data: UserDetailPayload; relo
           </div>
           <p className="text-[12px] text-[color:var(--color-ink)]">
             Spent {dollars(user.monthCostMicros)} this month and {dollars(user.lifetimeCostMicros)} in all. Leave a field blank for the plan&apos;s limit; a value here overrides
-            the plan&apos;s. The daily limit starts once the free first build finishes, and the person never sees either.
+            the plan&apos;s. Until the free first build finishes, the first build allowance applies in place of the monthly and daily limits; after it, the month counts only
+            spend after the build. A daily limit is off unless set here or on the plan. The person never sees any of them.
           </p>
           <Button strong disabled={pending}>
             Save limits
@@ -106,7 +114,7 @@ export function AccountActions({ data, reload }: { data: UserDetailPayload; relo
           {suspended ? "Suspended: every request from this account is refused." : `Active, with ${user.devices} live ${user.devices === 1 ? "device" : "devices"}.`}
         </p>
       </Card>
-      <DailyCard data={data} pending={pending} run={run} />
+      <SpendCard data={data} pending={pending} run={run} />
       <div className="lg:col-span-2">
         <Status text={message} />
       </div>

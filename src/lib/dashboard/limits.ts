@@ -39,7 +39,7 @@ export function spentShare(used: number, limit: number): number {
  * "until tomorrow", so it reads false, as does a missing row.
  */
 export function pausedToday(row: { daily_limit_micros?: unknown; day_cost_micros?: unknown; first_build_done?: unknown } | null | undefined): boolean {
-  if (!row || row.first_build_done !== true) return false;
+  if (!row || row.first_build_done !== true || row.daily_limit_micros === null || row.daily_limit_micros === undefined) return false;
   const limit = Number(row.daily_limit_micros);
   const spent = Number(row.day_cost_micros);
   return Number.isFinite(limit) && Number.isFinite(spent) && spent >= limit;

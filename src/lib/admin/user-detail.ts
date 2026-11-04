@@ -2,6 +2,8 @@ import "server-only";
 
 import { supabase } from "@/lib/supabase";
 
+import { toSpend } from "@/lib/v1/spend";
+
 import { num, toTotals } from "./totals";
 import type { UserDetailPayload } from "./types";
 import { joinUsers, monthKey, type ProfileRow } from "./user-rows";
@@ -9,9 +11,10 @@ import { PROFILE_COLUMNS, readPlans } from "./users";
 
 /**
  * One account for /admin/users/<id>: its row as the table shows it, its
- * running totals, this month, its memory file, every device, and the hidden
- * daily limit (or first build allowance) with what it has spent against it. Null when
- * there is no such account. Every query names this one user id.
+ * running totals, this month, its memory file, every device, and its spend
+ * limits as the gate reads them (spend_state), each with what it has spent
+ * against it. Null when there is no such account. Every query names this one
+ * user id.
  */
 export async function loadUser(id: string): Promise<UserDetailPayload | null> {
   const db = supabase();
@@ -19,7 +22,7 @@ export async function loadUser(id: string): Promise<UserDetailPayload | null> {
   if (error) throw new Error(`profiles read failed: ${error.code}`);
   if (!profile) return null;
 
-  const [member, devices, month, totals, file, plans, day] = await Promise.all([
+  const [member, devices, month, totals, file, plans, spend] = await Promise.all([
     db.from("org_members").select("user_id, org_id, role, organizations(name)").eq("user_id", id).maybeSingle(),
     db
       .from("devices")
@@ -31,9 +34,9 @@ export async function loadUser(id: string): Promise<UserDetailPayload | null> {
     db.from("user_totals").select("*").eq("user_id", id).maybeSingle(),
     db.from("memory_files").select("user_id, bytes, memories, chats, uploaded_at").eq("user_id", id).maybeSingle(),
     readPlans(),
-    db.rpc("daily_spend", { p_user: id }),
+    db.rpc("spend_state", { p_user: id }),
   ]);
-  for (const r of [member, devices, month, totals, file, day]) if (r.error) throw new Error(`account read failed: ${r.error.code}`);
+  for (const r of [member, devices, month, totals, file, spend]) if (r.error) throw new Error(`account read failed: ${r.error.code}`);
 
   const org = member.data ? (member.data.organizations as unknown as { name: string } | { name: string }[] | null) : null;
   const orgName = Array.isArray(org) ? (org[0]?.name ?? null) : (org?.name ?? null);
@@ -75,11 +78,6 @@ export async function loadUser(id: string): Promise<UserDetailPayload | null> {
       revokedReason: (d.revoked_reason as string | null) ?? null,
     })),
     plans,
-    day: toDay((Array.isArray(day.data) ? day.data[0] : day.data) as Record<string, unknown> | undefined),
+    spend: toSpend(((Array.isArray(spend.data) ? spend.data[0] : spend.data) as Record<string, unknown> | undefined) ?? {}),
   };
-}
-
-/** daily_spend's row, or an untouched first build when there is none. */
-function toDay(r: Record<string, unknown> | undefined): UserDetailPayload["day"] {
-  return { limitMicros: num(r?.daily_limit_micros), spentMicros: num(r?.day_cost_micros), firstBuildDone: r?.first_build_done === true };
 }

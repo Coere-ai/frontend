@@ -350,11 +350,12 @@ create table if not exists public.plans (
   monthly_limit_micros  bigint      not null,
   -- Null means the plan has no lifetime limit, which is true of every seed.
   lifetime_limit_micros bigint,
-  -- The daily AI spend limit (section 8.10), per UTC day. It starts once the
-  -- account's first memory build has finished; until then the first build
-  -- allowance applies instead, so the first build is free of the daily one.
-  -- Neither is shown to the person.
-  daily_limit_micros       bigint   not null default 2000000,
+  -- The daily AI spend limit (section 8.10), per UTC day. Null means none,
+  -- which is true of every seed, so the monthly limit governs. The operator
+  -- may set one. Until the account's first memory build has finished, the
+  -- first build allowance applies in place of the monthly and daily limits.
+  -- None of the limits is shown to the person.
+  daily_limit_micros       bigint,
   first_build_limit_micros bigint   not null default 10000000,
   storage_limit_bytes   bigint      not null,
   requests_per_minute   integer     not null,
@@ -363,16 +364,16 @@ create table if not exists public.plans (
   constraint plans_limits_sane check (
     monthly_limit_micros >= 0 and storage_limit_bytes >= 0 and requests_per_minute > 0
     and (lifetime_limit_micros is null or lifetime_limit_micros >= 0)
-    and daily_limit_micros >= 0 and first_build_limit_micros >= 0)
+    and (daily_limit_micros is null or daily_limit_micros >= 0) and first_build_limit_micros >= 0)
 );
 
--- The three plans of section 10, each $2 a day after a $10 first build. do
--- nothing, so an operator's later edit of a plan's limits survives a second
--- run of this file.
+-- The three plans of section 10, each with a $10 first build, then its
+-- monthly limit and no daily limit. do nothing, so an operator's later edit
+-- of a plan's limits survives a second run of this file.
 insert into public.plans (id, name, monthly_limit_micros, daily_limit_micros, first_build_limit_micros, storage_limit_bytes, requests_per_minute) values
-  ('free', 'Free',   5000000, 2000000, 10000000,  26214400,  60),
-  ('plus', 'Plus',  20000000, 2000000, 10000000, 104857600, 120),
-  ('team', 'Team', 100000000, 2000000, 10000000, 524288000, 300)
+  ('free', 'Free',   5000000, null, 10000000,  26214400,  60),
+  ('plus', 'Plus',  20000000, null, 10000000, 104857600, 120),
+  ('team', 'Team', 100000000, null, 10000000, 524288000, 300)
 on conflict (id) do nothing;
 
 
@@ -396,12 +397,13 @@ create table if not exists public.profiles (
   daily_limit_micros       bigint,
   first_build_limit_micros bigint,
   -- When the first memory build finished: the first memory_built event, set
-  -- by record_app_events(). Null until then, and the daily limit waits for it.
+  -- by record_app_events(). Null until then, and the monthly and daily
+  -- limits wait for it.
   first_build_at          timestamptz,
   -- user_totals.cost_micros at the last turn of the first build: when the
   -- free build began (0, or when the operator reset it) while first_build_at
   -- is null, and when it finished after. The first build allowance counts
-  -- spend above it, and so does the daily limit on the day the build finished.
+  -- spend above it, and so do the month and the day the build finished in.
   first_build_mark_micros bigint      not null default 0,
   status            text        not null default 'active',
   -- The memory backup is on by default (section 13); sensitive memories are
@@ -595,7 +597,7 @@ create table if not exists public.usage_monthly (
 );
 
 -- Each account's spend per UTC day, kept by record_usage() so the daily limit
--- reads one row. Server only: the daily limit is not shown to the person.
+-- reads one row, when the operator sets one. Server only.
 create table if not exists public.usage_daily (
   user_id            uuid        not null references public.profiles (id) on delete cascade,
   day                date        not null,
@@ -1248,41 +1250,60 @@ create policy coere_memory_delete_own on storage.objects
 -- Months and days are UTC, so a total means the same thing wherever the
 -- server runs.
 
--- The hidden daily limit of one account (section 8.10), resolved, with the
--- spend it is checked against. Before the first memory build has finished,
--- the limit is the first build allowance and the spend is everything since
--- the free build began. After, the limit is the daily one and the spend is
--- this UTC day's, less what the first build spent earlier on the day it
--- finished, so the free build never counts against the day. The person's own
--- value wins over the plan's, as for the other limits. No row for no account.
-create or replace function public.daily_spend(p_user uuid)
-returns table (daily_limit_micros bigint, day_cost_micros bigint, first_build_done boolean)
+-- One account's spend limits (section 8.10), each resolved (the person's
+-- own when the operator set one, else the plan's) and beside the spend it is
+-- checked against. Until the first memory build has finished, the first
+-- build allowance applies in place of the monthly and daily limits, against
+-- everything spent since the free build began, and the month and the day
+-- count nothing. After, the monthly limit applies to this UTC month's spend
+-- and the daily limit to this UTC day's, each less what the first build
+-- spent, so the free build never counts against either: in the month or on
+-- the day the build finished, only spend after it counts. A null daily limit
+-- means none, which is true of every seeded plan. The lifetime limit (null
+-- means none) applies always, against everything. first_build_cost_micros is
+-- 0 once the build is done. No row for no account.
+create or replace function public.spend_state(p_user uuid)
+returns table (
+  monthly_limit_micros bigint, month_cost_micros bigint,
+  lifetime_limit_micros bigint, lifetime_cost_micros bigint,
+  daily_limit_micros bigint, day_cost_micros bigint,
+  first_build_done boolean, first_build_limit_micros bigint, first_build_cost_micros bigint)
 language sql
 stable
 security invoker
 set search_path = ''
 as $$
-  select case when p.first_build_at is null
-              then coalesce(p.first_build_limit_micros, pl.first_build_limit_micros)
-              else coalesce(p.daily_limit_micros, pl.daily_limit_micros) end,
-         (case when p.first_build_at is null
-                 or p.first_build_at >= date_trunc('day', now() at time zone 'utc') at time zone 'utc'
+  select coalesce(p.monthly_limit_micros, pl.monthly_limit_micros),
+         (case when p.first_build_at is null then 0
+               when p.first_build_at >= date_trunc('month', now() at time zone 'utc') at time zone 'utc'
+               then greatest(coalesce(ut.cost_micros, 0) - p.first_build_mark_micros, 0)
+               else coalesce(um.cost_micros, 0) end)::bigint,
+         coalesce(p.lifetime_limit_micros, pl.lifetime_limit_micros),
+         coalesce(ut.cost_micros, 0)::bigint,
+         coalesce(p.daily_limit_micros, pl.daily_limit_micros),
+         (case when p.first_build_at is null then 0
+               when p.first_build_at >= date_trunc('day', now() at time zone 'utc') at time zone 'utc'
                then greatest(coalesce(ut.cost_micros, 0) - p.first_build_mark_micros, 0)
                else coalesce(ud.cost_micros, 0) end)::bigint,
-         p.first_build_at is not null
+         p.first_build_at is not null,
+         coalesce(p.first_build_limit_micros, pl.first_build_limit_micros),
+         (case when p.first_build_at is null
+               then greatest(coalesce(ut.cost_micros, 0) - p.first_build_mark_micros, 0)
+               else 0 end)::bigint
     from public.profiles p
     join public.plans pl on pl.id = p.plan_id
     left join public.user_totals ut on ut.user_id = p.id
+    left join public.usage_monthly um
+      on um.user_id = p.id and um.month = date_trunc('month', now() at time zone 'utc')::date
     left join public.usage_daily ud on ud.user_id = p.id and ud.day = (now() at time zone 'utc')::date
    where p.id = p_user;
 $$;
 
 -- Checks a device token and returns everything a metered call needs: the
--- account, its limits, this month's spend, the lifetime spend, the daily
--- limit with today's spend, and the organization. Each limit is already resolved: the person's own when the
--- operator set one, else the plan's. A null lifetime limit means none.
--- daily_limit_micros and day_cost_micros are daily_spend()'s, so the gate
--- needs no second call; first_build_done says which limit they are.
+-- account, the organization, and spend_state()'s limits and spend, so the
+-- gate needs no second call. Each limit is already resolved: the person's
+-- own when the operator set one, else the plan's. first_build_done says
+-- whether the first build allowance or the monthly and daily limits apply.
 -- No row means unknown or revoked, and the route answers signed_out.
 -- last_used_at and last_seen_at are touched at most every 5 minutes, so a
 -- busy extension does not write a row on every request.
@@ -1293,7 +1314,8 @@ returns table (
   storage_limit_bytes bigint, requests_per_minute integer,
   month_cost_micros bigint, lifetime_cost_micros bigint,
   memory_sync boolean, include_sensitive boolean, org_id uuid,
-  daily_limit_micros bigint, day_cost_micros bigint, first_build_done boolean)
+  daily_limit_micros bigint, day_cost_micros bigint, first_build_done boolean,
+  first_build_limit_micros bigint, first_build_cost_micros bigint)
 language plpgsql
 security invoker
 set search_path = ''
@@ -1316,19 +1338,16 @@ begin
 
   return query
     select v_device.id, p.id, p.status, p.plan_id,
-           coalesce(p.monthly_limit_micros, pl.monthly_limit_micros),
-           coalesce(p.lifetime_limit_micros, pl.lifetime_limit_micros),
+           s.monthly_limit_micros, s.lifetime_limit_micros,
            pl.storage_limit_bytes, pl.requests_per_minute,
-           coalesce(um.cost_micros, 0)::bigint, coalesce(ut.cost_micros, 0)::bigint,
+           s.month_cost_micros, s.lifetime_cost_micros,
            p.memory_sync, p.include_sensitive, m.org_id,
-           ds.daily_limit_micros, ds.day_cost_micros, ds.first_build_done
+           s.daily_limit_micros, s.day_cost_micros, s.first_build_done,
+           s.first_build_limit_micros, s.first_build_cost_micros
       from public.profiles p
       join public.plans pl on pl.id = p.plan_id
-      left join public.usage_monthly um
-        on um.user_id = p.id and um.month = date_trunc('month', now() at time zone 'utc')::date
-      left join public.user_totals ut on ut.user_id = p.id
+      cross join lateral public.spend_state(p.id) s
       left join public.org_members m on m.user_id = p.id
-      left join lateral public.daily_spend(p.id) ds on true
      where p.id = v_device.user_id;
 end;
 $$;
@@ -1483,11 +1502,12 @@ $$;
 -- refuse every batch of a small plan; its reservation then holds everything
 -- else back until its results are metered. A batch whose results were never
 -- read in 30 days (they expire after 29) is charged its reservation here.
--- The daily limit (or the first build allowance, before the first build has
--- finished) is checked the same way, against daily_spend() plus every
--- pending hold and reservation, so the day too can be passed by one batch at
--- most. Answers the hold's id, or which limit refused it: lifetime,
--- first_build, monthly or daily, the one that lasts longest first.
+-- Each limit is spend_state()'s, checked against its spend plus every
+-- pending hold and reservation: the lifetime limit always, the first build
+-- allowance until the first build has finished, and after it the monthly
+-- limit and the daily limit when there is one. So any of them can be passed
+-- by one batch at most. Answers the hold's id, or which limit refused it:
+-- lifetime, first_build, monthly or daily, the one that lasts longest first.
 create or replace function public.reserve_spend(
   p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean
 ) returns table (hold_id uuid, refused text)
@@ -1496,24 +1516,13 @@ security invoker
 set search_path = ''
 as $$
 declare
-  v_amount   bigint := greatest(coalesce(p_amount, 0), 0);
-  v_monthly  bigint;
-  v_lifetime bigint;
-  v_month    bigint;
-  v_total    bigint;
-  v_pending  bigint;
-  v_daily    bigint;
-  v_today    bigint;
-  v_built    boolean;
-  v_id       uuid;
-  r          record;
+  v_amount  bigint := greatest(coalesce(p_amount, 0), 0);
+  v_need    bigint;
+  v_id      uuid;
+  s         record;
+  r         record;
 begin
-  select coalesce(p.monthly_limit_micros, pl.monthly_limit_micros), coalesce(p.lifetime_limit_micros, pl.lifetime_limit_micros)
-    into v_monthly, v_lifetime
-    from public.profiles p
-    join public.plans pl on pl.id = p.plan_id
-   where p.id = p_user
-     for update of p;
+  perform 1 from public.profiles p where p.id = p_user for update of p;
   if not found then
     return query select null::uuid, 'monthly'::text;
     return;
@@ -1531,53 +1540,31 @@ begin
 
   delete from public.spend_holds h where h.user_id = p_user and h.expires_at <= now();
 
-  select coalesce(sum(um.cost_micros), 0) into v_month
-    from public.usage_monthly um
-   where um.user_id = p_user and um.month = date_trunc('month', now() at time zone 'utc')::date;
-  select coalesce(sum(ut.cost_micros), 0) into v_total from public.user_totals ut where ut.user_id = p_user;
-  select coalesce(sum(h.amount_micros), 0) into v_pending from public.spend_holds h where h.user_id = p_user;
-  v_pending := v_pending + (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b
-                             where b.user_id = p_user and b.metered_at is null);
-  select ds.daily_limit_micros, ds.day_cost_micros, ds.first_build_done
-    into v_daily, v_today, v_built
-    from public.daily_spend(p_user) ds;
+  -- What a limit must still hold above the spend already recorded: every
+  -- pending hold and reservation, plus a message's whole worst case. For a
+  -- batch it is 1 micro dollar, so in whole numbers "spend + need > limit"
+  -- means the limit is already reached.
+  select coalesce(sum(h.amount_micros), 0) into v_need from public.spend_holds h where h.user_id = p_user;
+  v_need := v_need
+    + (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b where b.user_id = p_user and b.metered_at is null)
+    + case when p_batch then 1 else v_amount end;
+  select * into s from public.spend_state(p_user);
 
-  if p_batch then
-    -- Nothing may already be at a limit.
-    if v_lifetime is not null and v_total + v_pending >= v_lifetime then
-      return query select null::uuid, 'lifetime'::text;
-      return;
-    end if;
-    if not v_built and v_today + v_pending >= v_daily then
-      return query select null::uuid, 'first_build'::text;
-      return;
-    end if;
-    if v_month + v_pending >= v_monthly then
-      return query select null::uuid, 'monthly'::text;
-      return;
-    end if;
-    if v_built and v_today + v_pending >= v_daily then
-      return query select null::uuid, 'daily'::text;
-      return;
-    end if;
-  else
-    -- The whole worst case must fit.
-    if v_lifetime is not null and v_total + v_pending + v_amount > v_lifetime then
-      return query select null::uuid, 'lifetime'::text;
-      return;
-    end if;
-    if not v_built and v_today + v_pending + v_amount > v_daily then
-      return query select null::uuid, 'first_build'::text;
-      return;
-    end if;
-    if v_month + v_pending + v_amount > v_monthly then
-      return query select null::uuid, 'monthly'::text;
-      return;
-    end if;
-    if v_built and v_today + v_pending + v_amount > v_daily then
-      return query select null::uuid, 'daily'::text;
-      return;
-    end if;
+  if s.lifetime_limit_micros is not null and s.lifetime_cost_micros + v_need > s.lifetime_limit_micros then
+    return query select null::uuid, 'lifetime'::text;
+    return;
+  end if;
+  if not s.first_build_done and s.first_build_cost_micros + v_need > s.first_build_limit_micros then
+    return query select null::uuid, 'first_build'::text;
+    return;
+  end if;
+  if s.first_build_done and s.month_cost_micros + v_need > s.monthly_limit_micros then
+    return query select null::uuid, 'monthly'::text;
+    return;
+  end if;
+  if s.first_build_done and s.daily_limit_micros is not null and s.day_cost_micros + v_need > s.daily_limit_micros then
+    return query select null::uuid, 'daily'::text;
+    return;
   end if;
 
   insert into public.spend_holds (user_id, amount_micros, expires_at)
@@ -1616,7 +1603,8 @@ $$;
 -- on context_import and transfer; the route already refuses it elsewhere,
 -- and this ignores it elsewhere too, so a direct caller cannot inflate it.
 -- The first memory_built marks the free first build done (first_build_at),
--- which starts the daily limit; a later one changes nothing.
+-- which ends the first build allowance and starts the monthly limit (and
+-- the daily one, when set); a later one changes nothing.
 create or replace function public.record_app_events(p_user uuid, p_device uuid, p_events jsonb)
 returns void
 language plpgsql
@@ -1940,10 +1928,10 @@ as $$
    order by 1, 2 nulls first;
 $$;
 
--- The operator gives an account its free first build again: the daily limit
--- waits for the next memory_built, and the first build allowance counts from
--- what the account has spent so far, so spend before the reset never uses it
--- up. False when there is no such account.
+-- The operator gives an account its free first build again: the monthly and
+-- daily limits wait for the next memory_built, and the first build allowance
+-- counts from what the account has spent so far, so spend before the reset
+-- never uses it up. False when there is no such account.
 create or replace function public.reset_first_build(p_user uuid)
 returns boolean
 language plpgsql
@@ -1984,13 +1972,16 @@ $$;
 -- /admin/cost's top accounts over the days on or after p_from (all time from
 -- user_totals when null): the p_limit largest by cost, by tokens (input plus
 -- output) and by requests, together, so the page can sort by any of the three
--- and still show the true top of each. Each comes with daily_spend(), what
--- the account spent today against its daily limit (or its first build
--- against the allowance). A deleted account's use is left out.
+-- and still show the true top of each. Each comes with spend_state()'s
+-- limits and spend, so the page shows the limit in force the way the gate
+-- reads it. A deleted account's use is left out.
 create or replace function public.admin_top_accounts(p_from date, p_limit integer)
 returns table (user_id uuid, email text, requests bigint, input_tokens bigint, output_tokens bigint,
                cache_write_tokens bigint, cache_read_tokens bigint, cost_micros bigint,
-               day_cost_micros bigint, daily_limit_micros bigint, first_build_done boolean)
+               monthly_limit_micros bigint, month_cost_micros bigint,
+               lifetime_limit_micros bigint, lifetime_cost_micros bigint,
+               daily_limit_micros bigint, day_cost_micros bigint,
+               first_build_done boolean, first_build_limit_micros bigint, first_build_cost_micros bigint)
 language sql
 stable
 security invoker
@@ -2016,10 +2007,12 @@ as $$
       from sums s
   )
   select r.user_id, p.email, r.requests, r.input_tokens, r.output_tokens, r.cache_write_tokens,
-         r.cache_read_tokens, r.cost_micros, ds.day_cost_micros, ds.daily_limit_micros, ds.first_build_done
+         r.cache_read_tokens, r.cost_micros, s.monthly_limit_micros, s.month_cost_micros,
+         s.lifetime_limit_micros, s.lifetime_cost_micros, s.daily_limit_micros, s.day_cost_micros,
+         s.first_build_done, s.first_build_limit_micros, s.first_build_cost_micros
     from ranked r
     join public.profiles p on p.id = r.user_id
-    left join lateral public.daily_spend(r.user_id) ds on true
+    cross join lateral public.spend_state(r.user_id) s
    where least(r.by_cost, r.by_tokens, r.by_requests) <= least(greatest(coalesce(p_limit, 50), 1), 500)
    order by r.cost_micros desc, r.requests desc, r.user_id;
 $$;
@@ -2040,7 +2033,7 @@ revoke all on function public.org_drop_member(uuid, uuid, text) from public, ano
 revoke all on function public.accept_org_invite(uuid, uuid) from public, anon, authenticated;
 revoke all on function public.admin_table_stats() from public, anon, authenticated;
 revoke all on function public.admin_storage_usage() from public, anon, authenticated;
-revoke all on function public.daily_spend(uuid) from public, anon, authenticated;
+revoke all on function public.spend_state(uuid) from public, anon, authenticated;
 revoke all on function public.reset_first_build(uuid) from public, anon, authenticated;
 revoke all on function public.admin_usage_by_model(date) from public, anon, authenticated;
 revoke all on function public.admin_top_accounts(date, integer) from public, anon, authenticated;
@@ -2057,7 +2050,7 @@ grant execute on function public.org_drop_member(uuid, uuid, text) to service_ro
 grant execute on function public.accept_org_invite(uuid, uuid) to service_role;
 grant execute on function public.admin_table_stats() to service_role;
 grant execute on function public.admin_storage_usage() to service_role;
-grant execute on function public.daily_spend(uuid) to service_role;
+grant execute on function public.spend_state(uuid) to service_role;
 grant execute on function public.reset_first_build(uuid) to service_role;
 grant execute on function public.admin_usage_by_model(date) to service_role;
 grant execute on function public.admin_top_accounts(date, integer) to service_role;

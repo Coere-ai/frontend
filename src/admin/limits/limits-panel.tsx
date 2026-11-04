@@ -24,9 +24,10 @@ export const LIMIT_NAMES: Record<LimitKind, string> = {
 /**
  * The global spend limits. Every account follows its plan's limits unless
  * the operator gave it its own on its page under Users, which then wins.
- * The daily limit applies once an account's free first memory build has
- * finished; until then the first build allowance does. Neither is ever
- * shown to the person.
+ * Until an account's free first memory build has finished, the first build
+ * allowance applies in place of the monthly and daily limits; after it, the
+ * monthly limit counts only spend after the build. The daily limit is off
+ * unless set. No limit is ever shown to the person.
  */
 export function LimitsPanel() {
   const { data, error, reload } = useAdminData<LimitsPayload>("/api/admin/limits");
@@ -35,9 +36,10 @@ export function LimitsPanel() {
       {data ? (
         <>
           <p className="max-w-[720px] text-[12.5px] text-[color:var(--color-ink)]">
-            These limits apply to every account on a plan. An account&apos;s own value, set on its page under Users, overrides its plan&apos;s. The daily limit starts once an
-            account&apos;s free first memory build has finished, counted per UTC day; until then the first build allowance applies instead. The monthly and lifetime limits always
-            apply. People never see the daily limit or the allowance: when one is reached, the extension shows its usual limit message and tries again each hour.
+            These limits apply to every account on a plan. An account&apos;s own value, set on its page under Users, overrides its plan&apos;s. Until an account&apos;s free first
+            memory build has finished, the first build allowance applies in place of the monthly and daily limits. After it, the monthly limit applies, counting only spend after
+            the build, per UTC month. The daily limit is off unless set here (blank is off), counted per UTC day. The lifetime limit always applies. People never see a limit:
+            when one is reached, the extension shows its usual limit message and tries again each hour, and the dashboard says only that their AI use is paused.
           </p>
           <div className="grid gap-4 lg:grid-cols-2">
             <EveryPlanCard data={data} reload={reload} />
@@ -63,15 +65,24 @@ function EveryPlanCard({ data, reload }: { data: LimitsPayload; reload: () => vo
     <Card title="Daily limit for everyone">
       <form key={String(shared)} action={(fd) => run(() => setDailyForAllPlans(fd))} className="flex items-end gap-2">
         <div className="flex-1">
-          <Label htmlFor="daily-all">Every plan, $ a day</Label>
-          <input id="daily-all" name="daily" inputMode="decimal" required defaultValue={dollarField(shared)} placeholder="Plans differ" className={fieldClass} style={fieldStyle} />
+          <Label htmlFor="daily-all">Every plan, $ a day, blank for off</Label>
+          <input
+            id="daily-all"
+            name="daily"
+            inputMode="decimal"
+            defaultValue={dollarField(shared)}
+            placeholder={values.length === 1 ? "Off" : "Plans differ"}
+            className={fieldClass}
+            style={fieldStyle}
+          />
         </div>
         <Button strong disabled={pending}>
           Set on every plan
         </Button>
       </form>
       <p className="mt-2 text-[12px] text-[color:var(--color-ink)]">
-        {whole(data.firstBuildsUsed)} of {whole(data.accounts)} accounts have finished their free first build, so the daily limit applies to them. {whole(data.overrides.daily)}{" "}
+        {whole(data.firstBuildsUsed)} of {whole(data.accounts)} accounts have finished their free first build, so the monthly limit (and a daily limit, when set) applies to them.{" "}
+        {whole(data.overrides.daily)}{" "}
         {data.overrides.daily === 1 ? "account has" : "accounts have"} a daily limit of its own, which this does not change.
       </p>
       <Status text={message} />

@@ -1,5 +1,6 @@
 import type { MemoryView } from "@/lib/memory/view";
 import type { OrgAccess } from "@/lib/org/access";
+import type { Spend } from "@/lib/v1/spend";
 
 import type { DayPoint } from "./by-day";
 import type { AccountUsage, CostRange, ModelUsage, TokenCounts } from "./cost";
@@ -62,9 +63,9 @@ export interface PlanRow {
   monthlyLimitMicros: number;
   /** Null means no lifetime limit. */
   lifetimeLimitMicros: number | null;
-  /** The hidden daily limit, once an account's first build is done. */
-  dailyLimitMicros: number;
-  /** What the free first build may spend before the daily limit starts. */
+  /** The daily limit, once an account's first build is done. Null means none, the default. */
+  dailyLimitMicros: number | null;
+  /** What the free first build may spend, in place of the monthly and daily limits until it finishes. */
   firstBuildLimitMicros: number;
 }
 
@@ -111,8 +112,8 @@ export interface UserDetailPayload {
   memory: { bytes: number; memories: number; chats: number; uploadedAt: string | null } | null;
   devices: DeviceRow[];
   plans: PlanRow[];
-  /** daily_spend(): the limit in force (the first build allowance until the first build is done) and the spend against it. */
-  day: { limitMicros: number; spentMicros: number; firstBuildDone: boolean };
+  /** spend_state(): every limit resolved, with the spend the gate checks it against. */
+  spend: Spend;
 }
 
 export interface OrgRow {

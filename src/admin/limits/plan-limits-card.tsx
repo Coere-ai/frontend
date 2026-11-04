@@ -20,8 +20,9 @@ const saved = (plan: PlanRow): Record<LimitKind, number | null> => ({
 });
 
 /**
- * One plan's four limits in dollars and cents. The lifetime limit may be
- * blank, meaning none; the rest must be amounts. The card says whether what
+ * One plan's four limits in dollars and cents. The daily limit may be blank,
+ * meaning off, and the lifetime limit blank, meaning none; the first build
+ * and monthly limits must be amounts. The card says whether what
  * is typed is saved, and the form starts again from the saved values after
  * each save, so what it shows is what applies.
  */
@@ -49,9 +50,9 @@ export function PlanLimitsCard({ plan, reload }: { plan: PlanRow; reload: () => 
                 id={`${plan.id}-${kind}`}
                 name={fieldName(kind)}
                 inputMode="decimal"
-                required={kind !== "lifetime"}
+                required={kind === "first_build" || kind === "monthly"}
                 defaultValue={dollarField(values[kind])}
-                placeholder={kind === "lifetime" ? "None" : undefined}
+                placeholder={kind === "lifetime" ? "None" : kind === "daily" ? "Off" : undefined}
                 className={fieldClass}
                 style={fieldStyle}
               />

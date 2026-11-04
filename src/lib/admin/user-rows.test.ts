@@ -49,8 +49,14 @@ test("a limit of zero is a limit, not the plan's", () => {
 
 test("plans keep a null lifetime limit as none, and carry the daily and first build limits", () => {
   assert.deepEqual(
-    toPlans([{ id: "free", name: "Free", monthly_limit_micros: "5000000", lifetime_limit_micros: null, daily_limit_micros: "2000000", first_build_limit_micros: 10_000_000 }]),
-    [{ id: "free", name: "Free", monthlyLimitMicros: 5_000_000, lifetimeLimitMicros: null, dailyLimitMicros: 2_000_000, firstBuildLimitMicros: 10_000_000 }],
+    toPlans([
+      { id: "free", name: "Free", monthly_limit_micros: "5000000", lifetime_limit_micros: null, daily_limit_micros: null, first_build_limit_micros: 10_000_000 },
+      { id: "plus", name: "Plus", monthly_limit_micros: 20_000_000, daily_limit_micros: "2000000", first_build_limit_micros: "10000000" },
+    ]),
+    [
+      { id: "free", name: "Free", monthlyLimitMicros: 5_000_000, lifetimeLimitMicros: null, dailyLimitMicros: null, firstBuildLimitMicros: 10_000_000 },
+      { id: "plus", name: "Plus", monthlyLimitMicros: 20_000_000, lifetimeLimitMicros: null, dailyLimitMicros: 2_000_000, firstBuildLimitMicros: 10_000_000 },
+    ],
   );
 });
 

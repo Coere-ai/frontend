@@ -1,7 +1,7 @@
 "use server";
 
 import { adminAction, check, done, refused, type AdminResult } from "@/lib/admin/action";
-import { checkClear, isPlanId, LIMIT_COLUMNS, LIMIT_KINDS, readPlanLimits, readRequiredDollars } from "@/lib/admin/limit-input";
+import { checkClear, isPlanId, LIMIT_COLUMNS, LIMIT_KINDS, readDailyForAll, readPlanLimits } from "@/lib/admin/limit-input";
 import { dollars } from "@/lib/dashboard/format";
 import { supabase } from "@/lib/supabase";
 
@@ -29,15 +29,16 @@ export async function savePlanLimits(planId: string, form: FormData): Promise<Ad
   });
 }
 
-/** The one global switch: the same daily limit on every plan. Accounts with their own keep it. */
+/** The one global switch: the same daily limit on every plan, or blank for none. Accounts with their own keep it. */
 export async function setDailyForAllPlans(form: FormData): Promise<AdminResult> {
   return adminAction("setDailyForAllPlans", async () => {
-    const daily = readRequiredDollars(form.get("daily"), "Daily limit");
+    const daily = readDailyForAll(form.get("daily"));
     if (!daily.ok) return refused(daily.error);
     const { data, error } = await supabase().from("plans").update({ daily_limit_micros: daily.micros }).not("id", "is", null).select("id");
     check(error, "plans update");
     const n = data?.length ?? 0;
-    return done(`Every plan's daily limit is now ${dollars(daily.micros)} (${n} ${n === 1 ? "plan" : "plans"}).`);
+    const now = daily.micros === null ? "off" : dollars(daily.micros);
+    return done(`Every plan's daily limit is now ${now} (${n} ${n === 1 ? "plan" : "plans"}).`);
   });
 }
 

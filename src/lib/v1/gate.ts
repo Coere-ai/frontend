@@ -14,10 +14,11 @@ export type { GateRefusal, SpentLimit } from "./gate-types";
 /**
  * The checks every bearer route makes before it does anything, in order:
  * the token, a suspended account, the device's per minute limit and, for a
- * metered call, the spend limits: lifetime, the first build allowance or the
- * hidden daily limit, and monthly (spend.ts). The route turns a
- * refusal into its own error shape (problem details, or Anthropic's on the
- * proxy); `limit` says which spend limit a `usage_limit` is about.
+ * metered call, the spend limits: lifetime always, then the first build
+ * allowance until the first memory build finishes, and after it the monthly
+ * limit and the daily one when set (spend.ts). The route turns a refusal
+ * into its own error shape (problem details, or Anthropic's on the proxy);
+ * `limit` says which spend limit a `usage_limit` is about.
  *
  * `rate_limited` and `usage_limited` are logged once per device per window,
  * so a runaway loop does not write a security row per request.

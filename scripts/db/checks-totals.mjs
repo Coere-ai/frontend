@@ -31,7 +31,12 @@ export async function checkRecordUsage(db, org) {
   await checkMeterBatch(db, call);
   await checkReserveSpend(db);
   await as(db, "service_role", null, async () => {
-    equal("device_auth reads this month's spend", num((await rows(db, "spend", "select month_cost_micros from public.device_auth('hash_a')"))?.[0]?.month_cost_micros), 1500);
+    // A's first build is still to come, so all of it counts against the allowance and none in the month.
+    equal(
+      "device_auth reads the first build's spend, and none of it in the month",
+      (await rows(db, "spend", "select month_cost_micros::int as m, first_build_cost_micros::int as f from public.device_auth('hash_a')"))?.[0],
+      { m: 0, f: 1500 },
+    );
   });
 }
 
@@ -55,11 +60,12 @@ async function checkMeterBatch(db) {
 }
 
 // reserve_spend on C, a free account ($5 a month) with no spend. Rolled back at the end.
-// C's first build is done and its daily limit set far out of the way, so
-// these checks are about the month; checks-daily.mjs covers the day.
+// C's first build is done and no daily limit is set (the default), so
+// these checks are about the month; checks-spend.mjs covers the first build
+// and the day.
 async function checkReserveSpend(db) {
   await db.exec("begin");
-  await db.query("update public.profiles set first_build_at = now() - interval '2 days', daily_limit_micros = 1000000000 where id = $1", [C]);
+  await db.query("update public.profiles set first_build_at = now() - interval '2 days' where id = $1", [C]);
   const reserve = (amount, batch = false) =>
     as(db, "service_role", null, async () => (await rows(db, `reserve ${amount}`, "select * from public.reserve_spend($1, $2, 900, $3)", [C, amount, batch]))?.[0]);
   check("a message that fits is held", (await reserve(1_000_000))?.hold_id !== null);
