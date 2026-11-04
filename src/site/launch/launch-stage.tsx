@@ -82,7 +82,7 @@ export function LaunchStage({
         <Heading className={`mx-auto max-w-4xl font-medium tracking-[-0.045em] text-neutral-950 text-balance ${look.title} ${copy.eyebrow ? look.gap.eyebrow : copy.chrome ? look.gap.chrome : ""}`}>
           {here ? copy.here : copy.title}
         </Heading>
-        <p className={`mx-auto leading-relaxed text-neutral-600 text-pretty ${look.line}`}>{copy.line}</p>
+        <p className={`mx-auto leading-relaxed text-neutral-600 text-pretty ${look.line}`}>{here ? copy.hereLine : copy.line}</p>
         {setting.show ? (
           <div className={look.timer}>
             <div className="relative">

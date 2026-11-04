@@ -30,6 +30,8 @@ export const launchCopy: Record<
     /** The heading once the moment has passed. */
     here: string;
     line: string;
+    /** The line once the moment has passed. */
+    hereLine: string;
     /** Whether the Chrome mark sits in its chip above the heading. */
     chrome: boolean;
   }
@@ -41,6 +43,7 @@ export const launchCopy: Record<
     title: "Coming soon on the Chrome Web Store",
     here: "Coere Connect is here",
     line: "One memory across every AI. Say you are interested and we will email you the day it is out.",
+    hereLine: "One memory across every AI, now in the Chrome Web Store.",
     chrome: true,
   },
   teams: {
@@ -50,6 +53,7 @@ export const launchCopy: Record<
     title: "Coere for Teams is coming soon",
     here: "Coere for Teams is here",
     line: "Shared memory for your whole team, with a free week to try it. Say you are interested and we will email you when it opens.",
+    hereLine: "Shared memory for your whole team, with a free week to try it.",
     chrome: false,
   },
 };
