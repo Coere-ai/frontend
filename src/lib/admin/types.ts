@@ -152,6 +152,15 @@ export interface WaitlistPayload {
   byDay: DayPoint[];
 }
 
+/** One of the Interested page's lists, and how many each list holds. */
+export interface InterestedPayload {
+  list: "developers" | "connect" | "teams";
+  rows: { email: string; source: string | null; createdAt: string }[];
+  total: number;
+  byDay: DayPoint[];
+  counts: Record<"developers" | "connect" | "teams", number>;
+}
+
 export interface TableStat {
   schema: string;
   name: string;
