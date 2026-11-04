@@ -466,7 +466,7 @@ error classes keep working unchanged:
 | Model not allowed | `404 {…not_found_error, message:'model: <name>'}` |
 | Beta not allowed | `400 {…invalid_request_error, message:'Unexpected value(s) for the \`anthropic-beta\` header.'}` |
 | Body too large | `413 {…request_too_large, message:'request_too_large'}` |
-| Server has no key | `503 {…api_error, message:'unavailable'}` |
+| Server has no key, or Anthropic refuses Coere's own account (upstream 401, 402 or 403, a 400 "Your credit balance is too low" or "You have reached your specified", a 429 `enforced_spend_limit_reached`) | `503 {…api_error, message:'unavailable'}`, which the runtime retries on its own |
 
 **Metering.** A successful message writes one usage row per model from its
 `usage` (input, output, cache write, cache read) priced by the table in

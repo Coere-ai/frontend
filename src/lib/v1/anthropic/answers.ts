@@ -8,6 +8,7 @@ import { anthropicError } from "./errors";
 import { answerHeaders } from "./headers";
 import type { AnthropicOp } from "./paths";
 import { meteredResults } from "./results-stream";
+import { serverAccountError } from "./server-errors";
 import { attemptsOf, byModel } from "./usage";
 
 /**
@@ -38,20 +39,25 @@ function parse(text: string): unknown {
 }
 
 export async function relayAnswer(up: Response, c: AnswerContext): Promise<Response> {
-  // Anthropic refusing Coere's own key must not reach the extension as a 401,
-  // which it reads as the person being signed out.
-  if (up.status === 401) {
-    console.error("anthropic refused the server key");
-    await up.body?.cancel().catch(() => {});
-    return anthropicError("unavailable");
-  }
   const headers = answerHeaders(up.headers);
   const requestId = up.headers.get("request-id");
   const status = up.status;
   const op = c.op;
 
+  // An error is read whole, once: it may be about Coere's own account (a
+  // refused key, no credit, Coere's spend limit), which must not reach the
+  // extension as the person's own billing or sign in trouble.
+  const failure = up.ok ? null : await up.text();
+  if (failure !== null) {
+    const server = serverAccountError(status, failure);
+    if (server) {
+      console.error("anthropic refused coere's account", server);
+      return anthropicError("unavailable");
+    }
+  }
+
   if (op.op === "batch_results") {
-    if (!up.ok || !up.body) return new Response(up.body, { status, headers });
+    if (failure !== null || !up.body) return new Response(failure, { status, headers });
     const body = meteredResults(up.body, async (totals) => {
       if (totals.size === 0 || !(await claimMetering(c.account.userId, op.batchId))) return;
       for (const [model, t] of totals) {
@@ -69,8 +75,8 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
     return new Response(body, { status, headers });
   }
 
+  if (failure !== null) return new Response(failure, { status, headers });
   const text = await up.text();
-  if (!up.ok) return new Response(text, { status, headers });
   const data = parse(text);
 
   if (op.op === "message") {
