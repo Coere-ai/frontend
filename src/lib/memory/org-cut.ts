@@ -28,8 +28,10 @@ export function cutToSections(index: MemoryIndex, sections: readonly string[], o
     const section = factSectionOf(f, allSections);
     return section !== null && keep.has(section);
   });
-  const sources = index.sources.flatMap((s) => {
-    const inside = (s.sections ?? []).filter((k) => keep.has(k));
+  const sources = index.sources.flatMap(({ sensitiveSections, ...s }) => {
+    // Sections reached only through sensitive memories count only where those memories are kept.
+    const reached = o.dropSensitive ? (s.sections ?? []) : [...(s.sections ?? []), ...(sensitiveSections ?? [])];
+    const inside = [...new Set(reached.filter((k) => keep.has(k)))].sort();
     return inside.length > 0 ? [{ ...s, sections: inside }] : [];
   });
   return {

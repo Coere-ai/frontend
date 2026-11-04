@@ -76,10 +76,12 @@ export function buildIndex(
 
   const includesSensitive = rec.facts.some((f) => str(f.sensitivity) !== null);
   const chatSections = new Map<string, Set<string>>();
-  const note = (r: Raw, section: string | null) => {
+  const sensitiveChatSections = new Map<string, Set<string>>();
+  const noteIn = (into: Map<string, Set<string>>, r: Raw, section: string | null) => {
     if (!section) return;
-    for (const chat of chatsOf(r)) chatSections.set(chat, (chatSections.get(chat) ?? new Set()).add(section));
+    for (const chat of chatsOf(r)) into.set(chat, (into.get(chat) ?? new Set()).add(section));
   };
+  const note = (r: Raw, section: string | null) => noteIn(chatSections, r, section);
   for (const e of rec.entities) note(e, str(e.section) ? keyOf(String(e.section)) : null);
 
   let facts: IndexFact[] = [];
@@ -87,7 +89,8 @@ export function buildIndex(
     const sensitivity = str(f.sensitivity);
     if (!str(f.id) || !str(f.subject) || (sensitivity !== null && !o.includeSensitive)) continue;
     const recorded = isRecord(f.recorded) ? f.recorded : {};
-    note(f, sectionOfFact(f));
+    // A sensitive fact files its chats apart, so dropping the fact also drops them from a shared part.
+    noteIn(sensitivity === null ? chatSections : sensitiveChatSections, f, sectionOfFact(f));
     facts.push({
       id: String(f.id),
       subject: String(f.subject),
@@ -112,6 +115,11 @@ export function buildIndex(
     .filter((r) => str(r.id) && str(r.from) && str(r.to))
     .map((r) => ({ id: String(r.id), from: String(r.from), type: str(r.type) ?? "related_to", to: String(r.to) }));
 
+  const sensitiveOnly = (id: string): { sensitiveSections?: string[] } => {
+    const plain = chatSections.get(id) ?? new Set<string>();
+    const only = [...(sensitiveChatSections.get(id) ?? [])].filter((k) => !plain.has(k)).sort();
+    return only.length > 0 ? { sensitiveSections: only } : {};
+  };
   const sources: IndexSource[] = rec.sources
     .filter((s) => str(s.id))
     .map((s) => ({
@@ -121,6 +129,7 @@ export function buildIndex(
       capturedAt: str(s.capturedAt),
       messages: num(s.messages),
       sections: [...(chatSections.get(String(s.id)) ?? [])].sort(),
+      ...sensitiveOnly(String(s.id)),
     }));
 
   const index: MemoryIndex = {

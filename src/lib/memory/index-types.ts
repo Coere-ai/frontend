@@ -56,6 +56,13 @@ export interface IndexSource {
    * chat titles never reach it.
    */
   sections?: string[];
+  /**
+   * Sections this chat reaches only through sensitive memories. Kept apart so
+   * the person's own view still files the chat there, while an
+   * organization's part, which drops sensitive memories, never keeps a chat
+   * (and its title) for them.
+   */
+  sensitiveSections?: string[];
 }
 
 export interface IndexDocument {

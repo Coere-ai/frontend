@@ -54,6 +54,24 @@ describe("memberPart", () => {
     assert.deepEqual(part.sections.map((s) => s.key), ["work"]);
   });
 
+  it("drops a chat that reaches a shared section only through a sensitive memory", () => {
+    const index = member("a", "Acme");
+    index.sources.push({ id: "claude:araise", platform: "claude", title: "Negotiating my raise", capturedAt: null, messages: 3, sections: [], sensitiveSections: ["work"] });
+    assert.ok(!memberPart(index, ["work"]).sources.some((s) => s.title === "Negotiating my raise"));
+    const own = cutToSections(index, ["work"], { dropSensitive: false }).sources.find((s) => s.title === "Negotiating my raise");
+    assert.deepEqual(own?.sections, ["work"]);
+    assert.equal(JSON.stringify(memberPart(index, ["work"])).includes("sensitiveSections"), false);
+  });
+
+  it("files a chat behind sensitive memories apart when the index is built", () => {
+    const opened = openCoere(zipFolder(SAM_FOLDER));
+    if (!opened.ok) throw new Error(opened.reason);
+    const { index } = buildIndex(opened.manifest, opened.files, { includeSensitive: true });
+    const sensitive = new Set(index.facts.filter((f) => f.sensitivity !== null).map((f) => f.id));
+    assert.ok(sensitive.size > 0);
+    for (const s of index.sources) for (const k of s.sensitiveSections ?? []) assert.ok(!(s.sections ?? []).includes(k));
+  });
+
   it("cuts the example bundle to one section", () => {
     const opened = openCoere(zipFolder(SAM_FOLDER));
     if (!opened.ok) throw new Error(opened.reason);

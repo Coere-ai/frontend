@@ -797,8 +797,9 @@ members share.
 
 1. When a member's memory file is committed (section 8.6) and their access
    lets them contribute, the server takes the part of their index that sits
-   in the organization's shared sections, drops every sensitive memory, and
-   writes it to
+   in the organization's shared sections, drops every sensitive memory
+   (and every chat that reaches a shared section only through one, so its
+   title stays out too), and writes it to
    `org/<org id>/members/<user id>.json` in the `memory` bucket.
 2. It then merges every member's part into `org/<org id>/index.json`.
    Entities with the same section, kind and name (compared without case or
