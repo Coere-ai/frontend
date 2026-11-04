@@ -62,6 +62,27 @@ describe("checkParams", () => {
     assert.deepEqual(checkParams([]), { ok: false, reason: "bad_request" });
   });
 
+  it("passes the extension's own client tools and 5 minute cache", () => {
+    const tool = { name: "save", input_schema: { type: "object" }, strict: true };
+    const system = [{ type: "text", text: "s", cache_control: { type: "ephemeral" } }];
+    assert.deepEqual(checkParams({ ...ok, system, tools: [tool, { ...tool, type: "custom" }] }), { ok: true });
+    assert.deepEqual(checkParams({ ...ok, system: [{ ...system[0], cache_control: { type: "ephemeral", ttl: "5m" } }] }), { ok: true });
+  });
+
+  it("refuses server tools and the 1 hour cache, which the meter cannot price", () => {
+    const long = { type: "ephemeral", ttl: "1h" };
+    for (const bad of [
+      { ...ok, tools: [{ type: "web_search_20250305", name: "web_search" }] },
+      { ...ok, tools: "web_search" },
+      { ...ok, system: [{ type: "text", text: "s", cache_control: long }] },
+      { ...ok, tools: [{ name: "t", input_schema: {}, cache_control: long }] },
+      { ...ok, messages: [{ role: "user", content: [{ type: "text", text: "x", cache_control: long }] }] },
+      { ...ok, messages: [{ role: "user", content: [{ type: "tool_result", tool_use_id: "a", content: [{ type: "text", text: "x", cache_control: long }] }] }] },
+    ]) {
+      assert.deepEqual(checkParams(bad), { ok: false, reason: "bad_request" });
+    }
+  });
+
   it("checks every entry of a batch", () => {
     const entry = (params: object) => ({ custom_id: "a", params });
     assert.deepEqual(checkBatchBody({ requests: [entry(ok), entry(ok)] }), { ok: true, count: 2 });

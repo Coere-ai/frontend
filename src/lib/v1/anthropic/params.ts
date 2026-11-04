@@ -29,7 +29,41 @@ export type ParamsCheck =
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === "object" && v !== null && !Array.isArray(v);
 
-/** One request's params: an allowed model, max_tokens at most 64,000, and no stream. */
+/**
+ * True when a tool is one Anthropic runs and bills per use (web search,
+ * code execution and the like). Those fees are not in `usage`'s token
+ * counts, so the meter could not price them; the extension only sends its
+ * own client tools, which have no `type` or `custom`.
+ */
+function isServerTool(tool: unknown): boolean {
+  return !isRecord(tool) || (tool.type !== undefined && tool.type !== "custom");
+}
+
+/** True when a block asks for a cache other than the 5 minute one, which the price table assumes. */
+function hasLongCache(block: unknown): boolean {
+  if (!isRecord(block)) return false;
+  const cache = block.cache_control;
+  if (isRecord(cache) && cache.ttl !== undefined && cache.ttl !== "5m") return true;
+  // A tool result holds blocks of its own.
+  return Array.isArray(block.content) && block.content.some(hasLongCache);
+}
+
+/** Every block that can carry `cache_control`: the system blocks, the tools and each message's content. */
+function cacheBlocks(params: Record<string, unknown>): unknown[] {
+  const blocks: unknown[] = [];
+  if (Array.isArray(params.system)) blocks.push(...params.system);
+  if (Array.isArray(params.tools)) blocks.push(...params.tools);
+  if (Array.isArray(params.messages)) {
+    for (const m of params.messages) if (isRecord(m) && Array.isArray(m.content)) blocks.push(...m.content);
+  }
+  return blocks;
+}
+
+/**
+ * One request's params: an allowed model, max_tokens at most 64,000, no
+ * stream, and nothing the meter cannot price (a server tool, or a cache
+ * longer than 5 minutes, which Anthropic bills at twice input).
+ */
 export function checkParams(params: unknown): ParamsCheck {
   if (!isRecord(params)) return { ok: false, reason: "bad_request" };
   const { model, max_tokens: maxTokens, stream } = params;
@@ -39,6 +73,8 @@ export function checkParams(params: unknown): ParamsCheck {
     return { ok: false, reason: "bad_request" };
   }
   if (stream === true) return { ok: false, reason: "bad_request" };
+  if (params.tools !== undefined && (!Array.isArray(params.tools) || params.tools.some(isServerTool))) return { ok: false, reason: "bad_request" };
+  if (cacheBlocks(params).some(hasLongCache)) return { ok: false, reason: "bad_request" };
   return { ok: true };
 }
 

@@ -442,7 +442,10 @@ Another path answers 404. Before forwarding:
 - **Each request's params** (one for a message, each entry for a batch):
   `model` is one of `claude-opus-5-5`, `claude-sonnet-5-5`,
   `claude-haiku-5-5`; `max_tokens` is at most 64,000; `stream` is not
-  true.
+  true; every tool is a client tool (no `type`, or `custom`), since a
+  server tool's per use fee is not in `usage`; and no `cache_control`
+  asks for a `ttl` other than `5m`, since the price table has only the 5
+  minute cache write.
 - **Headers forwarded:** `anthropic-version`, `content-type`, and
   `anthropic-beta` when each of its values is one of
   `message-batches-2024-09-24`, `token-counting-2024-11-01`,
