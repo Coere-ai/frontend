@@ -527,8 +527,9 @@ Auth and limit errors are the same as 8.4's statuses with a plain
 - **`POST /api/v1/memory/commit`** `{ path }`. The server reads the staged
   file, checks it is a `.coere` zip (the `mimetype` entry) under the limit,
   reads `manifest.json`, takes the counts from it, builds the index
-  (section 8.7), moves the file to `<user id>/memory.coere`, writes
-  `<user id>/index.json`, removes anything left in `incoming/`, and upserts
+  (section 8.7), writes the bytes over `<user id>/memory.coere` in one
+  upsert (so a failed write keeps the old copy), writes
+  `<user id>/index.json`, removes its own staged file, and upserts
   `memory_files`. Answer
   `200 { bytes, digest, uploadedAt, counts: { memories, entities, links, chats, documents, sections } }`.
 - **`GET /api/v1/memory`** answers `200 { url }`, a download link that lives

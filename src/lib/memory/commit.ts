@@ -4,29 +4,23 @@ import { supabase } from "@/lib/supabase";
 import type { DeviceAccount } from "@/lib/v1/device-auth";
 
 import { buildIndex } from "./build-index";
-import { openCoere } from "./coere-zip";
+import { COERE_MIMETYPE, openCoere } from "./coere-zip";
 import { countsFromManifest, type MemoryCounts } from "./counts";
-import { userIncomingPrefix, userIndexPath, userMemoryPath } from "./index-types";
+import { userIndexPath, userMemoryPath } from "./index-types";
 import { refreshMemberPart } from "./org-index";
-import { getBytes, listFolder, moveOver, objectSize, putJson, removePaths } from "./storage";
+import { getBytes, objectSize, putFile, putJson, removePaths } from "./storage";
 import { fileLimit } from "./upload-rules";
 
 /**
  * Committing an uploaded memory file (docs/accounts.md 8.6, 8.7, 14.2): read
  * the staged file, check it, build the index, put both in place, record the
- * row and the totals, then update the organization graph. A staged file
- * that fails a check is removed, so `incoming/` never fills up.
+ * row and the totals, then update the organization graph. The staged file
+ * is removed whether it passes or fails a check.
  */
 
 export type Committed =
   | { ok: true; bytes: number; digest: string; uploadedAt: string; counts: MemoryCounts }
   | { ok: false; reason: "not_found" | "too_large" | "bad_request" | "memory_sync_off" | "unavailable" };
-
-async function clearIncoming(userId: string): Promise<void> {
-  const prefix = userIncomingPrefix(userId);
-  const names = await listFolder(prefix.slice(0, -1));
-  await removePaths(names.map((n) => `${prefix}${n}`));
-}
 
 export async function commitMemory(a: DeviceAccount, staged: string): Promise<Committed> {
   if (!a.memorySync) {
@@ -50,9 +44,13 @@ export async function commitMemory(a: DeviceAccount, staged: string): Promise<Co
   const built = buildIndex(manifest, files, { includeSensitive: a.includeSensitive });
   const counts = countsFromManifest(manifest);
 
-  if (!(await moveOver(staged, userMemoryPath(a.userId)))) return { ok: false, reason: "unavailable" };
+  // The bytes are already here, so they are written over the stored copy
+  // directly: a failed write leaves the old copy, where a move would first
+  // have to delete it. Only this commit's own staged file goes afterwards, so
+  // another device's upload in flight is left alone.
+  if (!(await putFile(userMemoryPath(a.userId), bytes, COERE_MIMETYPE))) return { ok: false, reason: "unavailable" };
   const indexBytes = await putJson(userIndexPath(a.userId), built.index);
-  await clearIncoming(a.userId);
+  await removePaths([staged]);
 
   const uploadedAt = new Date().toISOString();
   const db = supabase();

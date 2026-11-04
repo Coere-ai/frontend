@@ -60,16 +60,14 @@ export async function listFolder(folder: string): Promise<string[]> {
 }
 
 /**
- * Moves a staged file over the stored one. Storage refuses a move onto an
- * existing name, so the old file is removed and the move tried again.
+ * Writes bytes over a stored file in one call. The old file stays until the
+ * new one is in place, so a failed write leaves the copy that was there,
+ * never no copy at all.
  */
-export async function moveOver(from: string, to: string): Promise<boolean> {
-  const first = await bucket().move(from, to);
-  if (!first.error) return true;
-  await removePaths([to]);
-  const second = await bucket().move(from, to);
-  if (second.error) console.error("storage move failed", second.error.name);
-  return !second.error;
+export async function putFile(path: string, bytes: Uint8Array, contentType: string): Promise<boolean> {
+  const { error } = await bucket().upload(path, bytes, { contentType, upsert: true, cacheControl: "0" });
+  if (error) console.error("storage write failed", error.name);
+  return !error;
 }
 
 /** A signed upload address for a new file, which lives 2 hours. */
