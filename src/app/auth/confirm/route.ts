@@ -1,45 +1,29 @@
-import type { EmailOtpType } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import type { NextRequest } from "next/server";
 
-import { overLimit } from "@/lib/auth/guard";
-import { markSignedIn } from "@/lib/auth/hint-cookie";
+import { continuePath, linkFailedPath, readEmailLink } from "@/lib/auth/email-link";
 import { nextFromLink } from "@/lib/auth/next-path";
 import { siteOrigins } from "@/lib/auth/origin";
-import { logSecurityEvent } from "@/lib/security/events";
-import { accountsConfigured, sessionClient } from "@/lib/supabase/server";
 
 /**
  * Every link Supabase emails lands here: the sign in code's email, the sign
  * up confirmation and an invite. The link carries a token hash rather than a
  * session, so it works in any browser, not only the one that asked for it.
- * A good link signs the person in and goes on to `next`; a bad one goes back
- * to sign in, which says the link did not work.
+ *
+ * Opening the link never spends it. Mail scanners fetch every link in an
+ * email before the person sees it (HEAD is served by this handler too), and
+ * the link's token is the same one as the code in the email, so verifying
+ * here would spend both. A link someone else sent would also replace the
+ * session already in this browser without a word. So this only checks the
+ * link's shape and moves on to /auth/continue, whose button posts the token
+ * to be verified.
  */
 
 export const dynamic = "force-dynamic";
 
-const TYPES = new Set<EmailOtpType>(["email", "signup", "magiclink", "invite"]);
-
-const isType = (value: string | null): value is EmailOtpType => value !== null && TYPES.has(value as EmailOtpType);
-
-export async function GET(request: NextRequest): Promise<never> {
+export function GET(request: NextRequest): never {
   const { searchParams, origin, search } = request.nextUrl;
   const next = nextFromLink(search, siteOrigins(origin));
-  const back = `/sign-in?error=link&next=${encodeURIComponent(next)}`;
-  const tokenHash = searchParams.get("token_hash");
-  const type = searchParams.get("type");
-
-  if (!tokenHash || !isType(type) || !accountsConfigured()) redirect(back);
-  if (await overLimit(request.headers, null)) redirect(back);
-
-  const client = await sessionClient();
-  const { data, error } = await client.auth.verifyOtp({ token_hash: tokenHash, type });
-  if (error || !data.user) {
-    await logSecurityEvent("sign_in_failed", { headers: request.headers });
-    redirect(back);
-  }
-  await markSignedIn();
-  await logSecurityEvent("sign_in", { userId: data.user.id, headers: request.headers });
-  redirect(next);
+  const link = readEmailLink(searchParams.get("token_hash"), searchParams.get("type"), next);
+  redirect(link ? continuePath(link) : linkFailedPath(next));
 }

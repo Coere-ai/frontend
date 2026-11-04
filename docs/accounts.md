@@ -71,9 +71,15 @@ security policy keeps `connect-src 'self'`.
    person types the code; the server calls `auth.verifyOtp({ email, token,
    type: 'email' })`. A new email makes a new account.
 2. **The link in the same email.** It goes to `/auth/confirm?token_hash=…&
-   type=email&next=…`, a route handler that calls `auth.verifyOtp({
-   token_hash, type })` and redirects to `next`. `next` must be a path on
-   this site that starts with `/` and not `//`.
+   type=email&next=…`, a route handler that only checks the link's shape
+   and redirects to `/auth/continue`. That page changes nothing when it
+   loads, because mail scanners open every link and the link's token is the
+   code's token too. Its button posts the token to a server action, which
+   calls `auth.verifyOtp({ token_hash, type })` and redirects to `next`.
+   When someone is already signed in, the page names that account first,
+   so a link another person sent cannot swap the session unseen. `next`
+   must be a path on this site: it is parsed the way a browser reads it and
+   only a same origin path is kept.
 3. **Password.** On `/sign-in`, "Use a password instead" shows email or
    username, and password. A username is turned into its email on the
    server with the secret key, and a wrong username gets the same answer as
@@ -112,7 +118,8 @@ nothing.
 |---|---|
 | `/sign-in` | Email code first, password second. A signed in person goes to `next` or `/dashboard`. |
 | `/sign-up` | Create an account with a password. |
-| `/auth/confirm` | Route handler for every emailed link. |
+| `/auth/confirm` | Route handler for every emailed link. It checks the link and sends it on. |
+| `/auth/continue` | The emailed link's confirm page. Its button spends the token. |
 | `/connect` | Hands a connect code to the extension (section 4). |
 | `/dashboard/...` | The person's dashboard (section 7). |
 | `/admin/...` | The operator's panel (section 9). It keeps its own USER and PASSWORD guard, separate from accounts. |
