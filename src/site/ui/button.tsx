@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { ArrowRightIcon } from "./icons/interface-icons";
 
 type Variant = "primary" | "secondary" | "ghost";
@@ -61,6 +61,28 @@ const pillSizes: Record<PillSize, { pill: string; inset: string; circle: string;
   lg: { pill: "h-14 gap-3 pr-2 text-[16px]", inset: "pl-6", circle: "h-10 w-10", arrow: 18 },
 };
 
+/** The pill's classes and its insides, shared by the link and the button. */
+function circleArrowParts({ tone, size, icon, wide, className, children }: { tone: PillTone; size: PillSize; icon?: ReactNode; wide: boolean; className: string; children: ReactNode }) {
+  const look = pillTones[tone];
+  const fit = pillSizes[size];
+  return {
+    className: `group inline-flex items-center rounded-full font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${look.pill} ${fit.pill} ${wide ? "w-full pl-1.5" : fit.inset} ${className}`,
+    inside: (
+      <>
+        {/* Wide: an empty circle's width on the left keeps the label in the middle. */}
+        {wide ? <span aria-hidden="true" className={`shrink-0 ${fit.circle}`} /> : null}
+        <span className={`inline-flex items-center gap-2.5 ${wide ? "flex-1 justify-center" : ""}`}>
+          {icon}
+          {children}
+        </span>
+        <span aria-hidden="true" className={`grid shrink-0 place-items-center rounded-full ${look.circle} ${fit.circle}`}>
+          <ArrowRightIcon size={fit.arrow} strokeWidth={2} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+        </span>
+      </>
+    ),
+  };
+}
+
 /**
  * A pill with its label and, inside on the right, a round circle holding an
  * arrow that nudges right on hover. Dark is a black pill with a white
@@ -87,23 +109,35 @@ export function CircleArrowLink({
   onClick?: () => void;
   children: ReactNode;
 }) {
-  const look = pillTones[tone];
-  const fit = pillSizes[size];
+  const parts = circleArrowParts({ tone, size, icon, wide, className, children });
   return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className={`group inline-flex items-center rounded-full font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${look.pill} ${fit.pill} ${wide ? "w-full pl-1.5" : fit.inset} ${className}`}
-    >
-      {/* Wide: an empty circle's width on the left keeps the label in the middle. */}
-      {wide ? <span aria-hidden="true" className={`shrink-0 ${fit.circle}`} /> : null}
-      <span className={`inline-flex items-center gap-2.5 ${wide ? "flex-1 justify-center" : ""}`}>
-        {icon}
-        {children}
-      </span>
-      <span aria-hidden="true" className={`grid shrink-0 place-items-center rounded-full ${look.circle} ${fit.circle}`}>
-        <ArrowRightIcon size={fit.arrow} strokeWidth={2} className="transition-transform duration-200 group-hover:translate-x-0.5" />
-      </span>
+    <Link href={href} onClick={onClick} className={parts.className}>
+      {parts.inside}
     </Link>
+  );
+}
+
+/** The same pill as a real button, for something that happens in place, like opening a form. */
+export function CircleArrowButton({
+  tone = "dark",
+  size = "md",
+  icon,
+  wide = false,
+  className = "",
+  children,
+  ...rest
+}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className" | "children"> & {
+  tone?: PillTone;
+  size?: PillSize;
+  icon?: ReactNode;
+  wide?: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  const parts = circleArrowParts({ tone, size, icon, wide, className, children });
+  return (
+    <button type="button" {...rest} className={`${parts.className} cursor-pointer disabled:cursor-default disabled:opacity-60`}>
+      {parts.inside}
+    </button>
   );
 }
