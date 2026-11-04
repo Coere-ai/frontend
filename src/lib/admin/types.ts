@@ -2,6 +2,7 @@ import type { MemoryView } from "@/lib/memory/view";
 import type { OrgAccess } from "@/lib/org/access";
 
 import type { DayPoint } from "./by-day";
+import type { AccountUsage, CostRange, ModelUsage, TokenCounts } from "./cost";
 import type { DayTotals } from "./totals";
 
 /**
@@ -192,15 +193,18 @@ export interface SecurityPayload {
 }
 
 export interface CostPayload {
+  range: CostRange;
+  /** The range's first UTC day, or null for all time. */
+  from: string | null;
   daily: DayPoint[];
   monthMicros: number;
-  last24hMicros: number;
-  /** How many days the by model and by account figures cover. */
-  breakdownDays: number;
-  /** True when the window held more calls than the panel reads. */
-  breakdownCapped: boolean;
-  byModel: { model: string; costMicros: number; requests: number }[];
-  byAccount: { id: string | null; name: string; costMicros: number; requests: number }[];
+  /** Today's spend (UTC), from daily_totals. */
+  todayMicros: number;
+  /** The range split by model, largest cost first, with the total of every model. */
+  byModel: ModelUsage[];
+  total: TokenCounts;
+  /** The range's top accounts by cost, by tokens and by requests together; the page sorts them. */
+  accounts: AccountUsage[];
   storageBytes: number;
   storageMonthMicros: number;
 }
