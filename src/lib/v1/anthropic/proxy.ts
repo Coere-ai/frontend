@@ -27,7 +27,7 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   const op = matchAnthropicPath(req.method, segments);
   if (!op) return anthropicError("not_found");
 
-  const g = await gate(req, { metered: STARTS_SPEND.has(op.op) });
+  const g = await gate(req, { metered: STARTS_SPEND.has(op.op), lane: op.op === "count_tokens" ? "count" : "default" });
   if (!g.ok) return anthropicFor(g.refusal, g.retryAfter, g.limit);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return anthropicError("unavailable");

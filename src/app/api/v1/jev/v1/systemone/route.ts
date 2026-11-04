@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request): Promise<Response> {
   const started = Date.now();
-  const g = await gate(req, { metered: true });
+  const g = await gate(req, { metered: true, lane: "jev" });
   if (!g.ok) return jevFor(g.refusal, g.retryAfter);
   const key = process.env.JEV_API_KEY;
   if (!key) return json({ error: "unavailable" }, 403);

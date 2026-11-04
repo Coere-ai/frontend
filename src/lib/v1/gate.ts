@@ -5,6 +5,7 @@ import { securityOnce } from "@/lib/security/once";
 
 import { authenticateDevice, type DeviceAccount } from "./device-auth";
 import type { GateRefusal, SpentLimit } from "./gate-types";
+import { laneBucket, rateRetryAfter, type Lane } from "./lanes";
 import { deviceLimiter } from "./limiter";
 import { spendRetryAfter, spentLimit } from "./spend";
 
@@ -25,17 +26,18 @@ export type GateResult =
   | { ok: true; account: DeviceAccount }
   | { ok: false; refusal: GateRefusal; retryAfter?: number; limit?: SpentLimit };
 
-export async function gate(req: Request, o: { metered: boolean }): Promise<GateResult> {
+export async function gate(req: Request, o: { metered: boolean; lane?: Lane }): Promise<GateResult> {
   const auth = await authenticateDevice(req);
   if (!auth.ok) return { ok: false, refusal: auth.reason };
   const account = auth.account;
   const who = { userId: account.userId, orgId: account.orgId, headers: req.headers };
   if (account.status === "suspended") return { ok: false, refusal: "suspended" };
 
-  const limit = deviceLimiter.hit(account.deviceId, account.requestsPerMinute);
+  const bucket = laneBucket(o.lane ?? "default", account.deviceId, account.requestsPerMinute);
+  const limit = deviceLimiter.hit(bucket.key, bucket.limit);
   if (!limit.ok) {
-    if (securityOnce.firstIn(`rate:${account.deviceId}`, 60_000)) logSecurityEventAfter("rate_limited", who);
-    return { ok: false, refusal: "rate_limited", retryAfter: limit.retryAfterSeconds };
+    if (securityOnce.firstIn(`rate:${bucket.key}`, 60_000)) logSecurityEventAfter("rate_limited", who);
+    return { ok: false, refusal: "rate_limited", retryAfter: rateRetryAfter(limit.retryAfterSeconds) };
   }
 
   const spent = o.metered ? spentLimit(account) : null;

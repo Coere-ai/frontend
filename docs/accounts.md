@@ -597,7 +597,7 @@ the next step after this build (section 14.5).
 
 | What | Limit |
 |---|---|
-| Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance |
+| Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance. Jev calls and `count_tokens` count in their own bucket per device, ten times that and at least 1,000, since the classifier sends one small call per item 16 at a time. A refusal's `retry-after` is at most 30 seconds, the longest the extension waits before giving an item up |
 | Monthly spend | the person's own `monthly_limit_micros` when the operator set one, else the plan's, checked before every metered call |
 | Lifetime spend | the person's own `lifetime_limit_micros` when set, else the plan's (null on every seeded plan, meaning none), against `user_totals.cost_micros`, checked before every metered call |
 | Memory file | the plan's `storage_limit_bytes`, and never over 50 MiB, Supabase Storage's default project upload limit (fixed on Free), which a bucket limit cannot raise |
