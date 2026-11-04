@@ -59,6 +59,10 @@ export async function signUp(prev: SignUpState, form: FormData): Promise<SignUpS
     }
     return { ...base, error: "We could not make the account. Try again in a minute." };
   }
-  await logSecurityEvent("sign_up", { userId: data.user?.id ?? null, headers: head });
+  // For an address that already has an account, Supabase answers a made up
+  // user with no identities (so the answer does not say the address is
+  // taken). Its id is in no table, so it is logged without one.
+  const realUser = data.user && (data.user.identities?.length ?? 0) > 0 ? data.user.id : null;
+  await logSecurityEvent("sign_up", { userId: realUser, headers: head });
   return { ...base, sent: email };
 }
