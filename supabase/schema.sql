@@ -543,10 +543,10 @@ create table if not exists public.usage_events (
   device_id          uuid        references public.devices (id) on delete set null,
   kind               text        not null,
   model              text,
-  input_tokens       integer     not null default 0,
-  output_tokens      integer     not null default 0,
-  cache_write_tokens integer     not null default 0,
-  cache_read_tokens  integer     not null default 0,
+  input_tokens       bigint      not null default 0,
+  output_tokens      bigint      not null default 0,
+  cache_write_tokens bigint      not null default 0,
+  cache_read_tokens  bigint      not null default 0,
   cost_micros        bigint      not null default 0,
   status             smallint,
   duration_ms        integer,
@@ -1167,7 +1167,7 @@ $$;
 -- user (it should not happen) still counts in the day, so cost is never lost.
 create or replace function public.record_usage(
   p_user uuid, p_device uuid, p_kind text, p_model text,
-  p_input integer, p_output integer, p_cache_write integer, p_cache_read integer,
+  p_input bigint, p_output bigint, p_cache_write bigint, p_cache_read bigint,
   p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text
 ) returns void
 language plpgsql
@@ -1526,7 +1526,7 @@ $$;
 -- default. These change totals and read across accounts, so only the server
 -- may call them.
 revoke all on function public.device_auth(text) from public, anon, authenticated;
-revoke all on function public.record_usage(uuid, uuid, text, text, integer, integer, integer, integer, bigint, integer, integer, text) from public, anon, authenticated;
+revoke all on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) from public, anon, authenticated;
 revoke all on function public.record_app_events(uuid, uuid, jsonb) from public, anon, authenticated;
 revoke all on function public.set_memory_totals(uuid) from public, anon, authenticated;
 revoke all on function public.set_org_memory_totals(uuid) from public, anon, authenticated;
@@ -1535,7 +1535,7 @@ revoke all on function public.accept_org_invite(uuid, uuid) from public, anon, a
 revoke all on function public.admin_table_stats() from public, anon, authenticated;
 revoke all on function public.admin_storage_usage() from public, anon, authenticated;
 grant execute on function public.device_auth(text) to service_role;
-grant execute on function public.record_usage(uuid, uuid, text, text, integer, integer, integer, integer, bigint, integer, integer, text) to service_role;
+grant execute on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) to service_role;
 grant execute on function public.record_app_events(uuid, uuid, jsonb) to service_role;
 grant execute on function public.set_memory_totals(uuid) to service_role;
 grant execute on function public.set_org_memory_totals(uuid) to service_role;

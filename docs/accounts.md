@@ -887,7 +887,7 @@ device_auth(p_token_hash text) returns table (
   memory_sync boolean, include_sensitive boolean, org_id uuid)
 
 record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
-  p_input integer, p_output integer, p_cache_write integer, p_cache_read integer,
+  p_input bigint, p_output bigint, p_cache_write bigint, p_cache_read bigint,
   p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text) returns void
 
 -- p_events: [{"kind": "...", "count": 1, "tokensSaved": 0}], already validated by the route

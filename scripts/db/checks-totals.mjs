@@ -8,8 +8,8 @@ import { as, check, equal, one, refused, rows } from "./harness.mjs";
 const num = (value) => (value === null || value === undefined ? null : Number(value));
 
 export async function checkRecordUsage(db, org) {
+  const call = "select public.record_usage($1, null, $2, 'claude-haiku-5-5', $3, $4, $5, $6, $7, 200, 900, 'req_1')";
   await as(db, "service_role", null, async () => {
-    const call = "select public.record_usage($1, null, $2, 'claude-haiku-5-5', $3, $4, $5, $6, $7, 200, 900, 'req_1')";
     await rows(db, "record_usage 1", call, [A, "message", 1000, 200, 50, 400, 1500]);
     await rows(db, "record_usage 2", call, [A, "count_tokens", 300, 0, 0, 0, 0]);
     await rows(db, "record_usage B", call, [B, "jev", 10, 0, 0, 0, 7]);
@@ -23,6 +23,11 @@ export async function checkRecordUsage(db, org) {
   const day = (await rows(db, "daily_totals", "select requests, cost_micros from public.daily_totals"))?.[0];
   equal("daily_totals adds every call", Object.values(day ?? {}).map(num), [3, 1507]);
   equal("usage_events keeps every row", await one(db, "events", "select count(*)::int from public.usage_events"), 3);
+  // One batch's summed output can pass 2^31 tokens; the write must still land. Rolled back, so the totals above stay.
+  await db.exec("begin");
+  await as(db, "service_role", null, () => rows(db, "record_usage big", call, [C, "batch_result", 5, 3000000000, 0, 0, 1]));
+  equal("token counts past int4 are kept", num(await one(db, "big", "select output_tokens from public.usage_events where user_id = $1", [C])), 3000000000);
+  await db.exec("rollback");
   await as(db, "service_role", null, async () => {
     equal("device_auth reads this month's spend", num((await rows(db, "spend", "select month_cost_micros from public.device_auth('hash_a')"))?.[0]?.month_cost_micros), 1500);
   });
