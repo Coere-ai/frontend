@@ -1,4 +1,5 @@
 import { readOrgIndex } from "@/lib/memory/org-index";
+import { capForAnswer } from "@/lib/memory/org-answer";
 import { cutToSections } from "@/lib/memory/org-cut";
 import { readMembership } from "@/lib/org/membership";
 import { gate } from "@/lib/v1/gate";
@@ -22,7 +23,8 @@ export async function GET(req: Request): Promise<Response> {
     if (!m) return problem("not_found");
     const index = await readOrgIndex(m.orgId);
     if (!index) return problem("not_found");
-    return json(cutToSections(index, m.readable, { dropSensitive: true }));
+    // At most the facts that fit one answer under Vercel's 4.5 MB ceiling, with `truncated` set.
+    return json(capForAnswer(cutToSections(index, m.readable, { dropSensitive: true })));
   } catch {
     return problem("unavailable");
   }

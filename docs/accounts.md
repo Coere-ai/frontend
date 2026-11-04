@@ -586,7 +586,10 @@ adds it to the totals.
 **`GET /api/v1/org`** answers `200 { org: { id, name, role, sharedSections, access } | null }`.
 **`GET /api/v1/org/index`** answers the organization's merged index (the
 shape of section 8.7, with a `contributor` user id on each fact) or `404`,
-cut to the sections the member may read. Only members may read it. The extension uses these to show the
+cut to the sections the member may read. One answer holds at most 5,000
+facts, the most important first, and fewer when it would pass 4 MB (a
+Vercel function answers at most 4.5 MB); `truncated` is then true. Only
+members may read it. The extension uses these to show the
 organization in Settings; reading the organization graph into context is
 the next step after this build (section 14.5).
 
