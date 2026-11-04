@@ -9,7 +9,7 @@ import { problemFor } from "@/lib/v1/refusals";
 //
 // The last step of a memory push: the staged file becomes the stored copy,
 // with its index, its row, the totals and the organization graph updated.
-// A 64 MiB file takes a while to read, hence the longer ceiling.
+// A 50 MiB file takes a while to read, hence the longer ceiling.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

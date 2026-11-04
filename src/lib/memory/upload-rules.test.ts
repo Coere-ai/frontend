@@ -8,7 +8,7 @@ const OTHER = "11111111-2222-4333-8444-555555555555";
 const DIGEST = "a".repeat(64);
 
 describe("upload rules", () => {
-  it("caps a file at the plan's storage and never over 64 MiB", () => {
+  it("caps a file at the plan's storage and never over 50 MiB", () => {
     assert.equal(fileLimit(26_214_400), 26_214_400);
     assert.equal(fileLimit(500 * 1024 * 1024), MEMORY_FILE_CAP);
   });

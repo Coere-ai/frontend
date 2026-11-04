@@ -11,8 +11,13 @@ import { userIncomingPrefix } from "./index-types";
  * folder, so one account can never commit another's file.
  */
 
-/** No memory file is ever over 64 MiB, whatever the plan. */
-export const MEMORY_FILE_CAP = 64 * 1024 * 1024;
+/**
+ * No memory file is ever over 50 MiB, whatever the plan: Supabase Storage's
+ * project wide upload limit, which a bucket's own limit cannot raise (and
+ * which the Free plan cannot change). A larger cap would hand out upload
+ * addresses Storage then refuses.
+ */
+export const MEMORY_FILE_CAP = 50 * 1024 * 1024;
 
 export function fileLimit(planStorageBytes: number): number {
   return Math.min(Math.max(0, planStorageBytes), MEMORY_FILE_CAP);

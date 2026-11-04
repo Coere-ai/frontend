@@ -281,7 +281,7 @@ access hook at `memory.changed`.
   a chat deletion, at browser start when the last push is over 24 hours
   old, and on the bridge's `coere.backup`.
 - It skips when the manifest's `digest` equals the last pushed digest, when
-  the person turned the backup off, or when the file is over 64 MiB.
+  the person turned the backup off, or when the file is over 50 MiB.
 - Steps: `POST /api/v1/memory/upload`, then a `PUT` of the zip to the
   signed URL it returns, then `POST /api/v1/memory/commit`.
 - Failures back off from 1 minute, doubling to 30 minutes.
@@ -499,7 +499,7 @@ Auth and limit errors are the same as 8.4's statuses with a plain
 ### 8.6 Memory
 
 - **`POST /api/v1/memory/upload`** `{ bytes, digest }`. With the backup off,
-  `409 memory_sync_off`. Over the plan's storage limit or 64 MiB,
+  `409 memory_sync_off`. Over the plan's storage limit or 50 MiB,
   `413 too_large`. With the same digest already stored, `200 { skip: true }`.
   Otherwise `200 { skip: false, path, url }`, where `url` is a signed upload
   URL for `<user id>/incoming/<random>.coere` that lives 2 hours. Anything
@@ -523,7 +523,7 @@ Auth and limit errors are the same as 8.4's statuses with a plain
   - Success is `200` with JSON `{ "Key": "memory/<path>", "Id": "…" }`.
     A refusal is a 4xx with JSON `{ statusCode, error, message }`: a wrong
     type or an expired token (the address lives 2 hours), a file over the
-    bucket's 64 MiB, or a second PUT to the same address, which conflicts
+    bucket's 50 MiB, or a second PUT to the same address, which conflicts
     because the address does not overwrite.
   - Storage answers the CORS preflight for any origin, so the extension
     needs no host permission for the Supabase host.
@@ -600,7 +600,7 @@ the next step after this build (section 14.5).
 | Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance |
 | Monthly spend | the person's own `monthly_limit_micros` when the operator set one, else the plan's, checked before every metered call |
 | Lifetime spend | the person's own `lifetime_limit_micros` when set, else the plan's (null on every seeded plan, meaning none), against `user_totals.cost_micros`, checked before every metered call |
-| Memory file | the plan's `storage_limit_bytes`, and never over 64 MiB |
+| Memory file | the plan's `storage_limit_bytes`, and never over 50 MiB, Supabase Storage's default project upload limit (fixed on Free), which a bucket limit cannot raise |
 | `/auth/token` | 20 a minute per address |
 
 **Spend reservations.** The monthly and lifetime checks above read spend
@@ -676,7 +676,7 @@ and is the only thing that writes.
 `ip_hash` is the first 16 hex characters of HMAC-SHA256(address,
 `SECURITY_SALT`). The address itself is never stored.
 
-**Storage.** A private bucket `memory`, 64 MiB per object, types
+**Storage.** A private bucket `memory`, 50 MiB per object, types
 `application/vnd.coere.memory+zip` and `application/json`. Each person's
 files sit under a folder named by their user id. Policies on
 `storage.objects` let a signed in person read and delete only objects whose

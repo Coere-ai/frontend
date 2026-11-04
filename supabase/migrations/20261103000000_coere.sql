@@ -1097,7 +1097,7 @@ create policy org_invites_read_own on public.org_invites
 -- through the server, which checks membership first.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('memory', 'memory', false, 67108864,
+values ('memory', 'memory', false, 52428800,
         array['application/vnd.coere.memory+zip', 'application/json'])
 on conflict (id) do update
   set public             = false,
