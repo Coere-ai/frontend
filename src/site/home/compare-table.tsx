@@ -2,11 +2,9 @@
 
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type CSSProperties } from "react";
-import { backgrounds } from "@/site/content/backgrounds";
 import { compareTables, type CompareTable as Table, type Mark } from "@/site/content/compare";
 import { Container } from "@/site/ui/container";
 import { CheckIcon, CloseIcon } from "@/site/ui/icons/interface-icons";
-import { SizedPhoto } from "@/site/ui/sized-photo";
 
 /** A half filled circle, for "partly". */
 const Half = () => (
@@ -36,7 +34,7 @@ const at = (row: number, col: number): CSSProperties => ({ gridRow: row, gridCol
 
 /**
  * One product's comparison as a grid: the points down the left, Coere's
- * column as a card of deep blue waves running the full height, and the
+ * column as a solid Coere blue card running the full height, and the
  * other products to its right, every column the same width. It keeps table
  * semantics for screen readers.
  */
@@ -46,11 +44,7 @@ function Board({ table }: { table: Table }) {
   return (
     <div role="table" aria-label={`${table.coere} compared with ${table.others.join(", ")}`} className="grid min-w-[600px] md:min-w-0" style={{ gridTemplateColumns: `minmax(170px, 1.6fr) repeat(${cols}, minmax(0, 1fr))` }}>
       {/* Coere's card, behind its column. */}
-      <div aria-hidden="true" className="relative isolate -my-3 overflow-hidden rounded-[28px] bg-neutral-950 shadow-[0_30px_80px_-30px_rgba(63,76,235,0.65)]" style={{ gridRow: `1 / span ${rows + 1}`, gridColumn: 2 }}>
-        {/* The waves' right side: deep navy at the top that brightens into layered blue, calm behind the white checks. */}
-        <SizedPhoto src={backgrounds.waves.src} alt="" fill sizes="240px" className="-z-10 object-cover object-[80%_50%]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-700/30 via-neutral-950/20 to-brand-700/40" />
-      </div>
+      <div aria-hidden="true" className="-my-3 rounded-[28px] bg-brand-500 shadow-[0_30px_80px_-30px_rgba(63,76,235,0.65)]" style={{ gridRow: `1 / span ${rows + 1}`, gridColumn: 2 }} />
 
       <div role="row" className="contents">
         <span role="columnheader" className="sticky left-0 z-10 bg-white md:static md:bg-transparent" style={at(1, 1)} />
