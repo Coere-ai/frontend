@@ -351,7 +351,7 @@ session is checked.
 | `/dashboard` | Connected browsers, memory counts, this month's usage against the plan, the last backup, and buttons that use the bridge: Open library, Back up now. |
 | `/dashboard/memory` | The memory graph (the product's flat graph, laid out by the same `layoutTree`), a searchable list of memories by section, and the source of each. Built from the stored index (section 8.7). Download the `.coere` file. **Edit in Coere** opens the local Memory page through the bridge. |
 | `/dashboard/chats` | The chats memory came from: title, AI, when it was saved, message count. Titles only. Chat text stays in the browser. |
-| `/dashboard/usage` | Cost and tokens by day, by model and by kind, against the monthly limit, and the lifetime spend against the lifetime limit when there is one. |
+| `/dashboard/usage` | Cost and tokens by day, by model and by kind, against the monthly limit, and the lifetime spend against the lifetime limit when there is one. It never shows the daily limit; only while that limit is reached does it say "Today's AI use is paused until tomorrow". |
 | `/dashboard/settings` | The synced settings (section 6.6), the memory backup switch and the sensitive memories switch. A change bumps the version, and the page sends `coere.settings` through the bridge so the extension pulls at once. |
 | `/dashboard/organization` | Section 14: create an organization or join one, its members and roles, invites, the shared knowledge graph and the organization's totals. |
 | `/dashboard/account` | Email, username, password, connected browsers with **Revoke**, download everything, delete the memory copy, delete the account. |
@@ -375,7 +375,8 @@ the site as a host, and pages never call these routes.
 
 Auth is `Authorization: Bearer <device token>` except on `/auth/token`. One
 database call, `device_auth(token_hash)` (section 10), checks the token and
-returns the account, its plan and this month's spend.
+returns the account, its plan, this month's spend and today's spend against
+the hidden daily limit.
 
 Errors outside the Anthropic routes are problem details
 (`application/problem+json`):
@@ -396,7 +397,7 @@ Errors outside the Anthropic routes are problem details
 | `sensitive_off` | 412 | A memory commit whose file holds sensitive memories while the person has them turned off; the extension refreshes its account and exports again |
 | `too_large` | 413 | A body or file over its limit |
 | `rate_limited` | 429 | Too many requests this minute, with `Retry-After` |
-| `usage_limit` | 429 | The monthly or the lifetime limit is spent |
+| `usage_limit` | 429 | The monthly, the lifetime or the daily limit (or the first build allowance) is spent. A spent day answers `Retry-After` until the next UTC midnight and the title "Daily limit reached" |
 | `unavailable` | 503 | The server is missing a setting it needs |
 
 ### 8.1 `POST /api/v1/auth/token`
@@ -465,7 +466,7 @@ error classes keep working unchanged:
 |---|---|
 | No, unknown or revoked token | `401 {type:'error', error:{type:'authentication_error', message:'signed_out'}}` |
 | Suspended | `403 {…permission_error, message:'account_suspended'}` |
-| Monthly or lifetime limit spent | `400 {…invalid_request_error, message:'You have reached your specified monthly usage limit on coere.ai.'}` (or `lifetime`). The runtime reads a message that starts "You have reached your specified" as a spend limit: it holds the queue, tries again every hour and on Try now, so raising the limit in the admin panel lets work go on within the hour |
+| Monthly, lifetime or daily limit spent | `400 {…invalid_request_error, message:'You have reached your specified monthly usage limit on coere.ai.'}` (or `lifetime`, or `daily`, which also covers a spent first build allowance). The runtime reads a message that starts "You have reached your specified" as a spend limit: it holds the queue, tries again every hour and on Try now, so raising the limit in the admin panel lets work go on within the hour |
 | Per minute limit | `429 {…rate_limit_error, message:'rate_limited'}` with `retry-after` |
 | Model not allowed | `404 {…not_found_error, message:'model: <name>'}` |
 | Beta not allowed | `400 {…invalid_request_error, message:'Unexpected value(s) for the \`anthropic-beta\` header.'}` |
@@ -600,6 +601,8 @@ the next step after this build (section 14.5).
 | Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance. Jev calls and `count_tokens` count in their own bucket per device, ten times that and at least 1,000, since the classifier sends one small call per item 16 at a time. A refusal's `retry-after` is at most 30 seconds, the longest the extension waits before giving an item up |
 | Monthly spend | the person's own `monthly_limit_micros` when the operator set one, else the plan's, checked before every metered call |
 | Lifetime spend | the person's own `lifetime_limit_micros` when set, else the plan's (null on every seeded plan, meaning none), against `user_totals.cost_micros`, checked before every metered call |
+| Daily spend (hidden) | the person's own `daily_limit_micros` when set, else the plan's ($2 on every seeded plan), per UTC day, once the account's free first build has finished, checked before every metered call |
+| First build allowance (hidden) | the person's own `first_build_limit_micros` when set, else the plan's ($10 on every seeded plan), in place of the daily limit until the first memory build finishes |
 | Memory file | the plan's `storage_limit_bytes`, and never over 50 MiB, Supabase Storage's default project upload limit (fixed on Free), which a bucket limit cannot raise |
 | `/auth/token` | 20 a minute per address |
 
@@ -620,6 +623,32 @@ A batch never metered within 30 days (its results expire after 29), or
 deleted before its results were read, is charged its reservation. So a limit can be passed by at most one batch's
 worst case, never by an unbounded amount.
 
+The daily limit (or the first build allowance) is held the same way:
+today's spend plus every pending hold and reservation, plus a message's
+worst case, must fit, and a batch may start only while the day is not at
+its limit. Pending spend counts against the day whatever day it was held
+on, so a day can be passed by one batch's worst case at most, the same
+bound as the month.
+
+**The hidden daily limit and the free first build.** Every account gets one
+free memory build, then a daily AI spend limit. `profiles.first_build_at`
+is set by `record_app_events()` the first time a `memory_built` event
+arrives, which the extension sends when a build finishes. Until then the
+first build allowance applies in place of the daily limit, against
+everything spent since the free build began, so an account that never
+finishes a build still cannot spend without bound. After it, the daily
+limit applies to the UTC day's spend from `usage_daily`, less what the
+first build spent earlier on the day it finished, so the free build never
+counts against a day. The monthly and lifetime limits apply throughout. The
+operator can reset the free first build on the account's page: the daily
+limit then waits for the next finished build, and the allowance counts only
+what is spent after the reset (`first_build_mark_micros`). The person never
+sees either number; a signed in session cannot read the columns. When one
+is reached, the extension shows its usual limit message and tries again
+each hour, and a spent day lifts at the next UTC midnight. When several
+limits are spent, the refusal names the one that lasts longest: lifetime,
+then the first build allowance, then monthly, then daily.
+
 ## 9. The admin panel
 
 `/statistics` becomes `/admin`, and `/statistics` redirects there. The guard
@@ -630,13 +659,14 @@ session never opens it. It keeps its own look (`stats.css`). Sections:
 |---|---|
 | `/admin` | **Statistics**: the product's running totals (section 15). Accounts, organizations, total AI cost, tokens used, tokens saved, memories, chats, context imports, transfers, storage. Each by day and in total, with the top accounts and organizations by tokens saved. |
 | `/admin/analytics` | Site analytics, as `/statistics` showed them. |
-| `/admin/users` | Accounts: email, username, plan, status, organization, created, last seen, devices, this month's cost and requests, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals and its knowledge graph. Actions: change plan, set the person's monthly and lifetime dollar limits (blank means the plan's), suspend or restore, revoke every device. |
+| `/admin/users` | Accounts: email, username, plan, status, organization, created, last seen, devices, this month's cost and requests, whether the free first build is used, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals, today's spend against its daily limit (or its first build against the allowance) and its knowledge graph. Actions: change plan, set the person's daily, first build, monthly and lifetime dollar limits (blank means the plan's), reset the free first build, suspend or restore, revoke every device. |
 | `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. **Create an organization** (name, plan, first admin picked from existing accounts by email). Opening one shows its members with their roles, access and totals, and the organization's knowledge graph, and lets the operator change its settings, add a member or admin from existing accounts, change roles, remove members and delete it. |
 | `/admin/interested` | **Interested** (section 16): three lists behind one switch, Developers (`developer_waitlist`), Coere Connect and Coere for Teams (`product_interest` by product). Each shows its count, the count by day, the newest entries and a CSV download; **Export all** is every list in one CSV with a product column. `/admin/waitlist` redirects to the Developers list. |
 | `/admin/launch` | **Launch countdown** (section 16): for `/install` and `/try-teams`, the moment in the operator's own time zone, +1 day, +1 week and 20 days from now, a show countdown switch, and a live preview drawn by the page's own component. A moment in the past saves only after a confirm. |
 | `/admin/database` | Every table's estimated rows, size, Row Level Security on or off and policy count, and the Storage bucket totals. |
 | `/admin/security` | Sign ins and failures by day, rate limit hits, refused tokens, revoked devices, connect refusals, deleted accounts, and any table with Row Level Security off. |
-| `/admin/cost` | AI spend by day, model and account, this month and the last 24 hours, storage bytes and their cost at $0.021 per GB month. |
+| `/admin/cost` | AI spend today, this month and by day, storage bytes and their cost at $0.021 per GB month. For a range (today, this month, the last 30 days, all time): each model's requests, input, output, cache write and cache read tokens and cost, with a total row, and the top accounts by cost, tokens or requests, each with today's spend against its daily limit. The sums come from `admin_usage_by_model()` and `admin_top_accounts()`, never from reading every call. |
+| `/admin/limits` | **Limits**: each plan's daily, first build, monthly and lifetime limits in dollars and cents, one daily limit set on every plan at once, how many accounts override each limit with their own, and **Clear all** for each after a confirm. An account's own value always wins over its plan's. |
 
 The admin panel reads memory through the server's secret key. Each time an
 operator opens a person's or an organization's graph, it writes an
@@ -653,12 +683,14 @@ and is the only thing that writes.
 
 | Table | Columns | Who reads |
 |---|---|---|
-| `plans` | `id text pk, name, monthly_limit_micros bigint, lifetime_limit_micros bigint (null means none), storage_limit_bytes bigint, requests_per_minute int, created_at`. Seeds `free` ($5, 25 MiB, 60), `plus` ($20, 100 MiB, 120), `team` ($100, 500 MiB, 300). | everyone signed in |
-| `profiles` | `id uuid pk references auth.users on delete cascade, email, username unique, display_name, plan_id references plans default 'free', monthly_limit_micros bigint (null means the plan's), lifetime_limit_micros bigint (null means the plan's), status ('active'\|'suspended'), memory_sync bool default true, include_sensitive bool default false, created_at, updated_at, last_seen_at`. A trigger on `auth.users` insert makes the row. The username from the sign up data, and the count in `daily_totals.new_users`, wait for the first email confirmation, so an address nobody confirms holds no username. | the owner; may update `display_name` only, everything else through the server |
+| `plans` | `id text pk, name, monthly_limit_micros bigint, lifetime_limit_micros bigint (null means none), daily_limit_micros bigint default 2000000, first_build_limit_micros bigint default 10000000, storage_limit_bytes bigint, requests_per_minute int, created_at`. Seeds `free` ($5, 25 MiB, 60), `plus` ($20, 100 MiB, 120), `team` ($100, 500 MiB, 300), each $2 a day after a $10 first build. | everyone signed in, every column but the daily and first build limits |
+| `profiles` | `id uuid pk references auth.users on delete cascade, email, username unique, display_name, plan_id references plans default 'free', monthly_limit_micros bigint (null means the plan's), lifetime_limit_micros bigint (null means the plan's), daily_limit_micros bigint (null means the plan's), first_build_limit_micros bigint (null means the plan's), first_build_at timestamptz (the first memory_built), first_build_mark_micros bigint default 0, status ('active'\|'suspended'), memory_sync bool default true, include_sensitive bool default false, created_at, updated_at, last_seen_at`. A trigger on `auth.users` insert makes the row. The username from the sign up data, and the count in `daily_totals.new_users`, wait for the first email confirmation, so an address nobody confirms holds no username. | the owner, every column but the four daily and first build ones; may update `display_name` only, everything else through the server |
 | `devices` | `id uuid pk, user_id references profiles cascade, name, token_hash unique, token_hint, extension_id, extension_version, created_at, last_used_at, revoked_at, revoked_reason ('signed_out'\|'user'\|'admin'\|'account')` | the owner, every column but `token_hash` |
 | `device_codes` | `code_hash pk, user_id cascade, challenge, extension_id, device_name, created_at, expires_at, used_at` | server only |
 | `usage_events` | `id bigint identity pk, user_id references profiles on delete set null, device_id references devices on delete set null, kind ('message'\|'count_tokens'\|'batch_result'\|'jev'), model, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros bigint, status smallint, duration_ms, request_id, created_at` | the owner |
 | `usage_monthly` | `user_id cascade, month date, requests, input_tokens, output_tokens, cost_micros, updated_at, pk (user_id, month)` | the owner |
+| `usage_daily` | `user_id cascade, day date (UTC), requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros, updated_at, pk (user_id, day)`. Today's row is what the daily limit reads. | server only |
+| `usage_model_daily` | `day date, model text ('' when none), requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros, updated_at, pk (day, model)`. No foreign key, so a deleted account's use stays. | server only |
 | `ai_batches` | `id text pk, user_id cascade, device_id set null, request_count, reserved_micros bigint, created_at, metered_at` | server only |
 | `spend_holds` | `id uuid pk, user_id cascade, amount_micros bigint, expires_at, created_at` | server only |
 | `memory_files` | `user_id pk cascade, object_path, index_path, bytes, index_bytes, digest, format_version, generator_version, memories, entities, links, chats, documents, sections, includes_quotes, includes_sensitive, device_id set null, uploaded_at` | the owner |
@@ -690,18 +722,22 @@ come through signed upload URLs that the server makes.
 
 | Function | What it does |
 |---|---|
-| `device_auth(p_token_hash text)` | One row for a live token: `device_id, user_id, status, plan_id, monthly_limit_micros, storage_limit_bytes, requests_per_minute, month_cost_micros, memory_sync, include_sensitive`. Touches `last_used_at` and `last_seen_at` when older than 5 minutes. No row for an unknown or revoked token. |
+| `device_auth(p_token_hash text)` | One row for a live token, with the columns of Appendix A, the daily limit and today's spend among them (from `daily_spend()`). Touches `last_used_at` and `last_seen_at` when older than 5 minutes. No row for an unknown or revoked token. |
+| `daily_spend(p_user uuid)` | The hidden daily limit resolved (the first build allowance until `first_build_at` is set), the spend it is checked against, and whether the first build is done (section 8.10). |
+| `reset_first_build(p_user uuid)` | The operator's reset: clears `first_build_at` and marks the spend so far, so the allowance counts from now. False for no account. |
 | `charge_unmetered_batch(p_user uuid, p_batch text)` | Marks a batch deleted before it was metered as metered, and records its reservation as its cost. |
-| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under the limits with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit. |
-| `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `user_totals`, the person's `org_totals` and today's `daily_totals` in one statement. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under the limits with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`. |
+| `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `usage_daily`, `user_totals`, the person's `org_totals`, today's `daily_totals` and today's `usage_model_daily` row for its model in one statement. |
 | `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |
-| `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. |
+| `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. The first `memory_built` sets `first_build_at`. |
 | `set_memory_totals(p_user uuid)` | Recomputes the person's memory counts in `user_totals` from `memory_files`, and their organization's from its members, after a commit or a delete. |
 | `create_organization(p_name text, p_slug text, p_admin uuid, p_plan text)` | The operator's call: makes the organization, its totals row and its first admin in one statement. Refuses an admin already in an organization. |
 | `org_drop_member(p_org uuid, p_user uuid, p_action text)` | Demotes (`demote`) or removes (`remove`) a member with the organization row locked, refusing with `last_admin` when they are its only admin, so two admins acting at once cannot leave it with none. Answers `ok`, `last_admin` or `not_member`. |
 | `accept_org_invite(p_user uuid, p_invite uuid)` | Checks the invite is live and for this account, adds the member with the invite's role, marks the invite accepted. |
 | `admin_table_stats()` | Each table in `public` and `storage`: estimated rows, total bytes, Row Level Security on, policy count. |
 | `admin_storage_usage()` | Bytes and object count per bucket, and per user in `memory`. |
+| `admin_usage_by_model(p_from date)` | Requests, the four token counts and cost per model from `usage_model_daily`, from a UTC day on (every day when null). |
+| `admin_top_accounts(p_from date, p_limit integer)` | The top `p_limit` accounts by cost, by tokens and by requests together over the range (all time from `user_totals` when null), each with `daily_spend()`. |
 
 ## 11. Prices
 
@@ -939,17 +975,36 @@ The site's code and the migration must agree on these names and types.
 -- monthly_limit_micros and lifetime_limit_micros are already resolved:
 -- the person's own value when set, else the plan's. lifetime_limit_micros
 -- null means no lifetime limit. lifetime_cost_micros is user_totals.cost_micros.
+-- The last three are daily_spend()'s: while first_build_done is false,
+-- daily_limit_micros is the first build allowance and day_cost_micros the
+-- spend since the free build began; after, the daily limit and today's
+-- (UTC) spend.
 device_auth(p_token_hash text) returns table (
   device_id uuid, user_id uuid, status text, plan_id text,
   monthly_limit_micros bigint, lifetime_limit_micros bigint,
   storage_limit_bytes bigint, requests_per_minute integer,
   month_cost_micros bigint, lifetime_cost_micros bigint,
-  memory_sync boolean, include_sensitive boolean, org_id uuid)
+  memory_sync boolean, include_sensitive boolean, org_id uuid,
+  daily_limit_micros bigint, day_cost_micros bigint, first_build_done boolean)
+
+-- plans: daily_limit_micros bigint not null default 2000000,
+--        first_build_limit_micros bigint not null default 10000000
+-- profiles: daily_limit_micros bigint, first_build_limit_micros bigint (null
+--   means the plan's), first_build_at timestamptz,
+--   first_build_mark_micros bigint not null default 0
+-- usage_daily: user_id uuid references profiles on delete cascade, day date,
+--   requests, input_tokens, output_tokens, cache_write_tokens,
+--   cache_read_tokens, cost_micros bigint, updated_at, pk (user_id, day)
+-- usage_model_daily: day date, model text, the same counters, pk (day, model)
+daily_spend(p_user uuid) returns table (
+  daily_limit_micros bigint, day_cost_micros bigint, first_build_done boolean)
+reset_first_build(p_user uuid) returns boolean
 
 record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
   p_input bigint, p_output bigint, p_cache_write bigint, p_cache_read bigint,
   p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text) returns void
 
+-- refused: 'lifetime', 'first_build', 'monthly' or 'daily'
 reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)
   returns table (hold_id uuid, refused text)
 
@@ -971,6 +1026,13 @@ accept_org_invite(p_user uuid, p_invite uuid) returns uuid
 admin_table_stats() returns table (schema_name text, table_name text,
   row_estimate bigint, total_bytes bigint, rls_enabled boolean, policy_count integer)
 admin_storage_usage() returns table (bucket_id text, folder text, objects bigint, bytes bigint)
+admin_usage_by_model(p_from date) returns table (model text, requests bigint,
+  input_tokens bigint, output_tokens bigint, cache_write_tokens bigint,
+  cache_read_tokens bigint, cost_micros bigint)
+admin_top_accounts(p_from date, p_limit integer) returns table (user_id uuid,
+  email text, requests bigint, input_tokens bigint, output_tokens bigint,
+  cache_write_tokens bigint, cache_read_tokens bigint, cost_micros bigint,
+  day_cost_micros bigint, daily_limit_micros bigint, first_build_done boolean)
 ```
 
 `extractions` grows with `extract_chat` and `extract_all` events,
