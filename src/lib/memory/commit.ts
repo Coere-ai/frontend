@@ -10,6 +10,7 @@ import { userIndexPath, userMemoryPath } from "./index-types";
 import { refreshMemberPart } from "./org-index";
 import { getBytes, objectSize, putFile, putJson, removePaths } from "./storage";
 import { fileLimit } from "./upload-rules";
+import { deleteMemory } from "./user-memory";
 
 /**
  * Committing an uploaded memory file (docs/accounts.md 8.6, 8.7, 14.2): read
@@ -21,6 +22,14 @@ import { fileLimit } from "./upload-rules";
 export type Committed =
   | { ok: true; bytes: number; digest: string; uploadedAt: string; counts: MemoryCounts }
   | { ok: false; reason: "not_found" | "too_large" | "bad_request" | "memory_sync_off" | "sensitive_off" | "unavailable" };
+
+/** Whether the person still wants a backup, read fresh: on, off, gone (no profile), or unknown when the read failed. */
+async function backupWanted(userId: string): Promise<"on" | "off" | "gone" | "unknown"> {
+  const { data, error } = await supabase().from("profiles").select("memory_sync").eq("id", userId).maybeSingle<{ memory_sync: boolean }>();
+  if (error) return "unknown";
+  if (!data) return "gone";
+  return data.memory_sync ? "on" : "off";
+}
 
 export async function commitMemory(a: DeviceAccount, staged: string): Promise<Committed> {
   if (!a.memorySync) {
@@ -82,7 +91,17 @@ export async function commitMemory(a: DeviceAccount, staged: string): Promise<Co
   );
   if (error) {
     console.error("memory_files write failed", error.code);
+    // The account was deleted while this ran: what was just written belongs to nobody.
+    if ((await backupWanted(a.userId)) === "gone") await removePaths([userMemoryPath(a.userId), userIndexPath(a.userId)]);
     return { ok: false, reason: "unavailable" };
+  }
+  // The backup was turned off while this ran. Checked after the writes, not
+  // before: setBackup writes the flag before it deletes, so either this sees
+  // it off and cleans up itself, or its own delete runs after these writes.
+  const wanted = await backupWanted(a.userId);
+  if (wanted === "off" || wanted === "gone") {
+    await deleteMemory(a.userId, a.orgId);
+    return { ok: false, reason: "memory_sync_off" };
   }
   const totals = await db.rpc("set_memory_totals", { p_user: a.userId });
   if (totals.error) console.error("set_memory_totals failed", totals.error.code);
