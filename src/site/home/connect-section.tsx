@@ -1,7 +1,6 @@
 import { AccordionShowcase, type ShowcaseItem } from "@/site/blocks/accordion-showcase";
 import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
-import { ButtonLink, CircleArrowLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { ActionsReel } from "./actions-reel";
@@ -48,7 +47,7 @@ const items: ShowcaseItem[] = [
   },
 ];
 
-/** Coere Connect on the home page: install or log in, then context as you type, the memory, how it fills, and what Cori does with it. */
+/** Coere Connect on the home page: context as you type, the memory, how it fills, and what Cori does with it. */
 export function ConnectSection() {
   return (
     <section id="connect" className="scroll-mt-24 border-t border-neutral-100 py-28 md:py-36">
@@ -59,14 +58,6 @@ export function ConnectSection() {
           line="A Chrome extension that saves your chats from every AI, builds them into a memory you own, and brings it into each new chat."
           href="/products/connect"
           linkLabel="Explore Coere Connect"
-          actions={
-            <>
-              <CircleArrowLink href="/install">Install</CircleArrowLink>
-              <ButtonLink href="/sign-in" variant="secondary">
-                Log in
-              </ButtonLink>
-            </>
-          }
         />
         <div className="mt-20">
           <AccordionShowcase items={items} background={backgrounds.dune} />
