@@ -477,7 +477,11 @@ Batch results are read as they stream through; when the stream ends, one
 row per model is written at half price and the batch is marked metered, so
 reading the results twice counts once.
 
-`maxDuration` is 300 seconds, since a long answer can take minutes.
+`maxDuration` is 800 seconds, above the extension's 600 second timeout for
+a non streaming call, so the function never dies before the extension gives
+up (a cut off call is billed upstream and never metered). That is Vercel's
+ceiling with Fluid compute and needs the Pro or Enterprise plan; Hobby stops
+at 300.
 
 ### 8.5 Jev: `POST /api/v1/jev/v1/systemone`
 
