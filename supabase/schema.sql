@@ -1119,15 +1119,15 @@ grant select on
   public.user_settings, public.user_totals, public.org_totals
 to authenticated;
 
--- plans and profiles: every column but the daily limit and the first build.
--- Column grants, as for devices below, so the hidden limit stays on the
--- server: a select naming one of them (or select *) is refused.
-grant select (id, name, monthly_limit_micros, lifetime_limit_micros, storage_limit_bytes,
-              requests_per_minute, created_at)
+-- plans and profiles: every column but the spend limits and the first
+-- build, which are never shown to the person (section 8.10). Column grants,
+-- as for devices below, so the limits stay on the server: a select naming
+-- one of them (or select *) is refused. The extension reads its own resolved
+-- limits through GET /api/v1/account, which the server answers.
+grant select (id, name, storage_limit_bytes, requests_per_minute, created_at)
   on public.plans to authenticated;
-grant select (id, email, username, display_name, plan_id, monthly_limit_micros,
-              lifetime_limit_micros, status, memory_sync, include_sensitive, created_at,
-              updated_at, last_seen_at)
+grant select (id, email, username, display_name, plan_id, status, memory_sync,
+              include_sensitive, created_at, updated_at, last_seen_at)
   on public.profiles to authenticated;
 
 -- devices: every column but token_hash. A column grant, not a policy,

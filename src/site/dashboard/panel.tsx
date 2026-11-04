@@ -67,16 +67,6 @@ export function StatGrid({ children }: { children: ReactNode }) {
   return <div className="grid grid-cols-2 gap-x-6 gap-y-7 md:grid-cols-4">{children}</div>;
 }
 
-/** A thin bar of how much of a limit is used, in the brand blue. */
-export function Meter({ value, label }: { value: number; label: string }) {
-  const pct = Math.min(100, Math.max(0, value));
-  return (
-    <div role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={label} className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
-      <div className={`h-full rounded-full ${pct >= 90 ? "bg-neutral-950" : "bg-brand-500"}`} style={{ width: `${pct}%` }} />
-    </div>
-  );
-}
-
 /** A line of muted text with a value on the right, for the rows inside a card. */
 export function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (

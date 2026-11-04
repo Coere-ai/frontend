@@ -73,7 +73,13 @@ export async function checkLimitResolution(db) {
 
 export async function checkOwnLimitsLocked(db) {
   await as(db, "authenticated", A, async () => {
-    equal("a person can read their own limits", (await rows(db, "read limits", "select monthly_limit_micros, lifetime_limit_micros from public.profiles where id = $1", [A]))?.length, 1);
+    // The limits are never shown to the person (section 8.10): the extension gets its own from the server.
+    for (const column of ["monthly_limit_micros", "lifetime_limit_micros"]) {
+      await refused(db, `a person cannot read their own ${column}`, `select ${column} from public.profiles where id = $1`, /permission denied/, [A]);
+      await refused(db, `a person cannot read a plan's ${column}`, `select ${column} from public.plans`, /permission denied/);
+    }
+    equal("a person still reads their plan's name", await one(db, "plan name", "select name from public.plans where id = 'free'"), "Free");
+    equal("and their own profile without the limits", (await rows(db, "own profile", "select id, plan_id, memory_sync from public.profiles where id = $1", [A]))?.length, 1);
     await refused(db, "a person cannot set their monthly limit", "update public.profiles set monthly_limit_micros = 999999999 where id = $1", /permission denied/, [A]);
     await refused(db, "a person cannot set their lifetime limit", "update public.profiles set lifetime_limit_micros = 999999999 where id = $1", /permission denied/, [A]);
     await refused(db, "a person cannot change a plan's limit", "update public.plans set lifetime_limit_micros = 1 where id = 'free'", /permission denied/);

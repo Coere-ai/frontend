@@ -1,45 +1,47 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { pausedToday, resolveLimits, spentShare } from "./limits";
+import { PAUSE_LINES, pauseOf } from "./limits";
 
-const free = { monthlyLimitMicros: 5_000_000, lifetimeLimitMicros: null };
+// A free account after its first build: $5 a month, no daily or lifetime limit.
+const built = {
+  monthlyLimitMicros: 5_000_000,
+  monthCostMicros: 0,
+  lifetimeLimitMicros: null,
+  lifetimeCostMicros: 0,
+  dailyLimitMicros: null,
+  dayCostMicros: 0,
+  firstBuildDone: true,
+  firstBuildLimitMicros: 10_000_000,
+  firstBuildCostMicros: 0,
+};
 
-describe("resolveLimits", () => {
-  it("takes the plan's when the person has none", () => {
-    assert.deepEqual(resolveLimits({ monthlyLimitMicros: null, lifetimeLimitMicros: null }, free), { monthlyMicros: 5_000_000, lifetimeMicros: null, ownMonthly: false });
-    assert.deepEqual(resolveLimits(null, { monthlyLimitMicros: 1, lifetimeLimitMicros: 9 }), { monthlyMicros: 1, lifetimeMicros: 9, ownMonthly: false });
+describe("pauseOf", () => {
+  it("is null while nothing is reached, and with no row", () => {
+    assert.equal(pauseOf(built), null);
+    assert.equal(pauseOf({ ...built, monthCostMicros: 4_999_999, dayCostMicros: 4_999_999 }), null);
+    assert.equal(pauseOf(null), null);
+    assert.equal(pauseOf(undefined), null);
   });
 
-  it("takes the person's own over the plan's, each on its own", () => {
-    assert.deepEqual(resolveLimits({ monthlyLimitMicros: 7_000_000, lifetimeLimitMicros: null }, { monthlyLimitMicros: 5, lifetimeLimitMicros: 30 }), { monthlyMicros: 7_000_000, lifetimeMicros: 30, ownMonthly: true });
-    assert.deepEqual(resolveLimits({ monthlyLimitMicros: null, lifetimeLimitMicros: 40 }, free), { monthlyMicros: 5_000_000, lifetimeMicros: 40, ownMonthly: false });
+  it("is the month once the monthly limit is reached", () => {
+    assert.equal(pauseOf({ ...built, monthCostMicros: 5_000_000 }), "month");
   });
 
-  it("keeps a limit of zero as a limit", () => {
-    assert.deepEqual(resolveLimits({ monthlyLimitMicros: 0, lifetimeLimitMicros: 0 }, free), { monthlyMicros: 0, lifetimeMicros: 0, ownMonthly: true });
+  it("is the day only when the operator set a daily limit and it is reached", () => {
+    assert.equal(pauseOf({ ...built, dailyLimitMicros: 2_000_000, dayCostMicros: 2_000_000 }), "day");
+    assert.equal(pauseOf({ ...built, dailyLimitMicros: 2_000_000, dayCostMicros: 2_000_000, monthCostMicros: 5_000_000 }), "month");
+  });
+
+  it("asks to contact us for a spent lifetime limit or first build allowance", () => {
+    assert.equal(pauseOf({ ...built, lifetimeLimitMicros: 1, lifetimeCostMicros: 1 }), "contact");
+    assert.equal(pauseOf({ ...built, firstBuildDone: false, firstBuildCostMicros: 10_000_000 }), "contact");
+    assert.equal(pauseOf({ ...built, firstBuildDone: false, firstBuildCostMicros: 9_999_999, monthCostMicros: 9e9 }), null);
   });
 });
 
-describe("spentShare", () => {
-  it("is the whole percent spent, and a zero limit is spent", () => {
-    assert.equal(spentShare(2_500_000, 5_000_000), 50);
-    assert.equal(spentShare(9, 5), 100);
-    assert.equal(spentShare(0, 0), 100);
-  });
-});
-
-describe("pausedToday", () => {
-  it("is true only while a done first build's day is at its limit", () => {
-    assert.equal(pausedToday({ daily_limit_micros: "2000000", day_cost_micros: "2000000", first_build_done: true }), true);
-    assert.equal(pausedToday({ daily_limit_micros: 2_000_000, day_cost_micros: 2_500_000, first_build_done: true }), true);
-    assert.equal(pausedToday({ daily_limit_micros: 2_000_000, day_cost_micros: 1_999_999, first_build_done: true }), false);
-  });
-
-  it("is false during the first build, even with its allowance spent, and with no row", () => {
-    assert.equal(pausedToday({ daily_limit_micros: 10_000_000, day_cost_micros: 10_000_000, first_build_done: false }), false);
-    assert.equal(pausedToday(null), false);
-    assert.equal(pausedToday(undefined), false);
-    assert.equal(pausedToday({ daily_limit_micros: "x", day_cost_micros: 1, first_build_done: true }), false);
+describe("PAUSE_LINES", () => {
+  it("never holds a number", () => {
+    for (const line of Object.values(PAUSE_LINES)) assert.doesNotMatch(line, /\d|\$/);
   });
 });

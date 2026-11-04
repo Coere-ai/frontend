@@ -238,13 +238,13 @@ export async function checkCostReaders(db) {
 
 export async function checkSpendLocked(db) {
   await as(db, "authenticated", A, async () => {
-    for (const column of ["daily_limit_micros", "first_build_limit_micros", "first_build_at", "first_build_mark_micros"]) {
+    for (const column of ["monthly_limit_micros", "lifetime_limit_micros", "daily_limit_micros", "first_build_limit_micros", "first_build_at", "first_build_mark_micros"]) {
       await refused(db, `a person cannot read their own ${column}`, `select ${column} from public.profiles where id = $1`, DENIED, [A]);
       const value = column === "first_build_at" ? "now()" : "999999999";
       await refused(db, `a person cannot set their own ${column}`, `update public.profiles set ${column} = ${value} where id = $1`, DENIED, [A]);
     }
     await refused(db, "a person cannot clear their first build", "update public.profiles set first_build_at = null where id = $1", DENIED, [A]);
-    for (const column of ["daily_limit_micros", "first_build_limit_micros"]) {
+    for (const column of ["monthly_limit_micros", "lifetime_limit_micros", "daily_limit_micros", "first_build_limit_micros"]) {
       await refused(db, `a person cannot read a plan's ${column}`, `select ${column} from public.plans`, DENIED);
       await refused(db, `a person cannot change a plan's ${column}`, `update public.plans set ${column} = 1`, DENIED);
     }
@@ -252,6 +252,7 @@ export async function checkSpendLocked(db) {
     await refused(db, "select * on plans is refused", "select * from public.plans", DENIED);
     for (const table of ["usage_daily", "usage_model_daily", "spend_holds", "ai_batches"]) await refused(db, `a person cannot read ${table}`, `select count(*) from public.${table}`, DENIED);
     await refused(db, "a person cannot call spend_state", "select * from public.spend_state($1)", DENIED, [A]);
+    await refused(db, "a person cannot call device_auth", "select * from public.device_auth('hash_a')", DENIED);
     await refused(db, "a person cannot call reserve_spend", "select * from public.reserve_spend($1, 1, 900, false)", DENIED, [A]);
     await refused(db, "a person cannot call reset_first_build", "select public.reset_first_build($1)", DENIED, [A]);
     await refused(db, "a person cannot call admin_usage_by_model", "select * from public.admin_usage_by_model(null)", DENIED);
@@ -260,8 +261,12 @@ export async function checkSpendLocked(db) {
   await as(db, "anon", null, async () => {
     await refused(db, "anon cannot call spend_state", "select * from public.spend_state($1)", DENIED, [A]);
   });
-  equal("nothing a person tried moved", await one(db, "locked", "select count(*)::int from public.profiles where daily_limit_micros is not null or first_build_limit_micros is not null or first_build_at is not null"), 0);
-  equal("and no plan moved", await one(db, "plans locked", "select count(*)::int from public.plans where daily_limit_micros is not null or first_build_limit_micros <> 10000000"), 0);
+  equal(
+    "nothing a person tried moved",
+    await one(db, "locked", "select count(*)::int from public.profiles where monthly_limit_micros is not null or lifetime_limit_micros is not null or daily_limit_micros is not null or first_build_limit_micros is not null or first_build_at is not null"),
+    0,
+  );
+  equal("and no plan moved", await one(db, "plans locked", "select count(*)::int from public.plans where daily_limit_micros is not null or first_build_limit_micros <> 10000000 or lifetime_limit_micros is not null"), 0);
 }
 
 // Values the operator and the first memory_built set, before the third run,

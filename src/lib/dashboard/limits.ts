@@ -1,46 +1,30 @@
-import { percent } from "./format";
+import { spentLimit, type Spend } from "@/lib/v1/spend";
 
 /**
- * The spend limits the dashboard shows, resolved the way device_auth does
- * (docs/accounts.md 8.10): the person's own when the operator set one, else
- * the plan's. The page reads the rows through the person's session, so it
- * resolves them itself instead of calling the server only function. Pure,
- * so the rule is pinned by a test and cannot drift from the database's.
+ * Whether the person's AI use is paused, and until when (docs/accounts.md 7,
+ * 8.10). The dashboard never shows a limit, a plan limit or a meter against
+ * one: only while a limit is reached does it say so, in one plain line. The
+ * rule is the gate's own (spentLimit), so the page cannot say paused when
+ * the extension is not, or the other way round. Pure, so a test pins it.
+ *
+ * - `month`: the monthly limit, which starts again on the first of the month.
+ * - `day`: a daily limit the operator set, which starts again at UTC midnight.
+ * - `contact`: the lifetime limit or the first build allowance, which only
+ *   the operator lifts.
  */
+export type Pause = "month" | "day" | "contact";
 
-export interface Limits {
-  monthlyMicros: number;
-  /** Null means no lifetime limit. */
-  lifetimeMicros: number | null;
-  /** True when the operator set this person's monthly limit, so the page does not credit the plan. */
-  ownMonthly: boolean;
+export function pauseOf(s: Spend | null | undefined): Pause | null {
+  if (!s) return null;
+  const spent = spentLimit(s);
+  if (spent === "monthly") return "month";
+  if (spent === "daily") return "day";
+  return spent === null ? null : "contact";
 }
 
-export function resolveLimits(
-  own: { monthlyLimitMicros: number | null; lifetimeLimitMicros: number | null } | null,
-  plan: { monthlyLimitMicros: number; lifetimeLimitMicros: number | null },
-): Limits {
-  const ownMonthly = own?.monthlyLimitMicros ?? null;
-  return {
-    monthlyMicros: ownMonthly ?? plan.monthlyLimitMicros,
-    lifetimeMicros: own?.lifetimeLimitMicros ?? plan.lifetimeLimitMicros,
-    ownMonthly: ownMonthly !== null,
-  };
-}
-
-/** The share of a limit spent, in whole percent. A limit of zero is spent, unlike a plain ratio. */
-export function spentShare(used: number, limit: number): number {
-  return limit <= 0 ? 100 : percent(used, limit);
-}
-
-/**
- * True only while the daily limit is reached: the free first build is done
- * and today's spend is at the limit. A spent first build allowance is not
- * "until tomorrow", so it reads false, as does a missing row.
- */
-export function pausedToday(row: { daily_limit_micros?: unknown; day_cost_micros?: unknown; first_build_done?: unknown } | null | undefined): boolean {
-  if (!row || row.first_build_done !== true || row.daily_limit_micros === null || row.daily_limit_micros === undefined) return false;
-  const limit = Number(row.daily_limit_micros);
-  const spent = Number(row.day_cost_micros);
-  return Number.isFinite(limit) && Number.isFinite(spent) && spent >= limit;
-}
+/** The one line the dashboard shows for each pause. `contact` ends with a link to the contact email. */
+export const PAUSE_LINES: Record<Pause, string> = {
+  month: "Your AI use is paused until next month.",
+  day: "Your AI use is paused until tomorrow.",
+  contact: "Your AI use is paused. Contact us to continue.",
+};
