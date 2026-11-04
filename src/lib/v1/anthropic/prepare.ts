@@ -2,6 +2,7 @@ import { readBody } from "../body";
 import type { AnthropicCase } from "./errors";
 import { checkBatchBody, checkBeta, checkParams } from "./params";
 import type { AnthropicOp } from "./paths";
+import { batchWorstCaseMicros, worstCaseMicros } from "./worst-case";
 
 /**
  * Everything the proxy checks about a request before it is forwarded
@@ -12,7 +13,15 @@ import type { AnthropicOp } from "./paths";
 export const BODY_CAP = 4 * 1024 * 1024;
 
 export type Prepared =
-  | { ok: true; beta: string | null; body: Uint8Array | null; requestCount: number; model?: string }
+  | {
+      ok: true;
+      beta: string | null;
+      body: Uint8Array | null;
+      requestCount: number;
+      model?: string;
+      /** The most the request can cost, for the spend reservation; 0 for a call that starts no spend. */
+      worstMicros: number;
+    }
   | { ok: false; error: AnthropicCase; model?: string };
 
 const WITH_PARAMS = new Set(["message", "count_tokens", "batch_create"]);
@@ -20,7 +29,7 @@ const WITH_PARAMS = new Set(["message", "count_tokens", "batch_create"]);
 export async function prepareRequest(req: Request, op: AnthropicOp): Promise<Prepared> {
   const beta = checkBeta(req.headers.get("anthropic-beta"));
   if (beta === false) return { ok: false, error: "beta" };
-  if (!WITH_PARAMS.has(op.op)) return { ok: true, beta, body: null, requestCount: 0 };
+  if (!WITH_PARAMS.has(op.op)) return { ok: true, beta, body: null, requestCount: 0, worstMicros: 0 };
 
   const read = await readBody(req, BODY_CAP);
   if (!read.ok) return { ok: false, error: read.reason };
@@ -34,5 +43,7 @@ export async function prepareRequest(req: Request, op: AnthropicOp): Promise<Pre
   if (!check.ok) return check.reason === "model" ? { ok: false, error: "model", model: check.model } : { ok: false, error: "bad_request" };
   const requestCount = op.op === "batch_create" ? ((check as { count?: number }).count ?? 0) : 1;
   const model = op.op === "message" ? ((parsed as { model?: string }).model ?? undefined) : undefined;
-  return { ok: true, beta, body: read.bytes, requestCount, ...(model ? { model } : {}) };
+  const worstMicros =
+    op.op === "message" ? worstCaseMicros(parsed as Record<string, unknown>, "direct") : op.op === "batch_create" ? batchWorstCaseMicros(parsed) : 0;
+  return { ok: true, beta, body: read.bytes, requestCount, worstMicros, ...(model ? { model } : {}) };
 }

@@ -25,6 +25,8 @@ interface AnswerContext {
   requestCount: number;
   /** The model the request asked for, for a fallback attempt that names none. */
   model: string | null;
+  /** A new batch's worst case, stored as its reservation. */
+  worstMicros: number;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -89,7 +91,7 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
     // Counting is free; the row counts the request without adding tokens to the totals.
     await recordUsage(c.account, { kind: "count_tokens", model: null, tokens: NO_TOKENS, costMicros: 0, status, durationMs: Date.now() - c.started, requestId });
   } else if (op.op === "batch_create" && isRecord(data) && typeof data.id === "string") {
-    await storeBatch(c.account, data.id, c.requestCount);
+    await storeBatch(c.account, data.id, c.requestCount, c.worstMicros);
   } else if (op.op === "batch_list" && isRecord(data) && Array.isArray(data.data)) {
     const items = data.data.filter(isRecord);
     const ids = items.map((b) => b.id).filter((id): id is string => typeof id === "string");

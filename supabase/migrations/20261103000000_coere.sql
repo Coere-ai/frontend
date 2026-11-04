@@ -573,16 +573,33 @@ create table if not exists public.usage_monthly (
 
 -- A batch id is stored as its caller's, so one account can never read or
 -- cancel another's batch. metered_at makes reading the results twice count once.
+-- reserved_micros is the batch's worst case cost, counted against the
+-- account's limits by reserve_spend() until the batch is metered.
 create table if not exists public.ai_batches (
-  id            text        primary key,
-  user_id       uuid        not null references public.profiles (id) on delete cascade,
-  device_id     uuid        references public.devices (id) on delete set null,
-  request_count integer     not null default 0,
-  created_at    timestamptz not null default now(),
-  metered_at    timestamptz
+  id              text        primary key,
+  user_id         uuid        not null references public.profiles (id) on delete cascade,
+  device_id       uuid        references public.devices (id) on delete set null,
+  request_count   integer     not null default 0,
+  reserved_micros bigint      not null default 0 check (reserved_micros >= 0),
+  created_at      timestamptz not null default now(),
+  metered_at      timestamptz
 );
 
 create index if not exists ai_batches_user_idx on public.ai_batches (user_id, created_at desc);
+
+-- Spend promised to calls still in flight. Cost is recorded only once
+-- Anthropic answers, so each metered call first holds its worst case here,
+-- and reserve_spend() counts every live hold against the limits. A hold is
+-- deleted when its call is metered, and simply runs out if the function dies.
+create table if not exists public.spend_holds (
+  id            uuid        primary key default gen_random_uuid(),
+  user_id       uuid        not null references public.profiles (id) on delete cascade,
+  amount_micros bigint      not null check (amount_micros >= 0),
+  expires_at    timestamptz not null,
+  created_at    timestamptz not null default now()
+);
+
+create index if not exists spend_holds_user_idx on public.spend_holds (user_id, expires_at);
 
 
 -- The memory copy
@@ -936,8 +953,8 @@ create trigger coere_on_auth_user_email
 -- authenticated. So each table first loses all of that, then gets back only
 -- what section 10 allows. Privileges decide which columns and verbs a role
 -- may use at all; the policies then decide which rows. Tables with no policy
--- (device_codes, ai_batches, app_events, security_events, daily_totals,
--- developer_waitlist) are server only: Row Level Security on with no policy
+-- (device_codes, ai_batches, spend_holds, app_events, security_events,
+-- daily_totals, developer_waitlist) are server only: Row Level Security on with no policy
 -- denies every signed in request.
 
 alter table public.plans              enable row level security;
@@ -951,6 +968,7 @@ alter table public.device_codes       enable row level security;
 alter table public.usage_events       enable row level security;
 alter table public.usage_monthly      enable row level security;
 alter table public.ai_batches         enable row level security;
+alter table public.spend_holds        enable row level security;
 alter table public.memory_files       enable row level security;
 alter table public.user_settings      enable row level security;
 alter table public.app_events         enable row level security;
@@ -963,7 +981,7 @@ alter table public.developer_waitlist enable row level security;
 revoke all on
   public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
   public.org_memory, public.devices, public.device_codes, public.usage_events,
-  public.usage_monthly, public.ai_batches, public.memory_files, public.user_settings,
+  public.usage_monthly, public.ai_batches, public.spend_holds, public.memory_files, public.user_settings,
   public.app_events, public.security_events, public.user_totals, public.org_totals,
   public.daily_totals, public.developer_waitlist
 from anon, authenticated;
@@ -973,7 +991,7 @@ from anon, authenticated;
 grant select, insert, update, delete on
   public.plans, public.profiles, public.organizations, public.org_members, public.org_invites,
   public.org_memory, public.devices, public.device_codes, public.usage_events,
-  public.usage_monthly, public.ai_batches, public.memory_files, public.user_settings,
+  public.usage_monthly, public.ai_batches, public.spend_holds, public.memory_files, public.user_settings,
   public.app_events, public.security_events, public.user_totals, public.org_totals,
   public.daily_totals, public.developer_waitlist
 to service_role;
@@ -1275,6 +1293,93 @@ begin
 end;
 $$;
 
+-- Holds a metered call's worst case against the account's limits before it
+-- is forwarded (docs/accounts.md 8.10). The profile row is locked, so two
+-- calls of one account never both pass on the same headroom. Pending spend
+-- is every live hold plus the reservation of each batch not yet metered. A
+-- message must fit whole. A batch may start while nothing is over a limit:
+-- its worst case is far above what it costs, so asking it to fit would
+-- refuse every batch of a small plan; its reservation then holds everything
+-- else back until its results are metered. A batch whose results were never
+-- read in 30 days (they expire after 29) is charged its reservation here.
+-- Answers the hold's id, or which limit refused it.
+create or replace function public.reserve_spend(
+  p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean
+) returns table (hold_id uuid, refused text)
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  v_amount   bigint := greatest(coalesce(p_amount, 0), 0);
+  v_monthly  bigint;
+  v_lifetime bigint;
+  v_month    bigint;
+  v_total    bigint;
+  v_pending  bigint;
+  v_id       uuid;
+  r          record;
+begin
+  select coalesce(p.monthly_limit_micros, pl.monthly_limit_micros), coalesce(p.lifetime_limit_micros, pl.lifetime_limit_micros)
+    into v_monthly, v_lifetime
+    from public.profiles p
+    join public.plans pl on pl.id = p.plan_id
+   where p.id = p_user
+     for update of p;
+  if not found then
+    return query select null::uuid, 'monthly'::text;
+    return;
+  end if;
+
+  for r in
+    update public.ai_batches b set metered_at = now()
+     where b.user_id = p_user and b.metered_at is null and b.reserved_micros > 0
+       and b.created_at < now() - interval '30 days'
+    returning b.id, b.device_id, b.reserved_micros
+  loop
+    perform public.record_usage(p_user, r.device_id, 'batch_result', null, 0, 0, 0, 0,
+      r.reserved_micros, 200, 0, left(r.id, 120));
+  end loop;
+
+  delete from public.spend_holds h where h.user_id = p_user and h.expires_at <= now();
+
+  select coalesce(sum(um.cost_micros), 0) into v_month
+    from public.usage_monthly um
+   where um.user_id = p_user and um.month = date_trunc('month', now() at time zone 'utc')::date;
+  select coalesce(sum(ut.cost_micros), 0) into v_total from public.user_totals ut where ut.user_id = p_user;
+  select coalesce(sum(h.amount_micros), 0) into v_pending from public.spend_holds h where h.user_id = p_user;
+  v_pending := v_pending + (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b
+                             where b.user_id = p_user and b.metered_at is null);
+
+  if p_batch then
+    -- Nothing may already be at a limit.
+    if v_lifetime is not null and v_total + v_pending >= v_lifetime then
+      return query select null::uuid, 'lifetime'::text;
+      return;
+    end if;
+    if v_month + v_pending >= v_monthly then
+      return query select null::uuid, 'monthly'::text;
+      return;
+    end if;
+  else
+    -- The whole worst case must fit.
+    if v_lifetime is not null and v_total + v_pending + v_amount > v_lifetime then
+      return query select null::uuid, 'lifetime'::text;
+      return;
+    end if;
+    if v_month + v_pending + v_amount > v_monthly then
+      return query select null::uuid, 'monthly'::text;
+      return;
+    end if;
+  end if;
+
+  insert into public.spend_holds (user_id, amount_micros, expires_at)
+  values (p_user, v_amount, now() + make_interval(secs => greatest(coalesce(p_ttl_seconds, 0), 1)))
+  returning id into v_id;
+  return query select v_id, null::text;
+end;
+$$;
+
 -- Stores one batch of feature counts from the extension and adds it to the
 -- person's, their organization's and today's totals. tokensSaved counts only
 -- on context_import and transfer; the route already refuses it elsewhere,
@@ -1560,6 +1665,7 @@ $$;
 revoke all on function public.device_auth(text) from public, anon, authenticated;
 revoke all on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) from public, anon, authenticated;
 revoke all on function public.meter_batch(uuid, uuid, text, jsonb, integer, integer, text) from public, anon, authenticated;
+revoke all on function public.reserve_spend(uuid, bigint, integer, boolean) from public, anon, authenticated;
 revoke all on function public.record_app_events(uuid, uuid, jsonb) from public, anon, authenticated;
 revoke all on function public.set_memory_totals(uuid) from public, anon, authenticated;
 revoke all on function public.set_org_memory_totals(uuid) from public, anon, authenticated;
@@ -1570,6 +1676,7 @@ revoke all on function public.admin_storage_usage() from public, anon, authentic
 grant execute on function public.device_auth(text) to service_role;
 grant execute on function public.record_usage(uuid, uuid, text, text, bigint, bigint, bigint, bigint, bigint, integer, integer, text) to service_role;
 grant execute on function public.meter_batch(uuid, uuid, text, jsonb, integer, integer, text) to service_role;
+grant execute on function public.reserve_spend(uuid, bigint, integer, boolean) to service_role;
 grant execute on function public.record_app_events(uuid, uuid, jsonb) to service_role;
 grant execute on function public.set_memory_totals(uuid) to service_role;
 grant execute on function public.set_org_memory_totals(uuid) to service_role;

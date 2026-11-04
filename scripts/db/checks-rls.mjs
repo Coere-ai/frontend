@@ -25,10 +25,11 @@ export async function checkOwnRows(db) {
     await rows(db, "A tries B's display name", "update public.profiles set display_name = 'Hacked' where id = $1", [B]);
     await refused(db, "A cannot delete devices", "delete from public.devices where user_id = $1", DENIED, [B]);
     await refused(db, "A cannot insert a device", "insert into public.devices (user_id, name, token_hash, token_hint) values ($1, 'x', 'y', 'z')", DENIED, [A]);
-    for (const table of ["device_codes", "ai_batches", "app_events", "security_events", "daily_totals", "developer_waitlist"]) {
+    for (const table of ["device_codes", "ai_batches", "spend_holds", "app_events", "security_events", "daily_totals", "developer_waitlist"]) {
       await refused(db, `A cannot read ${table}`, `select count(*) from public.${table}`, DENIED);
     }
     await refused(db, "A cannot call device_auth", "select * from public.device_auth('hash_b')", DENIED);
+    await refused(db, "A cannot call reserve_spend", "select * from public.reserve_spend($1, 0, 1, false)", DENIED, [A]);
     await refused(db, "A cannot call record_app_events", "select public.record_app_events($1, null, '[]'::jsonb)", DENIED, [A]);
     await refused(db, "A cannot call admin_table_stats", "select * from public.admin_table_stats()", DENIED);
   });

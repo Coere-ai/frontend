@@ -14,6 +14,7 @@ describe("prepareRequest", () => {
     assert.equal(p.ok, true);
     assert.equal(p.ok && p.beta, "server-side-fallback-2026-07-01");
     assert.equal(p.ok && p.requestCount, 1);
+    assert.ok(p.ok && p.worstMicros >= 50);
   });
 
   it("refuses a beta, a big body, a bad body and a model", async () => {
@@ -31,7 +32,9 @@ describe("prepareRequest", () => {
     const batch = { requests: [{ custom_id: "a", params: message }, { custom_id: "b", params: message }] };
     const p = await prepareRequest(req(JSON.stringify(batch)), { op: "batch_create" });
     assert.equal(p.ok && p.requestCount, 2);
+    // Two entries of 100 output tokens on Haiku at batch price, plus their prompts: a little over 50 micro dollars.
+    assert.ok(p.ok && p.worstMicros > 50 && p.worstMicros < 100);
     const cancel = await prepareRequest(req(null), { op: "batch_cancel", batchId: "msgbatch_1" });
-    assert.deepEqual(cancel, { ok: true, beta: null, body: null, requestCount: 0 });
+    assert.deepEqual(cancel, { ok: true, beta: null, body: null, requestCount: 0, worstMicros: 0 });
   });
 });

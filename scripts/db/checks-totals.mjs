@@ -29,6 +29,7 @@ export async function checkRecordUsage(db, org) {
   equal("token counts past int4 are kept", num(await one(db, "big", "select output_tokens from public.usage_events where user_id = $1", [C])), 3000000000);
   await db.exec("rollback");
   await checkMeterBatch(db, call);
+  await checkReserveSpend(db);
   await as(db, "service_role", null, async () => {
     equal("device_auth reads this month's spend", num((await rows(db, "spend", "select month_cost_micros from public.device_auth('hash_a')"))?.[0]?.month_cost_micros), 1500);
   });
@@ -50,6 +51,37 @@ async function checkMeterBatch(db) {
     equal("meter_batch refuses another's batch", await one(db, "meter other", "select public.meter_batch($1, null, 'msgbatch_m', '[]'::jsonb, 200, 10, null)", [A]), false);
   });
   equal("meter_batch writes the usage row", num(await one(db, "batch usage", "select cost_micros from public.usage_monthly where user_id = $1", [C])), 70);
+  await db.exec("rollback");
+}
+
+// reserve_spend on C, a free account ($5 a month) with no spend. Rolled back at the end.
+async function checkReserveSpend(db) {
+  await db.exec("begin");
+  const reserve = (amount, batch = false) =>
+    as(db, "service_role", null, async () => (await rows(db, `reserve ${amount}`, "select * from public.reserve_spend($1, $2, 900, $3)", [C, amount, batch]))?.[0]);
+  check("a message that fits is held", (await reserve(1_000_000))?.hold_id !== null);
+  equal("a message past the limit is refused", (await reserve(4_500_000))?.refused, "monthly");
+  check("a message that fits exactly is held", (await reserve(4_000_000))?.hold_id !== null);
+  equal("a batch waits while holds fill the limit", (await reserve(1, true))?.refused, "monthly");
+
+  await db.query("update public.spend_holds set expires_at = now() - interval '1 second' where user_id = $1", [C]);
+  check("a hold that ran out no longer counts", (await reserve(4_000_000))?.hold_id !== null);
+  equal("the run out holds are swept", await one(db, "holds", "select count(*)::int from public.spend_holds where user_id = $1", [C]), 1);
+  await db.query("delete from public.spend_holds where user_id = $1", [C]);
+
+  check("a batch far past the limit starts while nothing is spent", (await reserve(40_000_000, true))?.hold_id !== null);
+  await db.query("delete from public.spend_holds where user_id = $1", [C]);
+  await db.query("insert into public.ai_batches (id, user_id, reserved_micros) values ('msgbatch_r', $1, 40000000)", [C]);
+  equal("an unmetered batch holds messages back", (await reserve(1))?.refused, "monthly");
+  equal("and the next batch", (await reserve(1, true))?.refused, "monthly");
+
+  await db.query("update public.ai_batches set created_at = now() - interval '31 days' where id = 'msgbatch_r'");
+  await reserve(1);
+  check("a batch never read in 30 days is metered", await one(db, "charged", "select metered_at is not null from public.ai_batches where id = 'msgbatch_r'"));
+  equal("and charged its reservation", num(await one(db, "charged cost", "select cost_micros from public.usage_monthly where user_id = $1", [C])), 40_000_000);
+
+  await db.query("update public.profiles set lifetime_limit_micros = 1000 where id = $1", [A]);
+  equal("a lifetime limit refuses too", (await as(db, "service_role", null, () => rows(db, "lifetime", "select * from public.reserve_spend($1, 1, 900, false)", [A])))?.[0]?.refused, "lifetime");
   await db.exec("rollback");
 }
 
@@ -135,7 +167,7 @@ export async function checkAdminReaders(db) {
   await as(db, "service_role", null, async () => {
     const tables = await rows(db, "admin_table_stats", "select * from public.admin_table_stats()");
     const pub = (tables ?? []).filter((t) => t.schema_name === "public");
-    equal("admin_table_stats lists every public table", pub.length, 22);
+    equal("admin_table_stats lists every public table", pub.length, 23);
     equal("every public table has Row Level Security on", pub.filter((t) => !t.rls_enabled).map((t) => t.table_name), []);
     equal("admin_table_stats counts policies", pub.find((t) => t.table_name === "profiles")?.policy_count, 2);
     check("admin_table_stats sees storage.objects", (tables ?? []).some((t) => t.schema_name === "storage" && t.table_name === "objects" && t.policy_count >= 2));

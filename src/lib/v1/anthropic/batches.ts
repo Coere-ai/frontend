@@ -12,10 +12,14 @@ import type { TokenCounts } from "../prices";
  * twice count once.
  */
 
-export async function storeBatch(a: DeviceAccount, id: string, requestCount: number): Promise<void> {
+/** Stores a new batch as the caller's, with its worst case, which counts against the limits until it is metered. */
+export async function storeBatch(a: DeviceAccount, id: string, requestCount: number, reservedMicros: number): Promise<void> {
   const { error } = await supabase()
     .from("ai_batches")
-    .upsert({ id, user_id: a.userId, device_id: a.deviceId, request_count: requestCount }, { onConflict: "id", ignoreDuplicates: true });
+    .upsert(
+      { id, user_id: a.userId, device_id: a.deviceId, request_count: requestCount, reserved_micros: Math.max(0, Math.ceil(reservedMicros)) },
+      { onConflict: "id", ignoreDuplicates: true },
+    );
   if (error) console.error("batch not stored", error.code);
 }
 

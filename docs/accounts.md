@@ -591,6 +591,23 @@ the next step after this build (section 14.5).
 | Memory file | the plan's `storage_limit_bytes`, and never over 64 MiB |
 | `/auth/token` | 20 a minute per address |
 
+**Spend reservations.** The monthly and lifetime checks above read spend
+already recorded, which lands only after Anthropic answers. So before a
+message or a batch is forwarded, the proxy holds its worst case with
+`reserve_spend()`: input counted as one token per two bytes of the
+request's JSON, priced as cache writes, plus `max_tokens` (or 64,000) of
+output, at the asked model's price, half for a batch. Pending spend is every
+live hold (`spend_holds`, let go once the call is metered, and void after
+900 seconds) plus the `reserved_micros` of each batch not yet metered. A
+message must fit whole: month spend plus pending plus its worst case at most
+the limit, the same for the lifetime limit, or it gets the `usage_limit`
+400. A batch may start while nothing is at a limit, since its worst case is
+far above what it costs and a small plan could otherwise never batch; its
+reservation then holds every other call back until its results are metered.
+A batch never metered within 30 days (its results expire after 29) is
+charged its reservation. So a limit can be passed by at most one batch's
+worst case, never by an unbounded amount.
+
 ## 9. The admin panel
 
 `/statistics` becomes `/admin`, and `/statistics` redirects there. The guard
@@ -629,7 +646,8 @@ and is the only thing that writes.
 | `device_codes` | `code_hash pk, user_id cascade, challenge, extension_id, device_name, created_at, expires_at, used_at` | server only |
 | `usage_events` | `id bigint identity pk, user_id references profiles on delete set null, device_id references devices on delete set null, kind ('message'\|'count_tokens'\|'batch_result'\|'jev'), model, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros bigint, status smallint, duration_ms, request_id, created_at` | the owner |
 | `usage_monthly` | `user_id cascade, month date, requests, input_tokens, output_tokens, cost_micros, updated_at, pk (user_id, month)` | the owner |
-| `ai_batches` | `id text pk, user_id cascade, device_id set null, request_count, created_at, metered_at` | server only |
+| `ai_batches` | `id text pk, user_id cascade, device_id set null, request_count, reserved_micros bigint, created_at, metered_at` | server only |
+| `spend_holds` | `id uuid pk, user_id cascade, amount_micros bigint, expires_at, created_at` | server only |
 | `memory_files` | `user_id pk cascade, object_path, index_path, bytes, index_bytes, digest, format_version, generator_version, memories, entities, links, chats, documents, sections, includes_quotes, includes_sensitive, device_id set null, uploaded_at` | the owner |
 | `user_settings` | `user_id pk cascade, settings jsonb (object, at most 64 KiB), version bigint, updated_at, updated_by ('site'\|'extension')` | the owner |
 | `app_events` | `id bigint identity pk, user_id set null, device_id set null, kind (section 6.7), count, created_at` | server only |
@@ -658,6 +676,7 @@ come through signed upload URLs that the server makes.
 | Function | What it does |
 |---|---|
 | `device_auth(p_token_hash text)` | One row for a live token: `device_id, user_id, status, plan_id, monthly_limit_micros, storage_limit_bytes, requests_per_minute, month_cost_micros, memory_sync, include_sensitive`. Touches `last_used_at` and `last_seen_at` when older than 5 minutes. No row for an unknown or revoked token. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under the limits with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit. |
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `user_totals`, the person's `org_totals` and today's `daily_totals` in one statement. |
 | `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. |
@@ -890,6 +909,9 @@ device_auth(p_token_hash text) returns table (
 record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
   p_input bigint, p_output bigint, p_cache_write bigint, p_cache_read bigint,
   p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text) returns void
+
+reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)
+  returns table (hold_id uuid, refused text)
 
 -- p_rows: [{"model", "input", "output", "cacheWrite", "cacheRead", "costMicros"}], one per model
 meter_batch(p_user uuid, p_device uuid, p_batch text, p_rows jsonb,
