@@ -35,6 +35,11 @@ of them out of the live demos' own pages, `/admin` (and its old address
 how to stop model training without leaving AI search. `docs/seo-report.md`
 has the research and the remaining manual steps.
 
+`/privacy` is the privacy policy that the Chrome Web Store listing points
+to, linked from the footer. Its words are in `src/site/content/privacy.ts`,
+each taken from `docs/accounts.md` and the code. When one of those facts
+changes, change the policy and its effective date with it.
+
 The blog and careers pages are hidden from the menus for now. They still
 answer at their addresses but are `noindex` and left out of the sitemap.
 

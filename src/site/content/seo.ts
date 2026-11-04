@@ -92,3 +92,11 @@ export const waitlistSeo: Seo = {
     "Join the Coere Forge waitlist to give your app's users memory from day one, with their permission. Get 1,000 free credits at launch.",
   keywords: ["Coere Forge waitlist", "AI memory API waitlist", "user memory for apps", "Coere developer access"],
 };
+
+/** The privacy policy: what the extension and coere.ai read, keep and send. */
+export const privacySeo: Seo = {
+  title: "Privacy policy",
+  description:
+    "What the Coere extension and coere.ai read, keep and send. Your chats stay in your browser, and the memory backup is yours to turn off.",
+  keywords: ["Coere privacy policy", "Coere Connect privacy", "AI memory privacy", "Chrome extension privacy policy"],
+};

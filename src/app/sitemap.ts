@@ -13,6 +13,7 @@ import { products } from "@/site/content/products";
 const UPDATED = {
   site: "2026-11-03",
   docs: "2026-10-29",
+  privacy: "2026-11-04",
 } as const;
 
 /**
@@ -37,5 +38,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...docPages.filter((d) => d.slug !== "overview").map((d) => page(`/resources/${d.slug}`, 0.6, UPDATED.docs, "monthly")),
     page("/developers/waitlist", 0.7),
     page("/about", 0.6, UPDATED.site, "monthly"),
+    page("/privacy", 0.3, UPDATED.privacy, "monthly"),
   ];
 }

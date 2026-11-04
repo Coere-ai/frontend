@@ -40,3 +40,4 @@ Coere is in pre-launch. The developer waitlist is open: https://www.coere.ai/dev
 
 - Email: coereagent@gmail.com
 - Website: https://www.coere.ai/
+- [Privacy policy](https://www.coere.ai/privacy): what the extension and coere.ai read, keep and send

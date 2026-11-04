@@ -32,7 +32,7 @@ function currentYear(): number {
   return new Date().getFullYear();
 }
 
-/** The site footer: the product, company and resource links, and the copyright line. */
+/** The site footer: the product, company and resource links, the copyright line and the privacy policy. */
 export function Footer() {
   return (
     <footer className="border-t border-neutral-200 bg-white">
@@ -60,6 +60,9 @@ export function Footer() {
       </Container>
       <Container className="flex flex-col gap-3 border-t border-neutral-100 py-6 text-[13px] text-neutral-500 sm:flex-row sm:items-center sm:justify-between">
         <p>© {currentYear()} Coere AI</p>
+        <Link href="/privacy" className="hover:text-neutral-950">
+          Privacy policy
+        </Link>
       </Container>
     </footer>
   );
