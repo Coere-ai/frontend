@@ -3,7 +3,7 @@
 import { createContext, useActionState, useContext, type ReactNode } from "react";
 
 import { signInState, type SignInState, type SignInStep } from "@/lib/auth/sign-in-state";
-import { authCardClass, FormStatus } from "@/site/account/auth-shell";
+import { FormStatus } from "@/site/account/auth-shell";
 
 import { signInStep } from "./actions";
 import { CodeStep, EmailStep, PasswordStep } from "./sign-in-fields";
@@ -46,7 +46,7 @@ export function SignInForm() {
   // A field's own error shows under the field; the status line takes the rest.
   const formError = state.field ? null : state.error;
   return (
-    <form action={action} noValidate className={`space-y-6 ${authCardClass}`}>
+    <form action={action} noValidate className="space-y-6">
       <input type="hidden" name="next" value={state.next} />
       {state.step === "code" ? (
         <CodeStep key="code" state={state} pending={pending} />

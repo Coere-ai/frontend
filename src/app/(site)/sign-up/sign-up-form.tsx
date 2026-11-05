@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { PASSWORD_MIN } from "@/lib/auth/identity";
 import { signUpState, type SignUpField } from "@/lib/auth/sign-up-state";
 import { IconInput } from "@/site/account/auth-fields";
-import { authCardClass, FormStatus, textButtonClass } from "@/site/account/auth-shell";
+import { FormStatus, textButtonClass } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
 import { FormField } from "@/site/ui/form-field";
 import { LockIcon, MailIcon, UserIcon } from "@/site/ui/icons/interface-icons";
@@ -19,12 +19,9 @@ export function SignUpForm({ next }: { next: string }) {
 
   if (state.sent) {
     return (
-      <form action={action} role="status" className={`${authCardClass} text-center`}>
+      <form action={action} role="status" className="text-center">
         <input type="hidden" name="next" value={state.next} />
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
-          <MailIcon size={22} />
-        </span>
-        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">Check your email</p>
+        <p className="text-2xl font-medium tracking-[-0.02em] text-neutral-950">Check your email</p>
         <p className="mt-2 text-[15px] leading-relaxed text-neutral-500">
           We sent a link to <span className="break-all text-neutral-950">{state.sent}</span>. Open it to finish making your account.
         </p>
@@ -44,7 +41,7 @@ export function SignUpForm({ next }: { next: string }) {
   });
 
   return (
-    <form action={action} noValidate className={`space-y-6 ${authCardClass}`}>
+    <form action={action} noValidate className="space-y-6">
       <input type="hidden" name="next" value={state.next} />
       <FormField id="email" label="Email" error={state.errors.email}>
         <IconInput icon={MailIcon} {...field("email")} type="email" autoComplete="email" required defaultValue={state.values.email} />

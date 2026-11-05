@@ -48,15 +48,8 @@ export function CodeStep({ state, pending }: StepProps) {
   return (
     <>
       <div>
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
-            <MailIcon size={20} />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[13px] text-neutral-500">Code sent to</p>
-            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{state.email}</p>
-          </div>
-        </div>
+        <p className="text-[13px] text-neutral-500">Code sent to</p>
+        <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{state.email}</p>
         <p className="mt-4 text-[14px] leading-relaxed text-neutral-500">Type the 6 digit code from the email, or open the link in it.</p>
       </div>
       <input type="hidden" name="email" value={state.email} />

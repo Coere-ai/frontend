@@ -6,9 +6,8 @@ import { extensionRuntime, sendToExtension } from "@/lib/connect/bridge";
 import { deviceName } from "@/lib/connect/device-name";
 import { loadedAddress, loadedElsewhere } from "@/lib/connect/loaded-path";
 import type { ConnectParams } from "@/lib/connect/params";
-import { authCardClass, FormStatus } from "@/site/account/auth-shell";
+import { FormStatus } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
-import { CheckIcon, UserIcon } from "@/site/ui/icons/interface-icons";
 
 import { connectExtension } from "./actions";
 
@@ -67,28 +66,18 @@ export function ConnectCard({ email, params }: { email: string; params: ConnectP
 
   if (done) {
     return (
-      <div role="status" className={`${authCardClass} text-center`}>
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
-          <CheckIcon size={22} />
-        </span>
-        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">Connected</p>
+      <div role="status" className="text-center">
+        <p className="text-2xl font-medium tracking-[-0.02em] text-neutral-950">Connected</p>
         <p className="mt-2 text-[15px] text-neutral-500">Coere is connected. You can close this tab.</p>
       </div>
     );
   }
 
   return (
-    <div className={`space-y-6 ${authCardClass}`}>
+    <div className="space-y-6">
       <div>
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
-            <UserIcon size={20} />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[13px] text-neutral-500">Signed in as</p>
-            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{email}</p>
-          </div>
-        </div>
+        <p className="text-[13px] text-neutral-500">Signed in as</p>
+        <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{email}</p>
         <p className="mt-4 text-[14px] leading-relaxed text-neutral-500">
           Coere in this browser will use this account. Only connect if you opened this page from Coere.
         </p>
