@@ -183,112 +183,25 @@ origins, so pages there can send one off messages with
 `chrome.runtime.sendMessage(extensionId, message)`. The background handles
 them in `chrome.runtime.onMessageExternal`. It accepts a message only when
 `sender.origin` is one of the site origins. It answers with a small object
-and never with chat text, memory text or the token, except `coere.rpc`
-(5.1), whose answer is the Console's own and can hold the library's and
-memory's text. That text stays in the person's coere.ai tab, as it stays in
-the Console page: the site's page code never sends it to the server.
+and never with chat text, memory text or the token.
 
 | Message | Allowed from | Answer | What it does |
 |---|---|---|---|
-| `{type:'coere.hello'}` | any site page | `{ok:true, version, build:4, signedIn, userId, console:1}` | Lets the site know Coere is installed and which account it uses. `console:1` says the console bridge (5.1) is there; a Coere without it leaves the field out. |
+| `{type:'coere.hello'}` | any site page | `{ok:true, version, build:4, signedIn, userId}` | Lets the site know Coere is installed and which account it uses. |
 | `{type:'coere.connect', code, state}` | `/connect` | `{ok:true}` or `{ok:false, reason:'state'\|'exchange'}` | Section 4. |
-| `{type:'coere.open', target, run?}` | `/dashboard` and below | `{ok:true}` | Opens a local page. `target` is one of `library`, `memory`, `home`, `cori`, `settings-folder`, `settings-import`, `settings-logs`, `settings-transfer`, `allow-browser-use`. `run`, for `allow-browser-use` alone, is the run id (letters, digits, `_` and `-`, at most 80) whose kept start the Allow page goes on with. |
+| `{type:'coere.open', target}` | `/dashboard` and below | `{ok:true}` | Opens a local page. `target` is one of `library`, `memory`, `home`, `cori`, `settings-folder`, `settings-import`, `settings-logs`, `settings-transfer`. |
 | `{type:'coere.backup'}` | `/dashboard` and below | `{ok:true}` | Pushes the memory file now (section 6.5). |
 | `{type:'coere.settings'}` | `/dashboard` and below | `{ok:true}` | Pulls the synced settings now (section 6.6). |
-| `{type:'coere.rpc', v:1, message}` | `/dashboard` and below | the Reply, or a refusal | The console bridge's requests (5.1). |
 
-Anything else answers `{ok:false, reason:'unknown'}`, and so does a
-`coere.rpc` to a Coere without the console bridge.
+Anything else answers `{ok:false, reason:'unknown'}`, and a page off the
+site gets no answer at all.
 
-### 5.1 The console bridge
-
-coere.ai's `/dashboard` runs the extension's own Console, built for the web
-from the same source. The library, the memory and every other local part
-stay in the browser: the Console there reads and changes them through the
-extension, the same way the Console page does. Bridge version 1, in the v4
-background only (`background/account/console-*.ts`, `runtime-taps.ts`).
-
-**Who may use it.** Both halves take only a sender whose `origin` is one of
-the site origins, whose `url` sits on that same origin, and whose path is
-`/dashboard` or starts with `/dashboard/`. A sender off the site gets no
-answer at all, and a port from one is closed at once. A site page
-elsewhere (`/connect`, `/pricing`, `/dashboards`) gets
-`{ok:false, reason:'unknown'}` for a request.
-
-**Requests.** The page calls
-`chrome.runtime.sendMessage(extensionId, {type:'coere.rpc', v:1, message})`,
-where `message` is exactly a Coere message the Console sends the service
-worker today through `lib/rpc.ts` (`lib/messages.ts`), `ch:'coere'` and
-its `id` included. The background hands an allowed `message` to the
-service worker's own `onMessage` listeners as if the Console page had sent
-it (sender id the extension's, url `console.html`, the dashboard's tab),
-and answers with exactly the Reply those listeners give that page. With
-no answer from them, it answers nothing, as Chrome does. Otherwise:
-
-- `v` other than `1`, or a `message` that is not a Coere message:
-  `{ok:false, error:{code:'bad_request', message}}`.
-- A type or method off the list:
-  `{ok:false, error:{code:'forbidden', message}}`. Nothing reaches a
-  listener.
-
-The list (`console-allow.ts`) holds what the Console sends the worker and
-nothing else. `console-allow.test.ts` ties each entry to the Console file
-that sends it, and checks that nothing marked off the list appears there.
-
-- Types: `engine.call`, `batch.start`, `batch.action`, `transfer.start`,
-  `cori.ask`, `console.open`, `onboarding.open`, `account.connect`,
-  `account.disconnect`, `account.org`, and the Actions requests
-  `actions.start`, `actions.answer`, `actions.stop`, `actions.undo`,
-  `actions.retry`, `actions.takeover`, `actions.focus`, `actions.export`,
-  `actions.watch`, `actions.allow`, `actions.workers` and `actions.get`.
-- `engine.call` methods: `search`, `getConversation`, `getRawJson`,
-  `listConversations`, `listOpenings`, `listProjects`, `knownUpdates`,
-  `stats`, `getCheckpoint`, `listRuns`, `listErrors`,
-  `upsertConversations`, `upsertProject`, `deleteConversation`,
-  `saveCheckpoint`, `recordError`, `memory.search`, `memory.overview`,
-  `memory.children`, `memory.node`, `memory.quote`, `memory.dueSoon`,
-  `memory.review`, `memory.status`, `memory.control`, `memory.settings`,
-  `memory.setSettings`, `memory.edit`, `memory.export`, `memory.import`,
-  `memory.forgetPreview`, `memory.forgetTopic`, `memory.buildEstimate`,
-  `memory.usage`, `memory.learned`, `memory.documents`, `memory.corePack`,
-  `memory.stats`, `memory.deleteChats`, `memory.act.activity`,
-  `memory.act.clearActivity`, and `memory.chat.list`, `.get`, `.search`,
-  `.append`, `.rename`, `.delete`, `.deleteAll` and `.keep`.
-- Never on it: `account.token` and `account.backup` (the device token and
-  Back up now), the lab, the access layer, the agent's own model steps
-  (`memory.act.step` and the rest), what content scripts send (capture,
-  Recall, silent import, transfer claims and results, run progress) and
-  what the Console sends a site tab instead of the worker (`run.state`,
-  `run.resume`, `selftest.run`, `agent.show`). `actions.allowed` stays
-  with the Allow page, which stays in the extension.
-
-An `uploadId` travels as given, so a large argument that went over the
-extension's own upload port answers `upload_failed`: the web console sends
-its arguments inline.
-
-**Events.** The page opens
-`chrome.runtime.connect(extensionId, {name:'coere.console'})`. The
-background posts `{type:'coere.event', v:1, event}` on it for every
-broadcast the Console page hears, where `event` is that broadcast as the
-page gets it:
-
-- `engine.event` named `library.changed`, `index.progress`,
-  `memory.changed`, `memory.status`, `memory.build` or `memory.built`,
-  from the engine in the offscreen document;
-- the service worker's own `run.progress` (`via:'worker'`), its checked
-  `transfer.result`, and Actions' `actions.state`, `actions.preview` and
-  `actions.rows`.
-
-A site tab's own `run.progress`, which carries the chat's title, and the
-account events never travel. The page sends nothing on the port. The
-port closes when the service worker stops; the page connects again and
-reads its state anew, as the Console page does after a worker restart.
-
-**Local only.** The folder picker (its file handles belong to the
-extension's origin) and the Allow page for Browser Use (Chrome's
-permission prompt belongs to the extension's page) stay in the extension:
-the web console opens them with `coere.open` and `settings-folder` or
-`allow-browser-use`.
+The bridge never runs the Console's own requests. The dashboard on
+coere.ai is the extension's own `console.html` in a frame (section 6.8),
+which talks to the service worker as any extension page does, so the site
+needs no way in. An earlier build had one (`coere.rpc` and a
+`coere.console` port), and it let any script on coere.ai read and delete
+the local library and start Browser Use; it is gone.
 
 ## 6. The extension side
 
@@ -314,7 +227,8 @@ the web console opens them with `coere.open` and `settings-folder` or
   because the site's host refuses a request body over 4.5 MB.
 - `tools/lint-manifest` and the build scans learn the v4 rules: no model
   host, no key, no fake key, no v3 marker, `externally_connectable` only in
-  v4 and only with the site origins.
+  v4 and only with the site origins, and the one web accessible entry that
+  lets the site frame `console.html` (section 6.8) only in v4.
 
 ### 6.2 The account record
 
@@ -428,29 +342,80 @@ the person's running total (section 15).
 
 ### 6.8 The dashboard
 
-`console.open` stays the one way in. In v4 every section opens on
-coere.ai, which runs the Console through the console bridge (5.1): the
-path's last part is the id the local console takes in `?tab=`, with Home
-at `/dashboard` and Statistics at `/dashboard/usage`.
+coere.ai's `/dashboard` frames the extension's own `console.html`
+(section 7). The Console runs there as the extension itself, with every
+feature it has in its own tab. Nothing of it is copied, forked or
+restyled.
+
+**Who may frame it.** The v4 manifest adds one `web_accessible_resources`
+entry once the build is done: `console.html` and exactly the files it
+loads (its chunks and fonts, read from the built folder by
+`build/console-resources.ts`), with `matches` the site origins of
+`host_permissions` and `use_dynamic_url: false`. `tools/lint-manifest`
+allows that entry in v4 alone, with no wildcard, no other page and no
+`extension_ids`, and refuses a site origin in any other version. When the
+page is framed (`window.top !== window`), it renders only if every entry
+of `location.ancestorOrigins` is a site origin. Otherwise it shows one
+line, "Open Coere from its own button in the Chrome toolbar.", and loads
+nothing else (`console/embed/guard.ts`). An extension cannot send a
+`frame-ancestors` header for its own pages and a meta tag cannot carry
+one, so this check of every ancestor is the refusal; the site's own policy
+keeps other sites from framing `/dashboard`.
+
+**Framed by the site.** Links and `console.open` that open other
+extension pages use their usual routes, a new tab. Four things need the
+extension's own page, since Chrome refuses them in a frame on another
+site, and open it in a tab: the folder picker (`console.open` for
+`folder` with `local: true`), the microphone for voice (`settings` with
+`local: true`), and Browser Use's Allow, from the Settings switch (the
+Allow page `console.html#allow-browser-use`) or from a Cori chat (the
+worker's Allow page for the run, as an AI site's corner chat does).
+Inside the frame the Account card leaves out **Manage on coere.ai**.
+
+**From the site.** The Console reaches coere.ai's account data through
+the background, which holds the device token: an `account.site` message
+names one call (`lib/account-calls.ts`), and the background makes it and
+answers `{ok:true, status, body}` or `{ok:false, status, reason, detail}`,
+where `reason` and `detail` come from a `409 refused` (section 8). A page
+never names a path of its own. Deleting the account, or revoking this
+browser, then removes `coere.account`.
+
+- **Statistics**, the original section, shows in v4's rail without the
+  Dev Tools switch. Benchmarks and Evals stay out.
+- **The Account card** in Settings: the email, **Manage on coere.ai** and
+  **Disconnect**, then the connected browsers with **Revoke**
+  (`GET /devices`, `POST /devices/{id}/revoke`), **Download memory file**
+  and **Delete memory copy** (`GET` and `DELETE /memory`), and **Delete
+  account**, which works once the typed email matches
+  (`POST /account/delete`), all built from the Settings panel's own rows,
+  buttons and dialog.
+- **Organization**, a v4 section after Library, made only of the
+  Console's own cards, rows and buttons and the Memory page's graph, with
+  no sheet of its own: the organization's totals, the shared graph from
+  `GET /org/index`, the members, and for admins invites, roles, access and
+  the organization's settings (`GET /org/page`, `POST /org/{action}`).
+  With no organization, the person's pending invites with **Accept** and
+  **Decline**.
+
+**`console.open`** stays the one way in. In v4:
 
 | Asked for | Opens |
 |---|---|
 | `home` or no section | `<site>/dashboard` |
-| `memory`, `library`, `settings`, `search` | `<site>/dashboard/memory`, `/dashboard/library`, `/dashboard/settings`, `/dashboard/search` |
+| `memory` | `<site>/dashboard/memory` |
 | `statistics` | `<site>/dashboard/usage` |
-| the Settings parts `import`, `logs`, `transfer`, `platforms` | `<site>/dashboard/import`, `/dashboard/logs`, `/dashboard/transfer`, `/dashboard/platforms` |
-| `folder`, the folder picker, whose file handles belong to the extension's origin | the local `console.html` as today |
-| `apps`, `benchmarks`, `evals`, which v4 does not have | the local `console.html`, which opens Home |
-| any section with `local: true`, sent by voice, whose microphone permission only the extension's own page can ask for | the local `console.html` |
+| `settings` with no part | `<site>/dashboard/settings` |
+| `organization` | `<site>/dashboard/organization` |
+| `library`, `cori`, Settings parts `folder`, `import`, `logs`, `transfer`, `ais` | the local `console.html` as today |
+| any section with `local: true`, sent by voice and by the framed Console for what needs the extension's own page | the local `console.html` |
+| anything while `navigator.onLine` is false | the local `console.html`, so the dashboard still opens offline |
 
 Signed out, any of the site ones opens the connect page instead. The
-toolbar popup's dashboard button goes to the site. Settings in the
-extension gains an Account card: the email, **Manage on coere.ai** and
-**Disconnect**. In v4 the local dashboard hides Statistics, Benchmarks and
-Evals, and the memory settings drop the monthly spend cap, since the plan
-on coere.ai sets the limit. The Logs page's Memory table shows this month's
-spend with no limit beside it, since the person never sees a limit (section
-8.10).
+toolbar popup's dashboard button goes through `console.open`, so it lands
+on the site. In v4 the memory settings drop the monthly spend cap, since
+the plan on coere.ai sets the limit. The Logs page's Memory table shows
+this month's spend with no limit beside it, since the person never sees a
+limit (section 8.10).
 
 ## 7. The person's dashboard on coere.ai
 
