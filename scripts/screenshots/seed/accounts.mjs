@@ -20,8 +20,8 @@ export async function seedAccounts(db, passwords, now) {
     people.map((p) => ({
       email: p.email,
       raw_user_meta_data: { username: p.username },
-      email_confirmed_at: momentOf(now, p.createdDaysAgo, null),
-      created_at: momentOf(now, p.createdDaysAgo, null),
+      email_confirmed_at: momentOf(now, p.createdDaysAgo, { next: () => p.at }),
+      created_at: momentOf(now, p.createdDaysAgo, { next: () => p.at }),
     })),
     { returning: "id, email" },
   );
@@ -46,8 +46,9 @@ export async function seedAccounts(db, passwords, now) {
           id: p.id,
           display_name: `${p.first} ${p.last}`,
           plan_id: p.plan,
-          created_at: momentOf(now, p.createdDaysAgo, null),
-          last_seen_at: p.active ? momentOf(now, Math.min(p.createdDaysAgo, r.int(0, 6)), r) : momentOf(now, p.createdDaysAgo, null),
+          created_at: momentOf(now, p.createdDaysAgo, { next: () => p.at }),
+          // Each last visit at its own time: an active account within the week, a quiet one soon after it signed up.
+          last_seen_at: p.active ? momentOf(now, Math.min(p.createdDaysAgo, r.int(0, 6)), r) : momentOf(now, Math.max(0, p.createdDaysAgo - r.int(0, 2)), { next: () => Math.min(p.at, r.next()) }),
           first_build_at: p.firstBuildDaysAgo === null ? null : momentOf(now, p.firstBuildDaysAgo, null),
           // Two accounts the operator has set apart: one suspended, one with its own monthly limit.
           status: i === 40 ? "suspended" : "active",
