@@ -516,6 +516,7 @@ Errors outside the Anthropic routes are problem details
 | `bad_request` | 400 | A body that does not match |
 | `not_found` | 404 | Nothing there |
 | `memory_sync_off` | 409 | A memory upload while the backup is off |
+| `refused` | 409 | The request was understood and a rule said no (8.11, 8.12). The body adds `reason`, which names the rule, and `detail`, the line the Console shows as it is |
 | `sensitive_off` | 412 | A memory commit whose file holds sensitive memories while the person has them turned off; the extension refreshes its account and exports again |
 | `too_large` | 413 | A body or file over its limit |
 | `rate_limited` | 429 | Too many requests this minute, with `Retry-After` |
@@ -713,9 +714,76 @@ shape of section 8.7, with a `contributor` user id on each fact) or `404`,
 cut to the sections the member may read. One answer holds at most 5,000
 facts, the most important first, and fewer when it would pass 4 MB (a
 Vercel function answers at most 4.5 MB); `truncated` is then true. Only
-members may read it. The extension uses these to show the
-organization in Settings; reading the organization graph into context is
+members may read it. The Console's Organization section draws it with the
+Memory page's own graph; reading the organization graph into context is
 the next step after this build (section 14.5).
+
+**`GET /api/v1/org/page`** answers what the Organization section shows,
+in the shape of the site's `src/lib/org/page-data.ts`:
+
+```ts
+{ org: { id, name, plan, sharedSections: string[], defaultAccess: { read: "all" | string[], contribute: boolean },
+         sections: { key, name }[] } | null,
+  me: { userId, role: "admin" | "member", shareMemory: boolean, access, readable: string[] } | null,
+  members: { userId, name, email: string | null, role, access: object | null, effective, shareMemory,
+             joinedAt, tokensSaved, memoriesShared }[],
+  invites: { id, name, role, createdAt, expiresAt }[],
+  totals: { tokensSaved, memories, chats, members, costMicros, monthCostMicros } | null,
+  myInvites: { id, orgName, role, invitedBy: string | null, expiresAt }[] }
+```
+
+`sections` is every section an admin may share: the base ones, then any
+the graph or the settings name. A member's `email` and the open `invites`
+are filled for an admin only. With no organization, `org`, `me` and
+`totals` are null, `members` and `invites` empty, and `myInvites` holds the
+invites waiting for the person.
+
+**`POST /api/v1/org/{action}`** runs one action by the same rules the
+site's dashboard ran (14.1), for the person the token belongs to and only
+inside their own organization. Body at most 16 KiB.
+
+| Action | Body | Who |
+|---|---|---|
+| `invite` | `{ login, role? }`, the email or username of an existing account, `role` `member` by default | admin, at most 30 an hour |
+| `revoke-invite` | `{ inviteId }` | admin |
+| `accept`, `decline` | `{ inviteId }` | the invited person |
+| `role` | `{ userId, role }` | admin |
+| `access` | `{ userId, access }`, `{ read, contribute }` or `null` for the organization's default | admin |
+| `remove` | `{ userId }` | admin, not on themselves |
+| `leave` | `{}` | any member |
+| `share` | `{ on }` | any member |
+| `settings` | `{ name, sections, defaultAccess }` | admin |
+
+Done answers `200 { notice }`, the line to show or null; the Console then
+reads `/org/page` again. A rule's no answers `409 refused` with one of
+these `reason`s and its `detail`: `not_member`, `not_admin`,
+`last_admin`, `self`, `bad_login`, `no_account`, `in_org`, `pending`,
+`too_many`, `invite_not_found`, `invite_expired`, `already_in_org`,
+`bad_name`, `no_sections`. An unknown action is `404`, a body that does
+not match `400 bad_request`. Invites, joins, leaving and removals write
+the same security events as on the dashboard.
+
+### 8.12 Account
+
+These keep working for a suspended account, so a person can always see
+where they are signed in, sign a browser out and delete their account.
+
+**`GET /api/v1/devices`** answers the connected browsers, newest first, at
+most 50:
+`200 { devices: [{ id, name, tokenHint, extensionVersion, createdAt, lastUsedAt, revokedAt, current }] }`,
+where `current` marks the browser that asked.
+
+**`POST /api/v1/devices/{id}/revoke`** revokes one of the caller's own
+browsers (`revoked_reason = 'user'`) and writes `device_revoked`. `204`,
+also for one already revoked. An id that is not one of theirs is `404`.
+Revoking the calling browser signs it out, as `/auth/revoke` does.
+
+**`POST /api/v1/account/delete`** `{ email }` deletes the account by the
+steps of section 7. The typed email must be the account's own (trimmed,
+any case), else `409 refused` with `reason: 'email'`. The last admin of an
+organization is refused with `reason: 'last_admin'`. Then Storage goes
+first and `auth.admin.deleteUser` last. `204`, and the extension removes
+its `coere.account`.
 
 ### 8.10 Limits
 
