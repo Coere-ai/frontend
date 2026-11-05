@@ -3,9 +3,8 @@
 import { useState } from "react";
 
 import { saveLaunchAction } from "@/app/admin/launch/actions";
-import { ago } from "@/lib/dashboard/format";
 import { timeLeft } from "@/lib/launch/countdown";
-import { daysFromNow, fromLocalInput, shiftDays, toLocalInput } from "@/lib/launch/moment";
+import { fromLocalInput, toLocalInput } from "@/lib/launch/moment";
 import type { AdminLaunch } from "@/lib/launch/store";
 import { LAUNCH_PRODUCTS, launchCopy, type LaunchProduct } from "@/site/content/launch";
 import { Countdown } from "@/site/launch/countdown";
@@ -15,13 +14,6 @@ import { AdminPanel } from "../admin-panel";
 import { Button, fieldClass, fieldStyle, Label } from "../controls";
 import { useAction } from "../use-action";
 import { useAdminData } from "../use-admin-data";
-
-/** The zone this browser is in, named, with its offset at that moment: "Europe/London, GMT+1". */
-function zoneOf(ms: number): string {
-  const name = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local time";
-  const offset = new Intl.DateTimeFormat("en-US", { timeZoneName: "shortOffset" }).formatToParts(ms).find((p) => p.type === "timeZoneName")?.value;
-  return offset && !(name === "UTC" && offset === "GMT") ? `${name}, ${offset}` : name;
-}
 
 /** An on and off switch in the panel's look: ink when on. */
 function Toggle({ id, on, onChange }: { id: string; on: boolean; onChange: (v: boolean) => void }) {
@@ -43,9 +35,9 @@ function Toggle({ id, on, onChange }: { id: string; on: boolean; onChange: (v: b
 const textButton = "text-[12px] text-[color:var(--color-muted)] underline-offset-2 hover:text-[color:var(--color-ink)] hover:underline";
 
 /**
- * One product's countdown: the line its page shows, the moment in the
- * operator's own zone, the show switch and Save. A moment in the past saves
- * only after a confirm, since the page then says the product is here.
+ * One product's countdown: what it is for, a small preview of what
+ * visitors see, the moment, the show switch and Save. A moment in the past
+ * saves only after a confirm, since the page then says the product is here.
  */
 function LaunchCard({ product, saved, reload }: { product: LaunchProduct; saved: AdminLaunch[LaunchProduct]; reload: () => void }) {
   const copy = launchCopy[product];
@@ -70,7 +62,8 @@ function LaunchCard({ product, saved, reload }: { product: LaunchProduct; saved:
     setConfirming(false);
     run(() => saveLaunchAction(product, { at: new Date(draft).toISOString(), show, confirmPast }));
   };
-  const line = pending ? "Saving" : (message ?? (dirty ? "Not saved yet" : saved.saved ? `Saved ${ago(saved.updatedAt, now ?? undefined)}` : "Not saved yet. The page counts to the default moment."));
+  const line = pending ? "Saving" : (message ?? (dirty || !saved.saved ? "Not saved yet" : ""));
+  const left = now === null ? null : timeLeft(draft, now);
 
   return (
     <section className="rounded-xl border p-4" style={{ borderColor: "var(--color-border)", background: "var(--color-surface)" }}>
@@ -81,9 +74,18 @@ function LaunchCard({ product, saved, reload }: { product: LaunchProduct; saved:
         </a>
       </div>
 
-      {/* The line the page shows, drawn by the page's own component. */}
-      <div className="mt-4 min-h-[52px] text-[color:var(--color-ink)]">
-        {show ? <Countdown left={now === null ? null : timeLeft(draft, now)} size="sm" /> : <p className="pt-2 text-[12.5px] text-[color:var(--color-muted)]">No timer. The page says coming soon.</p>}
+      <p className="mt-1 text-[12px] text-[color:var(--color-muted)]">
+        Shown on coere.ai{copy.path} until {copy.name} is out.
+      </p>
+
+      {/* What a visitor sees, small: the page's title and its countdown, drawn by the page's own component. */}
+      <div className="mt-4 rounded-lg border px-4 py-5 text-center text-[color:var(--color-ink)]" style={{ borderColor: "var(--color-border)", background: "white" }} aria-label="Preview">
+        <p className="text-[15px] font-medium tracking-[-0.02em]">{left?.done ? copy.here : copy.title}</p>
+        {show && !left?.done ? (
+          <div className="mt-3">
+            <Countdown left={left} size="sm" />
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-4">
@@ -100,18 +102,6 @@ function LaunchCard({ product, saved, reload }: { product: LaunchProduct; saved:
           className={`${fieldClass} max-w-[260px] tabular-nums`}
           style={fieldStyle}
         />
-        <p className="mt-1 text-[11.5px] text-[color:var(--color-muted)]">Your time zone: {zoneOf(draft)}</p>
-        <div className="mt-1.5 flex flex-wrap gap-x-3">
-          <button type="button" className={textButton} onClick={() => move(shiftDays(draft, 1))}>
-            +1 day
-          </button>
-          <button type="button" className={textButton} onClick={() => move(shiftDays(draft, 7))}>
-            +1 week
-          </button>
-          <button type="button" className={textButton} onClick={() => move(daysFromNow(Date.now(), 20))}>
-            20 days from now
-          </button>
-        </div>
       </div>
 
       <div className="mt-4 flex items-center gap-3">
