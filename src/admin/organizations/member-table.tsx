@@ -63,10 +63,10 @@ export function MemberTable({ data, run, pending }: { data: OrgDetailPayload; ru
                   <Link href={`/admin/users/${m.userId}`} className="underline-offset-2 hover:underline">
                     {m.name}
                   </Link>
-                  {m.email && m.email !== m.name ? <span className="ml-1.5 text-[color:var(--color-muted)]">{m.email}</span> : null}
+                  {m.email && m.email !== m.name ? <span className="block text-[color:var(--color-muted)]">{m.email}</span> : null}
                 </td>
                 <td className="px-3 py-2">
-                  <select aria-label={`Role of ${m.name}`} value={m.role} disabled={pending} onChange={(e) => changeRole(m, e.target.value)} className={`${fieldClass} w-auto py-1`} style={fieldStyle}>
+                  <select aria-label={`Role of ${m.name}`} value={m.role} disabled={pending} onChange={(e) => changeRole(m, e.target.value)} className={`${fieldClass} min-w-[6.5rem] py-1`} style={fieldStyle}>
                     <option value="admin">Admin</option>
                     <option value="member">Member</option>
                   </select>
