@@ -181,17 +181,112 @@ origins, so pages there can send one off messages with
 `chrome.runtime.sendMessage(extensionId, message)`. The background handles
 them in `chrome.runtime.onMessageExternal`. It accepts a message only when
 `sender.origin` is one of the site origins. It answers with a small object
-and never with chat text, memory text or the token.
+and never with chat text, memory text or the token, except `coere.rpc`
+(5.1), whose answer is the Console's own and can hold the library's and
+memory's text. That text stays in the person's coere.ai tab, as it stays in
+the Console page: the site's page code never sends it to the server.
 
 | Message | Allowed from | Answer | What it does |
 |---|---|---|---|
-| `{type:'coere.hello'}` | any site page | `{ok:true, version, build:4, signedIn, userId}` | Lets the site know Coere is installed and which account it uses. |
+| `{type:'coere.hello'}` | any site page | `{ok:true, version, build:4, signedIn, userId, console:1}` | Lets the site know Coere is installed and which account it uses. `console:1` says the console bridge (5.1) is there; a Coere without it leaves the field out. |
 | `{type:'coere.connect', code, state}` | `/connect` | `{ok:true}` or `{ok:false, reason:'state'\|'exchange'}` | Section 4. |
-| `{type:'coere.open', target}` | `/dashboard` and below | `{ok:true}` | Opens a local page. `target` is one of `library`, `memory`, `home`, `cori`, `settings-folder`, `settings-import`, `settings-logs`, `settings-transfer`. |
+| `{type:'coere.open', target, run?}` | `/dashboard` and below | `{ok:true}` | Opens a local page. `target` is one of `library`, `memory`, `home`, `cori`, `settings-folder`, `settings-import`, `settings-logs`, `settings-transfer`, `allow-browser-use`. `run`, for `allow-browser-use` alone, is the run id (letters, digits, `_` and `-`, at most 80) whose kept start the Allow page goes on with. |
 | `{type:'coere.backup'}` | `/dashboard` and below | `{ok:true}` | Pushes the memory file now (section 6.5). |
 | `{type:'coere.settings'}` | `/dashboard` and below | `{ok:true}` | Pulls the synced settings now (section 6.6). |
+| `{type:'coere.rpc', v:1, message}` | `/dashboard` and below | the Reply, or a refusal | The console bridge's requests (5.1). |
 
-Anything else answers `{ok:false, reason:'unknown'}`.
+Anything else answers `{ok:false, reason:'unknown'}`, and so does a
+`coere.rpc` to a Coere without the console bridge.
+
+### 5.1 The console bridge
+
+coere.ai's `/dashboard` runs the extension's own Console, built for the web
+from the same source. The library, the memory and every other local part
+stay in the browser: the Console there reads and changes them through the
+extension, the same way the Console page does. Bridge version 1, in the v4
+background only (`background/account/console-*.ts`, `runtime-taps.ts`).
+
+**Who may use it.** Both halves take only a sender whose `origin` is one of
+the site origins, whose `url` sits on that same origin, and whose path is
+`/dashboard` or starts with `/dashboard/`. A sender off the site gets no
+answer at all, and a port from one is closed at once. A site page
+elsewhere (`/connect`, `/pricing`, `/dashboards`) gets
+`{ok:false, reason:'unknown'}` for a request.
+
+**Requests.** The page calls
+`chrome.runtime.sendMessage(extensionId, {type:'coere.rpc', v:1, message})`,
+where `message` is exactly a Coere message the Console sends the service
+worker today through `lib/rpc.ts` (`lib/messages.ts`), `ch:'coere'` and
+its `id` included. The background hands an allowed `message` to the
+service worker's own `onMessage` listeners as if the Console page had sent
+it (sender id the extension's, url `console.html`, the dashboard's tab),
+and answers with exactly the Reply those listeners give that page. With
+no answer from them, it answers nothing, as Chrome does. Otherwise:
+
+- `v` other than `1`, or a `message` that is not a Coere message:
+  `{ok:false, error:{code:'bad_request', message}}`.
+- A type or method off the list:
+  `{ok:false, error:{code:'forbidden', message}}`. Nothing reaches a
+  listener.
+
+The list (`console-allow.ts`) holds what the Console sends the worker and
+nothing else. `console-allow.test.ts` ties each entry to the Console file
+that sends it, and checks that nothing marked off the list appears there.
+
+- Types: `engine.call`, `batch.start`, `batch.action`, `transfer.start`,
+  `cori.ask`, `console.open`, `onboarding.open`, `account.connect`,
+  `account.disconnect`, `account.org`, and the Actions requests
+  `actions.start`, `actions.answer`, `actions.stop`, `actions.undo`,
+  `actions.retry`, `actions.takeover`, `actions.focus`, `actions.export`,
+  `actions.watch`, `actions.allow`, `actions.workers` and `actions.get`.
+- `engine.call` methods: `search`, `getConversation`, `getRawJson`,
+  `listConversations`, `listOpenings`, `listProjects`, `knownUpdates`,
+  `stats`, `getCheckpoint`, `listRuns`, `listErrors`,
+  `upsertConversations`, `upsertProject`, `deleteConversation`,
+  `saveCheckpoint`, `recordError`, `memory.search`, `memory.overview`,
+  `memory.children`, `memory.node`, `memory.quote`, `memory.dueSoon`,
+  `memory.review`, `memory.status`, `memory.control`, `memory.settings`,
+  `memory.setSettings`, `memory.edit`, `memory.export`, `memory.import`,
+  `memory.forgetPreview`, `memory.forgetTopic`, `memory.buildEstimate`,
+  `memory.usage`, `memory.learned`, `memory.documents`, `memory.corePack`,
+  `memory.stats`, `memory.deleteChats`, `memory.act.activity`,
+  `memory.act.clearActivity`, and `memory.chat.list`, `.get`, `.search`,
+  `.append`, `.rename`, `.delete`, `.deleteAll` and `.keep`.
+- Never on it: `account.token` and `account.backup` (the device token and
+  Back up now), the lab, the access layer, the agent's own model steps
+  (`memory.act.step` and the rest), what content scripts send (capture,
+  Recall, silent import, transfer claims and results, run progress) and
+  what the Console sends a site tab instead of the worker (`run.state`,
+  `run.resume`, `selftest.run`, `agent.show`). `actions.allowed` stays
+  with the Allow page, which stays in the extension.
+
+An `uploadId` travels as given, so a large argument that went over the
+extension's own upload port answers `upload_failed`: the web console sends
+its arguments inline.
+
+**Events.** The page opens
+`chrome.runtime.connect(extensionId, {name:'coere.console'})`. The
+background posts `{type:'coere.event', v:1, event}` on it for every
+broadcast the Console page hears, where `event` is that broadcast as the
+page gets it:
+
+- `engine.event` named `library.changed`, `index.progress`,
+  `memory.changed`, `memory.status`, `memory.build` or `memory.built`,
+  from the engine in the offscreen document;
+- the service worker's own `run.progress` (`via:'worker'`), its checked
+  `transfer.result`, and Actions' `actions.state`, `actions.preview` and
+  `actions.rows`.
+
+A site tab's own `run.progress`, which carries the chat's title, and the
+account events never travel. The page sends nothing on the port. The
+port closes when the service worker stops; the page connects again and
+reads its state anew, as the Console page does after a worker restart.
+
+**Local only.** The folder picker (its file handles belong to the
+extension's origin) and the Allow page for Browser Use (Chrome's
+permission prompt belongs to the extension's page) stay in the extension:
+the web console opens them with `coere.open` and `settings-folder` or
+`allow-browser-use`.
 
 ## 6. The extension side
 
@@ -331,16 +426,20 @@ the person's running total (section 15).
 
 ### 6.8 The dashboard
 
-`console.open` stays the one way in. In v4:
+`console.open` stays the one way in. In v4 every section opens on
+coere.ai, which runs the Console through the console bridge (5.1): the
+path's last part is the id the local console takes in `?tab=`, with Home
+at `/dashboard` and Statistics at `/dashboard/usage`.
 
 | Asked for | Opens |
 |---|---|
-| `home` | `<site>/dashboard` |
-| `memory` | `<site>/dashboard/memory` |
+| `home` or no section | `<site>/dashboard` |
+| `memory`, `library`, `settings`, `search` | `<site>/dashboard/memory`, `/dashboard/library`, `/dashboard/settings`, `/dashboard/search` |
 | `statistics` | `<site>/dashboard/usage` |
-| `settings` with no part | `<site>/dashboard/settings` |
-| `library`, `cori`, Settings parts `folder`, `import`, `logs`, `transfer`, `ais` | the local `console.html` as today |
-| `settings` with `local: true`, sent by voice, whose microphone permission only the extension's own page can ask for | the local `console.html` Settings |
+| the Settings parts `import`, `logs`, `transfer`, `platforms` | `<site>/dashboard/import`, `/dashboard/logs`, `/dashboard/transfer`, `/dashboard/platforms` |
+| `folder`, the folder picker, whose file handles belong to the extension's origin | the local `console.html` as today |
+| `apps`, `benchmarks`, `evals`, which v4 does not have | the local `console.html`, which opens Home |
+| any section with `local: true`, sent by voice, whose microphone permission only the extension's own page can ask for | the local `console.html` |
 
 Signed out, any of the site ones opens the connect page instead. The
 toolbar popup's dashboard button goes to the site. Settings in the
