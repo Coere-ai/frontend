@@ -203,7 +203,7 @@ export function libraryConversations(now) {
     messages: c.messages.map((m) => ({ role: m.role, text: m.text, createdAt: m.at })),
     alternateBranches: 0,
     hiddenCount: 0,
-    adapter: "coere-screenshots@1",
+    adapter: `${c.platform}-web@1`,
     capturedAt: c.messages[c.messages.length - 1].at,
   }));
 }
