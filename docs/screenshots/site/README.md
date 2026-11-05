@@ -8,7 +8,7 @@ Maya Collins, made up for these pictures.
 ## Home
 
 <p align="center">
-  <img src="home-hero.webp" width="100%" alt="The home page's first screen: Own your Memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
+  <img src="home-hero.webp" width="100%" alt="The home page's first screen: Own your memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
   <br />
   <sub>The first screen: what Coere is, in one line, and the way in.</sub>
 </p>
@@ -63,6 +63,6 @@ The whole page: [home.webp](home.webp).
 
 | | |
 |---|---|
-| <img src="sign-in-email.webp" alt="Sign in to Coere, with an email field and Email me a code, beside Cori on the dune background" /><br /><sub>Sign in: a code by email</sub> | <img src="sign-in-code.webp" alt="The code step for maya@fernhillcreative.co with three of the six digits typed and Verify" /><br /><sub>Sign in: the code</sub> |
+| <img src="sign-in-email.webp" alt="Sign in to Coere, with an email field and Email me a code, plain on the white page" /><br /><sub>Sign in: a code by email</sub> | <img src="sign-in-code.webp" alt="The code step for maya@fernhillcreative.co with three of the six digits typed and Verify" /><br /><sub>Sign in: the code</sub> |
 | <img src="sign-in-password.webp" alt="The password step, with Email or username filled in and a password field" /><br /><sub>Sign in: email or username and password</sub> | <img src="sign-up.webp" alt="Create your Coere account, with email, username and password" /><br /><sub>Sign up</sub> |
 | <img src="connect.webp" alt="Connect Coere to your account, signed in as maya@fernhillcreative.co, with Connect Coere" /><br /><sub>/connect, where the extension gets its device token</sub> | <img src="phone-sign-in.webp" width="195" alt="Sign in at phone width" /><br /><sub>Sign in at 390 wide</sub> |

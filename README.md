@@ -35,7 +35,7 @@ pictures: [the site](docs/screenshots/site/README.md),
 ### The site
 
 <p align="center">
-  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The home page's first screen: Own your Memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
+  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The home page's first screen: Own your memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
   <br />
   <sub>The home page opens on what Coere is, in one line. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
 </p>
@@ -60,7 +60,7 @@ pictures: [the site](docs/screenshots/site/README.md),
       <sub>Every Install button leads to the countdown until the extension is in the Chrome Web Store.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/sign-in-code.webp" alt="The sign in code step for maya@fernhillcreative.co, beside Cori on the dune background" />
+      <img src="docs/screenshots/site/sign-in-code.webp" alt="The sign in code step for maya@fernhillcreative.co, plain on the white page" />
       <br />
       <sub>Sign in with a code by email, or with a password.</sub>
     </td>
@@ -70,7 +70,7 @@ pictures: [the site](docs/screenshots/site/README.md),
 ### The dashboard
 
 <p align="center">
-  <img src="docs/screenshots/dashboard/memory-graph.webp" width="100%" alt="coere.ai/dashboard framing the Console's Memory page: Maya in the middle and her sections around her, with Work holding Fernhill Creative and three clients and their projects" />
+  <img src="docs/screenshots/dashboard/memory-graph.webp" width="100%" alt="coere.ai/dashboard framing the Console's Memory page: You in the middle and Maya's sections around her, with Work holding Fernhill Creative and three clients and their projects" />
   <br />
   <sub>coere.ai/dashboard is the extension's own Console, full screen: the same app, in its own style.</sub>
 </p>
