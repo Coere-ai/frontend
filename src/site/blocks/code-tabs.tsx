@@ -26,7 +26,7 @@ export function CodeTabs({ samples }: { samples: CodeSample[] }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-[#0b1020] text-white shadow-[0_40px_100px_-40px_rgba(0,0,0,0.6)] ring-1 ring-white/10">
+    <div className="overflow-hidden rounded-2xl bg-[#0b1020] text-white ring-1 ring-white/10">
       <div className="flex items-center gap-1 border-b border-white/10 px-3">
         {samples.map((s, index) => (
           <button

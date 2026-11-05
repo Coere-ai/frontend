@@ -36,8 +36,6 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
   return (
     <>
       <PhotoHero
-        photo={industry.photo.src}
-        alt={industry.photo.alt}
         eyebrow="Industries"
         title={`Coere for ${industry.name.toLowerCase()}`}
         line={content.line}
@@ -48,7 +46,7 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
         app={demo("context", `Coere for ${industry.name.toLowerCase()}, shown on the app`)}
       />
       <ProductSection id="how" title={`What ${industry.name.toLowerCase()} teams do with Coere`} line="Each Coere product, through an example from the field.">
-        <AccordionShowcase items={items} background={{ src: industry.photo.src, by: industry.photo.by }} />
+        <AccordionShowcase items={items} />
       </ProductSection>
       <MoreIndustries current={industry.slug} all={industries} />
       <ClosingCta title={`Bring memory to ${industry.name.toLowerCase()}.`} text="Tell us what your people repeat to AI every day." />

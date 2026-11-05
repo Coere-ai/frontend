@@ -37,7 +37,7 @@ export function CompareSection() {
             Without Coere, you paste files and notes into every new chat. With Coere, you name the project and the right context goes in for you.
           </p>
         </div>
-        <div ref={box} role="img" aria-label="Without Coere: 10.4k tokens and 4 minutes 12 seconds. With Coere: 240 tokens and 5 seconds." className="relative mt-16 aspect-video w-full overflow-hidden rounded-3xl bg-white shadow-[0_40px_100px_-40px_rgba(0,0,0,0.35)] ring-1 ring-neutral-200">
+        <div ref={box} role="img" aria-label="Without Coere: 10.4k tokens and 4 minutes 12 seconds. With Coere: 240 tokens and 5 seconds." className="relative mt-16 aspect-video w-full overflow-hidden rounded-3xl bg-white ring-1 ring-neutral-200">
           {near ? (
             <iframe
               src={PAGE}

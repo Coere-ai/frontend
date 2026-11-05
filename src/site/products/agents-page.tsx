@@ -1,7 +1,6 @@
 import { AgentCards } from "@/site/agents/agent-cards";
 import { AgentLineup } from "@/site/agents/agent-lineup";
 import { Capabilities } from "@/site/agents/capabilities";
-import { backgrounds } from "@/site/content/backgrounds";
 import { agentsHero } from "@/site/content/pages/agents";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { ProductHero } from "./hero";
@@ -17,7 +16,7 @@ export function AgentsPage() {
     <>
       <ProductHero
         copy={agentsHero}
-        background={backgrounds.blocks}
+       
         app={<AgentLineup />}
         appFit="contained"
         secondary={{ href: "#capabilities", label: "See all features" }}

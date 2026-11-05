@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { PhotoHero } from "@/site/blocks/photo-hero";
 import { FaqSection } from "@/site/blocks/faq";
-import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
 import { guideBySlug, portable } from "@/site/content/guides";
 import { contactHref, contactLabel } from "@/site/content/navigation";
@@ -27,7 +26,6 @@ export default function PortableAiMemoryPage() {
     <>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Portable AI memory", "AI memory layer"], faqs: portable.faqs })} />
       <PhotoHero
-        photo={backgrounds.flow.src}
         {...portable.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "How it works" }}
@@ -48,7 +46,7 @@ export default function PortableAiMemoryPage() {
         line="Four steps in your browser. The film below plays them live, on Coere's own code."
         steps={portable.steps}
         film={films.v2}
-        background={backgrounds.ribbons}
+       
         link={{ href: "/products/connect", label: "Explore Coere Connect" }}
       />
       <CompareTable />

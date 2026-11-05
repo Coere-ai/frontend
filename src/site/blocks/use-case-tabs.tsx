@@ -50,7 +50,7 @@ export function UseCaseTabs({ cases }: { cases: UseCase[] }) {
               {c.checks ? <CheckList items={c.checks} className="mt-7" /> : null}
               {c.href ? <ArrowLink href={c.href} className="mt-7 text-neutral-950">{c.linkLabel ?? "Learn more"}</ArrowLink> : null}
             </div>
-            {on ? <div className="overflow-hidden rounded-2xl border border-neutral-200 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.3)]">{c.visual}</div> : null}
+            {on ? <div className="overflow-hidden rounded-2xl border border-neutral-200">{c.visual}</div> : null}
           </div>
         );
       })}

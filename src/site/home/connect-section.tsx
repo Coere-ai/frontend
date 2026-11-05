@@ -1,5 +1,4 @@
 import { AccordionShowcase, type ShowcaseItem } from "@/site/blocks/accordion-showcase";
-import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
@@ -60,7 +59,7 @@ export function ConnectSection() {
           linkLabel="Explore Coere Connect"
         />
         <div className="mt-20">
-          <AccordionShowcase items={items} background={backgrounds.dune} />
+          <AccordionShowcase items={items} />
         </div>
       </Container>
     </section>

@@ -4,7 +4,6 @@ import { CheckList } from "@/site/blocks/check-list";
 import { CodeTabs } from "@/site/blocks/code-tabs";
 import { FaqSection } from "@/site/blocks/faq";
 import { PhotoHero } from "@/site/blocks/photo-hero";
-import { backgrounds } from "@/site/content/backgrounds";
 import { contextSamples, mcpSamples } from "@/site/content/code/context-api";
 import { films } from "@/site/content/films";
 import { agentMemory, guideBySlug } from "@/site/content/guides";
@@ -29,7 +28,6 @@ export default function AiAgentMemoryPage() {
     <>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["AI agent memory", "Model Context Protocol", "Memory API"], faqs: agentMemory.faqs })} />
       <PhotoHero
-        photo={backgrounds.blocks.src}
         {...agentMemory.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "/resources/mcp", label: "Read the MCP docs" }}
@@ -51,7 +49,7 @@ export default function AiAgentMemoryPage() {
         line="A developer makes a token, adds Coere to their app's AI call and runs it, then points it at any AI. The film below plays it live."
         steps={agentMemory.steps}
         film={films.forgeDev}
-        background={backgrounds.light}
+       
         link={{ href: "/resources/authentication", label: "Tokens and scopes" }}
       />
       <section className="bg-neutral-50 py-28 md:py-32">

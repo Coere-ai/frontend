@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { CheckList } from "@/site/blocks/check-list";
 import { Stage } from "@/site/blocks/stage";
-import type { Background } from "@/site/content/backgrounds";
 import { contactHref, contactLabel } from "@/site/content/navigation";
 import type { Film } from "@/site/content/films";
 import type { Step, Way } from "@/site/content/guides";
@@ -57,7 +56,7 @@ export function StepList({ steps }: { steps: Step[] }) {
 }
 
 /** How to do it: the steps, then the whole thing playing live on Coere's own code. */
-export function WorkflowSection({ id = "how", title, line, steps, film, background, link }: { id?: string; title: string; line: string; steps: Step[]; film: Film; background: Background; link?: { href: string; label: string } }) {
+export function WorkflowSection({ id = "how", title, line, steps, film, link }: { id?: string; title: string; line: string; steps: Step[]; film: Film; link?: { href: string; label: string } }) {
   return (
     <section id={id} className="scroll-mt-24 py-28 md:py-32">
       <Container>
@@ -69,9 +68,8 @@ export function WorkflowSection({ id = "how", title, line, steps, film, backgrou
         <div className="mt-16">
           <StepList steps={steps} />
         </div>
-        <Stage background={background} className="mt-16">
-          <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/45" />
-          <div className="relative p-6 md:p-12">
+        <Stage className="mt-16">
+          <div className="relative">
             <FilmFrame film={film} />
           </div>
         </Stage>
@@ -119,7 +117,7 @@ export function WordsTable({ caption, columns, rows, note }: { caption: string; 
   return (
     <section className="py-28 md:py-32">
       <Container>
-        <div className="relative overflow-x-auto rounded-3xl bg-white ring-1 ring-neutral-200 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.3)]">
+        <div className="relative overflow-x-auto rounded-3xl bg-white ring-1 ring-neutral-200">
           <table className="w-full min-w-[640px] border-collapse text-left">
             <caption className="px-4 pt-8 text-left text-2xl font-medium tracking-[-0.03em] text-neutral-950 md:px-8">{caption}</caption>
             <thead>
