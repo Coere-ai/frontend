@@ -88,8 +88,10 @@ security policy keeps `connect-src 'self'`.
    password (at least 10 characters) and an optional username. The server
    calls `auth.signUp` with the username in `options.data.username`. The
    person confirms by the emailed link, which also lands on `/auth/confirm`.
-5. **Later.** On `/dashboard/account` a person who came in by code can set
-   a username and a password, and change either.
+5. **Later.** A person who came in by code could set a username and a
+   password, and change either, on the site's old Account page. That page
+   went when the dashboard became the Console (section 7), and the Console
+   does not set them yet.
 
 Usernames are 3 to 24 characters of `a-z`, `0-9` and `_`, stored lowercase,
 unique.
@@ -452,41 +454,78 @@ spend with no limit beside it, since the person never sees a limit (section
 
 ## 7. The person's dashboard on coere.ai
 
-Pages under `/dashboard`, in the site's own style (white, neutral ink,
-Coere blue, the site's buttons and form fields). Reads go through the
-person's own Supabase session, so Row Level Security decides what they see.
-Writes that need more go through the server with the secret key after the
-session is checked.
+`coere.ai/dashboard` is the extension's own Console page, unchanged, in a
+frame that fills the window. The Console runs as the extension itself, so
+it keeps its own style and every feature it has in its own tab. Nothing of
+it is copied into the site. Its account data (Statistics, the Settings
+Account card, Organization) comes from the site through the background
+with the device token, by the routes of section 8.
 
-| Page | What it shows and does |
+**The host page.** `/dashboard` and every address below it are one page,
+`src/app/dashboard/[[...section]]/page.tsx`, outside the site's layout, so
+no navbar or footer shows. It renders per request, calls `requireUser`,
+and carries the nonce policy and noindex like the other account pages.
+
+1. The server picks the one extension it lets the page frame: the
+   `coere_ext` cookie's id when `COERE_EXTENSION_IDS` lists it (or, outside
+   production while the list is unset, any well formed id, as `/connect`
+   allows). On `/dashboard` alone the policy's `frame-src` is exactly
+   `chrome-extension://<that id>/`; every other directive stays as it is.
+2. The page asks that id, then each id of `COERE_EXTENSION_IDS`, with
+   `coere.hello`, and takes the first that answers.
+3. When that is the id the policy names, it renders only
+   `<iframe src="chrome-extension://<id>/console.html?tab=<section>&embed=1" allow="microphone; clipboard-read; clipboard-write">`.
+   When another id answered, it writes that id to `coere_ext` and loads the
+   page once more, so the policy names it. It never reloads twice for the
+   same id.
+4. With no Coere answering, or in a browser with no `chrome.runtime`, a
+   plain page in the site's style says the dashboard runs inside Coere
+   Connect, links **Install Coere** to `/install`, and says to open the page
+   in the Chrome where Coere is installed.
+
+| Address | Console section |
 |---|---|
-| `/dashboard` | Connected browsers, memory counts, this month's AI cost, requests and tokens, the last backup, and buttons that use the bridge: Open library, Back up now. |
-| `/dashboard/memory` | The memory graph (the product's flat graph, laid out by the same `layoutTree`), a searchable list of memories by section, and the source of each. Built from the stored index (section 8.7). Download the `.coere` file. **Edit in Coere** opens the local Memory page through the bridge. |
-| `/dashboard/chats` | The chats memory came from: title, AI, when it was saved, message count. Titles only. Chat text stays in the browser. |
-| `/dashboard/usage` | This month's cost, requests and tokens, cost and tokens by day, by model and by kind, and the running totals: tokens saved, tokens used, AI cost, imports and transfers. |
-| `/dashboard/settings` | The synced settings (section 6.6), the memory backup switch and the sensitive memories switch. A change bumps the version, and the page sends `coere.settings` through the bridge so the extension pulls at once. |
-| `/dashboard/organization` | Section 14: create an organization or join one, its members and roles, invites, the shared knowledge graph and the organization's totals. |
-| `/dashboard/account` | Email, username, password, connected browsers with **Revoke**, download everything, delete the memory copy, delete the account. |
+| `/dashboard` | `home` |
+| `/dashboard/memory` | `memory` |
+| `/dashboard/usage`, `/dashboard/statistics` | `statistics` |
+| `/dashboard/settings`, `/dashboard/account` | `settings`, whose Account card is first |
+| `/dashboard/organization` | `organization` |
+| `/dashboard/library`, `/dashboard/chats` | `library` |
+| `/dashboard/search`, `/import`, `/logs`, `/transfer`, `/platforms`, `/folder` | the same id, which the Console places itself (section 6.8) |
 
-**No limit shows.** No page shows a spend limit, a plan limit, a meter of
+Any other address below `/dashboard` is a 404. The mapping is
+`src/lib/dashboard/host/console-tab.ts`; the id rules are `frame-id.ts`
+and `find-extension.ts` beside it.
+
+**What the Console shows from the site.** Statistics, in v4's rail
+without the Dev Tools switch. The Settings Account card: the email,
+connected browsers with **Revoke** (`/devices`), download the memory file
+and delete the memory copy (`GET` and `DELETE /memory`), and delete the
+account with the typed email (`/account/delete`). The Organization
+section: the shared graph from `/org/index`, drawn by the Memory page's
+own graph, the members, and for admins invites, roles, access and the
+organization's settings (`/org/page`, `/org/{action}`); with no
+organization, the person's pending invites with **Accept** and
+**Decline**.
+
+**No limit shows.** Nothing shows a spend limit, a plan limit, a meter of
 spend against a limit or an amount left (section 8.10). The person sees
-only their own use. Only while a limit is reached do `/dashboard` and
-`/dashboard/usage` say so, in one line: "Your AI use is paused until next
-month." for the monthly limit, "Your AI use is paused until tomorrow." for
-a daily limit the operator set, and "Your AI use is paused. Contact us to
-continue." for the lifetime limit or a spent first build allowance, with
-"Contact us" linking to coereagent@gmail.com. The server answers which one
-from `spend_state()`, by the gate's own rule, and never a number.
+only their own use.
 
 **Deleting the account** asks the person to type their email. The server
 then removes every object under their Storage folder, revokes their
 devices, and calls `auth.admin.deleteUser`, which removes their rows
 through the foreign keys. Usage rows keep their numbers with the person
 cut off (`user_id` set to null), so the cost history stays whole and names
-nobody. It writes `account_deleted` with no user id.
+nobody. It writes `account_deleted` with no user id. The extension then
+removes its `coere.account`.
 
-**Turning the backup off** removes the stored file and its index, and the
-extension stops pushing.
+**Not in the Console yet.** The site's old Settings and Account pages also
+held the memory backup switch (`profiles.memory_sync`; off removes the
+stored file and its index, and the extension stops pushing), the
+sensitive memories switch (`include_sensitive`), and setting a username
+and a password. They went with those pages, and no route sets them for a
+device token yet, so each keeps its value until the Console gains it.
 
 ## 8. The API
 
@@ -846,8 +885,7 @@ before the reset no longer counts against it.
 
 **The person never sees a limit.** A signed in session cannot read any of
 the limit columns, `spend_state()` or the holds. The dashboard shows only
-the person's own use, and one plain line while a limit is reached (section
-7). `GET /api/v1/account` still answers the resolved monthly and lifetime
+the person's own use (section 7). `GET /api/v1/account` still answers the resolved monthly and lifetime
 limits for the extension, which shows no number from them in v4. When a
 limit is reached, the extension shows its usual limit message and tries
 again each hour; a spent month lifts on the first of the next and a spent
