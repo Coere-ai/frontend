@@ -52,7 +52,8 @@ function RollingDigit({ digit }: { digit: string }) {
  * The countdown as one line of tabular digits, 19:16:00:09, with a quiet
  * word under each part. `left` is null until the page knows the time on the
  * visitor's own clock. Until then the line is drawn at its full size but
- * hidden, so nothing moves when the numbers arrive. It takes its colour
+ * hidden, in plain spans so the server's HTML never depends on the
+ * visitor's motion setting, and nothing moves when the numbers arrive. It takes its colour
  * from the page around it.
  */
 export function Countdown({ left, size = "lg" }: { left: TimeLeft | null; size?: CountdownSize }) {
@@ -73,9 +74,13 @@ export function Countdown({ left, size = "lg" }: { left: TimeLeft | null; size?:
           ) : null}
           <span aria-hidden="true" className="flex flex-col items-center">
             <span className={`flex ${look.digits}`}>
-              {digitsOf(left ? left[unit.key] : 0).map((digit, d, all) => (
-                <RollingDigit key={all.length - d} digit={digit} />
-              ))}
+              {left
+                ? digitsOf(left[unit.key]).map((digit, d, all) => <RollingDigit key={all.length - d} digit={digit} />)
+                : digitsOf(0).map((digit, d) => (
+                    <span key={d} className={cell}>
+                      {digit}
+                    </span>
+                  ))}
             </span>
             <span className={`font-normal tracking-normal opacity-50 ${look.label}`}>{unit.label}</span>
           </span>
