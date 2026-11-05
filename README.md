@@ -312,10 +312,11 @@ copied here.
   on `/account`, and the invite waits in the coworker's Organization
   section.
 - `/account` holds what a device token may never do, since a token copied
-  out of a browser must not be able to: revoke any browser or all of them,
-  turn the memory backup on, invite someone or make an admin, and delete
-  the account after a sign in from the last ten minutes. It needs no
-  Coere, so it works from a phone.
+  out of a browser must not be able to: set the username or password,
+  revoke any browser or all of them, turn the memory backup on, invite
+  someone or make an admin, and delete the account after a sign in from
+  the last ten minutes. It also sets the display name and signs the site
+  out. It needs no Coere, so it works from a phone.
 
 ### Settings
 
@@ -333,6 +334,10 @@ below.
 
 - **Authentication, Sign In / Providers, Email**: on, with **Confirm email**
   on. Set **Email OTP Length** to 6 and **Minimum password length** to 10.
+- **Authentication, Sign In / Providers, Email, Secure password change**:
+  on or off. On, a session older than a day must type an emailed code to
+  change its password on `/account`; the **Reauthentication** template
+  must hold `{{ .Token }}`, as Supabase's own does.
 - **Authentication, URL Configuration**: Site URL `https://www.coere.ai`.
   Redirect URLs `https://www.coere.ai/**`, plus `http://localhost:3000/**`
   for development.

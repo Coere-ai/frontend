@@ -88,10 +88,14 @@ security policy keeps `connect-src 'self'`.
    password (at least 10 characters) and an optional username. The server
    calls `auth.signUp` with the username in `options.data.username`. The
    person confirms by the emailed link, which also lands on `/auth/confirm`.
-5. **Later.** A person who came in by code could set a username and a
-   password, and change either, on the site's old Account page. That page
-   went when the dashboard became the Console (section 7), and the Console
-   does not set them yet.
+5. **Later.** On `/account` a person who came in by code can set a
+   username and a password, and change either. The username is checked
+   unique on the server with the secret key and writes `username_set`. The
+   password (at least 10 characters) goes through the person's own session
+   with `auth.updateUser` and writes `password_set`. When Supabase's
+   Secure password change wants a sign in from the last day, the page says
+   so and offers an emailed code (`auth.reauthenticate`), which goes in as
+   the update's `nonce`. A typed code counts against the limits below.
 
 Usernames are 3 to 24 characters of `a-z`, `0-9` and `_`, stored lowercase,
 unique.
@@ -123,7 +127,7 @@ nothing.
 | `/auth/confirm` | Route handler for every emailed link. It checks the link and sends it on. |
 | `/auth/continue` | The emailed link's confirm page. Its button spends the token. |
 | `/connect` | Hands a connect code to the extension (section 4). |
-| `/account` | The steps a device token may not take, signed in on the site (section 7): the browsers with Revoke, the backup switches, an admin's invites, deleting the account. |
+| `/account` | The steps a device token may not take, signed in on the site (section 7): the display name, username and password, Sign out, the browsers with Revoke, the backup switches, an admin's invites, deleting the account. |
 | `/dashboard/...` | The person's dashboard (section 7). |
 | `/admin/...` | The operator's panel (section 9). It keeps its own USER and PASSWORD guard, separate from accounts. |
 
@@ -504,6 +508,12 @@ person into the organization. Those steps live on `/account`
 calls `requireUser` and needs no Coere, so it works from a phone when a
 laptop is lost:
 
+- **Profile**: the display name the organization sees (at most 80
+  characters; an empty box clears it), and the username, set or changed
+  by the rules of 3.1. Each saves on its own.
+- **Password**: set or change it, by 3.1.
+- **Sign out**: signs coere.ai out in this browser and clears the
+  `coere_signed_in` hint. Coere stays connected there.
 - **Browsers**: every connected browser with **Revoke**, and **Sign out
   every browser**, which revokes them all at once (`revoked_reason =
   'user'`, one `device_revoked` event). Each asks first.
@@ -535,10 +545,9 @@ backup switch (`profiles.memory_sync`) and the sensitive memories switch
 Turning the backup off removes the stored file and its index, and the
 extension stops pushing.
 
-**Not in the Console.** The old Account page also set a username and a
-password. They went with that page, and no route sets them for a device
-token: a token taken from a browser must never be able to change how the
-account signs in. Each keeps its value.
+**Not in the Console.** The username and the password are set on
+`/account` only, and no route sets them for a device token: a token taken
+from a browser must never be able to change how the account signs in.
 
 ## 8. The API
 
