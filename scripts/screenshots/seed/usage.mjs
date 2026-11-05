@@ -32,7 +32,8 @@ export async function seedUsage(db, { people, orgId, dayOf }) {
     totals.set(p.id, t);
     if (!p.active) continue;
     // An account that never built its memory used little: it is still inside its free first build.
-    const level = !p.built || p.email === MAYA.email ? r.int(1, 2) : p.org ? r.int(18, 60) : r.int(4, 40);
+    // Maya brought her memory in a file, so she builds less than her coworkers, but she uses Coere every day.
+    const level = p.email === MAYA.email ? r.int(10, 16) : !p.built ? r.int(1, 2) : p.org ? r.int(18, 60) : r.int(4, 40);
     for (let d = Math.min(DAYS - 1, p.createdDaysAgo); d >= 0; d--) {
       if (!r.chance(p.org ? 0.75 : 0.45)) continue;
       const day = dayOf(d);
