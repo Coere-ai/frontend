@@ -123,7 +123,7 @@ lists what each page shows.
 | `/admin/users` | Every account, and whether its free first build is used. One opens to its totals, devices and graph, with its plan, its own daily, first build, monthly and lifetime dollar limits, each limit in force with its spend, a reset of the free first build, suspend and restore, and revoke every device |
 | `/admin/organizations` | Every organization, and the only place one is made. One opens to its members, roles, access, settings, invites and graph, and can be deleted |
 | `/admin/interested` | Who is interested: the developer waitlist, Coere Connect and Coere for Teams, each by day with a CSV download, and Export all. `/admin/waitlist` leads here |
-| `/admin/launch` | The launch countdowns on `/install` and `/try-teams`: the moment, whether the timer shows, and a live preview |
+| `/admin/launch` | The launch countdowns on `/install` and `/try-teams`: the moment, whether the timer shows, and the countdown line the page shows |
 | `/admin/database` | Each table's estimated rows, size, Row Level Security and policies, and the Storage totals |
 | `/admin/security` | The security log over 7, 30 or 90 days, and any table with Row Level Security off |
 | `/admin/cost` | AI spend by day, and for today, this month, the last 30 days or all time each model's requests, tokens and cost with a total, and the top accounts by cost, tokens or requests. Storage's cost at $0.021 per GB month |

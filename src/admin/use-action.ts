@@ -8,7 +8,8 @@ import type { AdminResult } from "@/lib/admin/action";
  * Runs one admin server action, keeps what it answered for the page to
  * show, and reloads the page's data after it, so the numbers on screen
  * follow the change. A thrown action (the network dropped) reads as a
- * failure, not a crash.
+ * failure, not a crash. `clear` forgets the answer, for a form whose
+ * fields changed since.
  */
 export function useAction(reload: () => void) {
   const [pending, start] = useTransition();
@@ -22,6 +23,7 @@ export function useAction(reload: () => void) {
       }),
     [reload],
   );
+  const clear = useCallback(() => setResult(null), []);
   const message = result ? (result.ok ? result.notice : result.error) : null;
-  return { run, pending, message };
+  return { run, pending, message, clear };
 }

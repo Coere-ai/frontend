@@ -5,7 +5,7 @@ import { revalidatePath, updateTag } from "next/cache";
 import { adminAction, done, refused, type AdminResult } from "@/lib/admin/action";
 import { checkLaunchInput } from "@/lib/launch/moment";
 import { LAUNCH_PATHS, LAUNCH_TAG, saveLaunch } from "@/lib/launch/store";
-import { isLaunchProduct, launchCopy } from "@/site/content/launch";
+import { isLaunchProduct } from "@/site/content/launch";
 
 /**
  * Saves one product's launch countdown from /admin/launch. It re-checks the
@@ -22,8 +22,6 @@ export async function saveLaunchAction(product: string, input: { at: unknown; sh
     await saveLaunch(product, checked.setting);
     updateTag(LAUNCH_TAG);
     for (const path of LAUNCH_PATHS) revalidatePath(path);
-    const page = launchCopy[product].path;
-    if (!checked.setting.show) return done(`Saved. ${page} says coming soon without the timer.`);
-    return done(checked.past ? `Saved. ${page} now says ${launchCopy[product].name} is here.` : `Saved. ${page} counts to the new moment now.`);
+    return done("Saved");
   });
 }
