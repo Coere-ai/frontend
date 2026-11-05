@@ -383,6 +383,7 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
 | `GET /api/v1/org/page` | The Organization section: the organization, the caller's place, members, totals, open invites for an admin, or the caller's pending invites |
 | `POST /api/v1/org/{action}` | `invite`, `revoke-invite`, `accept`, `decline`, `role`, `access`, `remove`, `leave`, `share`, `settings`, by the rules of `docs/accounts.md` 14.1 |
 | `GET /api/v1/devices`, `POST /api/v1/devices/{id}/revoke` | The connected browsers, and signing one out |
+| `POST /api/v1/account/memory` | The memory backup and sensitive memories switches; off removes the stored copy |
 | `POST /api/v1/account/delete` | Deletes the account once the typed email matches |
 
 - Every route checks the token itself through `device_auth`.

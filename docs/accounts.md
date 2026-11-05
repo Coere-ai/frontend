@@ -384,7 +384,9 @@ browser, then removes `coere.account`.
   Dev Tools switch. Benchmarks and Evals stay out.
 - **The Account card** in Settings: the email, **Manage on coere.ai** and
   **Disconnect**, then the connected browsers with **Revoke**
-  (`GET /devices`, `POST /devices/{id}/revoke`), **Download memory file**
+  (`GET /devices`, `POST /devices/{id}/revoke`), the switches **Back up
+  memory to coere.ai** and **Include sensitive memories** (read from
+  `GET /account`, set with `POST /account/memory`), **Download memory file**
   and **Delete memory copy** (`GET` and `DELETE /memory`), and **Delete
   account**, which works once the typed email matches
   (`POST /account/delete`), all built from the Settings panel's own rows,
@@ -464,7 +466,8 @@ and `find-extension.ts` beside it.
 
 **What the Console shows from the site.** Statistics, in v4's rail
 without the Dev Tools switch. The Settings Account card: the email,
-connected browsers with **Revoke** (`/devices`), download the memory file
+connected browsers with **Revoke** (`/devices`), the memory backup and
+sensitive memories switches (`/account/memory`), download the memory file
 and delete the memory copy (`GET` and `DELETE /memory`), and delete the
 account with the typed email (`/account/delete`). The Organization
 section: the shared graph from `/org/index`, drawn by the Memory page's
@@ -485,12 +488,16 @@ cut off (`user_id` set to null), so the cost history stays whole and names
 nobody. It writes `account_deleted` with no user id. The extension then
 removes its `coere.account`.
 
-**Not in the Console yet.** The site's old Settings and Account pages also
-held the memory backup switch (`profiles.memory_sync`; off removes the
-stored file and its index, and the extension stops pushing), the
-sensitive memories switch (`include_sensitive`), and setting a username
-and a password. They went with those pages, and no route sets them for a
-device token yet, so each keeps its value until the Console gains it.
+**The backup switches.** The site's old Settings page held the memory
+backup switch (`profiles.memory_sync`) and the sensitive memories switch
+(`include_sensitive`). They now sit in the Console's Account card, set
+through `POST /api/v1/account/memory` (8.12). Turning the backup off
+removes the stored file and its index, and the extension stops pushing.
+
+**Not in the Console.** The old Account page also set a username and a
+password. They went with that page, and no route sets them for a device
+token: a token taken from a browser must never be able to change how the
+account signs in. Each keeps its value.
 
 ## 8. The API
 
@@ -770,7 +777,8 @@ the same security events as on the dashboard.
 ### 8.12 Account
 
 These keep working for a suspended account, so a person can always see
-where they are signed in, sign a browser out and delete their account.
+where they are signed in, sign a browser out, stop the backup and delete
+their account.
 
 **`GET /api/v1/devices`** answers the connected browsers, newest first, at
 most 50:
@@ -781,6 +789,14 @@ where `current` marks the browser that asked.
 browsers (`revoked_reason = 'user'`) and writes `device_revoked`. `204`,
 also for one already revoked. An id that is not one of theirs is `404`.
 Revoking the calling browser signs it out, as `/auth/revoke` does.
+
+**`POST /api/v1/account/memory`** `{ sync?, includeSensitive? }` sets
+the memory backup switches: at least one, each a boolean, nothing else
+(`400` otherwise). `sync: false` also removes the stored file, its index
+and the person's part of their organization's graph, and writes
+`memory_deleted`. Answers `200 { memory: { sync, includeSensitive } }` as
+they now stand. A suspended account may use it too, since off removes its
+data.
 
 **`POST /api/v1/account/delete`** `{ email }` deletes the account by the
 steps of section 7. The typed email must be the account's own (trimmed,
