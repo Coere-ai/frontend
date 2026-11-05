@@ -11,20 +11,25 @@ import { Backup } from "@/site/account/web/backup";
 import { Browsers } from "@/site/account/web/browsers";
 import { DeleteAccount } from "@/site/account/web/delete-account";
 import { Organization } from "@/site/account/web/organization";
+import { Password } from "@/site/account/web/password";
+import { Profile } from "@/site/account/web/profile";
+import { Part } from "@/site/account/web/rows";
 import { ButtonLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 
 export const metadata: Metadata = {
   title: "Your account",
-  description: "Your browsers, your memory backup and your account on coere.ai.",
+  description: "Your profile, how you sign in, your browsers, your memory backup and your account on coere.ai.",
   robots: { index: false, follow: false },
 };
 
 /**
  * /account: the steps a device token may not take (docs/accounts.md 7),
- * signed in on coere.ai. It lists and revokes the browsers Coere is
- * connected in, turns the memory backup on, lets an admin invite someone
- * or make an admin, and deletes the account. It needs no Coere, so it
+ * signed in on coere.ai, and how the person signs in (3.1). It sets the
+ * display name, the username and the password, signs this browser out,
+ * lists and revokes the browsers Coere is connected in, turns the memory
+ * backup on, lets an admin invite someone or make an admin, and deletes
+ * the account. It needs no Coere, so it
  * works from a phone when a laptop is lost. Everything else stays in the
  * dashboard, which is Coere's own Console.
  */
@@ -33,7 +38,7 @@ export default async function AccountPage() {
   const ready = supabaseConfigured();
   const [devices, profile, membership, fresh] = await Promise.all([
     ready ? listDevices(user.id).catch((): DeviceRow[] => []) : Promise.resolve<DeviceRow[]>([]),
-    ready ? supabase().from("profiles").select("memory_sync, include_sensitive").eq("id", user.id).maybeSingle().then((r) => r.data) : Promise.resolve(null),
+    ready ? supabase().from("profiles").select("username, display_name, memory_sync, include_sensitive").eq("id", user.id).maybeSingle().then((r) => r.data) : Promise.resolve(null),
     ready ? readMembership(user.id).catch(() => null) : Promise.resolve(null),
     signedInJustNow(),
   ]);
@@ -51,9 +56,13 @@ export default async function AccountPage() {
             <ButtonLink href="/dashboard" variant="secondary">
               Open the dashboard
             </ButtonLink>
-            <SignOutButton variant="ghost" />
           </div>
           <div className="mt-14 space-y-14">
+            <Profile displayName={(profile?.display_name as string | null) ?? null} username={(profile?.username as string | null) ?? null} />
+            <Password />
+            <Part title="Sign out" line="Sign out of coere.ai in this browser. Coere stays connected here; to sign it out too, revoke this browser below.">
+              <SignOutButton variant="secondary" />
+            </Part>
             <Browsers devices={devices} />
             <Backup sync={Boolean(profile?.memory_sync)} includeSensitive={Boolean(profile?.include_sensitive)} />
             {org ? <Organization name={org.name} members={org.members.map((m) => ({ userId: m.userId, name: m.name, role: m.role }))} /> : null}
