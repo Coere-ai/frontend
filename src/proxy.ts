@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { adminGate } from "@/lib/auth/admin-gate";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/session-token";
+import { frameExtensionId, frameSource } from "@/lib/dashboard/host/frame-id";
+import { EXTENSION_COOKIE } from "@/lib/supabase/cookie-options";
 import { refreshSession } from "@/lib/supabase/refresh";
 
 /**
@@ -42,9 +44,10 @@ const NOINDEX = "noindex, nofollow, noarchive";
  * script it emits, so this is set on the request as well as the response.
  * `'strict-dynamic'` then lets those scripts load the hashed chunks, while an
  * injected script, with no nonce and no trusted loader, never runs. Frames are
- * same origin only: the dashboard previews the live pages in small frames.
+ * same origin only, except on /dashboard, which frames the extension's own
+ * Console: there `frameSrc` names exactly that one extension's origin.
  */
-function buildCsp(nonce: string, isDev: boolean): string {
+function buildCsp(nonce: string, isDev: boolean, frameSrc: string | null = null): string {
   const directives: Array<[string, string[]]> = [
     ["default-src", ["'self'"]],
     // `https:` is the fallback for browsers that do not know strict-dynamic;
@@ -59,7 +62,7 @@ function buildCsp(nonce: string, isDev: boolean): string {
     ["base-uri", ["'none'"]],
     ["form-action", ["'self'"]],
     ["frame-ancestors", ["'none'"]],
-    ["frame-src", ["'self'"]],
+    ["frame-src", frameSrc ? [frameSrc] : ["'self'"]],
   ];
   const policy = directives.map(([name, values]) => `${name} ${values.join(" ")}`).join("; ");
   return isDev ? policy : `${policy}; upgrade-insecure-requests`;
@@ -74,6 +77,23 @@ function notFound(): NextResponse {
 
 /** The private account paths. Keep in step with the matcher below. */
 const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect)$|^\/(auth|dashboard)(\/|$)/;
+
+/** The dashboard host page, the one place an extension frame may load. */
+const DASHBOARD_PATH = /^\/dashboard(\/|$)/;
+
+/**
+ * The extension the dashboard may frame: the `coere_ext` cookie's id when
+ * the server allows it, the same rule the host page uses to decide what to
+ * frame. Anywhere else, no extension frame at all.
+ */
+function dashboardFrame(request: NextRequest): string | null {
+  if (!DASHBOARD_PATH.test(request.nextUrl.pathname)) return null;
+  const id = frameExtensionId(request.cookies.get(EXTENSION_COOKIE)?.value, {
+    ids: process.env.COERE_EXTENSION_IDS,
+    production: process.env.NODE_ENV === "production",
+  });
+  return frameSource(id);
+}
 
 /** A fresh 16 byte nonce, well past the 128 bits the CSP spec asks for. */
 function newNonce(): string {
@@ -90,13 +110,13 @@ function newNonce(): string {
  */
 async function accountPage(request: NextRequest): Promise<NextResponse> {
   const refreshed = await refreshSession(request);
-  return refreshed.apply(withNonce(request));
+  return refreshed.apply(withNonce(request, dashboardFrame(request)));
 }
 
 /** Passes the request on with a fresh nonce policy on the request and the answer, and noindex. */
-function withNonce(request: NextRequest): NextResponse {
+function withNonce(request: NextRequest, frameSrc: string | null = null): NextResponse {
   const nonce = newNonce();
-  const csp = buildCsp(nonce, process.env.NODE_ENV === "development");
+  const csp = buildCsp(nonce, process.env.NODE_ENV === "development", frameSrc);
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
