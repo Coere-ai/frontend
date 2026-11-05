@@ -27,6 +27,14 @@ const KNOWN: readonly { path: string; label: string }[] = [
     .filter((d) => d.slug !== "overview")
     .map((d) => ({ path: `/resources/${d.slug}`, label: `Docs: ${d.title}` })),
   { path: "/about", label: "About" },
+  { path: "/install", label: "Install Coere Connect" },
+  { path: "/try-teams", label: "Try Coere for Teams" },
+  { path: "/developers/waitlist", label: "Developer waitlist" },
+  { path: "/portable-ai-memory", label: "Guide: Portable AI memory" },
+  { path: "/chatgpt-to-claude-memory", label: "Guide: ChatGPT to Claude memory" },
+  { path: "/ai-agent-memory", label: "Guide: AI agent memory" },
+  { path: "/privacy", label: "Privacy" },
+  { path: "/careers", label: "Careers" },
 ];
 
 const BY_PATH = new Map(KNOWN.map((p) => [p.path, p.label]));
