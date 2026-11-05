@@ -18,6 +18,26 @@ const nextConfig: NextConfig = {
    * redirect in code, so the apex can never serve a second copy of the site
    * if the domain settings change.
    */
+  /**
+   * Frames on the public pages: they may frame only this site (the live
+   * demos under /preview/live) and only this site may frame them. So a
+   * script slipped into a public page cannot open a frame of Coere's own
+   * Console, which the extension lets coere.ai load for /dashboard alone
+   * (docs/accounts.md 6.8). The private paths are left out here, since
+   * src/proxy.ts gives each of them its own nonce policy, and two policies
+   * on one answer would both apply.
+   */
+  async headers() {
+    return [
+      {
+        source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|auth(?:/|$)|connect$|account$|dashboard(?:/|$)).*)",
+        headers: [
+          { key: "Content-Security-Policy", value: "frame-src 'self'; frame-ancestors 'self'" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       {
