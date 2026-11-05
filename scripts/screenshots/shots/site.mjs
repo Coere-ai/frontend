@@ -1,6 +1,6 @@
 // The public site's pictures, signed out, at 1440 wide (the whole page
 // when it is long) and a few at 390, plus the account pages: each step of
-// sign in, sign up, and the connect page.
+// sign in, sign up, the connect page and /account.
 
 import { MAYA } from "../seed/people.mjs";
 import { CODE } from "../fake-supabase/auth.mjs";
@@ -81,6 +81,9 @@ export async function shootSite(browser, base, shooter, { scale }) {
   const ext = "kfpnhnhmcmhdhlbkdmlnoeiogdgnfoap";
   await open(page, base, `/connect?ext=${ext}&state=${"Q".repeat(21)}w&challenge=${"c".repeat(42)}Q&v=4.0.3`);
   await s("connect");
+  // /account, signed in as Maya: what a device token may not do, from any browser.
+  await open(page, base, "/account");
+  await s("account", { full: true });
   // Without the extension, the dashboard says how to get it.
   await open(page, base, "/dashboard");
   // The host asks each allowed id with coere.hello before it says Coere is missing, which outlasts a fixed wait on a cold dev server.
