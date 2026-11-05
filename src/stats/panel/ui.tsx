@@ -106,8 +106,9 @@ export function Table({
 }) {
   if (!rows.length) return <EmptyCard>{empty}</EmptyCard>;
   return (
+    // Scrolls sideways rather than cut a wide table's last columns off.
     <div
-      className="overflow-hidden rounded-xl border"
+      className="overflow-x-auto rounded-xl border"
       style={{ borderColor: "var(--color-border)" }}
     >
       <table className="w-full text-[12.5px]">
