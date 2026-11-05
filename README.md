@@ -265,8 +265,10 @@ section is what the owner sets up by hand.
 - Every Supabase call runs on the server. The browser never talks to
   Supabase, so the content security policy keeps `connect-src 'self'`.
 - `src/proxy.ts` refreshes the session on the private paths only (`/sign-in`,
-  `/sign-up`, `/auth/*`, `/connect` and `/dashboard/*`), and gives
-  them the nonce policy and noindex. Public pages stay static.
+  `/sign-up`, `/auth/*`, `/connect`, `/account` and `/dashboard/*`), and
+  gives them the nonce policy and noindex. Public pages stay static, and
+  `next.config.ts` gives them `frame-src 'self'; frame-ancestors 'self'`
+  so none of them can frame the Console.
 - The session cookies are httpOnly and last 400 days. A second cookie,
   `coere_signed_in=1`, is readable by scripts so the navbar can say
   Dashboard instead of Sign in; it grants nothing.
@@ -297,8 +299,8 @@ copied here.
   the one that answers is the id the policy names, it renders only the
   frame, `console.html?tab=<section>&embed=1`. When another answers, it
   writes that id to `coere_ext` and loads once more. When none answers, it
-  says to install Coere (`/install`) or open the page in the Chrome where
-  Coere is installed.
+  says to get Coere (`/install`) or open the page in the Chrome where
+  Coere is installed, and links `/account` for a lost browser.
 - `/dashboard/usage` opens Statistics, `/dashboard/settings` and
   `/dashboard/account` Settings, `/dashboard/organization` Organization,
   and the last part of any other address is the Console's own section id
@@ -307,8 +309,14 @@ copied here.
   comes from the API below, called by the extension's background with the
   device token. Pages never call it.
 - Organizations are made in the admin panel, never from the dashboard. An
-  admin invites coworkers by the email or username of their Coere account,
-  and the invite waits in the coworker's Organization section.
+  admin invites coworkers by the email or username of their Coere account
+  on `/account`, and the invite waits in the coworker's Organization
+  section.
+- `/account` holds what a device token may never do, since a token copied
+  out of a browser must not be able to: revoke any browser or all of them,
+  turn the memory backup on, invite someone or make an admin, and delete
+  the account after a sign in from the last ten minutes. It needs no
+  Coere, so it works from a phone.
 
 ### Settings
 
@@ -389,10 +397,10 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
 | `POST /api/v1/events` | Feature counts and tokens saved |
 | `GET /api/v1/org`, `GET /api/v1/org/index` | The organization and its shared graph, members only |
 | `GET /api/v1/org/page` | The Organization section: the organization, the caller's place, members, totals, open invites for an admin, or the caller's pending invites |
-| `POST /api/v1/org/{action}` | `invite`, `revoke-invite`, `accept`, `decline`, `role`, `access`, `remove`, `leave`, `share`, `settings`, by the rules of `docs/accounts.md` 14.1 |
+| `POST /api/v1/org/{action}` | `invite`, `revoke-invite`, `accept`, `decline`, `role`, `access`, `remove`, `leave`, `share`, `settings`, by the rules of `docs/accounts.md` 14.1; an invite and making an admin are refused for a device token and done on `/account` |
 | `GET /api/v1/devices`, `POST /api/v1/devices/{id}/revoke` | The connected browsers, and signing one out |
-| `POST /api/v1/account/memory` | The memory backup and sensitive memories switches; off removes the stored copy |
-| `POST /api/v1/account/delete` | Deletes the account once the typed email matches |
+| `POST /api/v1/account/memory` | Turns the memory backup and sensitive memories switches off, which removes the stored copy; on is done on `/account` |
+| `POST /api/v1/account/delete` | Always refused for a device token; the account is deleted on `/account` after a fresh sign in |
 
 - Every route checks the token itself through `device_auth`.
   `src/proxy.ts` does not run on `/api/v1`.

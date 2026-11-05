@@ -123,6 +123,7 @@ nothing.
 | `/auth/confirm` | Route handler for every emailed link. It checks the link and sends it on. |
 | `/auth/continue` | The emailed link's confirm page. Its button spends the token. |
 | `/connect` | Hands a connect code to the extension (section 4). |
+| `/account` | The steps a device token may not take, signed in on the site (section 7): the browsers with Revoke, the backup switches, an admin's invites, deleting the account. |
 | `/dashboard/...` | The person's dashboard (section 7). |
 | `/admin/...` | The operator's panel (section 9). It keeps its own USER and PASSWORD guard, separate from accounts. |
 
@@ -357,10 +358,16 @@ allows that entry in v4 alone, with no wildcard, no other page and no
 page is framed (`window.top !== window`), it renders only if every entry
 of `location.ancestorOrigins` is a site origin. Otherwise it shows one
 line, "Open Coere from its own button in the Chrome toolbar.", and loads
-nothing else (`console/embed/guard.ts`). An extension cannot send a
+nothing else (`console/embed/guard.ts`). The check runs before anything
+else the page loads, the Allow page and the section sheets included, and
+the Allow page never renders framed at all: framed, it shows the same
+line. An extension cannot send a
 `frame-ancestors` header for its own pages and a meta tag cannot carry
 one, so this check of every ancestor is the refusal; the site's own policy
-keeps other sites from framing `/dashboard`.
+keeps other sites from framing `/dashboard`. Every other page on coere.ai
+answers `frame-src 'self'; frame-ancestors 'self'` and
+`X-Frame-Options: SAMEORIGIN` (`next.config.ts`), so a script slipped into
+a public page cannot frame the Console either.
 
 **Framed by the site.** Links and `console.open` that open other
 extension pages use their usual routes, a new tab. Four things need the
@@ -370,7 +377,7 @@ site, and open it in a tab: the folder picker (`console.open` for
 `local: true`), and Browser Use's Allow, from the Settings switch (the
 Allow page `console.html#allow-browser-use`) or from a Cori chat (the
 worker's Allow page for the run, as an AI site's corner chat does).
-Inside the frame the Account card leaves out **Manage on coere.ai**.
+**Manage on coere.ai** opens `<site>/account`, in the frame too.
 
 **From the site.** The Console reaches coere.ai's account data through
 the background, which holds the device token: an `account.site` message
@@ -386,17 +393,21 @@ browser, then removes `coere.account`.
   **Disconnect**, then the connected browsers with **Revoke**
   (`GET /devices`, `POST /devices/{id}/revoke`), the switches **Back up
   memory to coere.ai** and **Include sensitive memories** (read from
-  `GET /account`, set with `POST /account/memory`), **Download memory file**
-  and **Delete memory copy** (`GET` and `DELETE /memory`), and **Delete
-  account**, which works once the typed email matches
-  (`POST /account/delete`), all built from the Settings panel's own rows,
-  buttons and dialog.
+  `GET /account`, set with `POST /account/memory`; turning one on shows
+  the site's refusal line, since only `/account` turns them on),
+  **Download memory file** and **Delete memory copy** (`GET` and
+  `DELETE /memory`), and **Delete account**, a line and **Delete on
+  coere.ai**, which opens `<site>/account`, all built from the Settings
+  panel's own rows, buttons and dialog. Revoke, turning the backup off and
+  Delete memory copy each ask first in that dialog.
 - **Organization**, a v4 section after Library, made only of the
   Console's own cards, rows and buttons and the Memory page's graph, with
   no sheet of its own: the organization's totals, the shared graph from
   `GET /org/index`, the members, and for admins invites, roles, access and
-  the organization's settings (`GET /org/page`, `POST /org/{action}`).
-  With no organization, the person's pending invites with **Accept** and
+  the organization's settings (`GET /org/page`, `POST /org/{action}`). A
+  role change and **Remove** ask first. An invite and making an admin
+  show the site's refusal line, since only `/account` does those. With
+  no organization, the person's pending invites with **Accept** and
   **Decline**.
 
 **`console.open`** stays the one way in. In v4:
@@ -441,14 +452,19 @@ and carries the nonce policy and noindex like the other account pages.
 2. The page asks that id, then each id of `COERE_EXTENSION_IDS`, with
    `coere.hello`, and takes the first that answers.
 3. When that is the id the policy names, it renders only
-   `<iframe src="chrome-extension://<id>/console.html?tab=<section>&embed=1" allow="microphone; clipboard-read; clipboard-write">`.
+   `<iframe src="chrome-extension://<id>/console.html?tab=<section>&embed=1" allow="clipboard-write">`.
+   Voice records in the offscreen document and asks for the microphone on
+   the extension's own page, and nothing reads the clipboard, so the frame
+   is granted only writing to it.
    When another id answered, it writes that id to `coere_ext` and loads the
    page once more, so the policy names it. It never reloads twice for the
    same id.
 4. With no Coere answering, or in a browser with no `chrome.runtime`, a
    plain page in the site's style says the dashboard runs inside Coere
-   Connect, links **Install Coere** to `/install`, and says to open the page
-   in the Chrome where Coere is installed.
+   Connect, links **Get Coere for Chrome**, with the Chrome mark, to
+   `/install`, says to open the page in the Chrome where Coere is
+   installed, and links `/account` for a person who lost the browser
+   Coere was in.
 
 | Address | Console section |
 |---|---|
@@ -467,9 +483,9 @@ and `find-extension.ts` beside it.
 **What the Console shows from the site.** Statistics, in v4's rail
 without the Dev Tools switch. The Settings Account card: the email,
 connected browsers with **Revoke** (`/devices`), the memory backup and
-sensitive memories switches (`/account/memory`), download the memory file
-and delete the memory copy (`GET` and `DELETE /memory`), and delete the
-account with the typed email (`/account/delete`). The Organization
+sensitive memories switches (`/account/memory`, off only), download the
+memory file and delete the memory copy (`GET` and `DELETE /memory`), and
+Delete account, which opens `/account`. The Organization
 section: the shared graph from `/org/index`, drawn by the Memory page's
 own graph, the members, and for admins invites, roles, access and the
 organization's settings (`/org/page`, `/org/{action}`); with no
@@ -480,19 +496,44 @@ organization, the person's pending invites with **Accept** and
 spend against a limit or an amount left (section 8.10). The person sees
 only their own use.
 
-**Deleting the account** asks the person to type their email. The server
+**`/account`, signed in on the site.** A device token never expires and
+lives in a browser, so a copy of one taken from that browser must not be
+able to delete the account, start sending memory to coere.ai, or let a new
+person into the organization. Those steps live on `/account`
+(`src/app/(site)/account`), a plain page in the site's quiet style that
+calls `requireUser` and needs no Coere, so it works from a phone when a
+laptop is lost:
+
+- **Browsers**: every connected browser with **Revoke**, and **Sign out
+  every browser**, which revokes them all at once (`revoked_reason =
+  'user'`, one `device_revoked` event). Each asks first.
+- **Memory backup**: both switches, on and off. Turning one on writes
+  `memory_backup_on`; turning the backup off writes `memory_deleted`.
+- **Organization**, for an admin: invite a coworker by email or username
+  with a role, and **Make admin** for each member, by the same rules as
+  `POST /org/{action}`.
+- **Delete account**, below.
+
+**Deleting the account** happens on `/account` only. It needs a sign in
+from the last ten minutes: the newest `amr` timestamp of the session's
+verified access token (`getClaims`, `src/lib/auth/recent-sign-in.ts`).
+Older than that, the page offers **Sign in again**, which signs this
+browser out and comes back to `/account`. Then the person types their
+email. The server
 then removes every object under their Storage folder, revokes their
 devices, and calls `auth.admin.deleteUser`, which removes their rows
 through the foreign keys. Usage rows keep their numbers with the person
 cut off (`user_id` set to null), so the cost history stays whole and names
-nobody. It writes `account_deleted` with no user id. The extension then
+nobody. It writes `account_deleted` with no user id and signs the browser
+out. Coere's next request then answers `signed_out`, and the extension
 removes its `coere.account`.
 
 **The backup switches.** The site's old Settings page held the memory
 backup switch (`profiles.memory_sync`) and the sensitive memories switch
-(`include_sensitive`). They now sit in the Console's Account card, set
-through `POST /api/v1/account/memory` (8.12). Turning the backup off
-removes the stored file and its index, and the extension stops pushing.
+(`include_sensitive`). The Console's Account card turns them off through
+`POST /api/v1/account/memory` (8.12); only `/account` turns them on.
+Turning the backup off removes the stored file and its index, and the
+extension stops pushing.
 
 **Not in the Console.** The old Account page also set a username and a
 password. They went with that page, and no route sets them for a device
@@ -527,7 +568,7 @@ Errors outside the Anthropic routes are problem details
 | `bad_request` | 400 | A body that does not match |
 | `not_found` | 404 | Nothing there |
 | `memory_sync_off` | 409 | A memory upload while the backup is off |
-| `refused` | 409 | The request was understood and a rule said no (8.11, 8.12). The body adds `reason`, which names the rule, and `detail`, the line the Console shows as it is |
+| `refused` | 409 | The request was understood and a rule said no (8.11, 8.12). The body adds `reason`, which names the rule, and `detail`, the line the Console shows as it is. `reason: 'web_session'` marks a step a device token may never take, whose line sends the person to `/account` |
 | `sensitive_off` | 412 | A memory commit whose file holds sensitive memories while the person has them turned off; the extension refreshes its account and exports again |
 | `too_large` | 413 | A body or file over its limit |
 | `rate_limited` | 429 | Too many requests this minute, with `Retry-After` |
@@ -755,10 +796,10 @@ inside their own organization. Body at most 16 KiB.
 
 | Action | Body | Who |
 |---|---|---|
-| `invite` | `{ login, role? }`, the email or username of an existing account, `role` `member` by default | admin, at most 30 an hour |
+| `invite` | `{ login, role? }`, the email or username of an existing account, `role` `member` by default | refused for a device token; an admin on `/account`, at most 30 an hour |
 | `revoke-invite` | `{ inviteId }` | admin |
 | `accept`, `decline` | `{ inviteId }` | the invited person |
-| `role` | `{ userId, role }` | admin |
+| `role` | `{ userId, role }` | admin; `role: 'admin'` is refused for a device token and done on `/account` |
 | `access` | `{ userId, access }`, `{ read, contribute }` or `null` for the organization's default | admin |
 | `remove` | `{ userId }` | admin, not on themselves |
 | `leave` | `{}` | any member |
@@ -770,15 +811,17 @@ reads `/org/page` again. A rule's no answers `409 refused` with one of
 these `reason`s and its `detail`: `not_member`, `not_admin`,
 `last_admin`, `self`, `bad_login`, `no_account`, `in_org`, `pending`,
 `too_many`, `invite_not_found`, `invite_expired`, `already_in_org`,
-`bad_name`, `no_sections`. An unknown action is `404`, a body that does
-not match `400 bad_request`. Invites, joins, leaving and removals write
+`bad_name`, `no_sections`, `web_session`. An invite, or making someone an
+admin, answers `web_session` with the line "To invite someone or make an
+admin, sign in at coere.ai/account.": a person let in with a copied
+token would stay after the token is revoked. An unknown action is `404`,
+a body that does not match `400 bad_request`. Invites, joins, leaving and removals write
 the same security events as on the dashboard.
 
 ### 8.12 Account
 
 These keep working for a suspended account, so a person can always see
-where they are signed in, sign a browser out, stop the backup and delete
-their account.
+where they are signed in, sign a browser out and stop the backup.
 
 **`GET /api/v1/devices`** answers the connected browsers, newest first, at
 most 50:
@@ -790,20 +833,24 @@ browsers (`revoked_reason = 'user'`) and writes `device_revoked`. `204`,
 also for one already revoked. An id that is not one of theirs is `404`.
 Revoking the calling browser signs it out, as `/auth/revoke` does.
 
-**`POST /api/v1/account/memory`** `{ sync?, includeSensitive? }` sets
-the memory backup switches: at least one, each a boolean, nothing else
-(`400` otherwise). `sync: false` also removes the stored file, its index
+**`POST /api/v1/account/memory`** `{ sync?, includeSensitive? }` turns
+the memory backup switches off: at least one, each a boolean, nothing else
+(`400` otherwise). Turning either on is `409 refused` with `reason:
+'web_session'` and the line "To turn this on, sign in at coere.ai/account.
+You can turn it off here.": a copied token could otherwise make the
+person's own browser upload its memory, sensitive memories too, for the
+copy to download. `sync: false` also removes the stored file, its index
 and the person's part of their organization's graph, and writes
 `memory_deleted`. Answers `200 { memory: { sync, includeSensitive } }` as
 they now stand. A suspended account may use it too, since off removes its
 data.
 
-**`POST /api/v1/account/delete`** `{ email }` deletes the account by the
-steps of section 7. The typed email must be the account's own (trimmed,
-any case), else `409 refused` with `reason: 'email'`. The last admin of an
-organization is refused with `reason: 'last_admin'`. Then Storage goes
-first and `auth.admin.deleteUser` last. `204`, and the extension removes
-its `coere.account`.
+**`POST /api/v1/account/delete`** `{ email }` never deletes. A copied
+token could read the email from `GET /account` and type it, so after the
+token and the body check it answers `409 refused` with `reason:
+'web_session'` and the line "To delete your account, sign in at
+coere.ai/account and delete it there." The account is deleted on
+`/account` alone (section 7).
 
 ### 8.10 Limits
 
@@ -921,7 +968,7 @@ and is the only thing that writes.
 | `memory_files` | `user_id pk cascade, object_path, index_path, bytes, index_bytes, digest, format_version, generator_version, memories, entities, links, chats, documents, sections, includes_quotes, includes_sensitive, device_id set null, uploaded_at` | the owner |
 | `user_settings` | `user_id pk cascade, settings jsonb (object, at most 64 KiB), version bigint, updated_at, updated_by ('site'\|'extension')` | the owner |
 | `app_events` | `id bigint identity pk, user_id set null, device_id set null, kind (section 6.7), count, created_at` | server only |
-| `security_events` | `id bigint identity pk, user_id set null, org_id set null, kind, ip_hash, country, created_at`. Kinds: `sign_in`, `sign_in_failed`, `code_sent`, `sign_up`, `password_set`, `username_set`, `sign_out`, `device_connected`, `device_revoked`, `token_rejected`, `rate_limited`, `usage_limited`, `connect_refused`, `memory_deleted`, `account_deleted`, `org_created`, `org_deleted`, `org_invite_sent`, `org_joined`, `org_left`, `org_member_removed`, `admin_sign_in`, `admin_sign_in_failed`, `admin_viewed_memory` | server only |
+| `security_events` | `id bigint identity pk, user_id set null, org_id set null, kind, ip_hash, country, created_at`. Kinds: `sign_in`, `sign_in_failed`, `code_sent`, `sign_up`, `password_set`, `username_set`, `sign_out`, `device_connected`, `device_revoked`, `token_rejected`, `rate_limited`, `usage_limited`, `connect_refused`, `memory_deleted`, `memory_backup_on`, `account_deleted`, `org_created`, `org_deleted`, `org_invite_sent`, `org_joined`, `org_left`, `org_member_removed`, `admin_sign_in`, `admin_sign_in_failed`, `admin_viewed_memory` | server only |
 | `organizations` | `id uuid pk, name (1 to 80), slug unique, plan_id references plans default 'team', shared_sections text[] default '{work}', default_access jsonb default '{"read":"all","contribute":true}', created_at, updated_at`. Made only by the Coere operator in the admin panel. | its members |
 | `org_members` | `org_id cascade, user_id references profiles cascade unique, role ('admin'\|'member'), access jsonb (null means the organization's default_access), share_memory bool default true, added_by ('operator'\|'invite'), joined_at, pk (org_id, user_id)`. A person is in at most one organization. | members of the same organization |
 | `org_invites` | `id uuid pk, org_id cascade, user_id references profiles cascade (the invited account; it must exist), role ('admin'\|'member'), invited_by set null, created_at, expires_at (7 days), accepted_at, declined_at, revoked_at` | the organization's admins, and the invited person |
