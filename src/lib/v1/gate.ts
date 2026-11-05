@@ -28,12 +28,17 @@ export type GateResult =
   | { ok: true; account: DeviceAccount }
   | { ok: false; refusal: GateRefusal; retryAfter?: number; limit?: SpentLimit };
 
-export async function gate(req: Request, o: { metered: boolean; lane?: Lane }): Promise<GateResult> {
+/**
+ * `suspended: "allow"` lets a suspended account through, for what a person
+ * may always do about their own account: see and revoke their browsers,
+ * and delete the account.
+ */
+export async function gate(req: Request, o: { metered: boolean; lane?: Lane; suspended?: "allow" }): Promise<GateResult> {
   const auth = await authenticateDevice(req);
   if (!auth.ok) return { ok: false, refusal: auth.reason };
   const account = auth.account;
   const who = { userId: account.userId, orgId: account.orgId, headers: req.headers };
-  if (account.status === "suspended") return { ok: false, refusal: "suspended" };
+  if (account.status === "suspended" && o.suspended !== "allow") return { ok: false, refusal: "suspended" };
 
   const bucket = laneBucket(o.lane ?? "default", account.deviceId, account.requestsPerMinute);
   const limit = deviceLimiter.hit(bucket.key, bucket.limit);
