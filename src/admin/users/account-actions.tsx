@@ -44,24 +44,46 @@ export function AccountActions({ data, reload }: { data: UserDetailPayload; relo
   const suspended = user.status === "suspended";
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <Card title="Plan">
-        <form action={(fd) => run(() => setPlan(user.id, fd))} className="flex items-end gap-2">
-          <div className="flex-1">
-            <Label htmlFor="plan">Plan</Label>
-            <select id="plan" name="plan" defaultValue={user.plan} className={fieldClass} style={fieldStyle}>
-              {plans.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({dollars(p.monthlyLimitMicros)} a month)
-                </option>
-              ))}
-            </select>
+    // Plan and Access stack in one column beside Dollar limits, each card as tall as its own content.
+    <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="grid gap-4">
+        <Card title="Plan">
+          <form action={(fd) => run(() => setPlan(user.id, fd))} className="flex items-end gap-2">
+            <div className="flex-1">
+              <Label htmlFor="plan">Plan</Label>
+              <select id="plan" name="plan" defaultValue={user.plan} className={fieldClass} style={fieldStyle}>
+                {plans.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({dollars(p.monthlyLimitMicros)} a month)
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button strong disabled={pending}>
+              Save
+            </Button>
+          </form>
+        </Card>
+        <Card title="Access">
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" disabled={pending} onClick={() => run(() => setStatus(user.id, suspended ? "active" : "suspended"))}>
+              {suspended ? "Restore the account" : "Suspend the account"}
+            </Button>
+            <Button
+              type="button"
+              disabled={pending || user.devices === 0}
+              onClick={() => {
+                if (window.confirm("Revoke every device on this account? Each one has to connect again.")) run(() => revokeAllDevices(user.id));
+              }}
+            >
+              Revoke every device
+            </Button>
           </div>
-          <Button strong disabled={pending}>
-            Save
-          </Button>
-        </form>
-      </Card>
+          <p className="mt-3 text-[12px] text-[color:var(--color-ink)]">
+            {suspended ? "Suspended: every request from this account is refused." : `Active, with ${user.devices} live ${user.devices === 1 ? "device" : "devices"}.`}
+          </p>
+        </Card>
+      </div>
 
       <Card title="Dollar limits">
         <form action={(fd) => run(() => setLimits(user.id, fd))} className="space-y-3">
@@ -95,25 +117,6 @@ export function AccountActions({ data, reload }: { data: UserDetailPayload; relo
         </form>
       </Card>
 
-      <Card title="Access">
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" disabled={pending} onClick={() => run(() => setStatus(user.id, suspended ? "active" : "suspended"))}>
-            {suspended ? "Restore the account" : "Suspend the account"}
-          </Button>
-          <Button
-            type="button"
-            disabled={pending || user.devices === 0}
-            onClick={() => {
-              if (window.confirm("Revoke every device on this account? Each one has to connect again.")) run(() => revokeAllDevices(user.id));
-            }}
-          >
-            Revoke every device
-          </Button>
-        </div>
-        <p className="mt-3 text-[12px] text-[color:var(--color-ink)]">
-          {suspended ? "Suspended: every request from this account is refused." : `Active, with ${user.devices} live ${user.devices === 1 ? "device" : "devices"}.`}
-        </p>
-      </Card>
       <SpendCard data={data} pending={pending} run={run} />
       <div className="lg:col-span-2">
         <Status text={message} />
