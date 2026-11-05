@@ -17,6 +17,7 @@ export function HorizontalBarChart({
   labelWidth = "8rem",
 }: {
   series: MultiSeries[];
+  /** The height of the empty state, which has no bars to size it. */
   height?: number;
   /** Width of the label gutter, as a CSS length. Metric names fit the default;
    *  place names like "Newfoundland and Labrador" need more before they stop
@@ -54,9 +55,9 @@ export function HorizontalBarChart({
   // could only ever do that with a width fixed in advance.
   return (
     <div
-      className="grid content-center items-center gap-x-2.5 gap-y-2.5 py-2"
+      className="grid items-center gap-x-2.5 gap-y-2.5 py-2"
       style={{
-        minHeight: height,
+        // As tall as its bars, so a short list leaves no empty space above and below them.
         gridTemplateColumns: `${auto ? "max-content" : labelWidth} minmax(0, 1fr) max-content`,
       }}
     >
