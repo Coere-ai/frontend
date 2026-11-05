@@ -53,8 +53,10 @@
 }
 /* Tables scroll sideways instead of splitting a scope or a path in two. */
 .docs-prose td code, .docs-prose th code { white-space: nowrap; }
+/* Long lines wrap, so a command or a scope list is read whole and never cut off at the edge. */
 .docs-prose pre {
-  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   border-radius: 1rem;
   background: #0b1020;
   color: rgb(255 255 255 / 0.88);

@@ -13,7 +13,7 @@ export function CodeWindow({ file, code, language, className }: { file: string; 
         <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
         <span className="ml-3 font-mono text-[11px] text-white/50">{file}</span>
       </div>
-      <pre className="overflow-hidden px-4 py-3.5 text-[11px] leading-relaxed text-white/85">
+      <pre className="px-4 py-3.5 text-[11px] leading-relaxed [overflow-wrap:anywhere] whitespace-pre-wrap text-white/85">
         <Highlighted code={code} language={language} />
       </pre>
     </div>

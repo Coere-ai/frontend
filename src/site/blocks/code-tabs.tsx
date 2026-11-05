@@ -50,7 +50,7 @@ export function CodeTabs({ samples }: { samples: CodeSample[] }) {
           <pre
             key={s.label}
             aria-hidden={index !== picked}
-            className={`overflow-x-auto p-6 text-[13px] leading-relaxed [grid-area:1/1] ${index === picked ? "" : "invisible"}`}
+            className={`p-6 text-[13px] leading-relaxed [overflow-wrap:anywhere] whitespace-pre-wrap [grid-area:1/1] ${index === picked ? "" : "invisible"}`}
           >
             <Highlighted code={s.code} language={s.language} />
           </pre>
