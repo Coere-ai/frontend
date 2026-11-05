@@ -971,12 +971,14 @@ against 5 tries a minute per address, and shows a thank you in place of the
 form. The page is public and indexed; the form's endpoint is not.
 
 **Coming soon and I'm interested.** `/install` (Coere Connect) and
-`/try-teams` (Coere for Teams) share one page design. `/install` shows the
-Chrome mark in its round chip and "Coming soon on the Chrome Web Store";
-`/try-teams` says "Coere for Teams is coming soon". Under the heading, a
-large countdown in days, hours, minutes and seconds, drawn on the visitor's
-clock after the page loads, rolls each changing digit (a plain change with
-reduced motion), and at the moment says the product is here. Under it, **I'm
+`/try-teams` (Coere for Teams) share one plain white page. `/install` says
+"Coming soon on the Chrome Web Store" with the Chrome mark set in the
+heading in front of Chrome, the size of the letters; `/try-teams` says
+"Coere for Teams is coming soon". Under the heading, the countdown is one
+large line of digits, such as 19:16:00:09, with a small word under each
+part. It is drawn on the visitor's clock after the page loads, rolls each
+changing digit (a plain change with reduced motion), and at the moment says
+the product is here. Under it, **I'm
 interested** opens an email field in place. A server action checks the
 address, counts against 5 tries a minute per network address and per email,
 and stores it in `product_interest` with the product (`connect` or

@@ -4,10 +4,11 @@ import { useState } from "react";
 
 import { saveLaunchAction } from "@/app/admin/launch/actions";
 import { ago } from "@/lib/dashboard/format";
+import { timeLeft } from "@/lib/launch/countdown";
 import { daysFromNow, fromLocalInput, shiftDays, toLocalInput } from "@/lib/launch/moment";
 import type { AdminLaunch } from "@/lib/launch/store";
 import { LAUNCH_PRODUCTS, launchCopy, type LaunchProduct } from "@/site/content/launch";
-import { LaunchStage } from "@/site/launch/launch-stage";
+import { Countdown } from "@/site/launch/countdown";
 import { useNow } from "@/site/launch/use-now";
 
 import { AdminPanel } from "../admin-panel";
@@ -104,7 +105,7 @@ function LaunchCard({ product, saved, reload }: { product: LaunchProduct; saved:
               <span className="ml-2 rounded bg-neutral-100 px-2 py-0.5 text-[10.5px] text-neutral-500">coere.ai{copy.path}</span>
             </div>
             <div className="bg-gradient-to-b from-mist to-white px-4 pt-8 pb-9">
-              <LaunchStage product={product} setting={{ at: new Date(draft).toISOString(), show }} size="md" heading="h2" />
+              {show ? <Countdown left={now === null ? null : timeLeft(draft, now)} size="sm" /> : null}
             </div>
           </div>
         </div>

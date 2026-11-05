@@ -13,10 +13,8 @@ import { Container } from "@/site/ui/container";
 export async function ComingSoon({ product }: { product: LaunchProduct }) {
   const setting = (await launchSettings())[product];
   return (
-    <section className="relative overflow-hidden pt-20 pb-28 md:pt-28 md:pb-40">
-      {/* The hero's pale sky, fading out before the countdown. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-gradient-to-b from-mist to-white" />
-      <Container className="relative">
+    <section className="bg-white pt-20 pb-28 md:pt-28 md:pb-40">
+      <Container>
         <LaunchStage product={product} setting={setting}>
           <InterestForm product={product} />
         </LaunchStage>

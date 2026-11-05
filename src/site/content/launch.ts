@@ -25,35 +25,32 @@ export const launchCopy: Record<
     name: string;
     /** The page that counts down to it. */
     path: string;
-    eyebrow: string | null;
     title: string;
+    /** The words in the title the Chrome mark sits in front of, as part of the heading. */
+    markBefore: string | null;
     /** The heading once the moment has passed. */
     here: string;
     line: string;
     /** The line once the moment has passed. */
     hereLine: string;
-    /** Whether the Chrome mark sits in its chip above the heading. */
-    chrome: boolean;
   }
 > = {
   connect: {
     name: "Coere Connect",
     path: "/install",
-    eyebrow: "Coere Connect",
     title: "Coming soon on the Chrome Web Store",
+    markBefore: "Chrome Web Store",
     here: "Coere Connect is here",
-    line: "One memory across every AI. Say you are interested and we will email you the day it is out.",
+    line: "Coere Connect gives you one memory across every AI. Say you are interested and we will email you the day it is out.",
     hereLine: "One memory across every AI, now in the Chrome Web Store.",
-    chrome: true,
   },
   teams: {
     name: "Coere for Teams",
     path: "/try-teams",
-    eyebrow: null,
     title: "Coere for Teams is coming soon",
+    markBefore: null,
     here: "Coere for Teams is here",
     line: "Shared memory for your whole team, with a free week to try it. Say you are interested and we will email you when it opens.",
     hereLine: "Shared memory for your whole team, with a free week to try it.",
-    chrome: false,
   },
 };
