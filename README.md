@@ -157,7 +157,7 @@ src/app/api/          v1 (the extension's API), admin (the panels' data),
                       site/track (the analytics beacon)
 src/site/content/     everything the pages say: products, features, films and
                       their cues, industries and their stories, page copy,
-                      code samples, backgrounds, posts, roles, navbar tabs
+                      code samples, posts, roles, navbar tabs
 src/site/content/docs the developer docs as Markdown, one file per page
 src/site/blocks/      layouts the pages share: the accordion showcase, feature
                       grid, use case tabs, slanted card, photo hero, code tabs
@@ -179,7 +179,7 @@ src/site/ui/          shared pieces: container, buttons, icons, film frames,
 src/admin/            the admin panels; src/stats the analytics panel and charts
 src/lib/              the server side: auth, accounts, v1, memory, org, admin,
                       analytics, security, launch, Supabase clients
-public/preview/       artwork, backgrounds, industry photos, and the live films
+public/preview/       artwork, industry photos, and the live films
 demos/                builds every live film from coere-v2's source
 supabase/             the migration, and schema.sql to read it in one place
 scripts/db/           npm run db:check
@@ -242,8 +242,10 @@ from the extension.
 
 ## Photos and docs
 
-Industry photos and backgrounds are from Unsplash, free to use under the
-Unsplash License, each saved at 960, 1920 and 3840 wide. They load through
+Industry photos are from Unsplash, free to use under the Unsplash License,
+each saved at 960, 1920 and 3840 wide. The site's own pages are plain and
+calm: white, with no artwork, gradient or tint behind a hero, a film or a
+form, and no box or circle a part does not need. They load through
 `SizedPhoto` instead of the image optimizer, which fetches without the
 visitor's pass and would be turned away by the gate.
 
@@ -276,10 +278,7 @@ section is what the owner sets up by hand.
   per email, and a wrong code or password waits before it answers.
 - `/connect` is the page the extension opens to get its device token.
 - `/sign-in`, `/sign-up` and `/connect` share one frame,
-  `src/site/account/auth-shell.tsx`: Coere and Cori on the dune background
-  beside the form. Cori is `public/preview/images/agents/cori-general.svg`,
-  the happy still that `scripts/agents/build-cori.mts` draws from coere-v2's
-  Cori art.
+  `src/site/account/auth-shell.tsx`: the form alone on the white page.
 
 ### The dashboard
 
