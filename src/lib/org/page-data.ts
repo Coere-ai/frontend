@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { effectiveAccess, parseAccess, type OrgAccess } from "./access";
 import type { Membership } from "./membership";
 import { parseRole, type Role } from "./roles";
+import { sectionChoices } from "./sections";
 
 /**
  * Everything the organization page shows a member, read with the secret
@@ -48,6 +49,8 @@ export interface OrgPageData {
   totals: { tokensSaved: number; memories: number; chats: number; members: number; costMicros: number; monthCostMicros: number };
   members: OrgMember[];
   invites: OrgInvite[];
+  /** Every section an admin may share: the base ones, then any the graph or the settings name. */
+  sections: Array<{ key: string; name: string }>;
   view: MemoryView | null;
 }
 
@@ -123,6 +126,7 @@ export async function readOrgPage(m: Membership): Promise<OrgPageData | null> {
     },
     members,
     invites,
+    sections: sectionChoices(index?.sections ?? [], org.shared_sections ?? []),
     view: index && index.v === 1 ? toView(cutToSections(index, m.readable, { dropSensitive: false })) : null,
   };
 }
