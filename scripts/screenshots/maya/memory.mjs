@@ -9,12 +9,11 @@
 
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { allChats, MEMORY_CHATS } from "./chats.mjs";
+import { allChats, CHAT_URLS as URLS, MEMORY_CHATS } from "./chats.mjs";
 import { ENTITIES, FACTS, RELATIONS } from "./memory-records.mjs";
 
 const ZONE = "America/Los_Angeles";
 const AGENT = { app: "coere", version: "4.0.0" };
-const URLS = { chatgpt: "https://chatgpt.com/c/", claude: "https://claude.ai/chat/", gemini: "https://gemini.google.com/app/" };
 
 /** The next date on or after `now` with this month and day, as YYYY-MM-DD. */
 function nextDate(monthDay, now) {

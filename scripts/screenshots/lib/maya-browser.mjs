@@ -4,7 +4,7 @@
 // page, as Import memory does. After that the site's dashboard frames a
 // Console that holds her chats and memory.
 
-import { libraryConversations } from "../maya/chats.mjs";
+import { libraryConversations, libraryProjects } from "../maya/chats.mjs";
 import { MAYA } from "../seed/people.mjs";
 import { engineCall, tabMatching } from "./extension.mjs";
 
@@ -30,6 +30,7 @@ export async function connectMaya(context, memoryFile, now) {
   // Her chats, as Extract all would have saved them.
   await onboarding.goto(`${consoleUrl}?tab=home`);
   await onboarding.waitForTimeout(1500);
+  for (const project of libraryProjects()) await engineCall(onboarding, "upsertProject", { project });
   await engineCall(onboarding, "upsertConversations", { convs: libraryConversations(now) });
   // The AIs she uses, chosen on Home's own cards.
   for (const id of ["chatgpt", "claude", "gemini"]) await onboarding.locator(`.cx-ai[data-platform="${id}"]`).getByRole("checkbox").check();
