@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { extensionRuntime, sendToExtension } from "@/lib/connect/bridge";
 import { deviceName } from "@/lib/connect/device-name";
+import { loadedAddress, loadedElsewhere } from "@/lib/connect/loaded-path";
 import type { ConnectParams } from "@/lib/connect/params";
 import { authCardClass, FormStatus } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
@@ -40,6 +41,12 @@ export function ConnectCard({ email, params }: { email: string; params: ConnectP
   const [problem, setProblem] = useState<Problem | null>(null);
   const [done, setDone] = useState(false);
   const [pending, startTransition] = useTransition();
+
+  // Arrived here by a client side navigation (from sign in), Coere would see its message come from
+  // the page the document loaded at and turn it away, so the page loads itself once as a whole.
+  useEffect(() => {
+    if (loadedElsewhere(loadedAddress(), window.location.pathname)) window.location.reload();
+  }, []);
 
   function connect() {
     setProblem(null);
