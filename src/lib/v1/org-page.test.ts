@@ -22,7 +22,6 @@ function data(): OrgPageData {
     ],
     invites: [{ id: "i1", name: "new@example.com", role: "member", createdAt: "2026-11-02", expiresAt: "2026-11-09" }],
     sections: [{ key: "work", name: "Work" }],
-    view: null,
   };
 }
 

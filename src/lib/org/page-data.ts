@@ -1,9 +1,6 @@
 import "server-only";
 
-import { thisMonth } from "@/lib/dashboard/reads";
 import { readOrgIndex } from "@/lib/memory/org-index";
-import { cutToSections } from "@/lib/memory/org-cut";
-import { toView, type MemoryView } from "@/lib/memory/view";
 import { supabase } from "@/lib/supabase";
 
 import { effectiveAccess, parseAccess, type OrgAccess } from "./access";
@@ -12,10 +9,12 @@ import { parseRole, type Role } from "./roles";
 import { sectionChoices } from "./sections";
 
 /**
- * Everything the organization page shows a member, read with the secret
- * key for the organization the signed in person belongs to (found from
- * their own membership first), so nothing reaches another organization.
- * The graph is cut to the sections this person may read.
+ * Everything the Console's Organization section shows a member
+ * (GET /api/v1/org/page), read with the secret key for the organization
+ * the person belongs to (found from their own membership first), so
+ * nothing reaches another organization. The graph itself comes from
+ * GET /api/v1/org/index, cut to the sections this person may read; here the
+ * index is read only to count what each member brought.
  */
 
 export interface OrgMember {
@@ -51,10 +50,12 @@ export interface OrgPageData {
   invites: OrgInvite[];
   /** Every section an admin may share: the base ones, then any the graph or the settings name. */
   sections: Array<{ key: string; name: string }>;
-  view: MemoryView | null;
 }
 
 const n = (v: unknown): number => Number(v ?? 0) || 0;
+
+/** The first day of this month in UTC, as usage_monthly keys months. */
+const thisMonth = (now = new Date()): string => `${now.toISOString().slice(0, 7)}-01`;
 
 /** A person as the page names them: their display name, else username, else email. */
 export const nameOf = (p: { display_name?: string | null; username?: string | null; email?: string | null } | undefined): string =>
@@ -127,6 +128,5 @@ export async function readOrgPage(m: Membership): Promise<OrgPageData | null> {
     members,
     invites,
     sections: sectionChoices(index?.sections ?? [], org.shared_sections ?? []),
-    view: index && index.v === 1 ? toView(cutToSections(index, m.readable, { dropSensitive: false })) : null,
   };
 }
