@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   // Pin the workspace root so a stray lockfile above the repo is ignored.
   turbopack: { root: import.meta.dirname },
   poweredByHeader: false,
+  // The screenshot tool (scripts/screenshots) runs next dev; its pictures never show the dev badge.
+  ...(process.env.COERE_SCREENSHOTS ? { devIndicators: false as const } : {}),
   // The docs read their Markdown from disk when a page is drawn, so the
   // files must ship with the server build.
   outputFileTracingIncludes: {

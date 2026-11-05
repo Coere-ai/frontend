@@ -1,6 +1,6 @@
 // Takes one picture: waits for the page to settle, wakes every part that
-// fades in as it scrolls into view, hides the dev server's own badge, and
-// saves a WebP (through sharp, which Next already installs) or a PNG. Every
+// fades in as it scrolls into view, hides the dev server's own badge,
+// takes the focus off whatever was clicked, and saves a WebP (through sharp, which Next already installs) or a PNG. Every
 // picture taken is listed in the run's manifest, so the README pages and
 // the report read the same list.
 
@@ -25,8 +25,28 @@ const HIDE_DEV = "nextjs-portal, [data-nextjs-toast], [data-next-badge-root] { d
 export function createShooter(outDir) {
   const taken = [];
 
-  /** Hides the dev badge in this page and every page it loads next. */
-  async function prepare(page) {
+  /**
+   * Hides the dev badge in this page and every page it loads next. With
+   * `allNear`, every element counts as on screen: a live film starts only
+   * near the screen and stops far from it, so a whole page picture would
+   * otherwise show the films far from where the page was scrolled as blank.
+   */
+  async function prepare(page, { allNear = false } = {}) {
+    if (allNear) {
+      await page.addInitScript(() => {
+        const Real = window.IntersectionObserver;
+        window.IntersectionObserver = class extends Real {
+          constructor(callback, options) {
+            super(() => {}, options);
+            this.cb = callback;
+          }
+          observe(el) {
+            const box = el.getBoundingClientRect();
+            setTimeout(() => this.cb([{ target: el, isIntersecting: true, intersectionRatio: 1, boundingClientRect: box, intersectionRect: box, rootBounds: null, time: performance.now() }], this), 0);
+          }
+        };
+      });
+    }
     await page.addInitScript((css) => {
       const add = () => {
         const s = document.createElement("style");
@@ -59,8 +79,11 @@ export function createShooter(outDir) {
    */
   async function shot(page, area, name, o = {}) {
     await page.addStyleTag({ content: HIDE_DEV }).catch(() => {});
-    // No hover state in a picture.
+    // No hover state and no focus ring in a picture.
     await page.mouse.move(1, 1).catch(() => {});
+    for (const frame of page.frames()) await frame.evaluate(() => document.activeElement?.blur?.()).catch(() => {});
+    // A countdown's digits roll as they change; a still one never shows a digit mid roll.
+    if (o.still) await page.emulateMedia({ reducedMotion: "reduce" });
     if (o.full) await wake(page);
     await page.waitForTimeout(o.settle ?? 600);
     let png;
@@ -71,6 +94,7 @@ export function createShooter(outDir) {
       const clip = o.clip ?? (tall > MAX_HEIGHT ? { x: 0, y: 0, width: page.viewportSize().width, height: MAX_HEIGHT } : null);
       png = await page.screenshot({ fullPage: Boolean(o.full), animations: "disabled", ...(clip ? { clip } : {}) });
     }
+    if (o.still) await page.emulateMedia({ reducedMotion: "no-preference" });
     const ext = sharp ? "webp" : "png";
     const file = join(outDir, area, `${name}.${ext}`);
     mkdirSync(dirname(file), { recursive: true });

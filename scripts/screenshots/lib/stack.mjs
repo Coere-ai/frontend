@@ -21,6 +21,8 @@ export async function startStack({ port, user, password, now = Date.now() }) {
       SECURITY_SALT: randomBytes(24).toString("hex"),
       USER: user,
       PASSWORD: password,
+      // next.config.ts turns the dev badge off for a screenshot run.
+      COERE_SCREENSHOTS: "1",
     },
   });
   const proxy = await startHostProxy(port);

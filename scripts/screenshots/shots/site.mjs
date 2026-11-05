@@ -17,8 +17,10 @@ async function open(page, base, path) {
 export async function shootSite(browser, base, shooter, { scale }) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: scale });
   const page = await context.newPage();
-  await shooter.prepare(page);
-  const s = (name, o) => shooter.shot(page, "site", name, o);
+  await shooter.prepare(page, { allNear: true });
+  // Whole pages wait for their films to start, and the countdown pages are taken still.
+  const STILL = new Set(["install", "try-teams"]);
+  const s = (name, o) => shooter.shot(page, "site", name, { ...(o?.full ? { settle: 5000 } : {}), ...(STILL.has(name) ? { still: true } : {}), ...o });
 
   await open(page, base, "/");
   await s("home", { full: true });
@@ -88,10 +90,10 @@ export async function shootSite(browser, base, shooter, { scale }) {
   // A few at phone width.
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: scale, isMobile: true, hasTouch: true });
   const p = await phone.newPage();
-  await shooter.prepare(p);
+  await shooter.prepare(p, { allNear: true });
   for (const [name, path] of [["phone-home", "/"], ["phone-product-connect", "/products/connect"], ["phone-install", "/install"], ["phone-sign-in", "/sign-in"]]) {
     await open(p, base, path);
-    await shooter.shot(p, "site", name, { full: name === "phone-home" });
+    await shooter.shot(p, "site", name, { full: name === "phone-home", still: name === "phone-install", settle: 3000 });
   }
   await phone.close();
 }

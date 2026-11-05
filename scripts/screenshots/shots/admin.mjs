@@ -1,6 +1,7 @@
 // The admin panel's pictures: signed in with the USER and PASSWORD the run
 // was started with, every page at 1440 wide, one account (Maya's) and one
-// organization (Fernhill Creative) each with its knowledge graph opened.
+// organization (Fernhill Creative) each with its knowledge graph opened,
+// and Security after them, so it lists those two memory views.
 
 const PAGES = [
   ["statistics", "/admin"],
@@ -11,7 +12,6 @@ const PAGES = [
   ["launch", "/admin/launch"],
   ["limits", "/admin/limits"],
   ["database", "/admin/database"],
-  ["security", "/admin/security"],
   ["cost", "/admin/cost"],
 ];
 
@@ -37,7 +37,7 @@ export async function shootAdmin(browser, base, shooter, { user, password, mayaI
     await page.goto(`${base}${path}`);
     await settle(page);
     // Users lists every account; the picture keeps the first screens of the list.
-    await shooter.shot(page, "admin", name, { full: true, ...(name === "users" ? { clip: { x: 0, y: 0, width: 1440, height: 2600 } } : {}) });
+    await shooter.shot(page, "admin", name, { full: true, ...(name === "launch" ? { still: true } : {}), ...(name === "users" ? { clip: { x: 0, y: 0, width: 1440, height: 2600 } } : {}) });
   }
   for (const [name, path] of [["user", `/admin/users/${mayaId}`], ["organization", `/admin/organizations/${orgId}`]]) {
     await page.goto(`${base}${path}`);
@@ -48,5 +48,9 @@ export async function shootAdmin(browser, base, shooter, { user, password, mayaI
     await page.waitForTimeout(2500);
     await shooter.shot(page, "admin", `${name}-graph`, { full: true });
   }
+  // Security last, after the two graphs were opened, so its memory views list them.
+  await page.goto(`${base}/admin/security`);
+  await settle(page);
+  await shooter.shot(page, "admin", "security", { full: true });
   await context.close();
 }
