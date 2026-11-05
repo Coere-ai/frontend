@@ -3,11 +3,11 @@
  * page says a cost or a size the same way and the tests pin it.
  */
 
-/** Integer micro dollars as dollars: cents under $100, whole dollars above. */
+/** Integer micro dollars as dollars, always with cents, so a column of costs reads one way: $103.00 beside $64.60. */
 export function dollars(micros: number): string {
   const usd = (Number.isFinite(micros) ? micros : 0) / 1_000_000;
   if (usd > 0 && usd < 0.01) return "under $0.01";
-  return usd < 100 ? `$${usd.toFixed(2)}` : `$${Math.round(usd).toLocaleString("en-US")}`;
+  return `$${usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /** A count as people read it: 950, 12.4K, 3.1M. */

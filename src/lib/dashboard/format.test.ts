@@ -8,7 +8,8 @@ describe("dashboard formats", () => {
     assert.equal(dollars(0), "$0.00");
     assert.equal(dollars(5_000_000), "$5.00");
     assert.equal(dollars(1234), "under $0.01");
-    assert.equal(dollars(123_456_789), "$123");
+    assert.equal(dollars(123_456_789), "$123.46");
+    assert.equal(dollars(1_234_500_000), "$1,234.50");
   });
 
   it("writes counts short", () => {
