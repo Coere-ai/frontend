@@ -27,14 +27,14 @@ async function openSection(page, path) {
 }
 
 /** Scrolls the framed Console so `target` sits near the top. */
-async function scrollTo(target) {
-  await target.evaluate((el) => {
+async function scrollTo(target, room = 48) {
+  await target.evaluate((el, gap) => {
     el.scrollIntoView({ block: "start" });
     // A little room above, so the card the target opens shows its top edge.
     let box = el.parentElement;
     while (box && box.scrollHeight <= box.clientHeight) box = box.parentElement;
-    (box ?? document.scrollingElement)?.scrollBy(0, -48);
-  });
+    (box ?? document.scrollingElement)?.scrollBy(0, -gap);
+  }, room);
   await target.page().waitForTimeout(900);
 }
 
@@ -51,7 +51,8 @@ export async function shootDashboard(playwright, shooter, { coereV2, proxy, supa
 
     let f = await openSection(page, "/dashboard/memory");
     await s("memory");
-    await scrollTo(f.locator("input[type=search], [role=searchbox]").first());
+    // Room enough above the search box that the Graph and List switch beside it clears the page's header.
+    await scrollTo(f.locator("input[type=search], [role=searchbox]").first(), 140);
     await s("memory-graph");
 
     f = await openSection(page, "/dashboard/library");
@@ -71,13 +72,15 @@ export async function shootDashboard(playwright, shooter, { coereV2, proxy, supa
     await s("statistics");
 
     f = await openSection(page, "/dashboard/organization");
+    // From the shared graph down, so its root shows with the members' cards under it.
+    await scrollTo(f.getByRole("heading", { name: "Shared memory", exact: true }));
     await s("organization-admin");
     await scrollTo(f.getByRole("heading", { name: "Members", exact: true }));
     await s("organization-admin-members");
 
     // The same section for a member: Maya's role set to member, as an admin's Make member would.
     await fake.db.query("update public.org_members set role = 'member' where user_id = $1", [mayaId]);
-    await openSection(page, "/dashboard/organization");
+    f = await openSection(page, "/dashboard/organization");
     await s("organization-member");
     await fake.db.query("update public.org_members set role = 'admin' where user_id = $1", [mayaId]);
 
