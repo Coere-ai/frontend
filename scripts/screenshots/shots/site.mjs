@@ -83,7 +83,8 @@ export async function shootSite(browser, base, shooter, { scale }) {
   await s("connect");
   // Without the extension, the dashboard says how to get it.
   await open(page, base, "/dashboard");
-  await page.waitForTimeout(6000);
+  // The host asks each allowed id with coere.hello before it says Coere is missing, which outlasts a fixed wait on a cold dev server.
+  await page.getByRole("heading", { name: "Your dashboard is in Coere" }).waitFor({ timeout: 90_000 }).catch(() => {});
   await shooter.shot(page, "dashboard", "install");
   await context.close();
 
