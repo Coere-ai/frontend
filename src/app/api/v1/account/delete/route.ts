@@ -1,19 +1,17 @@
-import { deleteAccount } from "@/lib/account/delete-account";
-import { EMAIL_LINE, emailMatches, LAST_ADMIN_LINE, typedEmail } from "@/lib/account/delete-request";
-import { logSecurityEventAfter } from "@/lib/security/events";
-import { supabase } from "@/lib/supabase";
+import { typedEmail } from "@/lib/account/delete-request";
 import { readJson } from "@/lib/v1/body";
 import { gate } from "@/lib/v1/gate";
-import { noContent, problem, refusal } from "@/lib/v1/http";
+import { problem, refusal } from "@/lib/v1/http";
 import { problemFor } from "@/lib/v1/refusals";
+import { DELETE_ON_WEB } from "@/lib/v1/web-only";
 
 // POST /api/v1/account/delete (docs/accounts.md 7, 8.12)
 //
-// Deletes the caller's account once they typed its email, by the same
-// steps the dashboard took (src/lib/account/delete-account.ts): the last
-// admin of an organization is refused, Storage goes first, then
-// auth.admin.deleteUser. Answers 204, and the extension then clears its
-// account. A suspended account may still delete itself.
+// A device token never deletes the account. A copy of one, taken from a
+// browser, could read the email from GET /api/v1/account and type it, so
+// the typed email proves nothing. The route checks the token and the body,
+// then refuses with the line that sends the person to coere.ai/account,
+// where deleting needs a fresh sign in (src/app/(site)/account).
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,16 +23,5 @@ export async function POST(req: Request): Promise<Response> {
   if (!body.ok) return problem(body.reason);
   const typed = typedEmail(body.value);
   if (typed === null) return problem("bad_request");
-  const { userId } = g.account;
-  try {
-    const { data, error } = await supabase().auth.admin.getUserById(userId);
-    if (error || !data.user) return problem("unavailable");
-    if (!emailMatches(typed, data.user.email)) return refusal("email", EMAIL_LINE);
-    const done = await deleteAccount(userId);
-    if (!done.ok) return done.reason === "last_admin" ? refusal("last_admin", LAST_ADMIN_LINE) : problem("unavailable");
-  } catch {
-    return problem("unavailable");
-  }
-  logSecurityEventAfter("account_deleted", { headers: req.headers });
-  return noContent();
+  return refusal("web_session", DELETE_ON_WEB);
 }
