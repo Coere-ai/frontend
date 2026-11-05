@@ -51,42 +51,34 @@ export function ButtonLink({
 type PillTone = "dark" | "light";
 type PillSize = "md" | "lg";
 
-const pillTones: Record<PillTone, { pill: string; circle: string }> = {
-  dark: { pill: "bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-neutral-950", circle: "bg-white text-neutral-950" },
-  light: { pill: "bg-white text-neutral-950 hover:bg-neutral-100 focus-visible:outline-white", circle: "bg-neutral-950 text-white" },
+const pillTones: Record<PillTone, string> = {
+  dark: "bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-neutral-950",
+  light: "bg-white text-neutral-950 hover:bg-neutral-100 focus-visible:outline-white",
 };
 
-const pillSizes: Record<PillSize, { pill: string; inset: string; circle: string; arrow: number }> = {
-  md: { pill: "h-11 gap-2.5 pr-1.5 text-[15px]", inset: "pl-5", circle: "h-8 w-8", arrow: 15 },
-  lg: { pill: "h-14 gap-3 pr-2 text-[16px]", inset: "pl-6", circle: "h-10 w-10", arrow: 18 },
+const pillSizes: Record<PillSize, { pill: string; arrow: number }> = {
+  md: { pill: "h-11 gap-2 px-5 text-[15px]", arrow: 15 },
+  lg: { pill: "h-14 gap-2.5 px-6 text-[16px]", arrow: 18 },
 };
 
-/** The pill's classes and its insides, shared by the link and the button. */
+/** The pill's classes and its insides, shared by the link and the button. The arrow sits bare after the label, with no circle around it. */
 function circleArrowParts({ tone, size, icon, wide, className, children }: { tone: PillTone; size: PillSize; icon?: ReactNode; wide: boolean; className: string; children: ReactNode }) {
-  const look = pillTones[tone];
   const fit = pillSizes[size];
   return {
-    className: `group inline-flex items-center rounded-full font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${look.pill} ${fit.pill} ${wide ? "w-full pl-1.5" : fit.inset} ${className}`,
+    className: `group inline-flex items-center justify-center rounded-full font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${pillTones[tone]} ${fit.pill} ${wide ? "w-full" : ""} ${className}`,
     inside: (
       <>
-        {/* Wide: an empty circle's width on the left keeps the label in the middle. */}
-        {wide ? <span aria-hidden="true" className={`shrink-0 ${fit.circle}`} /> : null}
-        <span className={`inline-flex items-center gap-2.5 ${wide ? "flex-1 justify-center" : ""}`}>
-          {icon}
-          {children}
-        </span>
-        <span aria-hidden="true" className={`grid shrink-0 place-items-center rounded-full ${look.circle} ${fit.circle}`}>
-          <ArrowRightIcon size={fit.arrow} strokeWidth={2} className="transition-transform duration-200 group-hover:translate-x-0.5" />
-        </span>
+        {icon}
+        {children}
+        <ArrowRightIcon size={fit.arrow} strokeWidth={2} aria-hidden="true" className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
       </>
     ),
   };
 }
 
 /**
- * A pill with its label and, inside on the right, a round circle holding an
- * arrow that nudges right on hover. Dark is a black pill with a white
- * circle; light is the reverse, for dark artwork. An optional mark sits
+ * A pill with its label and a bare arrow after it that nudges right on
+ * hover. Dark is a black pill; light is a white one. An optional mark sits
  * before the label. Wide fills its row with the label centered, the way
  * full width buttons sit in the mobile menu.
  */
