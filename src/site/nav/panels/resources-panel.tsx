@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { backgrounds } from "@/site/content/backgrounds";
 import { docPages } from "@/site/content/docs";
 import { CodeWindow } from "@/site/code/code-window";
 import { Underlined } from "@/site/ui/underlined";
+import { SizedPhoto } from "@/site/ui/sized-photo";
 import { PanelLabel, PanelLink } from "./panel-parts";
 
 const shown = ["overview", "authentication", "endpoints", "sdks", "mcp"];
@@ -38,8 +40,11 @@ export function ResourcesPanel() {
         </ul>
       </div>
 
-      <Link href="/resources#quickstart" className="group grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-6">
-        <CodeWindow file="context.py" code={firstCall} language="python" />
+      <Link href="/resources#quickstart" className="group grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-6 rounded-2xl bg-neutral-50 p-4">
+        <div className="relative isolate overflow-hidden rounded-xl p-4">
+          <SizedPhoto src={backgrounds.prism.src} alt="" fill sizes="400px" className="-z-10 object-cover" />
+          <CodeWindow file="context.py" code={firstCall} language="python" />
+        </div>
         <div>
           <p className="text-[13px] font-medium text-neutral-500">Quickstart</p>
           <p className="mt-1 text-xl leading-snug font-medium tracking-[-0.02em] text-neutral-950"><Underlined big>From a server to your first context</Underlined></p>

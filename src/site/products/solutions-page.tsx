@@ -1,6 +1,7 @@
 import { AccordionShowcase } from "@/site/blocks/accordion-showcase";
 import { CheckList } from "@/site/blocks/check-list";
 import { FeatureGrid } from "@/site/blocks/feature-grid";
+import { backgrounds } from "@/site/content/backgrounds";
 import { ALL_FEATURES } from "@/site/content/features";
 import { films } from "@/site/content/films";
 import { demoHref, demoLabel } from "@/site/content/navigation";
@@ -18,9 +19,9 @@ import { ProductSection } from "./product-section";
 export function SolutionsPage() {
   return (
     <>
-      <ProductHero copy={solutionsHero} app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
+      <ProductHero copy={solutionsHero} background={backgrounds.glass} app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
       <ProductSection id="how" title="How your team shares one memory" line="Built from the chats your team already has, sorted into the company and each client.">
-        <AccordionShowcase items={asShowcase(solutionsCases)} />
+        <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.curl} />
       </ProductSection>
       <section className="py-28 md:py-32">
         <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">

@@ -44,7 +44,7 @@ function Board({ table }: { table: Table }) {
   return (
     <div role="table" aria-label={`${table.coere} compared with ${table.others.join(", ")}`} className="grid min-w-[600px] md:min-w-0" style={{ gridTemplateColumns: `minmax(170px, 1.6fr) repeat(${cols}, minmax(0, 1fr))` }}>
       {/* Coere's card, behind its column. */}
-      <div aria-hidden="true" className="-my-3 rounded-[28px] bg-brand-500" style={{ gridRow: `1 / span ${rows + 1}`, gridColumn: 2 }} />
+      <div aria-hidden="true" className="-my-3 rounded-[28px] bg-brand-500 shadow-[0_30px_80px_-30px_rgba(63,76,235,0.65)]" style={{ gridRow: `1 / span ${rows + 1}`, gridColumn: 2 }} />
 
       <div role="row" className="contents">
         <span role="columnheader" className="sticky left-0 z-10 bg-white md:static md:bg-transparent" style={at(1, 1)} />

@@ -8,7 +8,7 @@ import { ChromeMark } from "@/site/ui/icons/chrome-mark";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-const words = ["Own", "your", "memory"];
+const words = ["Own", "your", "Memory"];
 
 /** The two ways further down the page, to the team and developer products. On a phone the short words keep them on one row. */
 const paths = [

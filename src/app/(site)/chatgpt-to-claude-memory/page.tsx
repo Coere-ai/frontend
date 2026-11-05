@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { PhotoHero } from "@/site/blocks/photo-hero";
 import { FaqSection } from "@/site/blocks/faq";
+import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
 import { guideBySlug, switching } from "@/site/content/guides";
 import { contactHref, contactLabel } from "@/site/content/navigation";
@@ -26,6 +27,7 @@ export default function ChatgptToClaudeMemoryPage() {
     <>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Moving ChatGPT memory to Claude", "Importing AI chat history"], faqs: switching.faqs })} />
       <PhotoHero
+        photo={backgrounds.dune.src}
         {...switching.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "How it works" }}
@@ -38,7 +40,7 @@ export default function ChatgptToClaudeMemoryPage() {
         line="Four steps, once. After that every new chat on every AI starts from the same memory. The film below plays Extract all live, on Coere's own code."
         steps={switching.steps}
         film={films.extraction}
-       
+        background={backgrounds.prism}
         link={{ href: "/products/connect#import", label: "See Import chats" }}
       />
       <CompareSection />

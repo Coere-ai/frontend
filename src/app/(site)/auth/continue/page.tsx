@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { linkFailedPath, readEmailLink } from "@/lib/auth/email-link";
 import { getUser } from "@/lib/auth/user";
-import { AuthShell } from "@/site/account/auth-shell";
+import { AuthShell, authCardClass } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
 
 import { confirmLink } from "./actions";
@@ -46,7 +46,7 @@ export default async function ContinuePage({ searchParams }: PageProps<"/auth/co
 
   return (
     <AuthShell eyebrow="Account" title={copy.title} lede={lede}>
-      <form action={confirmLink}>
+      <form action={confirmLink} className={authCardClass}>
         <input type="hidden" name="token_hash" value={link.tokenHash} />
         <input type="hidden" name="type" value={link.type} />
         <input type="hidden" name="next" value={link.next} />

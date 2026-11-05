@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { CodeTabs } from "@/site/blocks/code-tabs";
 import { Stage } from "@/site/blocks/stage";
+import { backgrounds } from "@/site/content/backgrounds";
 import { contextSamples } from "@/site/content/code/context-api";
 import { waitlistSeo } from "@/site/content/seo";
 import { WaitlistForm } from "@/site/developers/waitlist-form";
@@ -35,8 +36,9 @@ export default function DeveloperWaitlistPage() {
             See what Coere Forge does
           </ArrowLink>
         </div>
-        <Stage>
-          <div className="relative">
+        <Stage background={backgrounds.ribbons}>
+          <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/35" />
+          <div className="relative p-6 md:p-12">
             <CodeTabs samples={contextSamples} />
           </div>
         </Stage>

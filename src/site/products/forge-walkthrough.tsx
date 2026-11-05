@@ -48,7 +48,7 @@ export function ForgeWalkthrough() {
         <span className="hidden md:block">
           <Arrow direction="back" onClick={() => go(-1)} disabled={index === 0} />
         </span>
-        <div className="relative min-w-0 flex-1 overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-200" style={{ aspectRatio: `${W} / ${H}` }}>
+        <div className="relative min-w-0 flex-1 overflow-hidden rounded-2xl bg-white shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)] ring-1 ring-white/15" style={{ aspectRatio: `${W} / ${H}` }}>
           {walkSteps.map((s, i) => (
             <div key={s.key} aria-hidden={i !== index} className={`absolute inset-0 transition-opacity duration-300 ${i === index ? "opacity-100" : "opacity-0"}`}>
               <ScreenFrame src={s.screen} title={s.alt} />

@@ -1,6 +1,7 @@
 import { CodeTabs } from "@/site/blocks/code-tabs";
 import { Stage } from "@/site/blocks/stage";
 import { FeatureGrid } from "@/site/blocks/feature-grid";
+import { backgrounds } from "@/site/content/backgrounds";
 import { contextSamples, mcpSamples } from "@/site/content/code/context-api";
 import { forgeGrid, forgeHero } from "@/site/content/pages/forge";
 import { ClosingCta } from "@/site/home/closing-cta";
@@ -17,15 +18,16 @@ import { ProductSection } from "./product-section";
 export function ForgePage() {
   return (
     <>
-      <ProductHero copy={forgeHero} app={<CodeTabs samples={contextSamples} />} appFit="contained" secondary={{ href: "/resources", label: "Read the docs" }} />
+      <ProductHero copy={forgeHero} background={backgrounds.ribbons} app={<CodeTabs samples={contextSamples} />} appFit="contained" secondary={{ href: "/resources", label: "Read the docs" }} />
       <section className="py-28 md:py-32">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">From a key to context, end to end</h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">A developer makes a token, adds Coere to their app&apos;s AI call and runs it, then points it at any AI.</p>
           </div>
-          <Stage className="mt-16">
-            <div className="relative">
+          <Stage background={backgrounds.prism} className="mt-16">
+            <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/45" />
+            <div className="relative p-6 md:p-12">
               <FilmFrame film={films.forgeDev} />
             </div>
           </Stage>
