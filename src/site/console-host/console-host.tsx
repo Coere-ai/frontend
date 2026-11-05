@@ -76,7 +76,7 @@ export function ConsoleHost({ tab, frameId, candidates }: { tab: string; frameId
     <iframe
       src={consoleSrc(view.id, tab)}
       title="Coere"
-      allow="microphone; clipboard-read; clipboard-write"
+      allow="clipboard-write"
       className="fixed inset-0 h-full w-full border-0 bg-white"
     />
   );
