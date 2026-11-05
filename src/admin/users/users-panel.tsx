@@ -13,7 +13,7 @@ import { fieldClass, fieldStyle } from "../controls";
 import { DayChart } from "../day-chart";
 import { useAdminData } from "../use-admin-data";
 
-const HEAD = ["Email", "Username", "Plan", "Status", "Organization", "Created", "Last seen", "Devices", "Month cost", "Requests", "Lifetime cost", "First build", "Tokens saved", "Memory"];
+const HEAD = ["Account", "Plan", "Status", "Created", "Last seen", "Devices", "Month cost", "Requests", "Lifetime cost", "First build", "Tokens saved", "Memory"];
 
 /**
  * Every account, with sign ups by day. Typing filters by email, username
@@ -78,13 +78,17 @@ export function UsersPanel() {
                   if (r) router.push(`/admin/users/${r.id}`);
                 }}
                 rows={rows.map((r) => [
-                  <Link key="email" href={`/admin/users/${r.id}`} onClick={(e) => e.stopPropagation()} className="underline-offset-2 hover:underline">
-                    {r.email ?? "No email"}
-                  </Link>,
-                  r.username ?? "",
+                  // The username and the organization sit under the email, so the table stays narrow enough to read whole.
+                  <span key="email">
+                    <Link href={`/admin/users/${r.id}`} onClick={(e) => e.stopPropagation()} className="underline-offset-2 hover:underline">
+                      {r.email ?? "No email"}
+                    </Link>
+                    {r.username || r.org ? (
+                      <span className="block text-[color:var(--color-muted)]">{[r.username, r.org ? `${r.org.name} (${r.org.role})` : null].filter(Boolean).join(", ")}</span>
+                    ) : null}
+                  </span>,
                   r.plan,
                   r.status,
-                  r.org ? `${r.org.name} (${r.org.role})` : "",
                   day(r.createdAt),
                   r.lastSeenAt ? ago(r.lastSeenAt) : "Never",
                   whole(r.devices),
