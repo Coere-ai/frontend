@@ -19,6 +19,7 @@ export const PROBLEMS = {
   bad_request: { status: 400, title: "Request not understood" },
   not_found: { status: 404, title: "Not found" },
   memory_sync_off: { status: 409, title: "Memory backup is off" },
+  refused: { status: 409, title: "Not allowed" },
   sensitive_off: { status: 412, title: "Sensitive memories are off" },
   too_large: { status: 413, title: "Too large" },
   rate_limited: { status: 429, title: "Too many requests" },
@@ -62,5 +63,18 @@ export function problem(code: ProblemCode, retryAfter?: number, title?: string):
   return new Response(JSON.stringify(problemBody(code, title)), {
     status: PROBLEMS[code].status,
     headers: headersWith(extra),
+  });
+}
+
+/**
+ * A `refused` answer: the request was understood and the rules said no,
+ * such as removing an organization's last admin or a typed email that does
+ * not match. `reason` names the rule for code, and `detail` is the line to
+ * show the person as it is.
+ */
+export function refusal(reason: string, detail: string): Response {
+  return new Response(JSON.stringify({ ...problemBody("refused"), reason, detail }), {
+    status: PROBLEMS.refused.status,
+    headers: headersWith({ "content-type": "application/problem+json" }),
   });
 }

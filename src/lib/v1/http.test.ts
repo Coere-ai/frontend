@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { json, noContent, problem, problemBody, PROBLEMS } from "./http";
+import { json, noContent, problem, problemBody, PROBLEMS, refusal } from "./http";
 
 describe("problem", () => {
   it("answers problem details with the code's status", async () => {
@@ -25,6 +25,7 @@ describe("problem", () => {
       bad_request: 400,
       not_found: 404,
       memory_sync_off: 409,
+      refused: 409,
       sensitive_off: 412,
       too_large: 413,
       rate_limited: 429,
@@ -41,9 +42,25 @@ describe("problem", () => {
   });
 });
 
+describe("refusal", () => {
+  it("is a 409 problem that names the rule and the line to show", async () => {
+    const res = refusal("last_admin", "An organization needs an admin.");
+    assert.equal(res.status, 409);
+    assert.equal(res.headers.get("content-type"), "application/problem+json");
+    assert.deepEqual(await res.json(), {
+      type: "https://www.coere.ai/docs/errors#refused",
+      title: "Not allowed",
+      status: 409,
+      code: "refused",
+      reason: "last_admin",
+      detail: "An organization needs an admin.",
+    });
+  });
+});
+
 describe("every answer", () => {
   it("is not cached, not indexed and has no CORS headers", () => {
-    for (const res of [json({ a: 1 }), noContent(), problem("signed_out")]) {
+    for (const res of [json({ a: 1 }), noContent(), problem("signed_out"), refusal("self", "x")]) {
       assert.equal(res.headers.get("cache-control"), "no-store");
       assert.equal(res.headers.get("x-robots-tag"), "noindex");
       assert.equal(res.headers.get("access-control-allow-origin"), null);
