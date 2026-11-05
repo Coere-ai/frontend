@@ -1,6 +1,6 @@
 // Seeds the public site's side: the developer waitlist, who asked to hear
 // about Coere Connect and Coere for Teams, and a month of site analytics
-// (visits, clicks and how long each home section was read), with the
+// (visits, clicks and how long each page's sections were read), with the
 // growth a new site has.
 
 import { insertRows, momentOf } from "./insert.mjs";
@@ -25,6 +25,22 @@ const AGENTS = [
 ];
 const BOTS = ["Googlebot", "bingbot", "GPTBot", "ClaudeBot", "PerplexityBot", "Applebot"];
 const HOME_SECTIONS = [["hero", "Hero", 0], ["demo", "Demo", 1], ["connect", "Coere Connect", 2], ["solutions", "Coere Solutions", 3], ["forge", "Coere Forge", 4], ["compare", "How Coere compares", 5]];
+/** Each other page's sections in page order, so its most read section is recorded too. */
+const PAGE_SECTIONS = {
+  "/products/connect": [["hero", "Hero", 0], ["use-cases", "Put your memory to work", 1], ["compare", "The same chat, fewer tokens", 2], ["features", "Everything in Coere Connect", 3]],
+  "/products/solutions": [["hero", "Hero", 0], ["how", "How it works", 1], ["cases", "Use cases", 2]],
+  "/products/forge": [["hero", "Hero", 0], ["walkthrough", "From a key to context", 1], ["mcp", "Memory over MCP", 2]],
+  "/products/agents": [["hero", "Hero", 0], ["capabilities", "Capabilities", 1], ["agents", "Meet the agents", 2]],
+  "/install": [["countdown", "Countdown", 0], ["interest", "I'm interested", 1]],
+  "/try-teams": [["countdown", "Countdown", 0], ["interest", "I'm interested", 1]],
+  "/industries": [["grid", "Industries", 0]],
+  "/resources": [["quickstart", "Quickstart", 0], ["endpoints", "Endpoints", 1]],
+  "/about": [["story", "Story", 0], ["team", "Team", 1]],
+  "/developers/waitlist": [["form", "Waitlist", 0], ["code", "Code sample", 1]],
+  "/portable-ai-memory": [["hero", "Hero", 0], ["how", "How it works", 1], ["faq", "Questions", 2]],
+  "/chatgpt-to-claude-memory": [["hero", "Hero", 0], ["steps", "Steps", 1], ["faq", "Questions", 2]],
+  "/privacy": [["policy", "Policy", 0]],
+};
 const CTAS = [["Install Coere Connect", "/install"], ["Try it free", "/try-teams"], ["Join the waitlist", "/developers/waitlist"], ["Sign in", "/sign-in"]];
 
 function weighted(r, list) {
@@ -89,9 +105,9 @@ export async function seedSite(db, now) {
         events.push({ session_id: session, visitor_id: visitor, path, kind: "cta", label, href, created_at: at });
       }
       if (r.chance(0.04)) events.push({ session_id: session, visitor_id: visitor, path, kind: "outbound", label: "GitHub", href: "https://github.com", created_at: at });
-      if (path === "/") {
+      {
         let left = duration;
-        for (const [id, label, position] of HOME_SECTIONS) {
+        for (const [id, label, position] of path === "/" ? HOME_SECTIONS : (PAGE_SECTIONS[path] ?? [])) {
           if (left <= 0) break;
           const seconds = Math.min(left, Math.round((position === 0 ? 14 : 22) * (0.3 + r.next())));
           left -= seconds;
