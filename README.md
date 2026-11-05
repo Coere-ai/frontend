@@ -322,6 +322,7 @@ copied here.
 | Variable | What it is |
 | --- | --- |
 | `SUPABASE_PUBLISHABLE_KEY` | The project's publishable key, used by the server's session client. Not `NEXT_PUBLIC_`: only the server uses it |
+| `COERE_STORE_URL` | Where Add to Chrome on `/install` leads once Coere Connect is out: its Chrome Web Store listing. Unset, a search of the store for Coere |
 | `COERE_EXTENSION_IDS` | The extension ids allowed to connect and to be framed at `/dashboard`, comma separated. Unset, any id may connect outside production and none in production |
 | `SECURITY_SALT` | A long random string, the key for the address hash in `security_events` |
 

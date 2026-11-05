@@ -28,7 +28,7 @@ export const launchCopy: Record<
     title: string;
     /** The words in the title the Chrome mark sits in front of, as part of the heading. */
     markBefore: string | null;
-    /** The heading once the moment has passed. */
+    /** The heading once the moment has passed; the Chrome mark sits in it too, before `markBefore`. */
     here: string;
     line: string;
     /** The line once the moment has passed. */
@@ -40,7 +40,7 @@ export const launchCopy: Record<
     path: "/install",
     title: "Coming soon on the Chrome Web Store",
     markBefore: "Chrome Web Store",
-    here: "Coere Connect is here",
+    here: "Coere Connect is on the Chrome Web Store",
     line: "Coere Connect gives you one memory across every AI. Say you are interested and we will email you the day it is out.",
     hereLine: "One memory across every AI, now in the Chrome Web Store.",
   },
