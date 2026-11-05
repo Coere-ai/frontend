@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { accountsConfigured, sessionClient } from "@/lib/supabase/server";
 
 import { safeNext } from "./next-path";
+import { signedInRecently } from "./recent-sign-in";
 
 export { safeNext } from "./next-path";
 
@@ -38,4 +39,15 @@ export async function requireUser(next = "/dashboard"): Promise<AccountUser> {
   const user = await getUser();
   if (!user) redirect(`/sign-in?next=${encodeURIComponent(safeNext(next))}`);
   return user;
+}
+
+/**
+ * Whether this browser's session signed in within the last few minutes
+ * (recent-sign-in.ts). `getClaims` checks the token's signature before its
+ * claims are read, so a cookie edited by hand never passes.
+ */
+export async function signedInJustNow(): Promise<boolean> {
+  if (!accountsConfigured()) return false;
+  const { data, error } = await (await sessionClient()).auth.getClaims();
+  return !error && signedInRecently(data?.claims?.amr);
 }

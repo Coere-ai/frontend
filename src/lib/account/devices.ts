@@ -41,3 +41,15 @@ export async function revokeDevice(userId: string, deviceId: string): Promise<"r
   if (readError) throw new Error(`devices read failed: ${readError.code}`);
   return row ? "already" : "not_found";
 }
+
+/** Revokes every browser of the person's still connected, for a lost or stolen one. Answers how many. */
+export async function revokeAllDevices(userId: string): Promise<number> {
+  const { data, error } = await supabase()
+    .from("devices")
+    .update({ revoked_at: new Date().toISOString(), revoked_reason: "user" })
+    .eq("user_id", userId)
+    .is("revoked_at", null)
+    .select("id");
+  if (error) throw new Error(`device revoke failed: ${error.code}`);
+  return data?.length ?? 0;
+}
