@@ -2,9 +2,10 @@ import { isOrgAction, readOrgCommand } from "@/lib/org/commands";
 import { runOrgCommand } from "@/lib/org/run-command";
 import { readJson } from "@/lib/v1/body";
 import { gate } from "@/lib/v1/gate";
-import { problem } from "@/lib/v1/http";
+import { problem, refusal } from "@/lib/v1/http";
 import { outcomeAnswer } from "@/lib/v1/outcome-answer";
 import { problemFor } from "@/lib/v1/refusals";
+import { INVITE_ON_WEB, orgNeedsWeb } from "@/lib/v1/web-only";
 
 // POST /api/v1/org/{action} (docs/accounts.md 8.11)
 //
@@ -12,6 +13,9 @@ import { problemFor } from "@/lib/v1/refusals";
 // revoke-invite, accept, decline, role, access, remove, leave, share and
 // settings. Each runs the same rules the site's dashboard ran, for the
 // person the device token belongs to, inside their own organization only.
+// An invite and making an admin are refused here: someone let in by a
+// copied token would stay after the token is revoked, so those two need
+// the person signed in at coere.ai/account.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,6 +34,7 @@ export async function POST(req: Request, ctx: Ctx): Promise<Response> {
   if (!body.ok) return problem(body.reason);
   const command = readOrgCommand(action, body.value);
   if (!command) return problem("bad_request");
+  if (orgNeedsWeb(command)) return refusal("web_session", INVITE_ON_WEB);
   try {
     return outcomeAnswer(await runOrgCommand(g.account.userId, req.headers, command));
   } catch {
