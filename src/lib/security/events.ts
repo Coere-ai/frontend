@@ -30,6 +30,7 @@ export type SecurityKind =
   | "usage_limited"
   | "connect_refused"
   | "memory_deleted"
+  | "memory_backup_on"
   | "account_deleted"
   | "org_created"
   | "org_deleted"
