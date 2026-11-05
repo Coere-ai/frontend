@@ -68,10 +68,12 @@ src/site/home/        the home page: one part per product
 src/site/products/    one page design per product
 src/site/industries/  the industries page and each industry's page
 src/site/docs/        the docs layout and the Markdown renderer
-src/site/dashboard/, memory/, organization/, settings/
-                      the person's dashboard at /dashboard
+src/app/dashboard/    the dashboard host: the extension's own Console, framed
+src/site/console-host/
+                      the host's frame and its install note
+src/site/memory/      the memory explorer the admin panel shows
 src/site/graph/       the memory graph, ported from coere-v2's graph2d
-src/site/bridge/      messages from dashboard pages to the extension
+src/site/bridge/      coere.hello, the one message the site sends the extension
 src/site/about/, blog/, careers/
                       each page's own sections
 src/site/ui/          shared pieces: container, buttons, icons, film frames,
@@ -271,36 +273,41 @@ section is what the owner sets up by hand.
 
 ### The dashboard
 
-`/dashboard` is the person's own: Overview, Memory, Chats, Usage,
-Organization, Settings and Account (`docs/accounts.md` sections 7 and 14).
+`/dashboard` is the extension's own Console page, unchanged, in a frame
+that fills the window (`docs/accounts.md` section 7). The Console runs as
+the extension, so it keeps its style and every feature; nothing of it is
+copied here.
 
-- Every page renders per request and calls `requireUser` itself. Reads of
-  the person's own rows go through their session, so Row Level Security
-  decides what they see. The memory index, the organization's rows and
-  every write go through the server with the secret key, after the session
-  check, scoped to the person's own id or their own organization.
-- The memory graph is the product's flat graph, ported from coere-v2's
-  `packages/ui/src/graph2d` into `src/site/graph/`. Change it there first,
-  then copy the change here.
-- Pages talk to the extension through `src/site/bridge/`: they find it by
-  the `coere_ext` cookie, else each id in `COERE_EXTENSION_IDS`, and send
-  `coere.hello`, `coere.open`, `coere.backup` and `coere.settings`.
-- No page shows a spend limit, a plan limit or a meter against one. While a
-  limit is reached, the Overview and Usage pages say so in one line, which
-  `src/lib/dashboard/paused.ts` reads from `spend_state()` with the secret
-  key (`docs/accounts.md` 7).
+- `src/app/dashboard/[[...section]]/page.tsx` is one page for `/dashboard`
+  and every address below it, outside the site layout (no navbar or
+  footer). It calls `requireUser` and gets the nonce policy and noindex
+  from `src/proxy.ts`.
+- The server lets the page frame one extension: the `coere_ext` cookie's
+  id when `COERE_EXTENSION_IDS` lists it. On `/dashboard` the policy's
+  `frame-src` is exactly `chrome-extension://<that id>/`.
+- The page asks that id, then each allowed id, with `coere.hello`. When
+  the one that answers is the id the policy names, it renders only the
+  frame, `console.html?tab=<section>&embed=1`. When another answers, it
+  writes that id to `coere_ext` and loads once more. When none answers, it
+  says to install Coere (`/install`) or open the page in the Chrome where
+  Coere is installed.
+- `/dashboard/usage` opens Statistics, `/dashboard/settings` and
+  `/dashboard/account` Settings, `/dashboard/organization` Organization,
+  and the last part of any other address is the Console's own section id
+  (`src/lib/dashboard/host/console-tab.ts`). An unknown one is a 404.
+- The Console's account data (Statistics, the Account card, Organization)
+  comes from the API below, called by the extension's background with the
+  device token. Pages never call it.
 - Organizations are made in the admin panel, never from the dashboard. An
   admin invites coworkers by the email or username of their Coere account,
-  and the invite waits on the coworker's Organization page.
-- The Chrome Web Store address in `src/site/dashboard/connect-first.tsx` is
-  a search until the listing is live; put the listing's address there.
+  and the invite waits in the coworker's Organization section.
 
 ### Settings
 
 | Variable | What it is |
 | --- | --- |
 | `SUPABASE_PUBLISHABLE_KEY` | The project's publishable key, used by the server's session client. Not `NEXT_PUBLIC_`: only the server uses it |
-| `COERE_EXTENSION_IDS` | The extension ids allowed to connect, comma separated. Unset, any id may connect outside production and none in production |
+| `COERE_EXTENSION_IDS` | The extension ids allowed to connect and to be framed at `/dashboard`, comma separated. Unset, any id may connect outside production and none in production |
 | `SECURITY_SALT` | A long random string, the key for the address hash in `security_events` |
 
 `SUPABASE_URL` and `SUPABASE_SECRET_KEY` are the same as for the analytics
@@ -373,6 +380,10 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
 | `GET`, `PUT /api/v1/settings` | The synced settings |
 | `POST /api/v1/events` | Feature counts and tokens saved |
 | `GET /api/v1/org`, `GET /api/v1/org/index` | The organization and its shared graph, members only |
+| `GET /api/v1/org/page` | The Organization section: the organization, the caller's place, members, totals, open invites for an admin, or the caller's pending invites |
+| `POST /api/v1/org/{action}` | `invite`, `revoke-invite`, `accept`, `decline`, `role`, `access`, `remove`, `leave`, `share`, `settings`, by the rules of `docs/accounts.md` 14.1 |
+| `GET /api/v1/devices`, `POST /api/v1/devices/{id}/revoke` | The connected browsers, and signing one out |
+| `POST /api/v1/account/delete` | Deletes the account once the typed email matches |
 
 - Every route checks the token itself through `device_auth`.
   `src/proxy.ts` does not run on `/api/v1`.
@@ -386,8 +397,10 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
   only spend after that build. There is no daily limit unless the operator
   sets one, and the lifetime limit applies always (`docs/accounts.md` 8.10).
   A spent one answers Anthropic's own spend limit 400 on the Claude routes
-  and a `usage_limit` 429 elsewhere. The person never sees a limit: the
-  dashboard says only that their AI use is paused, while it is.
+  and a `usage_limit` 429 elsewhere. The person never sees a limit.
+- A rule's no (the last admin, a typed email that does not match) answers
+  `409 refused` with `reason` and `detail`, the line the Console shows.
+  The device and account deletion routes work for a suspended account too.
 - Refused tokens, rate limits and spent limits write `security_events`
   rows. The token itself is never stored or logged; only its SHA-256 is.
 
