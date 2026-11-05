@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { fmtCompact, labelIndexes } from "./chart-axis";
 import { ChartTypeToggle, type ChartType } from "./chart-type-toggle";
+import { niceScale } from "./nice-scale";
 
 // Dependency-free multi-series chart. A single (left) Y axis whose scale spans
 // ALL series, so every metric is plotted on the same scale and stays directly
@@ -31,6 +32,7 @@ export function MultiLineChart({
   height = 300,
   type = "line",
   switchable = true,
+  legend = false,
 }: {
   labels: string[];
   /** Axis-tick text per bucket (undefined = this bucket carries no label), from
@@ -41,6 +43,8 @@ export function MultiLineChart({
   height?: number;
   type?: ChartType;
   switchable?: boolean;
+  /** Names each series under the chart, for a chart whose series are told apart by colour alone. */
+  legend?: boolean;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = useState(0);
@@ -71,8 +75,10 @@ export function MultiLineChart({
   const innerW = Math.max(1, w - padLeft - padRight);
   const innerH = Math.max(1, height - padTop - padBottom);
 
-  // One scale for every series, the axis spans the max value across all of them.
-  const max = Math.max(1, ...series.flatMap((s) => s.values), 0);
+  const allMoney = series.length > 0 && series.every((s) => s.format);
+  // One scale for every series, the axis spans the max value across all of them,
+  // rounded up so each tick is a round number (whole for counts, cents for money).
+  const max = niceScale(Math.max(0, ...series.flatMap((s) => s.values)), { whole: !allMoney }).top;
   const baseY = padTop + innerH;
 
   const slot = innerW / Math.max(1, n);
@@ -93,7 +99,6 @@ export function MultiLineChart({
   const k = Math.max(1, series.length);
   const barW = Math.max(1, groupW / k);
 
-  const allMoney = series.length > 0 && series.every((s) => s.format);
   const moneyFmt = allMoney ? series[0]!.format : undefined;
   const axisFmt = (v: number) => (moneyFmt ? moneyFmt(v) : fmtCompact(v));
   const yTicks = [0, 0.25, 0.5, 0.75, 1];
@@ -180,6 +185,17 @@ export function MultiLineChart({
           </text>
         ))}
       </svg>
+
+      {legend && series.length > 1 ? (
+        <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-zinc-500">
+          {series.map((s) => (
+            <li key={s.id} className="flex items-center gap-1.5">
+              <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full" style={{ background: s.color }} />
+              {s.label}
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {/* Multi-series tooltip. */}
       {hover != null && n > 0 && (

@@ -60,7 +60,7 @@ export function SecurityPanel() {
             ))}
           </section>
           <Section title={`Sign ins and failures, last ${data.days} days`}>
-            <MultiLineChart labels={chart.labels} series={chart.series} type="bar" switchable={false} height={240} />
+            <MultiLineChart labels={chart.labels} series={chart.series} type="bar" switchable={false} height={240} legend />
           </Section>
           <Section title="Your recent memory views">
             <Table head={["Whose memory", "When"]} empty="You have not opened anyone's memory." rows={data.memoryViews.map((v) => [v.label, ago(v.at)])} />
