@@ -32,8 +32,13 @@ export async function shootSite(browser, base, shooter, { scale }) {
     const el = page.locator(`section#${id}`);
     await el.scrollIntoViewIfNeeded();
     await page.waitForTimeout(900);
-    // What Coere solves plays its scenes in turn; its picture is the stills it settles on.
+    // What Coere solves plays its scenes in turn; its pictures are the stills they settle on, without Coere and then with it.
     await s(`home-${id}`, { element: el, ...(id === "solves" ? { still: true, settle: 1500 } : {}) });
+    if (id === "solves") {
+      await page.getByRole("tab", { name: "With Coere" }).click();
+      await s("home-solves-coere", { element: el, still: true, settle: 1500 });
+      await page.getByRole("tab", { name: "Without Coere" }).click();
+    }
   }
   await bar.evaluate((node) => node.remove());
   for (const slug of PRODUCTS) {
