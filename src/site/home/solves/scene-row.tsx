@@ -1,27 +1,30 @@
 "use client";
 
-import { motion } from "motion/react";
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
-import type { SceneWords } from "@/site/content/solves";
-import { LAST, sceneDrawings, STEP_MS } from "./scenes";
-import { useTurn } from "./turns";
+import { AnimatePresence, motion, useIsPresent } from "motion/react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { solves } from "@/site/content/solves";
+import { lastStep, scenes } from "./scenes";
+import { Swap } from "./swap";
 
 /**
- * Where the row is in its loop. One scene plays at a time while the others
- * hold their last step, so only one thing moves. A scene's turn starts by
- * fading out its still, going back to step 0 while it cannot be seen, and
- * fading in again; nothing ever rewinds in sight.
+ * Where the row is. One scene plays at a time while the others hold their
+ * still. `step` -1 is the scene whose turn is next, still on its still.
+ * `runs` counts each scene's showings: a new count is a new layer, whole
+ * under the one before as that fades out (Layer), so a scene goes from its
+ * still to its first step (or from one side to the other) between two
+ * whole chats, never through an empty window or a rewind in sight.
  */
-type Phase = "rest" | "hide" | "rewind" | "play";
-type Play = { active: number; phase: Phase; step: number };
+type Play = { coere: boolean; active: number; step: number; runs: number[] };
 
-/** How long the row stays in a state before the next, in ms. */
-function stay(play: Play): number {
-  if (play.phase === "rest") return 600;
-  if (play.phase === "hide") return 450;
-  if (play.phase === "rewind") return 700;
-  return play.step < LAST ? STEP_MS[play.step] : 3200;
-}
+/** The fade from one showing of a scene to the next, in s. */
+const CROSS = 0.6;
+/** The wait before the first scene in view starts, in ms. */
+const START_MS = 400;
+/** How long a scene holds its still before the next scene plays, in ms. It keeps showing it after. */
+const HOLD_MS = 2400;
+
+const words = solves.sides;
+const keys = words.today.scenes.map((s) => s.key);
 
 /** The first scene in view from index `from` on, going round, or -1 when none is. */
 function nextInView(seen: boolean[], from: number): number {
@@ -32,15 +35,39 @@ function nextInView(seen: boolean[], from: number): number {
   return -1;
 }
 
+/** A new showing of scene `i` (or of every scene), so it cross fades into its next frame. */
+const bump = (runs: number[], i?: number) => runs.map((r, j) => (i === undefined || i === j ? r + 1 : r));
+
 /**
- * The next state within a turn. The turn's end is the row's to handle, as
- * it may hand the turn to the other row.
+ * The next state, and how long the row stays in this one first, in ms.
+ * Null while no scene is in view: the row waits.
  */
-function advance(play: Play): Play {
-  if (play.phase === "rest") return { ...play, phase: "hide" };
-  if (play.phase === "hide") return { ...play, phase: "rewind", step: 0 };
-  if (play.phase === "rewind") return { ...play, phase: "play" };
-  return { ...play, step: play.step + 1 };
+function next(play: Play, seen: boolean[]): { after: number; play: Play } | null {
+  const first = nextInView(seen, play.active);
+  if (first === -1) return null;
+  // The scene whose turn it is went out of view: it settles on its still and the turn goes on.
+  if (first !== play.active) return { after: 200, play: { ...play, active: first, step: -1, runs: play.step >= 0 ? bump(play.runs, play.active) : play.runs } };
+  const times = scenes[keys[play.active]].steps(play.coere);
+  if (play.step === -1) return { after: START_MS, play: { ...play, step: 0, runs: bump(play.runs, play.active) } };
+  if (play.step < times.length) return { after: times[play.step], play: { ...play, step: play.step + 1 } };
+  const to = nextInView(seen, play.active + 1);
+  return { after: HOLD_MS, play: { ...play, active: to, step: 0, runs: bump(play.runs, to) } };
+}
+
+/**
+ * One showing of a scene. A new showing is whole from its first frame,
+ * under the one it replaces, which fades out on top of it. So between two
+ * showings both are whole chats, and however fast the switch is flipped
+ * the window never thins towards empty. With reduced motion it swaps at
+ * once.
+ */
+function Layer({ still, children }: { still: boolean; children: ReactNode }) {
+  const present = useIsPresent();
+  return (
+    <motion.div className={`absolute inset-0 ${present ? "" : "z-10"}`} initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: still ? 0 : CROSS, ease: "easeInOut" }}>
+      {children}
+    </motion.div>
+  );
 }
 
 const REDUCE = "(prefers-reduced-motion: reduce)";
@@ -63,29 +90,35 @@ function useStill(): boolean {
 }
 
 /**
- * A row of the three scenes, each a drawing with its title and line under
- * it. The page is served with every scene on its still, which is also all
- * that shows with reduced motion. The scenes in view take turns playing,
- * and the row plays only while it holds the section's turn. A turn goes to
- * the next scene in view, so on a phone, where one scene shows at a time,
- * the one in sight is the one that plays. A scene that leaves view mid
- * turn settles on its still and hands the turn on.
+ * The row of three scenes for the side the switch is on, each a drawing
+ * with its title and line under it. The page is served with every scene on
+ * its still, which is also all that shows with reduced motion. The scenes
+ * in view take turns: one plays its steps and holds its still, then the
+ * next one plays, so only one thing moves. On a phone, where one scene
+ * shows at a time, the one in sight is the one that plays. When the
+ * switch flips, every scene cross fades to the new side and the first
+ * scene in view plays at once.
  */
-export function SceneRow({ scenes, coere }: { scenes: SceneWords[]; coere: boolean }) {
+export function SceneRow({ coere }: { coere: boolean }) {
   const ref = useRef<HTMLUListElement>(null);
   const still = useStill();
-  const [seen, setSeen] = useState<boolean[]>(() => scenes.map(() => false));
-  const [play, setPlay] = useState<Play>({ active: 0, phase: "rest", step: LAST });
-  const { holding, done } = useTurn(useId(), !still && seen.some(Boolean));
+  const [seen, setSeen] = useState<boolean[]>(() => keys.map(() => false));
+  const [play, setPlay] = useState<Play>({ coere, active: 0, step: -1, runs: keys.map(() => 0) });
+
+  // The switch flipped: every scene takes a new showing on the new side, and the turn starts again from the first scene in view.
+  if (play.coere !== coere) {
+    const first = nextInView(seen, 0);
+    setPlay({ coere, active: Math.max(first, 0), step: first === -1 || still ? -1 : 0, runs: bump(play.runs) });
+  }
 
   useEffect(() => {
     const items = Array.from(ref.current?.children ?? []);
     const observer = new IntersectionObserver(
       (entries) =>
         setSeen((prev) => {
-          const next = [...prev];
-          for (const entry of entries) next[items.indexOf(entry.target)] = entry.intersectionRatio >= 0.5;
-          return next;
+          const now = [...prev];
+          for (const entry of entries) now[items.indexOf(entry.target)] = entry.intersectionRatio >= 0.5;
+          return now;
         }),
       { threshold: 0.5 },
     );
@@ -95,46 +128,33 @@ export function SceneRow({ scenes, coere }: { scenes: SceneWords[]; coere: boole
 
   useEffect(() => {
     if (still) return;
-    if (!holding) {
-      // The other row has the turn: this one holds its stills and starts its next turn from rest.
-      if (play.phase === "rest") return;
-      const timer = setTimeout(() => setPlay((p) => ({ ...p, phase: "rest", step: LAST })), 0);
-      return () => clearTimeout(timer);
-    }
-    const first = nextInView(seen, play.active);
-    if (first === -1) return;
-    // The scene whose turn it is went out of view: settle it and pass the turn on.
-    const move = first !== play.active;
-    const end = play.phase === "play" && play.step === LAST;
-    const timer = setTimeout(
-      () => {
-        if (move) setPlay({ active: first, phase: "rest", step: LAST });
-        else if (!end) setPlay(advance(play));
-        else {
-          setPlay({ active: nextInView(seen, play.active + 1), phase: "rest", step: LAST });
-          done();
-        }
-      },
-      move ? 200 : stay(play),
-    );
+    const move = next(play, seen);
+    if (!move) return;
+    const timer = setTimeout(() => setPlay(move.play), move.after);
     return () => clearTimeout(timer);
-  }, [seen, still, play, holding, done]);
+  }, [seen, still, play]);
 
   return (
     <ul ref={ref} className="mx-auto grid max-w-md gap-y-14 xl:max-w-none xl:grid-cols-3 xl:gap-x-8">
-      {scenes.map((scene, i) => {
-        const Drawing = sceneDrawings[scene.key];
-        const mine = i === play.active && holding && !still;
-        const hidden = mine && (play.phase === "hide" || play.phase === "rewind");
+      {keys.map((key, i) => {
+        const scene = scenes[key];
+        const mine = !still && i === play.active && play.step >= 0;
+        const step = mine ? play.step : lastStep(scene, coere);
         return (
-          <li key={scene.key}>
+          <li key={key}>
             <div aria-hidden="true" className="relative aspect-[5/4]">
-              <motion.div className="absolute inset-0" initial={false} animate={{ opacity: hidden ? 0 : 1 }} transition={{ duration: 0.4 }}>
-                <Drawing step={mine ? play.step : LAST} coere={coere} />
-              </motion.div>
+              <AnimatePresence initial={false}>
+                <Layer key={`${coere}-${play.runs[i]}`} still={still}>
+                  <scene.Drawing step={step} coere={coere} live={mine} />
+                </Layer>
+              </AnimatePresence>
             </div>
-            <h3 className="mt-6 text-[19px] font-medium tracking-[-0.02em] text-neutral-950">{scene.title}</h3>
-            <p className="mt-2 text-[15px] leading-relaxed text-neutral-500 text-pretty">{scene.line}</p>
+            <h3 className="mt-6 text-[19px] font-medium tracking-[-0.02em] text-neutral-950">
+              <Swap coere={coere} today={words.today.scenes[i].title} withCoere={words.coere.scenes[i].title} />
+            </h3>
+            <p className="mt-2 text-[15px] leading-relaxed text-neutral-500 text-pretty">
+              <Swap coere={coere} today={words.today.scenes[i].line} withCoere={words.coere.scenes[i].line} />
+            </p>
           </li>
         );
       })}

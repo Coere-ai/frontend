@@ -1,50 +1,85 @@
-import { solves } from "@/site/content/solves";
+"use client";
+
+import { useState } from "react";
+import { solves, type Side, type SideWords } from "@/site/content/solves";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
-import { SectionIntro } from "./section-intro";
+import { PillTabs, tabId } from "@/site/ui/pill-tabs";
 import { SceneRow } from "./solves/scene-row";
-import { SolvesTurns } from "./solves/turns";
+import { Swap } from "./solves/swap";
 
-/** One quiet centered line for the developers' side, its first words darker. */
-function DeveloperLine({ text }: { text: { lead: string; rest: string } }) {
-  return (
-    <p className="mx-auto mt-16 max-w-2xl text-center text-[17px] leading-relaxed text-neutral-500 text-balance md:mt-20">
-      <span className="text-neutral-950">{text.lead}</span> {text.rest}
-    </p>
-  );
-}
+const { today, coere: withCoere } = solves.sides;
+const SWITCH = "solves-side";
 
 /**
  * What Coere solves, right under the film: the three ways AI loses what
- * it knows about a person, each a small drawing that plays when it comes
- * into view, and the developers' side in a line. Then the same three
- * scenes with Coere, and the way to the developer waitlist. Coere Connect
- * follows with its own way in, so this part does not repeat it. The two
- * rows share one turn, so only one scene moves at a time.
+ * it knows about a person, each a small drawing that plays in turn, with
+ * a switch to see the same three with Coere in their place. The intro,
+ * each scene's words, the developers' line and the link at the end follow
+ * the switch, which starts without Coere. Coere Connect follows with its
+ * own way in, so this part does not repeat it.
  */
 export function SolvesSection() {
+  const [side, setSide] = useState<Side>("today");
+  const coere = side === "coere";
   return (
-    <section id="solves" className="scroll-mt-24 border-t border-neutral-100 py-28 md:py-36">
+    <section id="solves" className="scroll-mt-24 border-t border-neutral-100 pt-24 pb-28 md:pt-28 md:pb-36">
       <Container>
-        <SolvesTurns>
-          <SectionIntro eyebrow={solves.eyebrow} title={solves.title} line={solves.line} />
-          <div className="mt-16 md:mt-20">
-            <SceneRow scenes={solves.today} coere={false} />
-          </div>
-          <DeveloperLine text={solves.developers} />
+        {/* The two intros share one place, each set at its foot, so the switch under them never moves; the shorter one's room is above its name. */}
+        <Swap block coere={coere} className="items-end" today={<Intro words={today} />} withCoere={<Intro words={withCoere} />} />
 
-          <div className="mt-28 md:mt-36">
-            <SectionIntro eyebrow={solves.answer.eyebrow} title={solves.answer.title} line={solves.answer.line} />
-          </div>
-          <div className="mt-16 md:mt-20">
-            <SceneRow scenes={solves.withCoere} coere />
-          </div>
-          <DeveloperLine text={solves.developersAnswer} />
+        <PillTabs
+          label={solves.switchLabel}
+          id={SWITCH}
+          size="sm"
+          className="mt-10"
+          picked={side}
+          onPick={setSide}
+          tabs={[
+            { key: "today", label: today.tab },
+            { key: "coere", label: withCoere.tab },
+          ]}
+        />
+
+        <div id={`${SWITCH}-panel`} role="tabpanel" aria-labelledby={tabId(SWITCH, side)} className="mt-14 md:mt-16">
+          <SceneRow coere={coere} />
+          <p className="mx-auto mt-16 max-w-2xl text-center text-[17px] leading-relaxed text-neutral-500 text-balance md:mt-20">
+            <Swap
+              coere={coere}
+              today={<DeveloperLine text={today.developers} />}
+              withCoere={<DeveloperLine text={withCoere.developers} />}
+            />
+          </p>
           <div className="mt-8 flex justify-center">
-            <ArrowLink href="/developers/waitlist">Join the developer waitlist</ArrowLink>
+            <Swap
+              coere={coere}
+              className="justify-items-center"
+              today={<ArrowLink href="/developers/waitlist">{today.waitlist}</ArrowLink>}
+              withCoere={<ArrowLink href="/developers/waitlist">{withCoere.waitlist}</ArrowLink>}
+            />
           </div>
-        </SolvesTurns>
+        </div>
       </Container>
     </section>
+  );
+}
+
+/** The section's name, and a side's title and line, set as every part of the home page opens. */
+function Intro({ words }: { words: SideWords }) {
+  return (
+    <div className="mx-auto max-w-3xl text-center">
+      <p className="text-[15px] font-medium text-brand-500">{solves.eyebrow}</p>
+      <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04]">{words.title}</h2>
+      <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{words.line}</p>
+    </div>
+  );
+}
+
+/** The developers' side in a line, its first words darker. */
+function DeveloperLine({ text }: { text: { lead: string; rest: string } }) {
+  return (
+    <>
+      <span className="text-neutral-950">{text.lead}</span> {text.rest}
+    </>
   );
 }

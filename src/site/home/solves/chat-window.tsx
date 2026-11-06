@@ -3,12 +3,13 @@
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
+import { StripLine, type MemoryLine } from "./strip-line";
+import { Typed } from "./typed";
 
 /** One message in a drawn chat. An AI message with no text is drawn as quiet lines, two unless it says more. */
 export type Message = { id: string; who: "you" | "ai"; text?: string; dim?: boolean; lines?: 2 | 3 };
 
-/** Coere's line over the chat box, as the extension draws it: what it adds, and the mark of the AI it came from. */
-export type MemoryLine = { text: string; logo: string };
+export type { MemoryLine };
 
 /** What one window shows at one step of its scene. */
 export type WindowFrame = {
@@ -66,18 +67,19 @@ function Bubble({ message }: { message: Message }) {
   );
 }
 
-/** The chat box: Coere's line on top when it has one, the draft, and the send button. */
-function Box({ frame }: { frame: WindowFrame }) {
+/**
+ * The chat box: Coere's line on top when it has one, the draft, and the
+ * send button. A draft wraps as a real box does, so a long one shows all
+ * the typing.
+ */
+function Box({ frame, live }: { frame: WindowFrame; live: boolean }) {
   const lit = Boolean(frame.line);
   return (
     <motion.div layout="position" transition={soft} className={`mx-2.5 mb-2.5 shrink-0 overflow-hidden rounded-2xl ring-1 transition-[box-shadow] duration-500 ${lit ? "ring-brand-200" : "ring-neutral-200"}`}>
       <AnimatePresence initial={false}>
         {frame.line ? (
           <motion.div key="line" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={soft} className="overflow-hidden bg-brand-50">
-            <span className="flex items-center gap-2 px-2.5 py-1 text-[10.5px] leading-snug text-neutral-700">
-              <span className="min-w-0 flex-1">{frame.line.text}</span>
-              <Logo src={frame.line.logo} size={11} />
-            </span>
+            <StripLine line={frame.line} live={live} />
           </motion.div>
         ) : null}
         {frame.pasted ? (
@@ -90,8 +92,10 @@ function Box({ frame }: { frame: WindowFrame }) {
           </motion.div>
         ) : null}
       </AnimatePresence>
-      <span className="flex h-8 items-center gap-2 pr-1 pl-2.5">
-        <span className={`min-w-0 flex-1 truncate text-[11.5px] transition-opacity duration-500 ${frame.quiet ? "opacity-0" : ""} ${frame.draft ? "text-neutral-800" : "text-neutral-400"}`}>{frame.draft ?? "Ask anything"}</span>
+      <span className="flex min-h-8 items-end gap-2 py-1 pr-1 pl-2.5">
+        <span className={`line-clamp-3 min-w-0 flex-1 self-center py-0.5 text-[11.5px] leading-snug transition-opacity duration-500 ${frame.quiet ? "opacity-0" : ""} ${frame.draft ? "text-neutral-800" : "text-neutral-400"}`}>
+          {frame.draft ? <Typed key={frame.draft} text={frame.draft} live={live} /> : "Ask anything"}
+        </span>
         <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-neutral-950 text-white">
           <ArrowRightIcon size={12} strokeWidth={2} className="-rotate-90" />
         </span>
@@ -103,9 +107,11 @@ function Box({ frame }: { frame: WindowFrame }) {
 /**
  * A chat window drawn in the site's own lines: the AI's name, the
  * messages from the bottom up, and the chat box. Whatever changes between
- * steps moves softly into place.
+ * steps moves softly into place. `live` says the window is playing its
+ * scene, so a draft types in and Coere's line loads in; on a still they
+ * just show.
  */
-export function ChatWindow({ logo, name, frame, className = "" }: { logo: string; name: string; frame: WindowFrame; className?: string }) {
+export function ChatWindow({ logo, name, frame, live = false, className = "" }: { logo: string; name: string; frame: WindowFrame; live?: boolean; className?: string }) {
   return (
     <div className={`flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_-36px_rgba(0,0,0,0.35)] ring-1 ring-neutral-200 ${className}`}>
       <div className="flex h-8 shrink-0 items-center gap-2 border-b border-neutral-100 px-3 text-[11.5px] font-medium text-neutral-800">
@@ -131,7 +137,7 @@ export function ChatWindow({ logo, name, frame, className = "" }: { logo: string
           ))}
         </AnimatePresence>
       </div>
-      <Box frame={frame} />
+      <Box frame={frame} live={live} />
     </div>
   );
 }
