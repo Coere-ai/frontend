@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import type { SceneWords } from "@/site/content/solves";
 import { LAST, sceneDrawings, STEP_MS } from "./scenes";
+import { useTurn } from "./turns";
 
 /**
  * Where the row is in its loop. One scene plays at a time while the others
@@ -32,15 +33,14 @@ function nextInView(seen: boolean[], from: number): number {
 }
 
 /**
- * The next state. A turn goes to the next scene in view, so on a phone,
- * where one scene shows at a time, the one in sight is the one that plays.
+ * The next state within a turn. The turn's end is the row's to handle, as
+ * it may hand the turn to the other row.
  */
-function advance(play: Play, seen: boolean[]): Play {
+function advance(play: Play): Play {
   if (play.phase === "rest") return { ...play, phase: "hide" };
   if (play.phase === "hide") return { ...play, phase: "rewind", step: 0 };
   if (play.phase === "rewind") return { ...play, phase: "play" };
-  if (play.step < LAST) return { ...play, step: play.step + 1 };
-  return { active: nextInView(seen, play.active + 1), phase: "hide", step: LAST };
+  return { ...play, step: play.step + 1 };
 }
 
 const REDUCE = "(prefers-reduced-motion: reduce)";
@@ -65,15 +65,18 @@ function useStill(): boolean {
 /**
  * A row of the three scenes, each a drawing with its title and line under
  * it. The page is served with every scene on its still, which is also all
- * that shows with reduced motion. The scenes in view take turns playing;
- * with none in view, the row waits where it is, and a scene that leaves
- * view mid turn settles on its still and hands the turn on.
+ * that shows with reduced motion. The scenes in view take turns playing,
+ * and the row plays only while it holds the section's turn. A turn goes to
+ * the next scene in view, so on a phone, where one scene shows at a time,
+ * the one in sight is the one that plays. A scene that leaves view mid
+ * turn settles on its still and hands the turn on.
  */
 export function SceneRow({ scenes, coere }: { scenes: SceneWords[]; coere: boolean }) {
   const ref = useRef<HTMLUListElement>(null);
   const still = useStill();
   const [seen, setSeen] = useState<boolean[]>(() => scenes.map(() => false));
   const [play, setPlay] = useState<Play>({ active: 0, phase: "rest", step: LAST });
+  const { holding, done } = useTurn(useId(), !still && seen.some(Boolean));
 
   useEffect(() => {
     const items = Array.from(ref.current?.children ?? []);
@@ -92,23 +95,40 @@ export function SceneRow({ scenes, coere }: { scenes: SceneWords[]; coere: boole
 
   useEffect(() => {
     if (still) return;
+    if (!holding) {
+      // The other row has the turn: this one holds its stills and starts its next turn from rest.
+      if (play.phase === "rest") return;
+      const timer = setTimeout(() => setPlay((p) => ({ ...p, phase: "rest", step: LAST })), 0);
+      return () => clearTimeout(timer);
+    }
     const first = nextInView(seen, play.active);
     if (first === -1) return;
     // The scene whose turn it is went out of view: settle it and pass the turn on.
     const move = first !== play.active;
-    const timer = setTimeout(() => setPlay((p) => (move ? { active: first, phase: "rest", step: LAST } : advance(p, seen))), move ? 200 : stay(play));
+    const end = play.phase === "play" && play.step === LAST;
+    const timer = setTimeout(
+      () => {
+        if (move) setPlay({ active: first, phase: "rest", step: LAST });
+        else if (!end) setPlay(advance(play));
+        else {
+          setPlay({ active: nextInView(seen, play.active + 1), phase: "rest", step: LAST });
+          done();
+        }
+      },
+      move ? 200 : stay(play),
+    );
     return () => clearTimeout(timer);
-  }, [seen, still, play]);
+  }, [seen, still, play, holding, done]);
 
   return (
-    <ul ref={ref} className="grid gap-x-8 gap-y-14 md:grid-cols-3">
+    <ul ref={ref} className="mx-auto grid max-w-md gap-y-14 xl:max-w-none xl:grid-cols-3 xl:gap-x-8">
       {scenes.map((scene, i) => {
         const Drawing = sceneDrawings[scene.key];
-        const mine = i === play.active && !still;
+        const mine = i === play.active && holding && !still;
         const hidden = mine && (play.phase === "hide" || play.phase === "rewind");
         return (
           <li key={scene.key}>
-            <div aria-hidden="true" className="relative aspect-square overflow-hidden rounded-[28px] bg-neutral-50 sm:aspect-[5/4]">
+            <div aria-hidden="true" className="relative aspect-[5/4]">
               <motion.div className="absolute inset-0" initial={false} animate={{ opacity: hidden ? 0 : 1 }} transition={{ duration: 0.4 }}>
                 <Drawing step={mine ? play.step : LAST} coere={coere} />
               </motion.div>
