@@ -42,6 +42,13 @@ pictures: [the site](docs/screenshots/site/README.md),
 
 <table>
   <tr>
+    <td colspan="2">
+      <img src="docs/screenshots/site/home-solves.webp" alt="Every AI starts from zero: three drawn chats where context is lost, then the same three with Coere's line adding what matters" />
+      <br />
+      <sub>What Coere solves: switching AI to AI, a new chat and one long chat, then the same three with Coere.</sub>
+    </td>
+  </tr>
+  <tr>
     <td width="50%">
       <img src="docs/screenshots/site/home-connect.webp" alt="One memory across every AI, with a ChatGPT window beside four features" />
       <br />
