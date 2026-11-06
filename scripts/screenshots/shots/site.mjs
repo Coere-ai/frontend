@@ -7,7 +7,7 @@ import { CODE } from "../fake-supabase/auth.mjs";
 
 const PRODUCTS = ["connect", "solutions", "forge", "agents"];
 const INDUSTRIES = ["finance", "technology", "commerce", "consumer", "manufacturing", "energy", "education", "legal"];
-const HOME_SECTIONS = ["demo", "connect", "solutions", "forge", "compare"];
+const HOME_SECTIONS = ["demo", "solves", "connect", "solutions", "forge", "compare"];
 
 async function open(page, base, path) {
   await page.goto(`${base}${path}`, { waitUntil: "load" });
@@ -19,7 +19,8 @@ export async function shootSite(browser, base, shooter, { scale }) {
   const page = await context.newPage();
   await shooter.prepare(page, { allNear: true });
   // Whole pages wait for their films to start, and the countdown pages are taken still.
-  const STILL = new Set(["install", "try-teams"]);
+  // What Coere solves on the home page settles on its stills too, so no scene is caught mid turn.
+  const STILL = new Set(["home", "install", "try-teams"]);
   const s = (name, o) => shooter.shot(page, "site", name, { ...(o?.full ? { settle: 5000 } : {}), ...(STILL.has(name) ? { still: true } : {}), ...o });
 
   await open(page, base, "/");
@@ -31,7 +32,8 @@ export async function shootSite(browser, base, shooter, { scale }) {
     const el = page.locator(`section#${id}`);
     await el.scrollIntoViewIfNeeded();
     await page.waitForTimeout(900);
-    await s(`home-${id}`, { element: el });
+    // What Coere solves plays its scenes in turn; its picture is the stills it settles on.
+    await s(`home-${id}`, { element: el, ...(id === "solves" ? { still: true, settle: 1500 } : {}) });
   }
   await bar.evaluate((node) => node.remove());
   for (const slug of PRODUCTS) {
@@ -97,7 +99,7 @@ export async function shootSite(browser, base, shooter, { scale }) {
   await shooter.prepare(p, { allNear: true });
   for (const [name, path] of [["phone-home", "/"], ["phone-product-connect", "/products/connect"], ["phone-install", "/install"], ["phone-sign-in", "/sign-in"]]) {
     await open(p, base, path);
-    await shooter.shot(p, "site", name, { full: name === "phone-home", still: name === "phone-install", settle: 3000 });
+    await shooter.shot(p, "site", name, { full: name === "phone-home", still: name === "phone-install" || name === "phone-home", settle: 3000 });
   }
   await phone.close();
 }
