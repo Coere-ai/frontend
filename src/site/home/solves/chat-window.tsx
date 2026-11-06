@@ -4,11 +4,11 @@ import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 
-/** One message in a drawn chat. An AI message with no text is drawn as two quiet lines. */
-export type Message = { id: string; who: "you" | "ai"; text?: string; dim?: boolean };
+/** One message in a drawn chat. An AI message with no text is drawn as quiet lines, two unless it says more. */
+export type Message = { id: string; who: "you" | "ai"; text?: string; dim?: boolean; lines?: 2 | 3 };
 
-/** Coere's line over the chat box, as the extension draws it: what it adds and where from. */
-export type MemoryLine = { text: string; from: string; logo: string };
+/** Coere's line over the chat box, as the extension draws it: what it adds, and the mark of the AI it came from. */
+export type MemoryLine = { text: string; logo: string };
 
 /** What one window shows at one step of its scene. */
 export type WindowFrame = {
@@ -21,6 +21,8 @@ export type WindowFrame = {
   pasted?: boolean;
   /** Messages from the top down, as a chat reads when it opens, rather than up from the box. */
   fromTop?: boolean;
+  /** A window left behind: the words in its box fade, so none show cut at its edge. */
+  quiet?: boolean;
 };
 
 export const ease = [0.22, 1, 0.36, 1] as const;
@@ -30,12 +32,15 @@ function Logo({ src, size = 14 }: { src: string; size?: number }) {
   return <Image src={src} alt="" width={size} height={size} unoptimized className="shrink-0" />;
 }
 
-/** An AI's reply with no words: two short lines. */
-function Lines() {
+const LINE_WIDTHS = { 2: [78, 52], 3: [88, 80, 46] };
+
+/** An AI's reply with no words: two or three short lines. */
+function Lines({ count = 2 }: { count?: 2 | 3 }) {
   return (
-    <span className="flex flex-col gap-1.5 py-1">
-      <span className="h-1.5 w-[78%] rounded-full bg-neutral-200/80" />
-      <span className="h-1.5 w-[52%] rounded-full bg-neutral-200/80" />
+    <span className="flex flex-col gap-1.5 py-0.5">
+      {LINE_WIDTHS[count].map((w) => (
+        <span key={w} className="h-1.5 rounded-full bg-neutral-200/80" style={{ width: `${w}%` }} />
+      ))}
     </span>
   );
 }
@@ -55,7 +60,7 @@ function Bubble({ message }: { message: Message }) {
       ) : message.text ? (
         <span className="block py-0.5 text-[11.5px] leading-snug text-neutral-700">{message.text}</span>
       ) : (
-        <Lines />
+        <Lines count={message.lines} />
       )}
     </motion.div>
   );
@@ -71,17 +76,14 @@ function Box({ frame }: { frame: WindowFrame }) {
           <motion.div key="line" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={soft} className="overflow-hidden bg-brand-50">
             <span className="flex items-center gap-2 px-2.5 py-1 text-[10.5px] leading-snug text-neutral-700">
               <span className="min-w-0 flex-1">{frame.line.text}</span>
-              <span className="flex shrink-0 items-center gap-1 text-neutral-500">
-                {frame.line.from}
-                <Logo src={frame.line.logo} size={11} />
-              </span>
+              <Logo src={frame.line.logo} size={11} />
             </span>
           </motion.div>
         ) : null}
         {frame.pasted ? (
           <motion.div key="pasted" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.9, ease }} className="overflow-hidden">
             <span className="flex flex-col gap-1.5 px-2.5 pt-2.5">
-              {[92, 84, 96, 70, 88, 94, 60].map((w, i) => (
+              {[92, 84, 70].map((w, i) => (
                 <span key={i} className="h-1.5 rounded-full bg-neutral-200/80" style={{ width: `${w}%` }} />
               ))}
             </span>
@@ -89,7 +91,7 @@ function Box({ frame }: { frame: WindowFrame }) {
         ) : null}
       </AnimatePresence>
       <span className="flex h-8 items-center gap-2 pr-1 pl-2.5">
-        <span className={`min-w-0 flex-1 truncate text-[11.5px] ${frame.draft ? "text-neutral-800" : "text-neutral-400"}`}>{frame.draft ?? "Ask anything"}</span>
+        <span className={`min-w-0 flex-1 truncate text-[11.5px] transition-opacity duration-500 ${frame.quiet ? "opacity-0" : ""} ${frame.draft ? "text-neutral-800" : "text-neutral-400"}`}>{frame.draft ?? "Ask anything"}</span>
         <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-neutral-950 text-white">
           <ArrowRightIcon size={12} strokeWidth={2} className="-rotate-90" />
         </span>
@@ -115,7 +117,7 @@ export function ChatWindow({ logo, name, frame, className = "" }: { logo: string
           </motion.span>
         </AnimatePresence>
       </div>
-      <div className={`relative flex min-h-0 flex-1 flex-col gap-2 overflow-hidden px-3 pt-3 pb-2 ${frame.fromTop ? "justify-start" : "justify-end"}`}>
+      <div className={`relative flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden px-3 pt-3 pb-2 ${frame.fromTop ? "justify-start" : "justify-end"}`}>
         <AnimatePresence initial={false}>
           {frame.greeting ? (
             <motion.p key="greeting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={soft} className="absolute inset-0 grid place-items-center text-[12.5px] text-neutral-500">
