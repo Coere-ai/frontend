@@ -42,35 +42,36 @@ pictures: [the site](docs/screenshots/site/README.md),
 
 <table>
   <tr>
-    <td colspan="2">
+    <td width="50%">
       <img src="docs/screenshots/site/home-solves.webp" alt="Every AI starts from zero: three drawn chats where context is lost, then the same three with Coere's line adding what matters" />
       <br />
       <sub>What Coere solves: switching AI to AI, a new chat and one long chat, then the same three with Coere.</sub>
     </td>
-  </tr>
-  <tr>
     <td width="50%">
       <img src="docs/screenshots/site/home-connect.webp" alt="One memory across every AI, with a ChatGPT window beside four features" />
       <br />
       <sub>Each product has its part of the home page, Coere Connect first.</sub>
     </td>
+  </tr>
+  <tr>
     <td width="50%">
       <img src="docs/screenshots/site/home-compare.webp" alt="A table of Coere Connect against the memory ChatGPT, Claude, Gemini and OpenMemory keep" />
       <br />
       <sub>How Coere compares with the memory each AI keeps.</sub>
     </td>
-  </tr>
-  <tr>
     <td width="50%">
       <img src="docs/screenshots/site/install.webp" alt="Coming soon on the Chrome Web Store, a countdown and I'm interested" />
       <br />
       <sub>Every Install button leads to the countdown until the extension is in the Chrome Web Store.</sub>
     </td>
+  </tr>
+  <tr>
     <td width="50%">
       <img src="docs/screenshots/site/sign-in-code.webp" alt="The sign in code step for maya@fernhillcreative.co, plain on the white page" />
       <br />
       <sub>Sign in with a code by email, or with a password.</sub>
     </td>
+    <td width="50%"></td>
   </tr>
 </table>
 
