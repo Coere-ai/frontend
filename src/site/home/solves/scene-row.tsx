@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { motion } from "motion/react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { SceneWords } from "@/site/content/solves";
 import { LAST, sceneDrawings, STEP_MS } from "./scenes";
 
@@ -43,6 +43,25 @@ function advance(play: Play, seen: boolean[]): Play {
   return { active: nextInView(seen, play.active + 1), phase: "hide", step: LAST };
 }
 
+const REDUCE = "(prefers-reduced-motion: reduce)";
+
+/**
+ * Whether the person asked for reduced motion, kept current if they change
+ * it while the page is open (motion's own hook reads it once). The server
+ * renders the stills either way.
+ */
+function useStill(): boolean {
+  return useSyncExternalStore(
+    (change) => {
+      const query = matchMedia(REDUCE);
+      query.addEventListener("change", change);
+      return () => query.removeEventListener("change", change);
+    },
+    () => matchMedia(REDUCE).matches,
+    () => false,
+  );
+}
+
 /**
  * A row of the three scenes, each a drawing with its title and line under
  * it. The page is served with every scene on its still, which is also all
@@ -52,7 +71,7 @@ function advance(play: Play, seen: boolean[]): Play {
  */
 export function SceneRow({ scenes, coere }: { scenes: SceneWords[]; coere: boolean }) {
   const ref = useRef<HTMLUListElement>(null);
-  const still = useReducedMotion();
+  const still = useStill();
   const [seen, setSeen] = useState<boolean[]>(() => scenes.map(() => false));
   const [play, setPlay] = useState<Play>({ active: 0, phase: "rest", step: LAST });
 
