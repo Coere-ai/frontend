@@ -5,6 +5,7 @@ import { useState, type CSSProperties } from "react";
 import { compareTables, type CompareTable as Table, type Mark } from "@/site/content/compare";
 import { Container } from "@/site/ui/container";
 import { CheckIcon, CloseIcon } from "@/site/ui/icons/interface-icons";
+import { PillTabs, tabId } from "@/site/ui/pill-tabs";
 
 /** A half filled circle, for "partly". */
 const Half = () => (
@@ -95,24 +96,25 @@ export function CompareTable({ id = "compare" }: { id?: string }) {
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">Each AI remembers only what you told it. Coere knows you on day one, in every AI, and acts on it.</p>
         </div>
 
-        <div role="tablist" aria-label="Compare a product" className="mx-auto mt-12 flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-neutral-100 p-1.5">
-          {compareTables.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              role="tab"
-              aria-selected={t.key === table.key}
-              onClick={() => setPicked(t.key)}
-              className={`h-11 shrink-0 rounded-full px-5 text-[15px] transition-colors ${t.key === table.key ? "bg-neutral-950 text-white" : "text-neutral-700 hover:text-neutral-950"}`}
-            >
-              <span className="sm:hidden">{t.label.replace("Coere ", "")}</span>
-              <span className="hidden sm:inline">{t.label}</span>
-            </button>
-          ))}
-        </div>
+        <PillTabs
+          label="Compare a product"
+          id={`${id}-pick`}
+          className="mt-12"
+          picked={table.key}
+          onPick={setPicked}
+          tabs={compareTables.map((t) => ({
+            key: t.key,
+            label: (
+              <>
+                <span className="sm:hidden">{t.label.replace("Coere ", "")}</span>
+                <span className="hidden sm:inline">{t.label}</span>
+              </>
+            ),
+          }))}
+        />
 
         {/* relative: the marks' screen reader words are absolutely placed, and must stay inside this scroller, not widen the page on a phone. */}
-        <div className="relative mx-auto mt-14 max-w-6xl overflow-x-auto py-3">
+        <div id={`${id}-pick-panel`} role="tabpanel" aria-labelledby={tabId(`${id}-pick`, table.key)} className="relative mx-auto mt-14 max-w-6xl overflow-x-auto py-3">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={table.key} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
               <Board table={table} />
