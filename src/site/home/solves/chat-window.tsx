@@ -23,6 +23,8 @@ export type WindowFrame = {
   greeting?: string;
   messages: Message[];
   draft?: string;
+  /** How long the first letter of the draft waits, in ms, so typing starts once the window has finished moving. */
+  typeDelay?: number;
   line?: MemoryLine;
   /** The person pasted the whole chat back in: the box swells with it. */
   pasted?: boolean;
@@ -81,6 +83,8 @@ function Bubble({ message }: { message: Message }) {
   );
 }
 
+const PLACEHOLDER = "Ask anything";
+
 /**
  * The chat box: Coere's line on top when it has one, the draft, and the
  * send button. A draft wraps as a real box does, so a long one shows all
@@ -97,19 +101,19 @@ function Box({ frame, live }: { frame: WindowFrame; live: boolean }) {
           </motion.div>
         ) : null}
         {frame.pasted ? (
-          <motion.div key="pasted" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.9, ease }} className="overflow-hidden">
+          <motion.div key="pasted" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0, transition: { duration: 0.6, ease, delay: 0.3 } }} transition={{ duration: 0.9, ease }} className="overflow-hidden">
             <span className="flex flex-col gap-1.5 px-2.5 pt-2.5">
-              {/* The third line only where the window has room for it, so the chat above keeps the date in sight. */}
-              {[92, 84, 70].map((w, i) => (
-                <span key={i} className={`h-1.5 rounded-full bg-neutral-200/80 ${i === 2 ? "hidden @min-[400px]:block" : ""}`} style={{ width: `${w}%` }} />
+              {/* Two lines, so the chat above keeps the date in sight. */}
+              {[92, 76].map((w) => (
+                <span key={w} className="h-1.5 rounded-full bg-neutral-200/80" style={{ width: `${w}%` }} />
               ))}
             </span>
           </motion.div>
         ) : null}
       </AnimatePresence>
       <span className="flex min-h-8 items-end gap-2 py-1 pr-1 pl-2.5">
-        <span className={`line-clamp-3 min-w-0 flex-1 self-center py-0.5 text-[11.5px] leading-snug transition-opacity duration-500 ${frame.quiet ? "opacity-0" : ""} ${frame.draft ? "text-neutral-800" : "text-neutral-400"}`}>
-          {frame.draft ? <Typed key={frame.draft} text={frame.draft} live={live} /> : "Ask anything"}
+        <span className={`relative line-clamp-3 min-w-0 flex-1 self-center py-0.5 text-[11.5px] leading-snug transition-opacity duration-500 ${frame.quiet ? "opacity-0" : ""} ${frame.draft ? "text-neutral-800" : "text-neutral-400"}`}>
+          {frame.draft ? <Typed key={frame.draft} text={frame.draft} live={live} delay={frame.typeDelay} placeholder={PLACEHOLDER} /> : PLACEHOLDER}
         </span>
         <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-neutral-950 text-white">
           <ArrowRightIcon size={12} strokeWidth={2} className="-rotate-90" />
@@ -155,7 +159,8 @@ export function ChatWindow({ logo, name, frame, live = false, className = "" }: 
                 </motion.p>
               ) : null}
             </AnimatePresence>
-            <AnimatePresence initial={false} mode="popLayout">
+            {/* A message that goes keeps its place while it fades, and only then do the ones above it move down, so nothing slides under it. */}
+            <AnimatePresence initial={false}>
               {frame.messages.map((m) => (
                 <Bubble key={m.id} message={m} />
               ))}
