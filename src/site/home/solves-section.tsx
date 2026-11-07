@@ -25,13 +25,19 @@ export function SolvesSection() {
   return (
     <section id="solves" className="scroll-mt-24 border-t border-neutral-100 py-28 md:py-36">
       <Container>
-        {/* The two intros share one place, so the switch under them never moves. Without Coere's title is set narrower so it takes two lines, as With Coere's does, and the little room left over is split above and below it. */}
-        <Swap block coere={coere} className="items-center" today={<Intro words={today} narrow />} withCoere={<Intro words={withCoere} />} />
+        {/*
+          The section's name stays put, and the two intros share one place under it, from its top, so the
+          switch under them never moves. Without Coere's title is set narrower so it takes two lines, as
+          With Coere's does.
+        */}
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-[15px] font-medium text-brand-500">{solves.eyebrow}</p>
+          <Swap block coere={coere} className="mt-3" today={<Intro words={today} narrow />} withCoere={<Intro words={withCoere} />} />
+        </div>
 
         <PillTabs
           label={solves.switchLabel}
           id={SWITCH}
-          size="sm"
           className="mt-10"
           picked={side}
           onPick={setSide}
@@ -64,12 +70,11 @@ export function SolvesSection() {
   );
 }
 
-/** The section's name, and a side's title and line, set as every part of the home page opens. `narrow` sets a short title on two lines from md up. */
+/** A side's title and line, set as every part of the home page opens. `narrow` sets a short title on two lines from md up. */
 function Intro({ words, narrow = false }: { words: SideWords; narrow?: boolean }) {
   return (
-    <div className="mx-auto max-w-3xl text-center">
-      <p className="text-[15px] font-medium text-brand-500">{solves.eyebrow}</p>
-      <h2 className={`mx-auto mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04] ${narrow ? "md:max-w-md" : ""}`}>{words.title}</h2>
+    <div>
+      <h2 className={`mx-auto text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04] ${narrow ? "md:max-w-md" : ""}`}>{words.title}</h2>
       <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{words.line}</p>
     </div>
   );

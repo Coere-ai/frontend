@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { solves } from "@/site/content/solves";
 import { lastStep, scenes } from "./scenes";
-import { Swap } from "./swap";
+import { SWAP_IN_MS, SWAP_OUT_MS, Swap } from "./swap";
 
 /**
  * Where the row is. One scene plays at a time while the others hold their
@@ -18,8 +18,8 @@ import { Swap } from "./swap";
  */
 type Play = { coere: boolean; active: number; step: number; runs: number[] };
 
-/** The fade from one side's showing of a scene to the other's, in s. */
-const CROSS = 0.35;
+/** The fade from one side's showing of a scene to the other's, in s: as long as the words take to swap (swap.tsx). */
+const CROSS = (SWAP_OUT_MS + SWAP_IN_MS) / 1000;
 /** The wait before the first scene in view starts, in ms. */
 const START_MS = 400;
 /** How long a scene holds its still before the next scene plays, in ms. It keeps showing it after. */
@@ -35,6 +35,23 @@ function nextInView(seen: boolean[], from: number): number {
     if (seen[i]) return i;
   }
   return -1;
+}
+
+/**
+ * Which drawings count as in view: at least half of each one inside the
+ * window. In one column, where two can be half in sight at once on a
+ * phone, only the one nearest the middle counts, so it is the one that
+ * plays, again and again, and the other holds its still.
+ */
+function inSight(list: HTMLElement): boolean[] {
+  const drawings = Array.from(list.querySelectorAll<HTMLElement>("[data-drawing]"), (d) => d.getBoundingClientRect());
+  const shown = drawings.map((r) => Math.min(r.bottom, innerHeight) - Math.max(r.top, 0) >= r.height / 2);
+  const column = drawings.length > 1 && drawings[1].top >= drawings[0].bottom;
+  if (!column) return shown;
+  const middle = innerHeight / 2;
+  const off = drawings.map((r, i) => (shown[i] ? Math.abs((r.top + r.bottom) / 2 - middle) : Infinity));
+  const nearest = off.indexOf(Math.min(...off));
+  return shown.map((v, i) => v && i === nearest);
 }
 
 /** A new showing of scene `i` (or of every scene), so it fades into its next frame. */
@@ -95,9 +112,9 @@ function useStill(): boolean {
  * with its title and line under it. The page is served with every scene on
  * its still, which is also all that shows with reduced motion. The scenes
  * in view take turns: one plays its steps and holds its still, then the
- * next one plays, so only one thing moves. On a phone, where one scene
- * shows at a time, the one in sight is the one that plays, again and
- * again. When the switch flips, every scene fades to the new side and the
+ * next one plays, so only one thing moves. In one column, only the
+ * drawing nearest the middle of the screen counts as in view, so it plays
+ * again and again (inSight). When the switch flips, every scene fades to the new side and the
  * first scene in view plays at once.
  */
 export function SceneRow({ coere }: { coere: boolean }) {
@@ -113,18 +130,27 @@ export function SceneRow({ coere }: { coere: boolean }) {
   }
 
   useEffect(() => {
-    const items = Array.from(ref.current?.children ?? []);
-    const observer = new IntersectionObserver(
-      (entries) =>
-        setSeen((prev) => {
-          const now = [...prev];
-          for (const entry of entries) now[items.indexOf(entry.target)] = entry.intersectionRatio >= 0.5;
-          return now;
-        }),
-      { threshold: 0.5 },
-    );
-    items.forEach((item) => observer.observe(item));
-    return () => observer.disconnect();
+    const list = ref.current;
+    if (!list) return;
+    let frame = 0;
+    const look = () => {
+      frame = 0;
+      setSeen((prev) => {
+        const now = inSight(list);
+        return now.every((v, i) => v === prev[i]) ? prev : now;
+      });
+    };
+    const soon = () => {
+      if (!frame) frame = requestAnimationFrame(look);
+    };
+    look();
+    addEventListener("scroll", soon, { passive: true });
+    addEventListener("resize", soon);
+    return () => {
+      cancelAnimationFrame(frame);
+      removeEventListener("scroll", soon);
+      removeEventListener("resize", soon);
+    };
   }, []);
 
   useEffect(() => {
@@ -143,7 +169,7 @@ export function SceneRow({ coere }: { coere: boolean }) {
         const step = mine ? play.step : lastStep(scene, coere);
         return (
           <li key={key}>
-            <div aria-hidden="true" className="@container relative aspect-[6/5] sm:aspect-[4/3]">
+            <div aria-hidden="true" data-drawing className="@container relative aspect-[6/5] sm:aspect-[4/3]">
               <AnimatePresence initial={false}>
                 <Layer key={`${coere}-${play.runs[i]}`} still={still}>
                   <scene.Drawing step={step} coere={coere} live={mine} />
