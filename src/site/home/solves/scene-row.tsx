@@ -8,16 +8,18 @@ import { Swap } from "./swap";
 
 /**
  * Where the row is. One scene plays at a time while the others hold their
- * still. `step` -1 is the scene whose turn is next, still on its still.
- * `runs` counts each scene's showings: a new count is a new layer, whole
- * under the one before as that fades out (Layer), so a scene goes from its
- * still to its first step (or from one side to the other) between two
- * whole chats, never through an empty window or a rewind in sight.
+ * still. `step` -1 is the scene whose turn is next, still on its still. A
+ * scene goes from its still to its first step in place, each in its own
+ * way (see scenes.tsx), so only one thing moves and nothing is drawn over
+ * anything. `runs` counts each scene's showings: a new count is a new
+ * layer, whole under the one before as that fades out (Layer). That is
+ * only for the switch to the other side, and for a scene that leaves view
+ * mid turn going back to its still.
  */
 type Play = { coere: boolean; active: number; step: number; runs: number[] };
 
-/** The fade from one showing of a scene to the next, in s. */
-const CROSS = 0.6;
+/** The fade from one side's showing of a scene to the other's, in s. */
+const CROSS = 0.35;
 /** The wait before the first scene in view starts, in ms. */
 const START_MS = 400;
 /** How long a scene holds its still before the next scene plays, in ms. It keeps showing it after. */
@@ -35,7 +37,7 @@ function nextInView(seen: boolean[], from: number): number {
   return -1;
 }
 
-/** A new showing of scene `i` (or of every scene), so it cross fades into its next frame. */
+/** A new showing of scene `i` (or of every scene), so it fades into its next frame. */
 const bump = (runs: number[], i?: number) => runs.map((r, j) => (i === undefined || i === j ? r + 1 : r));
 
 /**
@@ -48,18 +50,17 @@ function next(play: Play, seen: boolean[]): { after: number; play: Play } | null
   // The scene whose turn it is went out of view: it settles on its still and the turn goes on.
   if (first !== play.active) return { after: 200, play: { ...play, active: first, step: -1, runs: play.step >= 0 ? bump(play.runs, play.active) : play.runs } };
   const times = scenes[keys[play.active]].steps(play.coere);
-  if (play.step === -1) return { after: START_MS, play: { ...play, step: 0, runs: bump(play.runs, play.active) } };
+  if (play.step === -1) return { after: START_MS, play: { ...play, step: 0 } };
   if (play.step < times.length) return { after: times[play.step], play: { ...play, step: play.step + 1 } };
   const to = nextInView(seen, play.active + 1);
-  return { after: HOLD_MS, play: { ...play, active: to, step: 0, runs: bump(play.runs, to) } };
+  return { after: HOLD_MS, play: { ...play, active: to, step: 0 } };
 }
 
 /**
  * One showing of a scene. A new showing is whole from its first frame,
- * under the one it replaces, which fades out on top of it. So between two
- * showings both are whole chats, and however fast the switch is flipped
- * the window never thins towards empty. With reduced motion it swaps at
- * once.
+ * under the one it replaces, which fades out on top of it. So however fast
+ * the switch is flipped the window never thins towards empty. With reduced
+ * motion it swaps at once.
  */
 function Layer({ still, children }: { still: boolean; children: ReactNode }) {
   const present = useIsPresent();
@@ -95,9 +96,9 @@ function useStill(): boolean {
  * its still, which is also all that shows with reduced motion. The scenes
  * in view take turns: one plays its steps and holds its still, then the
  * next one plays, so only one thing moves. On a phone, where one scene
- * shows at a time, the one in sight is the one that plays. When the
- * switch flips, every scene cross fades to the new side and the first
- * scene in view plays at once.
+ * shows at a time, the one in sight is the one that plays, again and
+ * again. When the switch flips, every scene fades to the new side and the
+ * first scene in view plays at once.
  */
 export function SceneRow({ coere }: { coere: boolean }) {
   const ref = useRef<HTMLUListElement>(null);
@@ -142,7 +143,7 @@ export function SceneRow({ coere }: { coere: boolean }) {
         const step = mine ? play.step : lastStep(scene, coere);
         return (
           <li key={key}>
-            <div aria-hidden="true" className="relative aspect-[5/4]">
+            <div aria-hidden="true" className="@container relative aspect-[6/5] sm:aspect-[4/3]">
               <AnimatePresence initial={false}>
                 <Layer key={`${coere}-${play.runs[i]}`} still={still}>
                   <scene.Drawing step={step} coere={coere} live={mine} />

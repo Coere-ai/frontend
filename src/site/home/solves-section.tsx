@@ -23,10 +23,10 @@ export function SolvesSection() {
   const [side, setSide] = useState<Side>("today");
   const coere = side === "coere";
   return (
-    <section id="solves" className="scroll-mt-24 border-t border-neutral-100 pt-24 pb-28 md:pt-28 md:pb-36">
+    <section id="solves" className="scroll-mt-24 border-t border-neutral-100 py-28 md:py-36">
       <Container>
-        {/* The two intros share one place, each set at its foot, so the switch under them never moves; the shorter one's room is above its name. */}
-        <Swap block coere={coere} className="items-end" today={<Intro words={today} />} withCoere={<Intro words={withCoere} />} />
+        {/* The two intros share one place, so the switch under them never moves. Without Coere's title is set narrower so it takes two lines, as With Coere's does, and the little room left over is split above and below it. */}
+        <Swap block coere={coere} className="items-center" today={<Intro words={today} narrow />} withCoere={<Intro words={withCoere} />} />
 
         <PillTabs
           label={solves.switchLabel}
@@ -64,12 +64,12 @@ export function SolvesSection() {
   );
 }
 
-/** The section's name, and a side's title and line, set as every part of the home page opens. */
-function Intro({ words }: { words: SideWords }) {
+/** The section's name, and a side's title and line, set as every part of the home page opens. `narrow` sets a short title on two lines from md up. */
+function Intro({ words, narrow = false }: { words: SideWords; narrow?: boolean }) {
   return (
     <div className="mx-auto max-w-3xl text-center">
       <p className="text-[15px] font-medium text-brand-500">{solves.eyebrow}</p>
-      <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04]">{words.title}</h2>
+      <h2 className={`mx-auto mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04] ${narrow ? "md:max-w-md" : ""}`}>{words.title}</h2>
       <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{words.line}</p>
     </div>
   );

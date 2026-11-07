@@ -16,7 +16,9 @@ const SIZES = {
  * The site's row of pills on light grey, the picked one solid black, as
  * tabs: the picked pill is the one in the tab order, and the arrow keys,
  * Home and End move the pick, so a keyboard and a screen reader get the
- * same switch the mouse does. With `id`, each tab is `<id>-tab-<key>` and
+ * same switch the mouse does. A pill with the keyboard's focus shows a
+ * ring inside its edge, white on the black pill, since the row's scroll
+ * would cut one drawn outside. With `id`, each tab is `<id>-tab-<key>` and
  * controls the part with the id `<id>-panel`, which the caller gives
  * role="tabpanel" and labels with the picked tab (`tabId`).
  */
@@ -48,7 +50,7 @@ export function PillTabs<K extends string>({ label, tabs, picked, onPick, id, si
             aria-controls={id ? `${id}-panel` : undefined}
             tabIndex={on ? 0 : -1}
             onClick={() => onPick(t.key)}
-            className={`shrink-0 rounded-full transition-colors ${look.tab} ${on ? "bg-neutral-950 text-white" : "text-neutral-700 hover:text-neutral-950"}`}
+            className={`shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 ${look.tab} ${on ? "bg-neutral-950 text-white focus-visible:outline-white" : "text-neutral-700 hover:text-neutral-950 focus-visible:outline-neutral-950"}`}
           >
             {t.label}
           </button>

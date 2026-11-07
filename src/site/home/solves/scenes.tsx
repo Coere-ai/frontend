@@ -21,8 +21,8 @@ export type Scene = { Drawing: (props: Props) => ReactNode; steps: (coere: boole
 export const lastStep = (scene: Scene, coere: boolean) => scene.steps(coere).length;
 
 const logos = { chatgpt: "/openai.svg", claude: "/claude-color.svg", gemini: "/gemini-color.svg" };
-const you = (id: string, text: string): Message => ({ id, who: "you", text });
-const ai = (id: string, text?: string): Message => ({ id, who: "ai", text });
+const you = (id: string, text: string, o: Partial<Message> = {}): Message => ({ id, who: "you", text, ...o });
+const ai = (id: string, o: Partial<Message> = {}): Message => ({ id, who: "ai", ...o });
 
 /** A typing step: the draft's letters, then a beat to read it. */
 const typing = (draft: string) => typingMs(draft) + 700;
@@ -62,33 +62,45 @@ function asked(step: number, at: number, base: WindowFrame, coere: boolean, o: {
 
 /**
  * Switching AI to AI: the chat about the Harbor redesign steps back in
- * ChatGPT, and Claude opens in front of it with nothing. With Coere, the
- * line over Claude's box brings the project across.
+ * ChatGPT, and Claude rises in front of it with nothing. With Coere, the
+ * line over Claude's box brings the project across, and the answer uses
+ * what the ChatGPT chat said: the booking flow. When the scene starts
+ * again, only Claude leaves, fading as ChatGPT glides back to the front.
  */
 function Switch({ step, coere, live }: Props) {
   const moved = step >= 1;
-  // One message, high in the window, so no words sit cut under the window in front.
-  const history: WindowFrame = { label: "Harbor site", fromTop: true, quiet: moved, messages: [you("a", "We're redesigning Harbor"), ai("b")] };
-  const answer = coere ? ai("r", "Here is the update on the Harbor redesign.") : ai("r", "Happy to help. What is Harbor, and who is it for?");
-  const front = asked(step, 2, fresh, coere, { draft: SWITCH_DRAFT, answer: [answer], what: ["your context on Harbor redesign", "your context on Harbor"], logo: logos.chatgpt });
+  // The first message sits high in the window, above the window in front, so the words that show of it once it steps back are whole.
+  const history: WindowFrame = {
+    label: "Harbor site",
+    fromTop: true,
+    quiet: moved,
+    messages: [you("a", "We're redesigning Harbor"), ai("b"), you("c", "Booking flow first"), ai("d", { lines: 3 })],
+  };
+  const answer = coere ? ai("r", { text: "Here is the booking flow update." }) : ai("r", { text: "Happy to help. What is Harbor, and who is it for?" });
+  const front = (at: number) => asked(at, 2, fresh, coere, { draft: SWITCH_DRAFT, answer: [answer], what: ["your context on Harbor redesign", "your context on Harbor"], logo: logos.chatgpt });
   return (
     <>
       <motion.div
         className="absolute h-[64%] w-[68%]"
         initial={false}
         animate={moved ? { left: "4%", top: "5%", opacity: 0.55 } : { left: "16%", top: "18%", opacity: 1 }}
-        transition={{ duration: 0.8, ease }}
+        transition={moved ? { duration: 0.8, ease, opacity: { duration: 0.8, delay: 0.25 } } : { duration: 0.8, ease, delay: 0.15, opacity: { duration: 0.3 } }}
       >
         <ChatWindow logo={logos.chatgpt} name="ChatGPT" frame={history} live={live} className="h-full" />
       </motion.div>
-      {/* Claude comes in as ChatGPT steps back, so the scene is never one faded window. Most of its entrance is the rise; the fade is short, so nothing reads through it. */}
+      {/*
+        Claude rises as ChatGPT steps back: it is mostly in before ChatGPT starts to fade, so the scene is
+        never one faded window. Leaving, it keeps the chat it ended on while it fades, quickly and before
+        ChatGPT glides back, and it opens anew, unseen, before it rises again. In a narrower scene it sits
+        a little lower, under ChatGPT's first message, whose height does not shrink with it.
+      */}
       <motion.div
-        className="absolute top-[31%] left-[20%] h-[64%] w-[76%]"
+        className="absolute top-[30%] left-[20%] h-[66%] w-[76%] @max-[399px]:top-[33%]"
         initial={false}
         animate={moved ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-        transition={moved ? { y: { duration: 0.6, ease, delay: 0.35 }, opacity: { duration: 0.25, delay: 0.35 } } : { duration: 0.3 }}
+        transition={moved ? { y: { duration: 0.7, ease }, opacity: { duration: 0.25 } } : { y: { duration: 0.3 }, opacity: { duration: 0.2 } }}
       >
-        <ChatWindow logo={logos.claude} name="Claude" frame={front} live={live} className="h-full" />
+        <ChatWindow key={moved ? "open" : "left"} logo={logos.claude} name="Claude" frame={front(moved ? step : lastStep(scenes.switch, coere))} live={live && moved} className="h-full" />
       </motion.div>
     </>
   );
@@ -96,38 +108,62 @@ function Switch({ step, coere, live }: Props) {
 const SWITCH_DRAFT = "Draft the Harbor update";
 
 /**
- * A new chat in the same AI: the project and the preference are gone, and
- * the person types them again as the new chat opens, so it is never an
- * empty window. With Coere, a short first message is
- * enough, and the answer is short as they like.
+ * A new chat in the same AI: the chat where the person gave their project
+ * and how they like answers scrolls away, and a new one opens as they
+ * start typing them again. With Coere, a short first message is enough,
+ * and the answer is short as they like. When the scene starts again, the
+ * new chat scrolls away the same way, so nothing is drawn over it.
  */
 function NewChat({ step, coere, live }: Props) {
   const history: WindowFrame = {
+    chat: "harbor",
     label: "Harbor redesign",
-    messages: [you("a", "My project is the Harbor redesign"), ai("b"), you("c", "I like short answers"), ai("d")],
+    messages: [
+      you("a", "My project is the Harbor redesign"),
+      ai("b", { lines: 3 }),
+      you("c", "I like short answers"),
+      ai("d"),
+    ],
   };
   const draft = coere ? NEW_DRAFT_COERE : NEW_DRAFT;
-  const answer = coere ? [ai("r", "Here is your week, Harbor redesign first.")] : [ai("r")];
-  const frame = step === 0 ? history : asked(step, 1, fresh, coere, { draft, answer, what: ["who you are and how you like answers"], logo: logos.claude });
-  return <ChatWindow logo={logos.claude} name="Claude" frame={frame} live={live} className="absolute inset-x-[5%] inset-y-[9%]" />;
+  // A whole answer under the message, so the new chat reads as a chat and not an empty window.
+  const answer = coere ? [ai("r", { text: "Here is your week, Harbor redesign first." }), ai("s")] : [ai("r", { text: "Got it. Here is where the Harbor redesign stands." }), ai("s", { lines: 3 })];
+  const frame = step === 0 ? history : asked(step, 1, { ...fresh, chat: "new" }, coere, { draft, answer, what: ["who you are and how you like answers"], logo: logos.claude });
+  return <ChatWindow logo={logos.claude} name="Claude" frame={frame} live={live} className="absolute inset-x-[5%] inset-y-[7%] @min-[400px]:inset-y-[12%]" />;
 }
 const NEW_DRAFT = "Again, my project is the Harbor redesign, and I like short answers";
 const NEW_DRAFT_COERE = "Plan my week";
 
 /**
- * Inside one long chat: the launch date is given, a long answer buries it
- * and it fades. Without Coere the AI asks for it, and pasting the whole
- * chat back swells the box. The date stays in sight at the top, dimmed,
- * so the still shows it was given. With Coere, only the date comes back.
+ * Inside one long chat: the launch date was given, and the long answers
+ * after it bury it, so it fades. Without Coere the AI asks for it, and
+ * pasting the whole chat back swells the box. The date stays in sight,
+ * dimmed, so the still shows it was given. With Coere, only the date
+ * comes back. The scene starts on its still without the last turn, so
+ * starting again only takes that turn away. As the message goes, the
+ * chat's first message leaves at the top, as a long chat scrolls on, so
+ * the date stays in sight; a narrower window also leaves out the turn
+ * after the date.
  */
 function LongChat({ step, coere, live }: Props) {
-  const said = { ...you("a", "The launch is on May 3"), dim: step >= 1 };
-  const base: WindowFrame = { label: "Launch plan", messages: [said, { ...ai("b"), lines: 3 }] };
-  const answer = coere ? ai("j", "Here is the email for the May 3 launch.") : ai("j", "Sure. When is the launch?");
+  // The step the message goes on, from which the chat's first message has gone up out of sight.
+  const sent = step >= (coere ? 4 : 3);
+  const base: WindowFrame = {
+    label: "Launch plan",
+    messages: [
+      ...(sent ? [] : [you("p", "Let's plan the launch")]),
+      ai("o", { lines: 3 }),
+      you("a", "The launch is on May 3", { dim: step >= 1 }),
+      ai("b", { lines: 3 }),
+      you("c", "Now the press list", { wide: true }),
+      ai("d", { wide: true }),
+    ],
+  };
+  const answer = coere ? ai("j", { text: "Here is the email for the May 3 launch." }) : ai("j", { text: "Sure. When is the launch?" });
   const done = [...base.messages, you("q", LONG_DRAFT), answer];
   const pasted: WindowFrame = { ...base, messages: done, pasted: true, draft: "Here is the whole chat again" };
   const frame = asked(step, 2, base, coere, { draft: LONG_DRAFT, answer: [answer], what: ["your context on Launch date"], logo: logos.gemini, after: [pasted] });
-  return <ChatWindow logo={logos.gemini} name="Gemini" frame={frame} live={live} className="absolute inset-x-[5%] inset-y-[4%]" />;
+  return <ChatWindow logo={logos.gemini} name="Gemini" frame={frame} live={live} className="absolute inset-x-[5%] inset-y-[2%]" />;
 }
 const LONG_DRAFT = "Write the launch email";
 
@@ -138,7 +174,7 @@ const LONG_DRAFT = "Write the launch email";
 export const scenes: Record<SceneKey, Scene> = {
   switch: {
     Drawing: Switch,
-    steps: (coere) => [1700, 1300, typing(SWITCH_DRAFT), ...(coere ? [LINE_MS] : []), SEND_MS],
+    steps: (coere) => [1700, 1100, typing(SWITCH_DRAFT), ...(coere ? [LINE_MS] : []), SEND_MS],
   },
   newChat: {
     Drawing: NewChat,
@@ -146,6 +182,6 @@ export const scenes: Record<SceneKey, Scene> = {
   },
   longChat: {
     Drawing: LongChat,
-    steps: (coere) => [1600, 1500, typing(LONG_DRAFT), coere ? LINE_MS : SEND_MS, coere ? SEND_MS : 1800],
+    steps: (coere) => [1400, 1300, typing(LONG_DRAFT), coere ? LINE_MS : SEND_MS, coere ? SEND_MS : 1800],
   },
 };
