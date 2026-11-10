@@ -5,10 +5,11 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import { deleteAccount } from "@/lib/account/delete-account";
-import { EMAIL_LINE, emailMatches, LAST_ADMIN_LINE } from "@/lib/account/delete-request";
+import { LAST_ADMIN_LINE, USERNAME_LINE, usernameMatches } from "@/lib/account/delete-request";
 import { revokeAllDevices, revokeDevice } from "@/lib/account/devices";
 import { setMemoryBackup } from "@/lib/account/memory-backup";
 import { clearSignedIn } from "@/lib/auth/hint-cookie";
+import { usernameOf } from "@/lib/auth/lookup";
 import { getUser, signedInJustNow } from "@/lib/auth/user";
 import { readMembership } from "@/lib/org/membership";
 import { parseRole } from "@/lib/org/roles";
@@ -105,13 +106,15 @@ export async function makeAdmin(_prev: FormState, form: FormData): Promise<FormS
   return { error: null, notice: done.notice };
 }
 
-/** Deletes the account once the person signed in moments ago and typed their own email, then signs this browser out. */
+/** Deletes the account once the person signed in moments ago and typed their own username, then signs this browser out. */
 export async function deleteAccountAction(_prev: FormState, form: FormData): Promise<FormState> {
   const user = await getUser();
   if (!user) return failed(SIGNED_OUT);
   if (!(await signedInJustNow())) return failed("Sign in again first, then delete your account within ten minutes.");
-  if (!emailMatches(String(form.get("email") ?? ""), user.email)) return failed(EMAIL_LINE);
   if (!supabaseConfigured()) return failed(UNAVAILABLE);
+  const username = await usernameOf(user.id).catch(() => undefined);
+  if (username === undefined) return failed(UNAVAILABLE);
+  if (!usernameMatches(String(form.get("username") ?? ""), username)) return failed(USERNAME_LINE);
   const done = await deleteAccount(user.id).catch(() => ({ ok: false as const, reason: "unavailable" as const }));
   if (!done.ok) return failed(done.reason === "last_admin" ? LAST_ADMIN_LINE : UNAVAILABLE);
   const hdrs = await headers();

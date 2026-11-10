@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { usernameOf } from "@/lib/auth/lookup";
 import { getUser } from "@/lib/auth/user";
 import { checkConnectParams, connectPath, type ConnectRefusal } from "@/lib/connect/params";
 import { ipHash, logSecurityEvent } from "@/lib/security/events";
@@ -55,9 +56,10 @@ export default async function ConnectPage({ searchParams }: PageProps<"/connect"
   const back = connectPath(checked.params);
   if (!user) redirect(`/sign-in?next=${encodeURIComponent(back)}`);
 
+  const username = await usernameOf(user.id).catch(() => null);
   return (
     <AuthShell eyebrow="Connect Coere" title="Connect Coere to your account" lede="One press links Coere in this browser to your account.">
-      <ConnectCard email={user.email} params={checked.params} />
+      <ConnectCard username={username} params={checked.params} />
       <div className="mt-6 flex justify-center">
         <SignOutButton variant="text" label="Use another account" next={`/sign-in?next=${encodeURIComponent(back)}`} />
       </div>

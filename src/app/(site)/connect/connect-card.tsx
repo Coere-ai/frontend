@@ -37,7 +37,7 @@ function readAnswer(answer: unknown): Problem | null {
  * The confirm step. Nothing is made until the person presses the button, so
  * a link someone else sent cannot connect their extension to this account.
  */
-export function ConnectCard({ email, params }: { email: string; params: ConnectParams }) {
+export function ConnectCard({ username, params }: { username: string | null; params: ConnectParams }) {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [done, setDone] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -86,7 +86,7 @@ export function ConnectCard({ email, params }: { email: string; params: ConnectP
           </span>
           <div className="min-w-0">
             <p className="text-[13px] text-neutral-500">Signed in as</p>
-            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{email}</p>
+            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{username ?? "Your account"}</p>
           </div>
         </div>
         <p className="mt-4 text-[14px] leading-relaxed text-neutral-500">

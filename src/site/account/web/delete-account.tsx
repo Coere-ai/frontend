@@ -12,9 +12,9 @@ const initial: FormState = { error: null, notice: null };
 
 /**
  * Delete account: only here, never from a device token. It needs a sign in
- * from the last ten minutes, then the person's own email typed out.
+ * from the last ten minutes, then the person's own username typed out.
  */
-export function DeleteAccount({ email, fresh, signInAgain }: { email: string; fresh: boolean; signInAgain: React.ReactNode }) {
+export function DeleteAccount({ username, fresh, signInAgain }: { username: string; fresh: boolean; signInAgain: React.ReactNode }) {
   const [state, action, pending] = useActionState(deleteAccountAction, initial);
   return (
     <Part
@@ -24,12 +24,14 @@ export function DeleteAccount({ email, fresh, signInAgain }: { email: string; fr
       {fresh ? (
         <form action={action} className="flex flex-wrap gap-3">
           <input
-            name="email"
-            type="email"
+            name="username"
             required
             autoComplete="off"
-            placeholder={email}
-            aria-label="Type your email"
+            autoCapitalize="none"
+            spellCheck={false}
+            maxLength={64}
+            placeholder={username}
+            aria-label="Type your username"
             className="h-11 min-w-0 flex-1 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950 placeholder:text-neutral-400 focus-visible:border-neutral-950 focus-visible:outline-none"
           />
           <button type="submit" disabled={pending} className={buttonClass("secondary", "disabled:opacity-60")}>

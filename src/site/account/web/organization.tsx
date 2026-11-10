@@ -23,9 +23,9 @@ export function Organization({ name, members }: { name: string; members: Array<{
   const [role, roleAction, promoting] = useActionState(makeAdmin, initial);
   const plain = members.filter((m) => m.role !== "admin");
   return (
-    <Part title={`Organization: ${name}`} line="Invite a coworker by the email or username of their Coere account, and make a member an admin. The rest is in Coere.">
+    <Part title={`Organization: ${name}`} line="Invite a coworker by the username of their Coere account, and make a member an admin. The rest is in Coere.">
       <form action={inviteAction} className="flex flex-wrap gap-3">
-        <input name="login" required maxLength={254} autoComplete="off" placeholder="Email or username" aria-label="Email or username" className={inputClass} />
+        <input name="login" required maxLength={64} autoComplete="off" autoCapitalize="none" spellCheck={false} placeholder="Username" aria-label="Username" className={inputClass} />
         <select name="role" aria-label="Role" defaultValue="member" className="h-11 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950">
           <option value="member">Member</option>
           <option value="admin">Admin</option>

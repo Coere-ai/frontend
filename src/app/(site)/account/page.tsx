@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 /**
  * /account: the steps a device token may not take (docs/accounts.md 7),
  * signed in on coere.ai, and how the person signs in (3.1). It sets the
- * display name, the username and the password, signs this browser out,
+ * display name, changes the username and the password, signs this browser out,
  * lists and revokes the browsers Coere is connected in, turns the memory
  * backup on, lets an admin invite someone or make an admin, and deletes
  * the account. It needs no Coere, so it
@@ -42,6 +42,7 @@ export default async function AccountPage() {
     ready ? readMembership(user.id).catch(() => null) : Promise.resolve(null),
     signedInJustNow(),
   ]);
+  const username = (profile?.username as string | null | undefined) ?? null;
   const org = membership?.role === "admin" ? await readOrgPage(membership).catch(() => null) : null;
 
   return (
@@ -50,7 +51,7 @@ export default async function AccountPage() {
         <div className="mx-auto max-w-[720px]">
           <h1 className="text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] text-neutral-950 md:text-[2.5rem]">Your account</h1>
           <p className="mt-4 text-[17px] leading-relaxed text-neutral-500">
-            Signed in as <span className="text-neutral-950 break-all">{user.email}</span>. Your dashboard runs inside Coere; these steps are here so they work from any browser.
+            Signed in as <span className="text-neutral-950 break-all">{username ?? "your account"}</span>. Your dashboard runs inside Coere; these steps are here so they work from any browser.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <ButtonLink href="/dashboard" variant="secondary">
@@ -58,7 +59,7 @@ export default async function AccountPage() {
             </ButtonLink>
           </div>
           <div className="mt-14 space-y-14">
-            <Profile displayName={(profile?.display_name as string | null) ?? null} username={(profile?.username as string | null) ?? null} />
+            <Profile displayName={(profile?.display_name as string | null) ?? null} username={username} />
             <Password />
             <Part title="Sign out" line="Sign out of coere.ai in this browser. Coere stays connected here; to sign it out too, revoke this browser below.">
               <SignOutButton variant="secondary" />
@@ -66,7 +67,7 @@ export default async function AccountPage() {
             <Browsers devices={devices} />
             <Backup sync={Boolean(profile?.memory_sync)} includeSensitive={Boolean(profile?.include_sensitive)} />
             {org ? <Organization name={org.name} members={org.members.map((m) => ({ userId: m.userId, name: m.name, role: m.role }))} /> : null}
-            <DeleteAccount email={user.email} fresh={fresh} signInAgain={<SignOutButton variant="secondary" label="Sign in again" next="/sign-in?next=%2Faccount" />} />
+            <DeleteAccount username={username ?? ""} fresh={fresh} signInAgain={<SignOutButton variant="secondary" label="Sign in again" next="/sign-in?next=%2Faccount" />} />
           </div>
         </div>
       </Container>

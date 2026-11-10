@@ -10,13 +10,13 @@ import { FormField, inputClass } from "@/site/ui/form-field";
 import { Part } from "./rows";
 
 /**
- * Profile: the name an organization sees, and the username a person can
- * sign in with instead of their email. Each field saves on its own, so a
- * taken username never holds back a new name.
+ * Profile: the name an organization sees, and the username the person
+ * signs in with. Each field saves on its own, so a taken username never
+ * holds back a new name.
  */
 export function Profile({ displayName, username }: { displayName: string | null; username: string | null }) {
   return (
-    <Part title="Profile" line="Your name is what your organization sees. A username lets you sign in with a password without typing your email.">
+    <Part title="Profile" line="Your name is what your organization sees. Your username is what you sign in with, so a new one works from your next sign in.">
       <div className="space-y-6">
         <OneField
           id="displayName"
@@ -33,7 +33,7 @@ export function Profile({ displayName, username }: { displayName: string | null;
           hint="3 to 24 letters, numbers or underscores"
           current={username}
           action={saveUsername}
-          button={username ? "Change username" : "Set username"}
+          button="Change username"
           input={{ autoComplete: "username", autoCapitalize: "none", spellCheck: false, maxLength: 24 }}
         />
       </div>
