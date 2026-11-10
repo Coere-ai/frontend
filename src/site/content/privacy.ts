@@ -6,8 +6,8 @@
  */
 
 /** The day this text took effect, as a date and as the page says it. */
-export const PRIVACY_EFFECTIVE = "2026-11-04";
-export const PRIVACY_EFFECTIVE_LABEL = "November 4, 2026";
+export const PRIVACY_EFFECTIVE = "2026-11-10";
+export const PRIVACY_EFFECTIVE_LABEL = "November 10, 2026";
 
 /** One part of the policy: a heading, its paragraphs, and an optional list after them. */
 export type PrivacySection = { id: string; title: string; paragraphs: string[]; list?: string[]; after?: string[] };
@@ -53,7 +53,7 @@ export const privacySections: PrivacySection[] = [
     id: "browser",
     title: "What stays in your browser",
     paragraphs: [
-      "Your saved chats and the library they make, the full text of every chat, your drafts, your chats with Cori and your memory itself are kept in your browser's storage on your computer. The extension also keeps your coere.ai sign in there: a device token and your email.",
+      "Your saved chats and the library they make, the full text of every chat, your drafts, your chats with Cori and your memory itself are kept in your browser's storage on your computer. The extension also keeps your coere.ai sign in there: a device token and your username.",
       "coere.ai never stores your chats. The parts of them that Coere sends to build your memory pass through coere.ai on their way to Anthropic, as the next section says.",
     ],
   },
@@ -89,7 +89,7 @@ export const privacySections: PrivacySection[] = [
     id: "account",
     title: "Your account",
     paragraphs: [
-      "Your account holds your email, a username if you set one, your plan and limits, when you joined and when you were last seen. Sign in runs through Supabase Auth, which sends the sign in code to your email. A password is optional. coere.ai passes it to Supabase Auth, which keeps it hashed. The extension never sees it.",
+      "Your account is a username and a password. coere.ai collects no email for it and sends you none. Your account holds your username, a display name if you set one, your plan and limits, when you joined and when you were last seen. Sign in runs through Supabase Auth: coere.ai passes your password to it, and it keeps the password hashed. Supabase Auth needs an address for each account, so coere.ai gives yours a made up one at users.coere.ai that receives no mail and is never shown. The extension never sees your password. If you forget it, write to {email} and the person who runs Coere can set a new one.",
       "For each browser you connect, coere.ai keeps a name such as Chrome on macOS, the extension's id and version, and when it was last used.",
       "For security, coere.ai records sign ins, failed tries, connected and revoked browsers and similar events, each with a keyed hash of your network address and your country. The address itself is never stored.",
       "coere.ai sets cookies only to keep you signed in and to talk to the extension:",
@@ -107,7 +107,7 @@ export const privacySections: PrivacySection[] = [
       "Coere for Teams lets a company's people read one shared memory. Only the Coere operator creates an organization, and a person is in at most one.",
       "A member's memories in the organization's shared sections (Work, unless an admin picks others) go into the shared memory, with the titles of the chats they come from. Sensitive memories never go in. Every member sees who brought each shared memory, the list of members with their roles and join dates, how many tokens each saved and memories each shared, and the organization's totals, including its AI cost this month. Your memory outside the shared sections stays yours.",
       "Admins also invite coworkers, remove members, change roles and the shared sections, and decide what each member may read and whether their memory goes in. You can turn off Share my memory or leave at any time, though an organization's only admin must name another admin before leaving. Either removes your part of the shared memory.",
-      "The person who runs Coere can open an account's or an organization's memory in Coere's admin panel, for support. It is never opened on its own, and every view is logged. The admin panel also shows each account's email, plan, devices and usage.",
+      "The person who runs Coere can open an account's or an organization's memory in Coere's admin panel, for support. It is never opened on its own, and every view is logged. The admin panel also shows each account's username, plan, devices and usage.",
     ],
   },
   {
@@ -149,7 +149,7 @@ export const privacySections: PrivacySection[] = [
     title: "Keeping and deleting your data",
     paragraphs: [
       "Your account and what it holds stay until you delete them. The memory copy stays until you turn the backup off, delete the copy or delete your account. You can download the stored .coere file at any time from your dashboard.",
-      "To delete your account, open your dashboard, go to Account and choose Delete account, then type your email. coere.ai then removes your part of your organization's shared memory, your memory copy and every other file in your folder, revokes your browsers, and deletes your profile, settings, devices and totals. If you are your organization's only admin, make another member an admin first.",
+      "To delete your account, sign in at coere.ai/account, choose Delete account and type your username. coere.ai then removes your part of your organization's shared memory, your memory copy and every other file in your folder, revokes your browsers, and deletes your profile, settings, devices and totals. If you are your organization's only admin, make another member an admin first.",
       "Some numbers stay after you delete your account, with you removed from them: the usage records (model, tokens, cost, status, duration), the feature counts and the security records. They name nobody. The product's daily totals and your organization's past totals keep your numbers too.",
       "Site analytics, the waitlist and interest lists, the usage numbers and the security records are not deleted on a schedule.",
       "Removing the extension from Chrome removes what it keeps in your browser. Files it saved to a folder you chose stay there until you delete them.",
