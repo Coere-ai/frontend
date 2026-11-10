@@ -42,7 +42,7 @@ export async function loadOrg(id: string): Promise<OrgDetailPayload | null> {
   const ids = memberRows.map((m) => m.user_id);
   const people = [...new Set([...ids, ...inviteRows.map((i) => i.user_id)])];
   const [profiles, userTotals] = await Promise.all([
-    people.length ? db.from("profiles").select("id, display_name, username, email").in("id", people) : Promise.resolve({ data: [], error: null }),
+    people.length ? db.from("profiles").select("id, display_name, username").in("id", people) : Promise.resolve({ data: [], error: null }),
     ids.length ? db.from("user_totals").select("user_id, tokens_saved, memories, cost_micros").in("user_id", ids) : Promise.resolve({ data: [], error: null }),
   ]);
   for (const r of [profiles, userTotals]) if (r.error) throw new Error(`member read failed: ${r.error.code}`);

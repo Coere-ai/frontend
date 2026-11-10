@@ -11,7 +11,7 @@ import { Button, Card, fieldClass, fieldStyle, Label, Status } from "../controls
 /**
  * Making an organization, which only the operator does: a name, a plan
  * (team unless picked otherwise) and its first admin, an existing account
- * found by email or username. A made organization opens straight away.
+ * found by username. A made organization opens straight away.
  */
 export function CreateOrg({ plans }: { plans: PlanRow[] }) {
   const router = useRouter();
@@ -44,7 +44,7 @@ export function CreateOrg({ plans }: { plans: PlanRow[] }) {
         </div>
         <div>
           <Label htmlFor="org-admin">First admin</Label>
-          <input id="org-admin" name="admin" required placeholder="Email or username of an account" autoComplete="off" className={fieldClass} style={fieldStyle} />
+          <input id="org-admin" name="admin" required placeholder="Username of an account" autoComplete="off" className={fieldClass} style={fieldStyle} />
         </div>
         <Button strong disabled={pending}>
           {pending ? "Creating…" : "Create"}

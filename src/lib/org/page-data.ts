@@ -20,7 +20,10 @@ import { sectionChoices } from "./sections";
 export interface OrgMember {
   userId: string;
   name: string;
-  email: string | null;
+  /** The username the member signs in with, for an admin to tell members apart and invite them. */
+  username: string | null;
+  /** Always null: accounts hold no email a person gave. Kept so the answer keeps its shape (docs/accounts.md 8.11). */
+  email: null;
   role: Role;
   /** Their own access object, or null when the organization's default applies. */
   access: OrgAccess | null;
@@ -57,9 +60,8 @@ const n = (v: unknown): number => Number(v ?? 0) || 0;
 /** The first day of this month in UTC, as usage_monthly keys months. */
 const thisMonth = (now = new Date()): string => `${now.toISOString().slice(0, 7)}-01`;
 
-/** A person as the page names them: their display name, else username, else email. */
-export const nameOf = (p: { display_name?: string | null; username?: string | null; email?: string | null } | undefined): string =>
-  p?.display_name || p?.username || p?.email || "A member";
+/** A person as the page names them: their display name, else their username. */
+export const nameOf = (p: { display_name?: string | null; username?: string | null } | undefined): string => p?.display_name || p?.username || "A member";
 
 export async function readOrgPage(m: Membership): Promise<OrgPageData | null> {
   const db = supabase();
@@ -71,7 +73,7 @@ export async function readOrgPage(m: Membership): Promise<OrgPageData | null> {
   if (!org) return null;
   const ids = (rows ?? []).map((r) => r.user_id as string);
   const [{ data: profiles }, { data: userTotals }, { data: months }, index] = await Promise.all([
-    db.from("profiles").select("id, email, username, display_name").in("id", ids),
+    db.from("profiles").select("id, username, display_name").in("id", ids),
     db.from("user_totals").select("user_id, tokens_saved").in("user_id", ids),
     db.from("usage_monthly").select("cost_micros").in("user_id", ids).eq("month", thisMonth()),
     readOrgIndex(m.orgId),
@@ -84,7 +86,8 @@ export async function readOrgPage(m: Membership): Promise<OrgPageData | null> {
   const members: OrgMember[] = (rows ?? []).map((r) => ({
     userId: r.user_id,
     name: nameOf(profile.get(r.user_id)),
-    email: m.role === "admin" ? (profile.get(r.user_id)?.email ?? null) : null,
+    username: profile.get(r.user_id)?.username ?? null,
+    email: null,
     role: parseRole(r.role) ?? "member",
     access: parseAccess(r.access),
     effective: effectiveAccess(r.access, org.default_access),
@@ -106,9 +109,9 @@ export async function readOrgPage(m: Membership): Promise<OrgPageData | null> {
       .gt("expires_at", new Date().toISOString())
       .order("created_at", { ascending: false });
     const invited = (data ?? []).map((i) => i.user_id as string);
-    const { data: people } = invited.length ? await db.from("profiles").select("id, email, username, display_name").in("id", invited) : { data: [] };
+    const { data: people } = invited.length ? await db.from("profiles").select("id, username, display_name").in("id", invited) : { data: [] };
     const who = new Map((people ?? []).map((p) => [p.id as string, p]));
-    invites = (data ?? []).map((i) => ({ id: i.id, name: who.get(i.user_id)?.email ?? nameOf(who.get(i.user_id)), role: parseRole(i.role) ?? "member", createdAt: i.created_at, expiresAt: i.expires_at }));
+    invites = (data ?? []).map((i) => ({ id: i.id, name: who.get(i.user_id)?.username ?? nameOf(who.get(i.user_id)), role: parseRole(i.role) ?? "member", createdAt: i.created_at, expiresAt: i.expires_at }));
   }
 
   return {

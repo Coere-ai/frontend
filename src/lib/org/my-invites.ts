@@ -34,7 +34,7 @@ export async function readMyInvites(userId: string): Promise<MyInvite[]> {
   if (rows.length === 0) return [];
   const [{ data: orgs }, { data: people }] = await Promise.all([
     db.from("organizations").select("id, name").in("id", [...new Set(rows.map((r) => r.org_id as string))]),
-    db.from("profiles").select("id, email, username, display_name").in("id", rows.map((r) => r.invited_by as string).filter(Boolean)),
+    db.from("profiles").select("id, username, display_name").in("id", rows.map((r) => r.invited_by as string).filter(Boolean)),
   ]);
   const org = new Map((orgs ?? []).map((o) => [o.id as string, o.name as string]));
   const who = new Map((people ?? []).map((p) => [p.id as string, p]));

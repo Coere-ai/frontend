@@ -17,10 +17,10 @@ function data(): OrgPageData {
     defaultAccess: access,
     totals: { tokensSaved: 10, memories: 2, chats: 1, members: 2, costMicros: 5, monthCostMicros: 1 },
     members: [
-      { userId: "u1", name: "Sam", email: null, role: "member", access: null, effective: access, shareMemory: false, joinedAt: "2026-11-01", tokensSaved: 3, memoriesShared: 1 },
-      { userId: "u2", name: "Ada", email: null, role: "admin", access: null, effective: access, shareMemory: true, joinedAt: "2026-11-01", tokensSaved: 7, memoriesShared: 1 },
+      { userId: "u1", name: "Sam", username: "sam", email: null, role: "member", access: null, effective: access, shareMemory: false, joinedAt: "2026-11-01", tokensSaved: 3, memoriesShared: 1 },
+      { userId: "u2", name: "Ada", username: "ada", email: null, role: "admin", access: null, effective: access, shareMemory: true, joinedAt: "2026-11-01", tokensSaved: 7, memoriesShared: 1 },
     ],
-    invites: [{ id: "i1", name: "new@example.com", role: "member", createdAt: "2026-11-02", expiresAt: "2026-11-09" }],
+    invites: [{ id: "i1", name: "new_person", role: "member", createdAt: "2026-11-02", expiresAt: "2026-11-09" }],
     sections: [{ key: "work", name: "Work" }],
   };
 }
@@ -39,6 +39,11 @@ describe("orgPageBody", () => {
   it("describes the caller from their own member row", () => {
     const body = orgPageBody("u1", membership("member"), data());
     assert.deepEqual(body.me, { userId: "u1", role: "member", shareMemory: false, access, readable: ["work"] });
+  });
+
+  it("names each member by username and carries no email", () => {
+    const members = orgPageBody("u2", membership("admin"), data()).members;
+    assert.deepEqual(members.map((m) => [m.username, m.email]), [["sam", null], ["ada", null]]);
   });
 
   it("shows the open invites to an admin only", () => {

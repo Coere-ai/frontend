@@ -38,8 +38,8 @@ export async function loadDatabase(): Promise<DatabasePayload> {
     .sort((a, b) => b.bytes - a.bytes)
     .slice(0, TOP_FOLDERS);
   const ids = folders.map((f) => f.folder!).filter(isUuid);
-  const { data: people } = ids.length ? await supabase().from("profiles").select("id, display_name, username, email").in("id", ids) : { data: [] };
-  const name = new Map((people ?? []).map((p) => [p.id as string, p.email ?? personName(p)]));
+  const { data: people } = ids.length ? await supabase().from("profiles").select("id, display_name, username").in("id", ids) : { data: [] };
+  const name = new Map((people ?? []).map((p) => [p.id as string, p.username ?? personName(p)]));
   return {
     tables: [...tables].sort((a, b) => b.bytes - a.bytes),
     buckets: storage.filter((r) => r.folder === null).map((r) => ({ bucket: r.bucket, objects: r.objects, bytes: r.bytes })),

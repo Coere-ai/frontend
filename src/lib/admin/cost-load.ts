@@ -37,6 +37,11 @@ export async function loadCost(rawRange: string | null): Promise<CostPayload> {
   if (accounts.error) throw new Error(`admin_top_accounts failed: ${accounts.error.code}`);
   const daily = dailySeries(days, STAT_DAYS).map((d) => ({ date: d.date, count: d.costMicros }));
   const byModel = toModelUsage((models.data ?? []) as Record<string, unknown>[]);
+  const accountRows = (accounts.data ?? []) as Record<string, unknown>[];
+  const ids = [...new Set(accountRows.map((r) => r.user_id).filter((id): id is string => typeof id === "string"))];
+  const people = ids.length ? await db.from("profiles").select("id, username").in("id", ids) : { data: [], error: null };
+  if (people.error) throw new Error(`profiles read failed: ${people.error.code}`);
+  const usernames = new Map((people.data ?? []).map((p) => [p.id as string, (p.username as string | null) ?? null]));
   const storageBytes = storage.filter((r) => r.folder === null).reduce((s, r) => s + r.bytes, 0);
 
   return {
@@ -47,7 +52,7 @@ export async function loadCost(rawRange: string | null): Promise<CostPayload> {
     todayMicros: daily.at(-1)?.count ?? 0,
     byModel,
     total: totalUsage(byModel),
-    accounts: toAccountUsage((accounts.data ?? []) as Record<string, unknown>[]),
+    accounts: toAccountUsage(accountRows, usernames),
     storageBytes,
     storageMonthMicros: storageMonthMicros(storageBytes),
   };

@@ -26,7 +26,7 @@ export interface AdminContext {
   headers: Headers;
 }
 
-/** Finding accounts by email or username one guess at a time is slow work at this rate. */
+/** Finding accounts by username one guess at a time is slow work at this rate. */
 const invites = createAttemptLimiter({ max: 30, windowMs: 60 * 60 * 1000 });
 
 const graphNote = () => console.error("organization graph not updated");

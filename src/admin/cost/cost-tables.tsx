@@ -48,7 +48,7 @@ export function AccountTable({ title, accounts }: { title: string; accounts: Acc
           empty="No account used AI in this range."
           rows={shown.map((a) => [
             <Link key="a" href={`/admin/users/${a.id}`} className="underline-offset-2 hover:underline">
-              {a.email ?? "No email"}
+              {a.username ?? "No username"}
             </Link>,
             whole(a.requests),
             compact(a.tokens),

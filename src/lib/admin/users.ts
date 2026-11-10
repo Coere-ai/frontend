@@ -16,7 +16,7 @@ import { joinUsers, monthKey, toPlans, type ProfileRow } from "./user-rows";
 const MAX_USERS = 5000;
 
 export const PROFILE_COLUMNS =
-  "id, email, username, plan_id, status, created_at, last_seen_at, monthly_limit_micros, lifetime_limit_micros, daily_limit_micros, first_build_limit_micros, first_build_at";
+  "id, username, plan_id, status, created_at, last_seen_at, monthly_limit_micros, lifetime_limit_micros, daily_limit_micros, first_build_limit_micros, first_build_at";
 
 export async function readPlans() {
   const { data, error } = await supabase()

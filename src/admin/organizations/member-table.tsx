@@ -63,7 +63,7 @@ export function MemberTable({ data, run, pending }: { data: OrgDetailPayload; ru
                   <Link href={`/admin/users/${m.userId}`} className="underline-offset-2 hover:underline">
                     {m.name}
                   </Link>
-                  {m.email && m.email !== m.name ? <span className="block text-[color:var(--color-muted)]">{m.email}</span> : null}
+                  {m.username && m.username !== m.name ? <span className="block text-[color:var(--color-muted)]">{m.username}</span> : null}
                 </td>
                 <td className="px-3 py-2">
                   <select aria-label={`Role of ${m.name}`} value={m.role} disabled={pending} onChange={(e) => changeRole(m, e.target.value)} className={`${fieldClass} min-w-[6.5rem] py-1`} style={fieldStyle}>

@@ -5,7 +5,6 @@ import { joinUsers, monthKey, numOrNull, toPlans } from "./user-rows";
 
 const profile = {
   id: "u1",
-  email: "a@example.com",
   username: "ada",
   plan_id: "free",
   status: "active",
@@ -22,6 +21,8 @@ test("each column comes from its own table", () => {
     files: [{ user_id: "u1", bytes: 2048 }],
   });
   assert.deepEqual(row?.org, { id: "o1", name: "Acme", role: "admin" });
+  assert.equal(row?.username, "ada");
+  assert.equal(row && "email" in row, false);
   assert.equal(row?.devices, 2);
   assert.equal(row?.monthCostMicros, 1500);
   assert.equal(row?.monthRequests, 4);

@@ -17,7 +17,7 @@ test("members list admins first, with their own access or the default", () => {
   const rows = toMemberRows(
     [
       { user_id: "u2", role: "member", access: { read: ["work"], contribute: false }, share_memory: true, added_by: "invite", joined_at: "", profile: { username: "bea" }, totals: { memories: 4 } },
-      { user_id: "u1", role: "admin", access: null, share_memory: true, added_by: "operator", joined_at: "", profile: { email: "zed@example.com" }, totals: null },
+      { user_id: "u1", role: "admin", access: null, share_memory: true, added_by: "operator", joined_at: "", profile: { display_name: "Zed", username: "zed_1" }, totals: null },
     ],
     { read: "all", contribute: true },
   );
@@ -28,7 +28,9 @@ test("members list admins first, with their own access or the default", () => {
   assert.equal(rows[0]?.access, null);
   assert.deepEqual(rows[0]?.effective, { read: "all", contribute: true });
   assert.deepEqual(rows[1]?.effective, { read: ["work"], contribute: false });
-  assert.equal(rows[0]?.name, "zed@example.com");
+  assert.equal(rows[0]?.name, "Zed");
+  assert.equal(rows[0]?.username, "zed_1");
+  assert.equal(rows[1]?.name, "bea");
   assert.equal(rows[1]?.memories, 4);
 });
 

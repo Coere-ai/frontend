@@ -31,10 +31,10 @@ export async function loadSecurity(days: number): Promise<SecurityPayload> {
   const userIds = [...new Set(rows.map((r) => r.user_id).filter((v): v is string => !!v))];
   const orgIds = [...new Set(rows.map((r) => r.org_id).filter((v): v is string => !!v))];
   const [people, orgs] = await Promise.all([
-    userIds.length ? db.from("profiles").select("id, display_name, username, email").in("id", userIds) : Promise.resolve({ data: [] }),
+    userIds.length ? db.from("profiles").select("id, display_name, username").in("id", userIds) : Promise.resolve({ data: [] }),
     orgIds.length ? db.from("organizations").select("id, name").in("id", orgIds) : Promise.resolve({ data: [] }),
   ]);
-  const person = new Map((people.data ?? []).map((p) => [p.id as string, p.email ?? personName(p)]));
+  const person = new Map((people.data ?? []).map((p) => [p.id as string, p.username ?? personName(p)]));
   const org = new Map((orgs.data ?? []).map((o) => [o.id as string, o.name as string]));
 
   const { daily, counts } = summarizeSecurity(events, days);

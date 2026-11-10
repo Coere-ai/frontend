@@ -53,7 +53,7 @@ export interface MemberDbRow {
   share_memory: boolean;
   added_by: string;
   joined_at: string;
-  profile: { display_name?: string | null; username?: string | null; email?: string | null } | null;
+  profile: { display_name?: string | null; username?: string | null } | null;
   totals: { tokens_saved?: unknown; memories?: unknown; cost_micros?: unknown } | null;
 }
 
@@ -62,8 +62,8 @@ export function toMemberRows(rows: readonly MemberDbRow[], defaultAccess: unknow
   return rows
     .map((m) => ({
       userId: m.user_id,
-      name: m.profile?.display_name || m.profile?.username || m.profile?.email || "An account",
-      email: m.profile?.email ?? null,
+      name: m.profile?.display_name || m.profile?.username || "An account",
+      username: m.profile?.username ?? null,
       role: parseRole(m.role) ?? "member",
       access: parseAccess(m.access),
       effective: effectiveAccess(m.access, defaultAccess),

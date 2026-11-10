@@ -51,7 +51,8 @@ export interface ModelUsage extends TokenCounts {
 /** One account's use in the range, with its limits and the spend against each (spend_state). */
 export interface AccountUsage extends TokenCounts {
   id: string;
-  email: string | null;
+  /** The account's username, read from profiles by id: the database function's email column is never shown. */
+  username: string | null;
   /** Input plus output, as tokens used are counted everywhere else. */
   tokens: number;
   spend: Spend;
@@ -84,15 +85,15 @@ export function totalUsage(rows: readonly TokenCounts[]): TokenCounts {
   return t;
 }
 
-/** admin_top_accounts's rows. A row without an account id is dropped. */
-export function toAccountUsage(rows: readonly Raw[]): AccountUsage[] {
+/** admin_top_accounts's rows, named by `usernames` (account id to username). A row without an account id is dropped. */
+export function toAccountUsage(rows: readonly Raw[], usernames: ReadonlyMap<string, string | null> = new Map()): AccountUsage[] {
   return rows
     .filter((r) => typeof r.user_id === "string")
     .map((r) => {
       const c = counts(r);
       return {
         id: r.user_id as string,
-        email: typeof r.email === "string" ? r.email : null,
+        username: usernames.get(r.user_id as string) ?? null,
         ...c,
         tokens: c.inputTokens + c.outputTokens,
         spend: toSpend(r),

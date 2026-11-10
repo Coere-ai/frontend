@@ -33,10 +33,10 @@ export async function loadStatistics(): Promise<StatisticsPayload> {
   const userIds = (topUsers.data ?? []).map((r) => r.user_id as string);
   const orgIds = (topOrgs.data ?? []).map((r) => r.org_id as string);
   const [people, names] = await Promise.all([
-    userIds.length ? db.from("profiles").select("id, email, username").in("id", userIds) : Promise.resolve({ data: [] as { id: string; email: string | null; username: string | null }[] }),
+    userIds.length ? db.from("profiles").select("id, username").in("id", userIds) : Promise.resolve({ data: [] as { id: string; username: string | null }[] }),
     orgIds.length ? db.from("organizations").select("id, name").in("id", orgIds) : Promise.resolve({ data: [] as { id: string; name: string }[] }),
   ]);
-  const person = new Map((people.data ?? []).map((p) => [p.id as string, (p.email as string | null) ?? (p.username as string | null) ?? "An account"]));
+  const person = new Map((people.data ?? []).map((p) => [p.id as string, (p.username as string | null) ?? "An account"]));
   const orgName = new Map((names.data ?? []).map((o) => [o.id as string, o.name as string]));
 
   const flows = sumDaily(daily);

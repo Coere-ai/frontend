@@ -10,7 +10,6 @@ import type { PlanRow, UserRow } from "./types";
 
 export interface ProfileRow {
   id: string;
-  email: string | null;
   username: string | null;
   plan_id: string;
   status: string;
@@ -48,7 +47,6 @@ export function joinUsers(profiles: readonly ProfileRow[], parts: UserParts): Us
     const m = members.get(p.id);
     return {
       id: p.id,
-      email: p.email,
       username: p.username,
       plan: p.plan_id,
       status: p.status,

@@ -16,12 +16,11 @@ import type { MemoryPayload } from "./types";
  * leaves the server, so no view goes unrecorded.
  */
 
-/** Display name, then username, then email: what the operator knows a person by. */
-export const personName = (p: { display_name?: string | null; username?: string | null; email?: string | null }): string =>
-  p.display_name || p.username || p.email || "An account";
+/** Display name, then username: what the operator knows a person by. The placeholder email is never shown. */
+export const personName = (p: { display_name?: string | null; username?: string | null }): string => p.display_name || p.username || "An account";
 
 export async function loadUserMemory(userId: string, headers: Headers): Promise<MemoryPayload | null> {
-  const { data: profile } = await supabase().from("profiles").select("display_name, username, email").eq("id", userId).maybeSingle();
+  const { data: profile } = await supabase().from("profiles").select("display_name, username").eq("id", userId).maybeSingle();
   if (!profile) return null;
   await logSecurityEvent("admin_viewed_memory", { userId, headers });
   const index = await getJson<MemoryIndex>(userIndexPath(userId));
@@ -39,7 +38,7 @@ export async function loadOrgMemory(orgId: string, headers: Headers): Promise<Me
   const contributors = [...new Set((view?.facts ?? []).map((f) => f.contributor).filter((c): c is string => !!c))];
   const names: Record<string, string> = {};
   if (contributors.length) {
-    const { data: people } = await db.from("profiles").select("id, display_name, username, email").in("id", contributors.slice(0, 1000));
+    const { data: people } = await db.from("profiles").select("id, display_name, username").in("id", contributors.slice(0, 1000));
     for (const p of people ?? []) names[p.id as string] = personName(p);
   }
   return { center: org.name, names, view };

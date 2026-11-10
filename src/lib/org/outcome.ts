@@ -34,7 +34,7 @@ export const REFUSAL_LINES: Record<OrgRefusal, string> = {
   not_admin: "Only an admin can do that.",
   last_admin: "An organization needs an admin. Make someone else an admin first.",
   self: "To remove yourself, leave the organization.",
-  bad_login: "Type the email or username of your coworker's Coere account.",
+  bad_login: "Type the username of your coworker's Coere account.",
   no_account: "No Coere account uses that. Your coworker needs to make one first, at coere.ai/sign-up.",
   in_org: "They are already in an organization.",
   pending: "They already have an invite waiting.",

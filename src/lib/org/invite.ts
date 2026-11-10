@@ -1,14 +1,14 @@
 import "server-only";
 
-import { parseLogin } from "@/lib/auth/identity";
+import { normalizeUsername } from "@/lib/auth/identity";
 import { supabase } from "@/lib/supabase";
 
 import type { Role } from "./roles";
 
 /**
  * Inviting a coworker (docs/accounts.md 14.1). Invites go only to existing
- * accounts, found by email or username; nothing is stored and no email is
- * sent for an address with no account. Someone already in an organization,
+ * accounts, found by username; nothing is stored for a name with no
+ * account, and nothing is ever emailed. Someone already in an organization,
  * or with an invite here still open, is not invited again.
  */
 
@@ -17,11 +17,10 @@ export type InviteOutcome =
   | { ok: false; reason: "bad_login" | "no_account" | "self" | "in_org" | "pending" | "unavailable" };
 
 export async function inviteByLogin(o: { orgId: string; invitedBy: string; login: unknown; role: Role }): Promise<InviteOutcome> {
-  const login = parseLogin(o.login);
-  if (!login) return { ok: false, reason: "bad_login" };
+  const username = normalizeUsername(o.login);
+  if (!username) return { ok: false, reason: "bad_login" };
   const db = supabase();
-  const query = db.from("profiles").select("id, email, username");
-  const { data: person, error } = await ("email" in login ? query.eq("email", login.email) : query.eq("username", login.username)).maybeSingle();
+  const { data: person, error } = await db.from("profiles").select("id, username").eq("username", username).maybeSingle();
   if (error) return { ok: false, reason: "unavailable" };
   if (!person) return { ok: false, reason: "no_account" };
   if (person.id === o.invitedBy) return { ok: false, reason: "self" };
@@ -42,5 +41,5 @@ export async function inviteByLogin(o: { orgId: string; invitedBy: string; login
 
   const { error: insertError } = await db.from("org_invites").insert({ org_id: o.orgId, user_id: person.id, role: o.role, invited_by: o.invitedBy });
   if (insertError) return { ok: false, reason: "unavailable" };
-  return { ok: true, name: person.username ?? person.email ?? "your coworker" };
+  return { ok: true, name: person.username ?? "your coworker" };
 }

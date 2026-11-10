@@ -34,7 +34,6 @@ export interface StatisticsPayload {
 
 export interface UserRow {
   id: string;
-  email: string | null;
   username: string | null;
   plan: string;
   status: string;
@@ -137,7 +136,7 @@ export interface OrgsPayload {
 export interface OrgMemberRow {
   userId: string;
   name: string;
-  email: string | null;
+  username: string | null;
   role: "admin" | "member";
   /** Their own access, or null when the organization's default applies. */
   access: OrgAccess | null;
@@ -192,7 +191,7 @@ export interface BucketStat {
 export interface DatabasePayload {
   tables: TableStat[];
   buckets: BucketStat[];
-  /** The largest folders in the memory bucket, named by account email where there is one. */
+  /** The largest folders in the memory bucket, named by account username where there is one. */
   folders: { folder: string; label: string; objects: number; bytes: number }[];
 }
 

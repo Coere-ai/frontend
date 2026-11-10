@@ -59,7 +59,7 @@ export function OrgPanel({ id }: { id: string }) {
             <form action={(fd) => run(() => addMember(id, fd))} className="grid gap-3 sm:grid-cols-[2fr_1fr_auto] sm:items-end">
               <div>
                 <Label htmlFor="add-login">Account</Label>
-                <input id="add-login" name="login" required placeholder="Email or username of an account" autoComplete="off" className={fieldClass} style={fieldStyle} />
+                <input id="add-login" name="login" required placeholder="Username of an account" autoComplete="off" className={fieldClass} style={fieldStyle} />
               </div>
               <div>
                 <Label htmlFor="add-role">Role</Label>

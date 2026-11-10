@@ -23,11 +23,11 @@ export function UserPanel({ id }: { id: string }) {
   const u = data?.user;
 
   return (
-    <AdminPanel title={u ? (u.email ?? u.username ?? "Account") : "Account"} ready={!!data} error={error} reload={reload} control={<BackLink />}>
+    <AdminPanel title={u ? (u.username ?? "Account") : "Account"} ready={!!data} error={error} reload={reload} control={<BackLink />}>
       {data && u ? (
         <>
           <p className="text-[12.5px] text-[color:var(--color-ink)]">
-            {[u.username ? `@${u.username}` : null, u.displayName, `${u.plan} plan`, u.status, u.org ? `${u.org.role} of ${u.org.name}` : "no organization", `joined ${day(u.createdAt)}`, u.lastSeenAt ? `last seen ${ago(u.lastSeenAt)}` : "never seen"]
+            {[u.displayName, `${u.plan} plan`, u.status, u.org ? `${u.org.role} of ${u.org.name}` : "no organization", `joined ${day(u.createdAt)}`, u.lastSeenAt ? `last seen ${ago(u.lastSeenAt)}` : "never seen"]
               .filter(Boolean)
               .join(", ")}
           </p>

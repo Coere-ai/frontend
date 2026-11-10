@@ -48,7 +48,7 @@ const ACCOUNTS = toAccountUsage([
   { user_id: "b", email: null, requests: 50, input_tokens: 10, output_tokens: 10, cache_write_tokens: 9, cache_read_tokens: 9, cost_micros: 100, monthly_limit_micros: 5000000, month_cost_micros: 0, first_build_done: false, first_build_limit_micros: 10000000, first_build_cost_micros: 100 },
   { user_id: "c", email: "c@x.com", requests: 1, input_tokens: 900, output_tokens: 100, cache_write_tokens: 0, cache_read_tokens: 0, cost_micros: 100, monthly_limit_micros: 5000000, month_cost_micros: 100, daily_limit_micros: "2000000", day_cost_micros: 100, first_build_done: true },
   { user_id: null, email: "gone", requests: 9, cost_micros: 9 },
-]);
+], new Map([["a", "ada"], ["b", null]]));
 
 test("accounts count input plus output as tokens and keep their limits and spend", () => {
   assert.equal(ACCOUNTS.length, 3);
@@ -56,6 +56,11 @@ test("accounts count input plus output as tokens and keep their limits and spend
     ACCOUNTS.map((a) => [a.id, a.tokens, a.spend.monthCostMicros, a.spend.dailyLimitMicros, a.spend.firstBuildDone, a.spend.firstBuildCostMicros]),
     [["a", 100, 200, null, true, 0], ["b", 20, 0, null, false, 100], ["c", 1000, 100, 2_000_000, true, 0]],
   );
+});
+
+test("accounts are named by username, never by the email the database sends", () => {
+  assert.deepEqual(ACCOUNTS.map((a) => a.username), ["ada", null, null]);
+  assert.equal(ACCOUNTS.some((a) => "email" in a), false);
 });
 
 test("accounts sort by cost, tokens or requests, ties by cost then id", () => {

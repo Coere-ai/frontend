@@ -16,7 +16,7 @@ import { useAdminData } from "../use-admin-data";
 const HEAD = ["Account", "Plan", "Status", "Created", "Last seen", "Devices", "Month cost", "Requests", "Lifetime cost", "First build", "Tokens saved", "Memory"];
 
 /**
- * Every account, with sign ups by day. Typing filters by email, username
+ * Every account, with sign ups by day. Typing filters by username
  * or organization; a row opens the account. First build says whether the
  * account's free first memory build is used, after which its daily limit
  * applies; the account's page can give it back.
@@ -30,7 +30,7 @@ export function UsersPanel() {
     const q = query.trim().toLowerCase();
     const all = data?.rows ?? [];
     if (!q) return all;
-    return all.filter((r) => [r.email, r.username, r.org?.name].some((v) => v?.toLowerCase().includes(q)));
+    return all.filter((r) => [r.username, r.org?.name].some((v) => v?.toLowerCase().includes(q)));
   }, [data, query]);
 
   const lines = useMemo(() => (data ? [{ id: "signups", label: "Sign ups", points: data.signups }] : []), [data]);
@@ -78,14 +78,12 @@ export function UsersPanel() {
                   if (r) router.push(`/admin/users/${r.id}`);
                 }}
                 rows={rows.map((r) => [
-                  // The username and the organization sit under the email, so the table stays narrow enough to read whole.
-                  <span key="email">
+                  // The organization sits under the username, so the table stays narrow enough to read whole.
+                  <span key="account">
                     <Link href={`/admin/users/${r.id}`} onClick={(e) => e.stopPropagation()} className="underline-offset-2 hover:underline">
-                      {r.email ?? "No email"}
+                      {r.username ?? "No username"}
                     </Link>
-                    {r.username || r.org ? (
-                      <span className="block text-[color:var(--color-muted)]">{[r.username, r.org ? `${r.org.name} (${r.org.role})` : null].filter(Boolean).join(", ")}</span>
-                    ) : null}
+                    {r.org ? <span className="block text-[color:var(--color-muted)]">{`${r.org.name} (${r.org.role})`}</span> : null}
                   </span>,
                   r.plan,
                   r.status,
