@@ -1,6 +1,7 @@
 "use client";
 
-import { revokeAllDevices, setLimits, setPlan, setStatus } from "@/app/admin/users/actions";
+import { revokeAllDevices, setLimits, setPassword, setPlan, setStatus } from "@/app/admin/users/actions";
+import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/auth/identity";
 import { dollarField } from "@/lib/admin/money";
 import { fieldName, LIMIT_KINDS, type LimitKind } from "@/lib/admin/limit-input";
 import type { PlanRow, UserDetailPayload } from "@/lib/admin/types";
@@ -81,6 +82,25 @@ export function AccountActions({ data, reload }: { data: UserDetailPayload; relo
           </div>
           <p className="mt-3 text-[12px] text-[color:var(--color-ink)]">
             {suspended ? "Suspended: every request from this account is refused." : `Active, with ${user.devices} live ${user.devices === 1 ? "device" : "devices"}.`}
+          </p>
+        </Card>
+        <Card title="Set a new password">
+          <form
+            action={(fd) => {
+              if (window.confirm(`Set a new password for ${user.username ?? "this account"}? Their old one stops working.`)) run(() => setPassword(user.id, fd));
+            }}
+            className="flex items-end gap-2"
+          >
+            <div className="flex-1">
+              <Label htmlFor="new-password">New password</Label>
+              <input id="new-password" name="password" type="text" autoComplete="off" spellCheck={false} minLength={PASSWORD_MIN} maxLength={PASSWORD_MAX} placeholder={`At least ${PASSWORD_MIN} characters`} className={fieldClass} style={fieldStyle} />
+            </div>
+            <Button strong disabled={pending}>
+              Set password
+            </Button>
+          </form>
+          <p className="mt-3 text-[12px] text-[color:var(--color-ink)]">
+            For a person who forgot theirs and wrote to the contact email. Nothing is emailed: tell them the password yourself, then they change it on their account page.
           </p>
         </Card>
       </div>

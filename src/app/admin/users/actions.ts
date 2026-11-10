@@ -5,13 +5,15 @@ import { headers } from "next/headers";
 import { adminAction, check, done, refused, type AdminResult } from "@/lib/admin/action";
 import { isUuid } from "@/lib/admin/http";
 import { LIMIT_COLUMNS, LIMIT_KINDS, readAccountLimits } from "@/lib/admin/limit-input";
+import { passwordProblem } from "@/lib/auth/identity";
 import { logSecurityEvent } from "@/lib/security/events";
 import { supabase } from "@/lib/supabase";
 
 /**
  * What the operator changes on an account: its plan, its own dollar
  * limits (daily, first build, monthly and lifetime), its free first build,
- * suspend or restore, and revoking every device. Each re-checks the admin
+ * suspend or restore, revoking every device, and a new password for a
+ * person who forgot theirs. Each re-checks the admin
  * session and writes only the one account it names.
  */
 
@@ -82,5 +84,26 @@ export async function revokeAllDevices(userId: string): Promise<AdminResult> {
     const count = data?.length ?? 0;
     if (count > 0) await logSecurityEvent("device_revoked", { userId, headers: await headers() });
     return done(count === 0 ? "No device was connected." : `Revoked ${count} ${count === 1 ? "device" : "devices"}.`);
+  });
+}
+
+/**
+ * Sets a new password for a person who forgot theirs and asked through the
+ * contact email: coere.ai sends no reset email. The operator tells the
+ * person the password some other way, and the person changes it on
+ * /account. Written with the secret key; the event names the account.
+ */
+export async function setPassword(userId: string, form: FormData): Promise<AdminResult> {
+  return adminAction("setPassword", async () => {
+    if (!isUuid(userId)) return refused(NO_ACCOUNT);
+    const password = String(form.get("password") ?? "");
+    const problem = passwordProblem(password);
+    if (problem) return refused(problem);
+    const { error } = await supabase().auth.admin.updateUserById(userId, { password });
+    if (error?.status === 404 || error?.code === "user_not_found") return refused(NO_ACCOUNT);
+    if (error?.code === "weak_password") return refused("Pick a stronger password.");
+    check(error, "auth password update");
+    await logSecurityEvent("password_set", { userId, headers: await headers() });
+    return done("Password set. Tell the person, and ask them to change it on their account page.");
   });
 }
