@@ -42,6 +42,16 @@ export async function checkSignUp(db) {
   await db.query("delete from auth.users where id = $1", [D]);
   await db.query("update public.daily_totals set new_users = new_users - 1");
 
+  // The site's sign up: auth.admin.createUser with a placeholder address, already confirmed, the username in user_metadata.
+  const E = "00000000-0000-4000-8000-00000000000e";
+  await db.query(`insert into auth.users (id, email, raw_user_meta_data, email_confirmed_at) values ($1, 'eve_1@users.coere.ai', '{"username":"eve_1"}', now())`, [E]);
+  equal("a user made confirmed takes its username at once", await one(db, "made confirmed", "select username from public.profiles where id = $1", [E]), "eve_1");
+  equal("a user made confirmed counts as a sign up at once", await one(db, "daily new_users", "select new_users from public.daily_totals"), 4);
+  await db.query("update auth.users set raw_user_meta_data = '{\"username\":\"eve_1\"}' where id = $1", [E]);
+  equal("a later write to a confirmed user counts nothing", await one(db, "daily new_users", "select new_users from public.daily_totals"), 4);
+  await db.query("delete from auth.users where id = $1", [E]);
+  await db.query("update public.daily_totals set new_users = new_users - 1");
+
   await db.query("update auth.users set email = 'Alice2@Example.com' where id = $1", [A]);
   equal("an email change reaches the profile", await one(db, "email sync", "select email from public.profiles where id = $1", [A]), "alice2@example.com");
 }
