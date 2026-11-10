@@ -7,6 +7,7 @@ import { overLimit, wrongAnswerDelay } from "./guard";
 import { markSignedIn } from "./hint-cookie";
 import { normalizeUsername } from "./identity";
 import { emailForUsername } from "./lookup";
+import { isWrongLogin } from "./password-refusal";
 import type { SignInState } from "./sign-in-state";
 
 /**
@@ -52,6 +53,8 @@ export async function passwordSignIn(prev: SignInState, rawUsername: unknown, ra
   const client = await sessionClient();
   const { data, error } = await client.auth.signInWithPassword({ email, password });
   if (error || !data.user) {
+    // Supabase's own refusals (its shared sign in limit, an outage) read as wrong to the person, like every other failure, but the operator sees the code.
+    if (error && !isWrongLogin(error.code)) console.error("sign in refused", error.code ?? error.status ?? "unknown");
     await logSecurityEvent("sign_in_failed", { headers });
     await wrongAnswerDelay(startedAt);
     return failed;
