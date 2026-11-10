@@ -31,3 +31,24 @@ export function createAttemptLimiter({ max, windowMs }: { max: number; windowMs:
     },
   };
 }
+
+/**
+ * The sign in limits: one budget for each network address and a larger one
+ * for each username. A try from an address whose own budget is spent is
+ * refused there and never reaches the username's, so one address cannot
+ * spend a username's budget and lock its owner out. Locking a username out
+ * takes `perUsername` tries from at least `perUsername / perAddress`
+ * addresses in one window, and many addresses aimed at one account still
+ * get no more than `perUsername` guesses in it.
+ */
+export function createSignInLimiter({ perAddress, perUsername, windowMs }: { perAddress: number; perUsername: number; windowMs: number }) {
+  const addresses = createAttemptLimiter({ max: perAddress, windowMs });
+  const usernames = createAttemptLimiter({ max: perUsername, windowMs });
+  return {
+    /** Counts one try; true when it is over either limit. */
+    hit(address: string, username: string | null, now = Date.now()): boolean {
+      if (addresses.hit(address, now)) return true;
+      return username !== null && usernames.hit(username, now);
+    },
+  };
+}

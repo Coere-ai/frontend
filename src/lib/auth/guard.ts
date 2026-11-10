@@ -2,23 +2,21 @@ import "server-only";
 
 import { addressOf, logSecurityEvent } from "@/lib/security/events";
 
-import { createAttemptLimiter } from "./attempts";
+import { createSignInLimiter } from "./attempts";
 import { WRONG_GUESS_DELAY_MS } from "./credentials";
 
 /**
- * The limits on every sign in path (docs/accounts.md section 3.1): 10 tries
- * in 15 minutes for each network address and for each username, so neither
- * one machine nor many machines aimed at one account get more than 10
- * guesses at a password.
+ * The limits on every sign in path and every check of a current password
+ * (docs/accounts.md section 3.1): 10 tries in 15 minutes for each network
+ * address, and 50 for each username, counted only from addresses still
+ * within their own 10. One machine gets 10 guesses and cannot lock anyone
+ * out; many machines aimed at one account get 50.
  */
-const limiter = createAttemptLimiter({ max: 10, windowMs: 15 * 60_000 });
+const limiter = createSignInLimiter({ perAddress: 10, perUsername: 50, windowMs: 15 * 60_000 });
 
-/** Counts one attempt against each key; true, and a `rate_limited` event, when any is spent. */
+/** Counts one attempt; true, and a `rate_limited` event, when a limit is spent. */
 export async function overLimit(headers: Headers, username: string | null): Promise<boolean> {
-  const keys = [`ip:${addressOf(headers) ?? "unknown"}`];
-  if (username) keys.push(`username:${username}`);
-  // Every key is counted, so a refused try still uses up the others' budget.
-  const spent = keys.map((key) => limiter.hit(key)).some(Boolean);
+  const spent = limiter.hit(`ip:${addressOf(headers) ?? "unknown"}`, username ? `username:${username}` : null);
   if (spent) await logSecurityEvent("rate_limited", { headers });
   return spent;
 }
