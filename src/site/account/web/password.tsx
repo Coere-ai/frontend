@@ -12,13 +12,16 @@ import { Part } from "./rows";
 
 const START: FieldState = { error: null, notice: null };
 
-/** Password: change the one this account signs in with. Nothing is emailed. */
+/** Password: change the one this account signs in with, after the current one. Nothing is emailed. */
 export function Password() {
   const [state, action, pending] = useActionState(savePassword, START);
   const field = `${inputClass(false)} h-11`;
   return (
-    <Part title="Password" line="You sign in with your username and this password. Type a new one twice to change it.">
+    <Part title="Password" line="You sign in with your username and this password. Type your current one, then a new one twice.">
       <form action={action} noValidate className="max-w-[420px] space-y-4">
+        <FormField id="current-password" label="Current password">
+          <input id="current-password" name="currentPassword" type="password" autoComplete="current-password" maxLength={PASSWORD_MAX} className={field} />
+        </FormField>
         <FormField id="password" label="New password" hint={`At least ${PASSWORD_MIN} characters`}>
           <input id="password" name="password" type="password" autoComplete="new-password" maxLength={PASSWORD_MAX} className={field} />
         </FormField>

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { newPasswordProblem, passwordRefusal, SIGN_IN_AGAIN, UNAVAILABLE } from "./password-change";
+import { currentPasswordRefusal, newPasswordProblem, passwordRefusal, SIGN_IN_AGAIN, UNAVAILABLE } from "./password-change";
 
 describe("newPasswordProblem", () => {
   it("asks for 10 characters", () => {
@@ -36,5 +36,17 @@ describe("passwordRefusal", () => {
   it("falls back to try again for anything else", () => {
     assert.equal(passwordRefusal(undefined), UNAVAILABLE);
     assert.equal(passwordRefusal("unexpected_failure"), UNAVAILABLE);
+  });
+});
+
+describe("currentPasswordRefusal", () => {
+  it("lets a right current password through", () => {
+    assert.equal(currentPasswordRefusal("ok"), null);
+  });
+
+  it("says the current password is wrong, too many tries, or try later", () => {
+    assert.equal(currentPasswordRefusal("wrong"), "Your current password is wrong.");
+    assert.match(currentPasswordRefusal("limited") ?? "", /^Too many tries/);
+    assert.equal(currentPasswordRefusal("unavailable"), UNAVAILABLE);
   });
 });
