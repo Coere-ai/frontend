@@ -20,9 +20,8 @@ a chat, a commit, an issue or a screenshot.
 | Anthropic | the Claude API that builds memory | pay as you go, prepaid credits |
 | Supabase | the database, sign in and memory backups | free plan is enough to start |
 | Vercel | hosts www.coere.ai | Hobby works; Pro raises limits |
-| Resend (or Postmark, SendGrid) | sends the sign in emails | free plan is enough to start |
 | Chrome Web Store developer account | publishes the extension | one time $5 |
-| Your domain registrar | DNS for coere.ai and the email sender | already yours |
+| Your domain registrar | DNS for coere.ai | already yours |
 
 ## 1. Anthropic API key (`ANTHROPIC_API_KEY`)
 
@@ -53,19 +52,20 @@ extension sorts with Claude Haiku instead, so everything works. If TypeSafe
 gives you a key later, add it in section 7 and redeploy. If you never use
 Jev, remove TypeSafe from `/privacy`.
 
-## 3. The email sender (Resend)
+## 3. Email: none to set up
 
-Supabase's own sender allows only a few emails an hour, and every sign in
-needs one, so set up a real sender before anyone else signs in.
+coere.ai sends no email. An account is a username and a password, so there
+is no sign in code, no confirmation link and no reset email, and no sender
+(Resend, SMTP or templates) to set up. Supabase's own sender reaches only
+the project team's addresses, a few an hour, so nothing may depend on it.
 
-1. Make an account at resend.com.
-2. **Domains**, then **Add domain**: enter `coere.ai`.
-3. Resend shows DNS records (an MX or return path record, an SPF TXT record
-   and a DKIM TXT record). Add each one at your domain registrar exactly as
-   shown, then press **Verify** in Resend. Wait until it says **Verified**
-   (minutes to an hour).
-4. **API Keys**, then **Create API key** with sending access. Copy it. You
-   will paste it into Supabase in section 4.6; it does not go into Vercel.
+Supabase Auth still needs an email for every account. The server gives each
+one a placeholder, `<username>@users.coere.ai`, marks it confirmed when it
+makes the account, and never shows it. No mail is ever sent to it.
+
+A person who forgets their password writes to the site's contact email
+(`/sign-in` says so). You then set a new one on `/admin/users`, the account,
+**Set a new password**, and tell them; they change it on `/account`.
 
 ## 4. Supabase
 
@@ -91,7 +91,7 @@ needs one, so set up a real sender before anyone else signs in.
    - **Storage** shows a private bucket named `memory`.
 5. If it fails, copy the error message (not the SQL) and send it to the
    developer. `npm run db:check` runs the same file locally on PGlite with
-   301 checks, so a failure on Supabase would be a Supabase difference.
+   304 checks, so a failure on Supabase would be a Supabase difference.
 
 This one file is every migration there is: site analytics, accounts, devices,
 usage and limits, the memory backup, settings sync, organizations, running
@@ -115,75 +115,33 @@ The secret key can read and change everything. Only Vercel may hold it.
 Everything here is under **Authentication** in the left menu.
 
 1. **Sign In / Providers**, then **Email**:
-   - **Enable Email provider**: on.
-   - **Confirm email**: on.
-   - **Email OTP Length**: `6`. Expiry: leave the default (3600 seconds).
+   - **Enable Email provider**: on. Supabase keeps a placeholder email for
+     each account, and the password sign in runs through this provider.
+   - **Confirm email**: on or off, the site works either way: the server
+     confirms each account when it makes it, so Supabase never sends a
+     confirmation. Leave it on. Then an account someone makes straight
+     through Supabase with the public key, around the site's username
+     rules, stays unconfirmed and can never sign in.
+   - **Secure password change**: off. On, Supabase would email a code before
+     a password change on `/account`, and coere.ai sends no email. If it is
+     left on, the page says to sign in again instead.
    - **Minimum password length**: `10`.
-   - **Secure password change**: your choice. On, a session older than a day
-     must type an emailed code before changing its password on `/account`
-     (the page handles it).
    - Save.
 2. **Sign In / Providers**: leave every other provider off (no Google,
-   GitHub, phone or anonymous sign in).
+   GitHub, phone, magic link or anonymous sign in).
 3. **URL Configuration**:
    - **Site URL**: `https://www.coere.ai`
-   - **Redirect URLs**: add `https://www.coere.ai/**`. Add
-     `http://localhost:3000/**` only if you run the site on your computer.
+   - **Redirect URLs**: none are needed, since no email carries a link.
 4. **Sessions**: leave **Time-box user sessions** and **Inactivity timeout**
    off (the default), so people stay signed in until they sign out.
-5. **Rate Limits**: after section 4.6, raise **Rate limit for sending
-   emails** to what your sender allows (for example 100 an hour to start).
+5. **Rate Limits**: every sign in reaches Supabase from the site's servers,
+   not from the person's address, so raise **Rate limit for sign ups and
+   sign ins** well above the default (for example 300 in 5 minutes). The
+   site keeps its own limit of 10 tries in 15 minutes for each address and
+   each username. The email rate limit does not matter, since nothing is
+   sent.
 
-### 4.5 Email templates
-
-**Authentication**, then **Emails**, then **Templates**. A new address that
-signs in by code gets **Confirm signup**, a known one gets **Magic Link**, so
-both must hold the code and the link. Paste these exactly.
-
-**Magic Link**. Subject: `Your Coere sign in code`
-
-```html
-<h2>Sign in to Coere</h2>
-<p>Your code is <strong>{{ .Token }}</strong>. Type it on the sign in page.</p>
-<p>Or open this link in the browser you want to sign in on:</p>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">Sign in to Coere</a></p>
-<p>If you did not ask to sign in, you can ignore this email.</p>
-```
-
-**Confirm signup**. Subject: `Confirm your Coere account`
-
-```html
-<h2>Welcome to Coere</h2>
-<p>Open this link to confirm your email and sign in:</p>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">Confirm your email</a></p>
-<p>Or type this code on the sign in page: <strong>{{ .Token }}</strong></p>
-<p>If you did not make a Coere account, you can ignore this email.</p>
-```
-
-**Reauthentication**: leave Supabase's own template; it already holds
-`{{ .Token }}`, which the password change on `/account` needs. The other
-templates (Invite user, Change email, Reset password) are not used.
-
-Keep `next={{ .RedirectTo }}` last in both links: `/auth/confirm` reads
-everything after `next=` as the page to return to.
-
-### 4.6 SMTP
-
-**Authentication**, then **Emails** (or **Notifications**), then **SMTP
-Settings**. Turn on **Enable custom SMTP** and enter:
-
-| Field | Value |
-| --- | --- |
-| Sender email | `no-reply@coere.ai` |
-| Sender name | `Coere` |
-| Host | `smtp.resend.com` |
-| Port | `465` |
-| Username | `resend` |
-| Password | the Resend API key from section 3 |
-
-Save, then go back to section 4.4 step 5 and raise the email rate limit.
-
-### 4.7 Storage
+### 4.5 Storage
 
 Nothing to make: the migration made the private `memory` bucket (50 MiB per
 file) and its rules. Check **Storage**, then **Settings**: the global upload
@@ -275,10 +233,11 @@ cut off.
 
 1. **Deployments**, the menu on the latest one, **Redeploy**. Variables only
    take effect on a new deployment.
-2. Open `https://www.coere.ai/sign-in`, sign in with your email: the code
-   comes from `no-reply@coere.ai`, and after typing it you land on the
+2. Open `https://www.coere.ai/sign-up` and make your account with a
+   username and a password. No email is asked for or sent. You land on the
    dashboard page, which says to install Coere (expected for now).
-3. Open `https://www.coere.ai/account`: your email shows; set a username.
+3. Open `https://www.coere.ai/account`: your username shows. Sign out, then
+   sign in again at `/sign-in` with the username and password.
 4. Open `https://www.coere.ai/admin` and sign in with `USER` and `PASSWORD`:
    **Users** lists your account, **Database** lists every table with Row
    Level Security on and no alert.
@@ -310,7 +269,8 @@ cut off.
      local library and memory); `downloads` (exports); `tabGroups` (grouping
      the tabs Extract all opens); `activeTab`, `contextMenus`, `search`
      (Coere Actions).
-   - **Data use**: declare email address (the account), user activity and
+   - **Data use**: declare authentication information (the account's
+     username and device token, kept in the browser), user activity and
      website content (the chats it saves locally, and the cleaned AI requests
      and memory backup that go to coere.ai), and confirm the Limited Use
      statement; the privacy page makes it.
@@ -320,11 +280,12 @@ cut off.
 
 1. Install the extension (unpacked, or the store version once approved). The
    coere.ai connect page opens.
-2. Sign in with an email code and press **Connect Coere**. Onboarding opens.
+2. Sign in with your username and password and press **Connect Coere**.
+   Onboarding opens.
 3. Pick your AIs, run Extract all, and let the first memory build finish.
 4. Open `https://www.coere.ai/dashboard`: it shows Coere's own dashboard with
    your memory, library and Statistics. In Settings, the Account card shows
-   your email and the backup.
+   your username and the backup.
 5. Press **Back up now**, then in Supabase **Storage**, `memory`, check for a
    folder named by your user id.
 6. In `/admin`: **Users** shows your account and its cost, **Cost** shows
@@ -332,8 +293,11 @@ cut off.
    device.
 7. On `/admin/organizations`, make a test organization with yourself as
    admin, check its section in the dashboard, then delete it.
-8. On `/account`, make a second test account, sign in again within ten
-   minutes, and delete it, to prove deletion works on real Supabase.
+8. Make a second test account at `/sign-up`. On `/admin/users`, open it and
+   use **Set a new password**, then sign in with the new password, to prove
+   the forgotten password path works. On `/account`, change its password,
+   sign in again within ten minutes, type its username and delete it, to
+   prove deletion works on real Supabase.
 
 ## 10. Limits, countdown and launch
 
@@ -352,16 +316,17 @@ cut off.
 
 | What you see | Most likely cause | Fix |
 | --- | --- | --- |
-| The sign in code never arrives | SMTP not set or domain not verified | Section 3 and 4.6; check Resend's logs |
-| "Too many requests" on sign in | Supabase's email rate limit | Section 4.4 step 5 |
-| The email link opens the home page | Redirect URL missing | Section 4.4 step 3 |
+| "Too many tries" on sign in for everyone at once | Supabase's sign in rate limit, shared by the site's servers | Section 4.4 step 5 |
+| Sign up says the account could not be made | `SUPABASE_SECRET_KEY` missing, or the Email provider off | Section 4.4 step 1 and 7.2 |
+| Changing a password on `/account` says to sign in again | Secure password change is on | Section 4.4 step 1 |
+| Someone forgot their password | there is no reset email | Section 3: set a new one on `/admin/users` |
 | `/admin` never accepts the password | `USER` or `PASSWORD` missing, or not redeployed | Section 7.2, then redeploy |
 | `/admin` says storage is not configured | `SUPABASE_URL` or `SUPABASE_SECRET_KEY` missing | Section 7.2 |
 | Connect Coere says the extension is not allowed | its id is not in `COERE_EXTENSION_IDS` | Section 8 step 3 or 4 |
 | The dashboard says to install Coere with Coere installed | the same | the same |
 | Memory never builds, the card says coere.ai is unavailable | `ANTHROPIC_API_KEY` missing or out of credit | Section 1 and 7.2 |
 | Every extension call fails | Deployment protection covers `/api/v1` | Section 7.3 |
-| Backup never appears in Storage | the backup switch is off on `/account`, or the file is over 50 MB | `/account`, section 4.7 |
+| Backup never appears in Storage | the backup switch is off on `/account`, or the file is over 50 MB | `/account`, section 4.5 |
 
 Vercel's **Logs** for the deployment and `/admin/security` say where a
 request failed. Send the error text, never a key.
