@@ -43,7 +43,7 @@ Set `SHOTS_VERBOSE=1` to see the dev server's log, and
    Auth and Storage routes supabase-js calls. Postgres writes every answer
    with `json_agg`, as PostgREST does, and each request runs as the role its
    key or session gives it, so Row Level Security decides what a signed in
-   person reads. Every email code is `246810`. It serves https as
+   person reads. It serves https as
    `localhost`, since the extension only uploads to an https address.
 2. **The made up world** (`seed/`): Maya Collins, an account director at
    Fernhill Creative, an agency with seven people and one open invite; five
