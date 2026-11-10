@@ -2,38 +2,19 @@
 
 import { useActionState } from "react";
 
-import { PASSWORD_MIN } from "@/lib/auth/identity";
+import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/auth/identity";
 import { signUpState, type SignUpField } from "@/lib/auth/sign-up-state";
 import { IconInput } from "@/site/account/auth-fields";
-import { authCardClass, FormStatus, textButtonClass } from "@/site/account/auth-shell";
+import { authCardClass, FormStatus } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
 import { FormField } from "@/site/ui/form-field";
-import { LockIcon, MailIcon, UserIcon } from "@/site/ui/icons/interface-icons";
-import { Underlined } from "@/site/ui/underlined";
+import { LockIcon, UserIcon } from "@/site/ui/icons/interface-icons";
 
 import { signUp } from "./actions";
 
-/** The sign up card, and in its place, once the email has gone, the "check your email" panel. */
+/** The sign up card: a username and a password typed twice. A made account goes straight on, signed in. */
 export function SignUpForm({ next }: { next: string }) {
   const [state, action, pending] = useActionState(signUp, signUpState(next));
-
-  if (state.sent) {
-    return (
-      <form action={action} role="status" className={`${authCardClass} text-center`}>
-        <input type="hidden" name="next" value={state.next} />
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
-          <MailIcon size={22} />
-        </span>
-        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">Check your email</p>
-        <p className="mt-2 text-[15px] leading-relaxed text-neutral-500">
-          We sent a link to <span className="break-all text-neutral-950">{state.sent}</span>. Open it to finish making your account.
-        </p>
-        <button type="submit" name="intent" value="restart" className={`${textButtonClass} mt-6`}>
-          <Underlined>Use another email</Underlined>
-        </button>
-      </form>
-    );
-  }
 
   const field = (id: SignUpField) => ({
     id,
@@ -46,14 +27,14 @@ export function SignUpForm({ next }: { next: string }) {
   return (
     <form action={action} noValidate className={`space-y-6 ${authCardClass}`}>
       <input type="hidden" name="next" value={state.next} />
-      <FormField id="email" label="Email" error={state.errors.email}>
-        <IconInput icon={MailIcon} {...field("email")} type="email" autoComplete="email" required defaultValue={state.values.email} />
-      </FormField>
-      <FormField id="username" label="Username" hint="optional" error={state.errors.username}>
-        <IconInput icon={UserIcon} {...field("username")} autoComplete="username" autoCapitalize="none" spellCheck={false} maxLength={24} defaultValue={state.values.username} />
+      <FormField id="username" label="Username" hint="3 to 24 letters, numbers or underscores" error={state.errors.username}>
+        <IconInput icon={UserIcon} {...field("username")} autoComplete="username" autoCapitalize="none" spellCheck={false} maxLength={24} required defaultValue={state.username} />
       </FormField>
       <FormField id="password" label="Password" hint={`at least ${PASSWORD_MIN} characters`} error={state.errors.password}>
-        <IconInput icon={LockIcon} {...field("password")} type="password" autoComplete="new-password" required minLength={PASSWORD_MIN} />
+        <IconInput icon={LockIcon} {...field("password")} type="password" autoComplete="new-password" required minLength={PASSWORD_MIN} maxLength={PASSWORD_MAX} />
+      </FormField>
+      <FormField id="confirm" label="Password again" error={state.errors.confirm}>
+        <IconInput icon={LockIcon} {...field("confirm")} type="password" autoComplete="new-password" required minLength={PASSWORD_MIN} maxLength={PASSWORD_MAX} />
       </FormField>
       <button type="submit" disabled={pending} className={buttonClass("primary", "w-full disabled:opacity-60")}>
         {pending ? "Making your account" : "Create account"}

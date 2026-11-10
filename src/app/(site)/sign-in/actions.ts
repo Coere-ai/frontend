@@ -5,46 +5,21 @@ import { redirect } from "next/navigation";
 
 import { safeNext } from "@/lib/auth/next-path";
 import type { SignInState } from "@/lib/auth/sign-in-state";
-import { passwordSignIn, sendCode, verifyCode } from "@/lib/auth/sign-in-steps";
+import { passwordSignIn } from "@/lib/auth/sign-in-steps";
+import { supabaseConfigured } from "@/lib/supabase";
 import { accountsConfigured } from "@/lib/supabase/server";
 
-/**
- * The sign in form's one action. Every button posts here with its own
- * `intent`, so the steps also work before the page's scripts load. Switching
- * between the code and the password way is an intent too, and touches
- * nothing but the form state.
- */
-export async function signInStep(prev: SignInState, form: FormData): Promise<SignInState> {
+/** The sign in form's one action: a username and a password, then on to `next`. */
+export async function signIn(prev: SignInState, form: FormData): Promise<SignInState> {
   const next = safeNext(String(form.get("next") ?? ""));
-  const state: SignInState = { ...prev, next, error: null, field: null, notice: null };
-  const intent = form.get("intent");
-
-  if (intent === "use-password") return { ...state, step: "password" };
-  if (intent === "use-code" || intent === "restart") return { ...state, step: "email", email: "" };
-  if (!accountsConfigured()) {
-    console.error("[accounts] SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be set for sign in");
+  const state: SignInState = { ...prev, next, error: null, field: null };
+  if (!accountsConfigured() || !supabaseConfigured()) {
+    console.error("[accounts] SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY and SUPABASE_SECRET_KEY must be set for sign in");
     // Give back what was typed, since the form resets after every action.
-    const email = form.get("email");
-    const login = form.get("login");
-    return {
-      ...state,
-      email: typeof email === "string" ? email : state.email,
-      login: typeof login === "string" ? login : state.login,
-      error: "Signing in is not available right now. Try again later.",
-    };
+    const username = form.get("username");
+    return { ...state, username: typeof username === "string" ? username.slice(0, 64) : "", error: "Signing in is not available right now. Try again later." };
   }
-
-  const head = await headers();
-  if (intent === "send" || intent === "resend") return sendCode(state, form.get("email"), head);
-  if (intent === "verify") {
-    const failed = await verifyCode(state, form.get("email"), form.get("code"), head);
-    if (failed) return failed;
-    redirect(next);
-  }
-  if (intent === "password") {
-    const failed = await passwordSignIn(state, form.get("login"), form.get("password"), head);
-    if (failed) return failed;
-    redirect(next);
-  }
-  return state;
+  const failed = await passwordSignIn(state, form.get("username"), form.get("password"), await headers());
+  if (failed) return failed;
+  redirect(next);
 }

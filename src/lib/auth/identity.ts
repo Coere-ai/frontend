@@ -1,13 +1,13 @@
 /**
- * The rules for what a person types to sign in or sign up: an email, a
- * username, a password, a code. Pure, so the server actions and the tests
- * share them.
+ * The rules for what a person types to sign in or sign up: a username and
+ * a password. Pure, so the server actions and the tests share them. The
+ * email rule stays for the waitlist and interest forms, which do take one.
  */
 
 /** 3 to 24 of a to z, 0 to 9 and underscore, stored lowercase. */
 const USERNAME = /^[a-z0-9_]{3,24}$/;
 
-/** Enough to catch a typo; Supabase checks the address for real when it mails it. */
+/** Enough to catch a typo in the waitlist and interest forms. */
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const PASSWORD_MIN = 10;
@@ -45,22 +45,16 @@ export function passwordProblem(raw: string): string | null {
   return null;
 }
 
-/** The sign in box takes either, and an @ is what tells them apart: usernames cannot hold one. */
-export type Login = { email: string } | { username: string } | null;
+/**
+ * Supabase Auth needs an email for every account, and coere.ai collects
+ * none. So the server gives each account a placeholder address at a domain
+ * nobody receives mail for, and confirms it itself when it makes the
+ * account. The address is never shown: the site shows the username, and
+ * sign in turns the username back into the address through `profiles`.
+ */
+export const PLACEHOLDER_DOMAIN = "users.coere.ai";
 
-export function parseLogin(raw: unknown): Login {
-  if (typeof raw !== "string") return null;
-  if (raw.includes("@")) {
-    const email = normalizeEmail(raw);
-    return email ? { email } : null;
-  }
-  const username = normalizeUsername(raw);
-  return username ? { username } : null;
-}
-
-/** The emailed code: 6 digits, with any spaces a person typed or pasted taken out. */
-export function normalizeCode(raw: unknown): string | null {
-  if (typeof raw !== "string") return null;
-  const code = raw.replace(/\s+/g, "");
-  return /^\d{6}$/.test(code) ? code : null;
+/** The placeholder for a username already in stored form. A suffix keeps it unique when an older account still holds the plain one. */
+export function placeholderEmail(username: string, suffix?: string): string {
+  return `${username}${suffix ? `.${suffix}` : ""}@${PLACEHOLDER_DOMAIN}`;
 }

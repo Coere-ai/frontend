@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { codeSendRefusal, newPasswordProblem, passwordRefusal, UNAVAILABLE } from "./password-change";
+import { newPasswordProblem, passwordRefusal, SIGN_IN_AGAIN, UNAVAILABLE } from "./password-change";
 
 describe("newPasswordProblem", () => {
   it("asks for 10 characters", () => {
@@ -18,33 +18,23 @@ describe("newPasswordProblem", () => {
 });
 
 describe("passwordRefusal", () => {
-  it("asks for an emailed code when Supabase needs a recent sign in", () => {
-    for (const code of ["reauthentication_needed", "reauth_nonce_missing"]) {
-      const refusal = passwordRefusal(code);
-      assert.equal(refusal.needsCode, true);
-      assert.match(refusal.message, /sign in from the last day/);
+  it("says to sign in again when Supabase wants a recent sign in", () => {
+    for (const code of ["reauthentication_needed", "reauth_nonce_missing", "reauthentication_not_valid"]) {
+      assert.equal(passwordRefusal(code), SIGN_IN_AGAIN);
     }
   });
 
-  it("keeps the code box for a wrong or expired code", () => {
-    assert.equal(passwordRefusal("reauthentication_not_valid").needsCode, true);
-    assert.equal(passwordRefusal("otp_expired").needsCode, true);
+  it("never offers an emailed code", () => {
+    for (const code of ["reauthentication_needed", "otp_expired", undefined]) assert.doesNotMatch(passwordRefusal(code), /email|code/i);
   });
 
   it("names the password problems Supabase finds", () => {
-    assert.deepEqual(passwordRefusal("same_password"), { message: "That is already your password.", needsCode: false });
-    assert.equal(passwordRefusal("weak_password").message, "Choose a password that is harder to guess.");
+    assert.equal(passwordRefusal("same_password"), "That is already your password.");
+    assert.equal(passwordRefusal("weak_password"), "Choose a password that is harder to guess.");
   });
 
   it("falls back to try again for anything else", () => {
-    assert.deepEqual(passwordRefusal(undefined), { message: UNAVAILABLE, needsCode: false });
-    assert.deepEqual(passwordRefusal("unexpected_failure"), { message: UNAVAILABLE, needsCode: false });
-  });
-});
-
-describe("codeSendRefusal", () => {
-  it("asks for a wait when a code just went out", () => {
-    assert.match(codeSendRefusal("over_email_send_rate_limit"), /Wait a minute/);
-    assert.equal(codeSendRefusal(undefined), UNAVAILABLE);
+    assert.equal(passwordRefusal(undefined), UNAVAILABLE);
+    assert.equal(passwordRefusal("unexpected_failure"), UNAVAILABLE);
   });
 });

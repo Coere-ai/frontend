@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { normalizeCode, normalizeEmail, normalizeUsername, parseLogin, passwordProblem, usernameProblem } from "./identity";
+import { normalizeEmail, normalizeUsername, passwordProblem, placeholderEmail, usernameProblem } from "./identity";
 
 describe("usernames", () => {
   it("stores them lowercase", () => {
@@ -50,24 +50,16 @@ describe("passwords", () => {
   });
 });
 
-describe("parseLogin", () => {
-  it("tells an email from a username by the @", () => {
-    assert.deepEqual(parseLogin("Ada@Example.com"), { email: "ada@example.com" });
-    assert.deepEqual(parseLogin("Ada_L"), { username: "ada_l" });
+describe("placeholderEmail", () => {
+  it("puts the username at the placeholder domain", () => {
+    assert.equal(placeholderEmail("ada_l"), "ada_l@users.coere.ai");
   });
 
-  it("answers null for neither", () => {
-    assert.equal(parseLogin("ada@"), null);
-    assert.equal(parseLogin("x"), null);
-    assert.equal(parseLogin(undefined), null);
+  it("adds a suffix when asked, so the address stays unique", () => {
+    assert.equal(placeholderEmail("ada_l", "k3x9"), "ada_l.k3x9@users.coere.ai");
   });
-});
 
-describe("normalizeCode", () => {
-  it("takes 6 digits with spaces removed", () => {
-    assert.equal(normalizeCode("123 456"), "123456");
-    assert.equal(normalizeCode("12345"), null);
-    assert.equal(normalizeCode("12345a"), null);
-    assert.equal(normalizeCode("1234567"), null);
+  it("makes an address the email rule accepts", () => {
+    assert.equal(normalizeEmail(placeholderEmail("ada_l", "k3x9")), "ada_l.k3x9@users.coere.ai");
   });
 });

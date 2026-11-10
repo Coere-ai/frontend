@@ -29,8 +29,8 @@ import { refreshSession } from "@/lib/supabase/refresh";
  * Everything here is also marked noindex, and every page gets a per-request
  * nonce Content-Security-Policy.
  *
- * The account pages (sign in, sign up, the emailed link, /connect,
- * /account, the person's dashboard) pass through here too, for two things only: the
+ * The account pages (sign in, sign up, /connect, /account, the
+ * person's dashboard) pass through here too, for two things only: the
  * Supabase session is refreshed before they render, and they get the same
  * nonce policy and noindex. Who may see what is decided by each page, action
  * and route itself.
@@ -76,7 +76,7 @@ function notFound(): NextResponse {
 }
 
 /** The private account paths. Keep in step with the matcher below. */
-const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect|account)$|^\/(auth|dashboard)(\/|$)/;
+const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect|account)$|^\/dashboard(\/|$)/;
 
 /** The dashboard host page, the one place an extension frame may load. */
 const DASHBOARD_PATH = /^\/dashboard(\/|$)/;
@@ -152,7 +152,6 @@ export const config = {
     "/api/admin/:path*",
     "/sign-in",
     "/sign-up",
-    "/auth/:path*",
     "/connect",
     "/account",
     "/dashboard/:path*",

@@ -11,11 +11,11 @@ import { SignUpForm } from "./sign-up-form";
 
 export const metadata: Metadata = {
   title: "Create an account",
-  description: "Make a Coere account with a password.",
+  description: "Make a Coere account with a username and a password.",
   robots: { index: false, follow: false },
 };
 
-/** Make an account with a password. Most people never need this page: the emailed code makes one too. */
+/** Make an account with a username and a password. A signed in visitor goes straight on. */
 export default async function SignUpPage({ searchParams }: PageProps<"/sign-up">) {
   const query = await searchParams;
   const next = safeNext(typeof query.next === "string" ? query.next : null);
@@ -23,7 +23,7 @@ export default async function SignUpPage({ searchParams }: PageProps<"/sign-up">
   const signIn = next === "/dashboard" ? "/sign-in" : `/sign-in?next=${encodeURIComponent(next)}`;
 
   return (
-    <AuthShell eyebrow="Account" title="Create your account" lede="Use a password, or skip this and sign in with a code we email you.">
+    <AuthShell eyebrow="Account" title="Create your account" lede="Pick a username and a password. No email needed.">
       <SignUpForm next={next} />
       <p className="mt-6 text-center text-[14px] text-neutral-500">
         Already have an account?{" "}

@@ -1,68 +1,71 @@
 "use server";
 
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
+import { newPasswordProblem } from "@/lib/account/password-change";
+import { createAccount, type Created } from "@/lib/auth/create-account";
 import { overLimit } from "@/lib/auth/guard";
-import { normalizeEmail, normalizeUsername, passwordProblem, usernameProblem } from "@/lib/auth/identity";
+import { markSignedIn } from "@/lib/auth/hint-cookie";
+import { normalizeUsername, passwordProblem, usernameProblem } from "@/lib/auth/identity";
 import { usernameTaken } from "@/lib/auth/lookup";
 import { safeNext } from "@/lib/auth/next-path";
-import { requestOrigin } from "@/lib/auth/origin";
 import type { SignUpField, SignUpState } from "@/lib/auth/sign-up-state";
 import { logSecurityEvent } from "@/lib/security/events";
+import { supabaseConfigured } from "@/lib/supabase";
 import { accountsConfigured, sessionClient } from "@/lib/supabase/server";
 
 /**
- * Makes an account with a password. Supabase then emails a link that lands
- * on /auth/confirm. An address that already has an account gets the same
- * "check your email" as a new one (Supabase answers both the same way), so
- * the form never says which addresses are taken. Usernames are different:
- * the person has to pick a free one, so a taken one is said plainly.
+ * Makes an account from a username and a password, then signs the person
+ * in and goes on to `next`. No email is asked for and none is sent: the
+ * server makes the Supabase user already confirmed (create-account.ts).
+ * The person has to pick a free username, so a taken one is said plainly.
  */
-export async function signUp(prev: SignUpState, form: FormData): Promise<SignUpState> {
+export async function signUp(_prev: SignUpState, form: FormData): Promise<SignUpState> {
   const next = safeNext(String(form.get("next") ?? ""));
-  const rawEmail = String(form.get("email") ?? "");
-  const rawUsername = String(form.get("username") ?? "").trim();
+  const rawUsername = String(form.get("username") ?? "").trim().slice(0, 64);
   const password = String(form.get("password") ?? "");
-  const base: SignUpState = { next, sent: null, values: { email: rawEmail, username: rawUsername }, errors: {}, error: null };
-  if (form.get("intent") === "restart") return { ...base, values: { email: "", username: "" } };
+  const confirm = String(form.get("confirm") ?? "");
+  const base: SignUpState = { next, username: rawUsername, errors: {}, error: null };
 
   const errors: Partial<Record<SignUpField, string>> = {};
-  const email = normalizeEmail(rawEmail);
-  if (!email) errors.email = "Enter your email address.";
-  const usernameIssue = rawUsername ? usernameProblem(rawUsername) : null;
+  const usernameIssue = rawUsername ? usernameProblem(rawUsername) : "Pick a username.";
   if (usernameIssue) errors.username = usernameIssue;
   const passwordIssue = passwordProblem(password);
   if (passwordIssue) errors.password = passwordIssue;
-  if (Object.keys(errors).length > 0 || !email) return { ...base, errors };
+  else {
+    const confirmIssue = newPasswordProblem(password, confirm);
+    if (confirmIssue) errors.confirm = confirmIssue;
+  }
+  const username = normalizeUsername(rawUsername);
+  if (Object.keys(errors).length > 0 || !username) return { ...base, errors };
 
-  if (!accountsConfigured()) {
-    console.error("[accounts] SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be set for sign up");
+  if (!accountsConfigured() || !supabaseConfigured()) {
+    console.error("[accounts] SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY and SUPABASE_SECRET_KEY must be set for sign up");
     return { ...base, error: "Making an account is not available right now. Try again later." };
   }
   const head = await headers();
-  if (await overLimit(head, email)) return { ...base, error: "Too many tries. Wait a few minutes and try again." };
+  if (await overLimit(head, username)) return { ...base, error: "Too many tries. Wait a few minutes and try again." };
 
-  const username = rawUsername ? normalizeUsername(rawUsername) : null;
-  if (username && (await usernameTaken(username))) return { ...base, errors: { username: "That username is taken." } };
-
-  const client = await sessionClient();
-  const { data, error } = await client.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: `${requestOrigin(head)}${next}`, data: username ? { username } : {} },
-  });
-  if (error) {
-    console.error("sign up refused", error.code ?? error.status);
-    if (error.code === "weak_password") return { ...base, errors: { password: "Pick a stronger password." } };
-    if (error.status === 429 || error.code === "over_email_send_rate_limit") {
-      return { ...base, error: "We just sent you an email. Wait a minute before trying again." };
-    }
+  let made: Created;
+  try {
+    made = (await usernameTaken(username)) ? { ok: false, reason: "taken" } : await createAccount(username, password);
+  } catch {
+    made = { ok: false, reason: "unavailable" };
+  }
+  if (!made.ok) {
+    if (made.reason === "taken") return { ...base, errors: { username: "That username is taken." } };
+    if (made.reason === "weak_password") return { ...base, errors: { password: "Pick a stronger password." } };
     return { ...base, error: "We could not make the account. Try again in a minute." };
   }
-  // For an address that already has an account, Supabase answers a made up
-  // user with no identities (so the answer does not say the address is
-  // taken). Its id is in no table, so it is logged without one.
-  const realUser = data.user && (data.user.identities?.length ?? 0) > 0 ? data.user.id : null;
-  await logSecurityEvent("sign_up", { userId: realUser, headers: head });
-  return { ...base, sent: email };
+  await logSecurityEvent("sign_up", { userId: made.userId, headers: head });
+
+  const { error } = await (await sessionClient()).auth.signInWithPassword({ email: made.email, password });
+  if (error) {
+    console.error("new account not signed in", error.code ?? error.status);
+    return { ...base, error: "Your account is ready, but signing in did not work. Sign in with it now." };
+  }
+  await markSignedIn();
+  await logSecurityEvent("sign_in", { userId: made.userId, headers: head });
+  redirect(next);
 }
