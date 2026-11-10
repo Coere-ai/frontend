@@ -60,7 +60,7 @@ export function UsersPanel() {
               <input
                 type="search"
                 aria-label="Filter accounts"
-                placeholder="Email, username or organization"
+                placeholder="Username or organization"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className={`${fieldClass} max-w-[260px]`}
