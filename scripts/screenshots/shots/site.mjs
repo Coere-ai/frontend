@@ -1,9 +1,8 @@
 // The public site's pictures, signed out, at 1440 wide (the whole page
-// when it is long) and a few at 390, plus the account pages: each step of
-// sign in, sign up, the connect page and /account.
+// when it is long) and a few at 390, plus the account pages: sign in,
+// sign up, the connect page and /account.
 
 import { MAYA } from "../seed/people.mjs";
-import { CODE } from "../fake-supabase/auth.mjs";
 
 const PRODUCTS = ["connect", "solutions", "forge", "agents"];
 const INDUSTRIES = ["finance", "technology", "commerce", "consumer", "manufacturing", "energy", "education", "legal"];
@@ -59,29 +58,17 @@ export async function shootSite(browser, base, shooter, { scale }) {
   await open(page, base, "/resources/endpoints");
   await s("resources-endpoints");
 
-  // Sign in: the email step, the code step after a code is sent, and the password step.
+  // Sign in and sign up: a username and a password, the username typed as a person mid way through.
   await open(page, base, "/sign-in");
-  await s("sign-in-email");
-  await page.getByLabel("Email", { exact: true }).fill(MAYA.email);
-  await page.getByRole("button", { name: "Email me a code" }).click();
-  // The code is one box a digit; half of it typed, as a person mid way through.
-  const boxes = page.getByRole("group", { name: "Code" }).locator("input");
-  await boxes.first().waitFor();
-  await boxes.first().click();
-  await page.keyboard.type(CODE.slice(0, 3));
-  await s("sign-in-code");
-  await open(page, base, "/sign-in");
-  await page.getByRole("button", { name: "Use a password instead" }).click();
-  await page.getByLabel("Email or username").waitFor();
-  await page.getByLabel("Email or username").fill(MAYA.username);
-  await s("sign-in-password");
+  await page.getByLabel("Username").fill(MAYA.username);
+  await s("sign-in");
   await open(page, base, "/sign-up");
+  await page.getByLabel("Username").fill("sam_rivera");
   await s("sign-up");
 
   // The connect page as the extension opens it, signed in as Maya.
   await open(page, base, "/sign-in");
-  await page.getByRole("button", { name: "Use a password instead" }).click();
-  await page.getByLabel("Email or username").fill(MAYA.email);
+  await page.getByLabel("Username").fill(MAYA.username);
   await page.getByLabel("Password").fill(MAYA.password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await page.waitForURL(/\/dashboard/, { timeout: 60_000 }).catch(() => {});

@@ -14,8 +14,7 @@ const ONBOARDING = /^chrome-extension:\/\/([a-p]{32})\/onboarding\.html/;
 export async function connectMaya(context, memoryFile, now) {
   const tab = await tabMatching(context, CONNECT);
   await tab.waitForLoadState("load");
-  await tab.getByRole("button", { name: "Use a password instead" }).click();
-  await tab.getByLabel("Email or username").fill(MAYA.email);
+  await tab.getByLabel("Username").fill(MAYA.username);
   await tab.getByLabel("Password").fill(MAYA.password);
   await tab.getByRole("button", { name: "Sign in", exact: true }).click();
   await tab.waitForURL(/\/connect\?/, { timeout: 60_000 });

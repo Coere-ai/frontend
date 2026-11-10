@@ -1,14 +1,11 @@
 // The Auth half of the fake Supabase: the GoTrue routes supabase-js calls
-// for this site (password, email code, sign up, the session's user, sign
-// out, and the admin reads), over auth.users in PGlite. Every email code
-// is CODE, so the screenshot tool can type it. Sessions are HS256 tokens
-// signed with a key made for this run; the REST half reads them back to
-// act as the person.
+// for this site (password sign in, the session's user and its password,
+// sign out, and the admin routes that make, read, change and delete a
+// user), over auth.users in PGlite. Sessions are HS256 tokens signed with
+// a key made for this run; the REST half reads them back to act as the
+// person.
 
 import { createHmac, randomBytes, randomUUID } from "node:crypto";
-
-/** The code every email "sends". */
-export const CODE = "246810";
 
 const SECRET = randomBytes(32);
 const b64 = (v) => Buffer.from(typeof v === "string" ? v : JSON.stringify(v)).toString("base64url");
@@ -90,25 +87,6 @@ export function createAuth(db, passwords) {
       }
       return fail(400, "unsupported_grant_type", "unsupported grant");
     }
-    if (method === "POST" && path === "/otp") {
-      const known = await byEmail(body?.email);
-      if (!known && body?.create_user === false) return fail(422, "otp_disabled", "Signups not allowed for otp");
-      if (!known) await db.query("insert into auth.users (email, raw_user_meta_data) values (lower($1), $2)", [body.email, JSON.stringify(body.data ?? {})]);
-      return { status: 200, body: {} };
-    }
-    if (method === "POST" && path === "/verify") {
-      if (body?.token !== CODE && !body?.token_hash) return fail(403, "otp_expired", "Token has expired or is invalid");
-      const row = await byEmail(body?.email);
-      if (!row) return fail(403, "otp_expired", "Token has expired or is invalid");
-      await db.query("update auth.users set email_confirmed_at = coalesce(email_confirmed_at, now()) where id = $1", [row.id]);
-      return { status: 200, body: session(await byId(row.id)) };
-    }
-    if (method === "POST" && path === "/signup") {
-      if (await byEmail(body?.email)) return { status: 200, body: { ...userJson(await byEmail(body.email)), identities: [] } };
-      const { rows } = await db.query("insert into auth.users (email, raw_user_meta_data) values (lower($1), $2) returning *", [body.email, JSON.stringify(body.data ?? {})]);
-      passwords.set(rows[0].email, body.password);
-      return { status: 200, body: userJson(rows[0]) };
-    }
     if (method === "GET" && path === "/user") {
       const claims = verify(bearer);
       const row = claims ? await byId(claims.sub) : null;
@@ -122,10 +100,24 @@ export function createAuth(db, passwords) {
       return { status: 200, body: userJson(row) };
     }
     if (method === "POST" && path === "/logout") return { status: 204, body: null };
+    // auth.admin.createUser, as sign up calls it: confirmed at once when email_confirm is set.
+    if (method === "POST" && path === "/admin/users") {
+      if (await byEmail(body?.email)) return fail(422, "email_exists", "A user with this email address has already been registered");
+      const confirmed = body?.email_confirm === true ? new Date().toISOString() : null;
+      const { rows } = await db.query("insert into auth.users (email, raw_user_meta_data, email_confirmed_at) values (lower($1), $2, $3) returning *", [body.email, JSON.stringify(body.user_metadata ?? {}), confirmed]);
+      if (body?.password) passwords.set(rows[0].email, body.password);
+      return { status: 200, body: userJson(rows[0]) };
+    }
     const admin = /^\/admin\/users\/([0-9a-f-]{36})$/.exec(path);
     if (admin && method === "GET") {
       const row = await byId(admin[1]);
       return row ? { status: 200, body: userJson(row) } : fail(404, "user_not_found", "User not found");
+    }
+    if (admin && method === "PUT") {
+      const row = await byId(admin[1]);
+      if (!row) return fail(404, "user_not_found", "User not found");
+      if (body?.password) passwords.set(row.email.toLowerCase(), body.password);
+      return { status: 200, body: userJson(row) };
     }
     if (admin && method === "DELETE") {
       await db.query("delete from auth.users where id = $1", [admin[1]]);

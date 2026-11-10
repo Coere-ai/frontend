@@ -4,7 +4,7 @@
 
 import { createHash, randomBytes } from "node:crypto";
 import { dayOf, insertRows, momentOf } from "./insert.mjs";
-import { accounts, FERNHILL, MAYA, OTHER_ORGS, random } from "./people.mjs";
+import { accountEmail, accounts, FERNHILL, MAYA, OTHER_ORGS, random } from "./people.mjs";
 
 const BROWSERS = ["Chrome on macOS", "Chrome on Windows", "Chrome on Linux", "Chrome on ChromeOS"];
 const COUNTRIES = ["US", "US", "US", "GB", "CA", "DE", "IN", "AU", "FR", "NL", "BR", "JP", "SE", "ES"];
@@ -18,7 +18,7 @@ export async function seedAccounts(db, passwords, now) {
     db,
     "auth.users",
     people.map((p) => ({
-      email: p.email,
+      email: accountEmail(p),
       raw_user_meta_data: { username: p.username },
       email_confirmed_at: momentOf(now, p.createdDaysAgo, { next: () => p.at }),
       created_at: momentOf(now, p.createdDaysAgo, { next: () => p.at }),
@@ -26,8 +26,9 @@ export async function seedAccounts(db, passwords, now) {
     { returning: "id, email" },
   );
   const idOf = new Map(users.map((u) => [u.email, u.id]));
-  people.forEach((p) => (p.id = idOf.get(p.email)));
-  passwords.set(MAYA.email, MAYA.password);
+  people.forEach((p) => (p.id = idOf.get(accountEmail(p))));
+  const mayaId = idOf.get(accountEmail(MAYA));
+  passwords.set(accountEmail(MAYA), MAYA.password);
 
   // Profiles: names, plans, when they were last seen and whether their first build ran.
   for (const p of people) {
@@ -58,7 +59,7 @@ export async function seedAccounts(db, passwords, now) {
     ],
   );
   // Maya's first build is still ahead of her: the dashboard imports her memory file.
-  await db.query("update public.profiles set first_build_at = null where id = $1", [idOf.get(MAYA.email)]);
+  await db.query("update public.profiles set first_build_at = null where id = $1", [mayaId]);
 
   // Organizations, each with its members and, for Fernhill, a pending invite.
   const orgSpecs = [[FERNHILL.name, FERNHILL.slug, 54], ...OTHER_ORGS.map(([name, slug]) => [name, slug, r.int(20, 50)])];
@@ -76,7 +77,7 @@ export async function seedAccounts(db, passwords, now) {
   );
   await insertRows(db, "public.org_memory", orgs.map((o) => ({ org_id: o.id })));
   const nina = people.find((p) => p.username === FERNHILL.invited[0][2]);
-  await insertRows(db, "public.org_invites", [{ org_id: orgId.get(FERNHILL.slug), user_id: nina.id, role: "member", invited_by: idOf.get(MAYA.email), created_at: momentOf(now, 2, null), expires_at: new Date(now + 5 * 86_400_000).toISOString() }]);
+  await insertRows(db, "public.org_invites", [{ org_id: orgId.get(FERNHILL.slug), user_id: nina.id, role: "member", invited_by: mayaId, created_at: momentOf(now, 2, null), expires_at: new Date(now + 5 * 86_400_000).toISOString() }]);
 
   // Browsers connected to each active account. Maya's comes from the run itself, through /connect.
   const devices = [];
@@ -101,7 +102,7 @@ export async function seedAccounts(db, passwords, now) {
   }
   const madeDevices = await insertRows(db, "public.devices", devices, { returning: "id, user_id" });
 
-  // A month of the security log: sign ins, codes, new browsers, and the odd refusal.
+  // A month of the security log: sign ins, new browsers, and the odd refusal.
   const events = [];
   const ipHash = () => createHash("sha256").update(String(r.next())).digest("hex").slice(0, 32);
   for (const p of people) {
@@ -109,7 +110,6 @@ export async function seedAccounts(db, passwords, now) {
     if (!p.active) continue;
     for (let d = Math.min(p.createdDaysAgo, 29); d >= 0; d--) {
       if (!r.chance(0.18)) continue;
-      events.push({ user_id: p.id, kind: "code_sent", country: r.pick(COUNTRIES), created_at: momentOf(now, d, r), ip_hash: ipHash() });
       events.push({ user_id: p.id, kind: "sign_in", country: r.pick(COUNTRIES), created_at: momentOf(now, d, r), ip_hash: ipHash() });
       if (r.chance(0.08)) events.push({ user_id: p.id, kind: "sign_in_failed", country: r.pick(COUNTRIES), created_at: momentOf(now, d, r), ip_hash: ipHash() });
     }
@@ -121,7 +121,7 @@ export async function seedAccounts(db, passwords, now) {
     if (r.chance(0.5)) events.push({ kind: "admin_sign_in", country: "US", created_at: momentOf(now, d, r), ip_hash: ipHash() });
   }
   for (const p of people.filter((x) => x.org && x.role === "member")) events.push({ user_id: p.id, org_id: orgId.get(p.org), kind: "org_joined", country: "US", created_at: momentOf(now, Math.min(29, p.createdDaysAgo), null) });
-  events.push({ user_id: idOf.get(MAYA.email), org_id: orgId.get(FERNHILL.slug), kind: "org_invite_sent", country: "US", created_at: momentOf(now, 2, null) });
+  events.push({ user_id: mayaId, org_id: orgId.get(FERNHILL.slug), kind: "org_invite_sent", country: "US", created_at: momentOf(now, 2, null) });
   for (const o of orgs) events.push({ org_id: o.id, kind: "org_created", country: "US", created_at: new Date(o.created_at).toISOString() });
   await insertRows(db, "public.security_events", events.filter((e) => Date.parse(e.created_at) > now - 90 * 86_400_000));
 

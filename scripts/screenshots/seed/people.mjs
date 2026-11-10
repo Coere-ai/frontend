@@ -24,6 +24,9 @@ export function random(seed) {
 /** The account the dashboard pictures are signed in as. */
 export const MAYA = { first: "Maya", last: "Collins", email: "maya@fernhillcreative.co", username: "maya_collins", password: "juniper-waterfront-26" };
 
+/** The placeholder address the site gives an account (src/lib/auth/identity.ts): the username at users.coere.ai. */
+export const accountEmail = (p) => `${p.username}@users.coere.ai`;
+
 /** Fernhill Creative, her agency: [first, last, username, role]. */
 export const FERNHILL = {
   name: "Fernhill Creative",
