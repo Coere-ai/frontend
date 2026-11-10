@@ -7,9 +7,8 @@ site side. Both repositories keep a copy of this file: here as
 `docs/accounts.md`. When one copy changes, change the other one too.
 
 This replaces the parts of coere-v2's `docs/design/hosted-service.md` that it
-names. Sign in is by email (a one time code, or the link in the same email),
-with an optional password, through Supabase Auth. It is not Google through
-Auth.js. The site is the separate Next.js repository, not an `apps/web`
+names. An account is a username and a password, through Supabase Auth, and
+coere.ai sends no email. It is not Google through Auth.js. The site is the separate Next.js repository, not an `apps/web`
 workspace in coere-v2. The extension gets its token from a coere.ai tab,
 not from `chrome.identity`.
 
@@ -65,44 +64,57 @@ security policy keeps `connect-src 'self'`.
 
 ### 3.1 Ways in
 
-1. **Email code (the main way).** The person types an email. The server
-   calls `auth.signInWithOtp({ email, options: { shouldCreateUser: true,
-   emailRedirectTo } })`. The email holds a 6 digit code and a link. The
-   person types the code; the server calls `auth.verifyOtp({ email, token,
-   type: 'email' })`. A new email makes a new account.
-2. **The link in the same email.** It goes to `/auth/confirm?token_hash=…&
-   type=email&next=…`, a route handler that only checks the link's shape
-   and redirects to `/auth/continue`. That page changes nothing when it
-   loads, because mail scanners open every link and the link's token is the
-   code's token too. Its button posts the token to a server action, which
-   calls `auth.verifyOtp({ token_hash, type })` and redirects to `next`.
-   When someone is already signed in, the page names that account first,
-   so a link another person sent cannot swap the session unseen. `next`
-   must be a path on this site: it is parsed the way a browser reads it and
-   only a same origin path is kept.
-3. **Password.** On `/sign-in`, "Use a password instead" shows email or
-   username, and password. A username is turned into its email on the
-   server with the secret key, and a wrong username gets the same answer as
-   a wrong password.
-4. **Create an account with a password.** `/sign-up` asks for email,
-   password (at least 10 characters) and an optional username. The server
-   calls `auth.signUp` with the username in `options.data.username`. The
-   person confirms by the emailed link, which also lands on `/auth/confirm`.
-5. **Later.** On `/account` a person who came in by code can set a
-   username and a password, and change either. The username is checked
-   unique on the server with the secret key and writes `username_set`. The
-   password (at least 10 characters) goes through the person's own session
-   with `auth.updateUser` and writes `password_set`. When Supabase's
-   Secure password change wants a sign in from the last day, the page says
-   so and offers an emailed code (`auth.reauthenticate`), which goes in as
-   the update's `nonce`. A typed code counts against the limits below.
+An account is a username and a password. coere.ai collects no email and
+sends none: Supabase's own sender reaches only the project team's
+addresses, a few an hour, so nothing a person does may wait on an email.
+
+1. **Create an account.** `/sign-up` asks for a username and a password
+   typed twice (at least 10 characters). The server checks the username is
+   free with the secret key, then makes the user with the secret key:
+   `auth.admin.createUser({ email: '<username>@users.coere.ai', password,
+   email_confirm: true, user_metadata: { username } })`. `email_confirm`
+   marks the placeholder address confirmed at once, so Supabase sends no
+   confirmation whatever its Confirm email setting, and the signup trigger
+   sets the profile's username and counts the sign up. The server then signs
+   the person in with `auth.signInWithPassword` through their own session
+   client and goes on to `next` or `/dashboard`.
+2. **Sign in.** `/sign-in` asks for the username and the password. The
+   server turns the username into the account's email by reading
+   `profiles` with the secret key, then calls `auth.signInWithPassword`. A
+   username nobody has and a wrong password get the same answer after the
+   same wait, so the form never says which usernames exist. `next` must be
+   a path on this site: it is parsed the way a browser reads it and only a
+   same origin path is kept.
+3. **The placeholder email.** Supabase Auth needs an email for every
+   account, so each one has `<username>@users.coere.ai`, a domain that
+   receives no mail. It is never shown: the site, the admin panel and the
+   extension show the username. An account that changes its username keeps
+   its first placeholder; when a new person then picks the old name, their
+   placeholder gets a short random suffix. If two people take one free name
+   at the same moment, the trigger gives it to the first, and the second
+   user, left without one, is deleted again and told the name is taken.
+4. **On `/account`.** The person changes their username (checked unique on
+   the server with the secret key; it writes `username_set`, and the
+   placeholder email stays as it was) and their password (through their
+   own session with `auth.updateUser`; it writes `password_set`).
+   Supabase's Secure password change must be off, since it would email a
+   code. Should Supabase still ask for a recent sign in, the page says to
+   sign in again.
+5. **A forgotten password.** There is no reset email. `/sign-in` says
+   "Forgot your password? Contact us." with the site's contact email. The
+   operator sets a new password on `/admin/users` (**Set a new password**,
+   `auth.admin.updateUserById` behind the admin guard, which writes
+   `password_set` naming the account) and tells the person, who then
+   changes it on `/account`.
 
 Usernames are 3 to 24 characters of `a-z`, `0-9` and `_`, stored lowercase,
 unique.
 
-Every sign in attempt counts against the address: 10 tries in 15 minutes,
-then a short wait. A wrong code or password waits 800 ms, like the admin
-guard. Each outcome writes a `security_events` row (section 8.9).
+Every sign in and sign up attempt counts against the network address and
+the username: 10 tries in 15 minutes each, then a short wait. A wrong
+username or password waits at least 800 ms and about 1.5 seconds in all,
+like the admin guard. Each outcome writes a `security_events` row (section
+8.9).
 
 ### 3.2 The session
 
@@ -122,14 +134,14 @@ nothing.
 
 | Path | What it is |
 |---|---|
-| `/sign-in` | Email code first, password second. A signed in person goes to `next` or `/dashboard`. |
-| `/sign-up` | Create an account with a password. |
-| `/auth/confirm` | Route handler for every emailed link. It checks the link and sends it on. |
-| `/auth/continue` | The emailed link's confirm page. Its button spends the token. |
+| `/sign-in` | A username and a password. A signed in person goes to `next` or `/dashboard`. |
+| `/sign-up` | Create an account with a username and a password. |
 | `/connect` | Hands a connect code to the extension (section 4). |
 | `/account` | The steps a device token may not take, signed in on the site (section 7): the display name, username and password, Sign out, the browsers with Revoke, the backup switches, an admin's invites, deleting the account. |
 | `/dashboard/...` | The person's dashboard (section 7). |
 | `/admin/...` | The operator's panel (section 9). It keeps its own USER and PASSWORD guard, separate from accounts. |
+
+No page handles an emailed link: there is none.
 
 Every private path is `noindex`, left out of the sitemap and disallowed in
 `robots.txt`. The site tracker does not run on them.
@@ -152,7 +164,7 @@ a device token through a coere.ai tab.
    refusal writes `connect_refused`.
 3. **Sign in if needed.** Signed out, `/connect` redirects to
    `/sign-in?next=<the whole /connect address>`.
-4. **The person confirms.** The page shows the account's email and a
+4. **The person confirms.** The page shows the account's username and a
    **Connect Coere** button. Nothing happens without the press. This stops a
    link made by someone else from connecting their extension to this
    account.
@@ -243,6 +255,9 @@ the local library and start Browser Use; it is gone.
 { v: 1, token: string, deviceId: string, userId: string,
   email: string, username: string | null, at: number }
 ```
+
+`email` is the account's placeholder address (section 3.1) and is never
+shown; pages show `username`.
 
 Only the background writes it. "Disconnect" in Settings calls
 `POST /api/v1/auth/revoke` and then removes it. `restartOnboarding` leaves
@@ -393,7 +408,7 @@ browser, then removes `coere.account`.
 
 - **Statistics**, the original section, shows in v4's rail without the
   Dev Tools switch. Benchmarks and Evals stay out.
-- **The Account card** in Settings: the email, **Manage on coere.ai** and
+- **The Account card** in Settings: the username, **Manage on coere.ai** and
   **Disconnect**, then the connected browsers with **Revoke**
   (`GET /devices`, `POST /devices/{id}/revoke`), the switches **Back up
   memory to coere.ai** and **Include sensitive memories** (read from
@@ -485,7 +500,7 @@ Any other address below `/dashboard` is a 404. The mapping is
 and `find-extension.ts` beside it.
 
 **What the Console shows from the site.** Statistics, in v4's rail
-without the Dev Tools switch. The Settings Account card: the email,
+without the Dev Tools switch. The Settings Account card: the username,
 connected browsers with **Revoke** (`/devices`), the memory backup and
 sensitive memories switches (`/account/memory`, off only), download the
 memory file and delete the memory copy (`GET` and `DELETE /memory`), and
@@ -519,7 +534,7 @@ laptop is lost:
   'user'`, one `device_revoked` event). Each asks first.
 - **Memory backup**: both switches, on and off. Turning one on writes
   `memory_backup_on`; turning the backup off writes `memory_deleted`.
-- **Organization**, for an admin: invite a coworker by email or username
+- **Organization**, for an admin: invite a coworker by username
   with a role, and **Make admin** for each member, by the same rules as
   `POST /org/{action}`.
 - **Delete account**, below.
@@ -529,7 +544,7 @@ from the last ten minutes: the newest `amr` timestamp of the session's
 verified access token (`getClaims`, `src/lib/auth/recent-sign-in.ts`).
 Older than that, the page offers **Sign in again**, which signs this
 browser out and comes back to `/account`. Then the person types their
-email. The server
+username. The server
 then removes every object under their Storage folder, revokes their
 devices, and calls `auth.admin.deleteUser`, which removes their rows
 through the foreign keys. Usage rows keep their numbers with the person
@@ -786,7 +801,7 @@ in the shape of the site's `src/lib/org/page-data.ts`:
 { org: { id, name, plan, sharedSections: string[], defaultAccess: { read: "all" | string[], contribute: boolean },
          sections: { key, name }[] } | null,
   me: { userId, role: "admin" | "member", shareMemory: boolean, access, readable: string[] } | null,
-  members: { userId, name, email: string | null, role, access: object | null, effective, shareMemory,
+  members: { userId, name, username: string | null, email: null, role, access: object | null, effective, shareMemory,
              joinedAt, tokensSaved, memoriesShared }[],
   invites: { id, name, role, createdAt, expiresAt }[],
   totals: { tokensSaved, memories, chats, members, costMicros, monthCostMicros } | null,
@@ -794,8 +809,9 @@ in the shape of the site's `src/lib/org/page-data.ts`:
 ```
 
 `sections` is every section an admin may share: the base ones, then any
-the graph or the settings name. A member's `email` and the open `invites`
-are filled for an admin only. With no organization, `org`, `me` and
+the graph or the settings name. A member's `email` is always null (kept so
+the shape holds; accounts hold no email a person gave), and the open
+`invites` are filled for an admin only. With no organization, `org`, `me` and
 `totals` are null, `members` and `invites` empty, and `myInvites` holds the
 invites waiting for the person.
 
@@ -805,7 +821,7 @@ inside their own organization. Body at most 16 KiB.
 
 | Action | Body | Who |
 |---|---|---|
-| `invite` | `{ login, role? }`, the email or username of an existing account, `role` `member` by default | refused for a device token; an admin on `/account`, at most 30 an hour |
+| `invite` | `{ login, role? }`, the username of an existing account, `role` `member` by default | refused for a device token; an admin on `/account`, at most 30 an hour |
 | `revoke-invite` | `{ inviteId }` | admin |
 | `accept`, `decline` | `{ inviteId }` | the invited person |
 | `role` | `{ userId, role }` | admin; `role: 'admin'` is refused for a device token and done on `/account` |
@@ -855,7 +871,7 @@ they now stand. A suspended account may use it too, since off removes its
 data.
 
 **`POST /api/v1/account/delete`** `{ email }` never deletes. A copied
-token could read the email from `GET /account` and type it, so after the
+token could read the account from `GET /account` and type it, so after the
 token and the body check it answers `409 refused` with `reason:
 'web_session'` and the line "To delete your account, sign in at
 coere.ai/account and delete it there." The account is deleted on
@@ -940,8 +956,8 @@ session never opens it. It keeps its own look (`stats.css`). Sections:
 |---|---|
 | `/admin` | **Statistics**: the product's running totals (section 15). Accounts, organizations, total AI cost, tokens used, tokens saved, memories, chats, context imports, transfers, storage. Each by day and in total, with the top accounts and organizations by tokens saved. |
 | `/admin/analytics` | Site analytics, as `/statistics` showed them. |
-| `/admin/users` | Accounts: email, username, plan, status, organization, created, last seen, devices, this month's cost and requests, whether the free first build is used, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals, each limit in force with its spend as the gate reads it (the first build against the allowance while it runs, then this month after the build, today when a daily limit is set, and the lifetime limit when there is one), and its knowledge graph. Actions: change plan, set the person's daily, first build, monthly and lifetime dollar limits (blank means the plan's, shown as the placeholder; a daily limit the plan does not set shows "Off (plan)"), reset the free first build, suspend or restore, revoke every device. |
-| `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. **Create an organization** (name, plan, first admin picked from existing accounts by email). Opening one shows its members with their roles, access and totals, and the organization's knowledge graph, and lets the operator change its settings, add a member or admin from existing accounts, change roles, remove members and delete it. |
+| `/admin/users` | Accounts: username, plan, status, organization, created, last seen, devices, this month's cost and requests, whether the free first build is used, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals, each limit in force with its spend as the gate reads it (the first build against the allowance while it runs, then this month after the build, today when a daily limit is set, and the lifetime limit when there is one), and its knowledge graph. Actions: change plan, set the person's daily, first build, monthly and lifetime dollar limits (blank means the plan's, shown as the placeholder; a daily limit the plan does not set shows "Off (plan)"), reset the free first build, suspend or restore, revoke every device, and set a new password for a person who forgot theirs. Every page shows the username, never the placeholder email. |
+| `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. **Create an organization** (name, plan, first admin picked from existing accounts by username). Opening one shows its members with their roles, access and totals, and the organization's knowledge graph, and lets the operator change its settings, add a member or admin from existing accounts, change roles, remove members and delete it. |
 | `/admin/interested` | **Interested** (section 16): three lists behind one switch, Developers (`developer_waitlist`), Coere Connect and Coere for Teams (`product_interest` by product). Each shows its count, the count by day, the newest entries and a CSV download; **Export all** is every list in one CSV with a product column. `/admin/waitlist` redirects to the Developers list. |
 | `/admin/launch` | **Launch countdown** (section 16): one plain block each for `/install` and `/try-teams`, with the countdown line the page shows (drawn by the page's own component), the moment in the operator's own time zone, +1 day, +1 week and 20 days from now as small text buttons, a show countdown switch, Save and one line that says whether it is saved. A moment in the past saves only after a confirm. |
 | `/admin/database` | Every table's estimated rows, size, Row Level Security on or off and policy count, and the Storage bucket totals. |
@@ -965,7 +981,7 @@ and is the only thing that writes.
 | Table | Columns | Who reads |
 |---|---|---|
 | `plans` | `id text pk, name, monthly_limit_micros bigint, lifetime_limit_micros bigint (null means none), daily_limit_micros bigint (null means none, the default), first_build_limit_micros bigint default 10000000, storage_limit_bytes bigint, requests_per_minute int, created_at`. Seeds `free` ($5 a month, 25 MiB, 60), `plus` ($20, 100 MiB, 120), `team` ($100, 500 MiB, 300), each with a $10 first build and no daily limit. | everyone signed in: `id`, `name`, `storage_limit_bytes`, `requests_per_minute` and `created_at`, never a spend limit |
-| `profiles` | `id uuid pk references auth.users on delete cascade, email, username unique, display_name, plan_id references plans default 'free', monthly_limit_micros bigint (null means the plan's), lifetime_limit_micros bigint (null means the plan's), daily_limit_micros bigint (null means the plan's), first_build_limit_micros bigint (null means the plan's), first_build_at timestamptz (the first memory_built), first_build_mark_micros bigint default 0 (`user_totals.cost_micros` when the free build began, then when it finished), status ('active'\|'suspended'), memory_sync bool default true, include_sensitive bool default false, created_at, updated_at, last_seen_at`. A trigger on `auth.users` insert makes the row. The username from the sign up data, and the count in `daily_totals.new_users`, wait for the first email confirmation, so an address nobody confirms holds no username. | the owner, every column but the four limits, `first_build_at` and `first_build_mark_micros`; may update `display_name` only, everything else through the server |
+| `profiles` | `id uuid pk references auth.users on delete cascade, email, username unique, display_name, plan_id references plans default 'free', monthly_limit_micros bigint (null means the plan's), lifetime_limit_micros bigint (null means the plan's), daily_limit_micros bigint (null means the plan's), first_build_limit_micros bigint (null means the plan's), first_build_at timestamptz (the first memory_built), first_build_mark_micros bigint default 0 (`user_totals.cost_micros` when the free build began, then when it finished), status ('active'\|'suspended'), memory_sync bool default true, include_sensitive bool default false, created_at, updated_at, last_seen_at`. `email` is the placeholder `<username>@users.coere.ai` (section 3.1), never shown. A trigger on `auth.users` insert makes the row. The username from the sign up data, and the count in `daily_totals.new_users`, wait for the email confirmation, which the server sets when it makes the account, so a user made around the site and never confirmed holds no username. | the owner, every column but the four limits, `first_build_at` and `first_build_mark_micros`; may update `display_name` only, everything else through the server |
 | `devices` | `id uuid pk, user_id references profiles cascade, name, token_hash unique, token_hint, extension_id, extension_version, created_at, last_used_at, revoked_at, revoked_reason ('signed_out'\|'user'\|'admin'\|'account')` | the owner, every column but `token_hash` |
 | `device_codes` | `code_hash pk, user_id cascade, challenge, extension_id, device_name, created_at, expires_at, used_at` | server only |
 | `usage_events` | `id bigint identity pk, user_id references profiles on delete set null, device_id references devices on delete set null, kind ('message'\|'count_tokens'\|'batch_result'\|'jev'), model, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros bigint, status smallint, duration_ms, request_id, created_at` | the owner |
@@ -1050,10 +1066,12 @@ When `prices.ts` changes, change the site's copy in the same week.
 | `USER`, `PASSWORD` | The admin guard |
 
 Supabase's own settings (the owner sets these in the Supabase dashboard,
-listed in the frontend README): email sign in on, email confirmation on,
-the Site URL and redirect URLs set to the site, the magic link email
-holding both `{{ .Token }}` and the `/auth/confirm` link, and no session
-time limit or inactivity timeout.
+listed in the frontend README and `docs/launch.md` 4.4): the Email provider
+on (it keeps the placeholder emails and runs the password sign in), Confirm
+email on or off (the server confirms each account itself; on is safer),
+Secure password change off, every other provider off, the Site URL set to
+the site, and no session time limit or inactivity timeout. No sender, SMTP
+or email template is set up.
 
 ## 13. What coere.ai sees
 
@@ -1106,12 +1124,11 @@ about organizations, in this file and in any builder's brief.
   memory goes into it. Admins always read everything.
 - **A person is in at most one organization.**
 - **Invites go only to existing accounts.** An admin invites a coworker by
-  the email or username of their Coere account, with a role. With no such
-  account, the site says the coworker must first make a Coere account (and
-  gives the sign up link to send them); nothing is stored and no email is
-  sent. A coworker already in an organization cannot be invited. The
-  invited person sees the invite on `/dashboard/organization` and accepts or
-  declines it. Invites expire after 7 days, and admins can see and revoke
+  the username of their Coere account, with a role. With no such account,
+  the site says the coworker must first make a Coere account (and gives the
+  sign up link to send them); nothing is stored and nothing is emailed. A
+  coworker already in an organization cannot be invited. The invited person
+  sees the invite on `/dashboard/organization` and accepts or declines it. Invites expire after 7 days, and admins can see and revoke
   pending ones.
 
 ### 14.2 The shared knowledge graph
