@@ -53,7 +53,7 @@ export const privacySections: PrivacySection[] = [
     id: "browser",
     title: "What stays in your browser",
     paragraphs: [
-      "Your saved chats and the library they make, the full text of every chat, your drafts, your chats with Cori and your memory itself are kept in your browser's storage on your computer. The extension also keeps your coere.ai sign in there: a device token and your username.",
+      "Your saved chats and the library they make, the full text of every chat, your drafts, your chats with Cori and your memory itself are kept in your browser's storage on your computer. The extension also keeps your coere.ai sign in there: a device token, your username and your account's made up address at users.coere.ai (below).",
       "coere.ai never stores your chats. The parts of them that Coere sends to build your memory pass through coere.ai on their way to Anthropic, as the next section says.",
     ],
   },
