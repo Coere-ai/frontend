@@ -96,25 +96,44 @@ addresses, a few an hour, so nothing a person does may wait on an email.
 4. **On `/account`.** The person changes their username (checked unique on
    the server with the secret key; it writes `username_set`, and the
    placeholder email stays as it was) and their password (through their
-   own session with `auth.updateUser`; it writes `password_set`).
+   own session with `auth.updateUser`; it writes `password_set`). Each
+   asks for the current password first: a session lives 400 days and
+   there is no email to win an account back with, so a browser left signed
+   in must not be enough to lock the owner out. The server checks it with
+   `auth.signInWithPassword` on a throwaway client that keeps its session
+   in memory and signs it out again, so the browser's own session is not
+   touched, and the check counts against the sign in limits below.
    Supabase's Secure password change must be off, since it would email a
    code. Should Supabase still ask for a recent sign in, the page says to
    sign in again.
-5. **A forgotten password.** There is no reset email. `/sign-in` says
-   "Forgot your password? Contact us." with the site's contact email. The
-   operator sets a new password on `/admin/users` (**Set a new password**,
-   `auth.admin.updateUserById` behind the admin guard, which writes
-   `password_set` naming the account) and tells the person, who then
-   changes it on `/account`.
+5. **A forgotten password or username.** There is no reset email.
+   `/sign-in` says "Forgot your password? Contact us." with the site's
+   contact email. The operator sets a new password on `/admin/users`
+   (**Set a new password**, `auth.admin.updateUserById` behind the admin
+   guard, which writes `admin_set_password` naming the account, so the log
+   tells it from the person's own `password_set`) and tells the person,
+   who then changes it on `/account`. Supabase signs the account's web
+   sessions out; its Coere browsers stay connected, so after a takeover the
+   operator also uses **Revoke every device**. **Set the username** works
+   the same way and writes `admin_set_username`; it also gives a username
+   to an account that has none, which cannot sign in until it has one.
 
 Usernames are 3 to 24 characters of `a-z`, `0-9` and `_`, stored lowercase,
 unique.
 
-Every sign in and sign up attempt counts against the network address and
-the username: 10 tries in 15 minutes each, then a short wait. A wrong
-username or password waits at least 800 ms and about 1.5 seconds in all,
-like the admin guard. Each outcome writes a `security_events` row (section
-8.9).
+Every sign in, sign up and current password check counts against the
+network address and the username: 10 tries in 15 minutes for each
+address, and 50 for each username. A try from an address past its own 10
+is refused there and does not count against the username, so one machine
+cannot lock anyone out; many machines aimed at one account get 50 guesses
+in 15 minutes. The trade-off: usernames are public to an organization's
+members, so someone with five or more addresses can still keep one
+username locked while they keep trying. A wrong username or password waits
+at least 800 ms and about 1.5 seconds in all, like the admin guard.
+Supabase's own refusals (its shared sign in limit, an outage) read the same
+to the person, so the form never says which usernames exist, and the
+server logs their code. Each outcome writes a `security_events` row
+(section 8.9).
 
 ### 3.2 The session
 
@@ -257,7 +276,9 @@ the local library and start Browser Use; it is gone.
 ```
 
 `email` is the account's placeholder address (section 3.1) and is never
-shown; pages show `username`.
+shown; pages show `username`. A rename on coere.ai reaches the record the
+next time the background reads `GET /api/v1/account` for the Account card:
+when `user.username` differs, it writes the new one back.
 
 Only the background writes it. "Disconnect" in Settings calls
 `POST /api/v1/auth/revoke` and then removes it. `restartOnboarding` leaves
@@ -525,8 +546,8 @@ laptop is lost:
 
 - **Profile**: the display name the organization sees (at most 80
   characters; an empty box clears it), and the username, set or changed
-  by the rules of 3.1. Each saves on its own.
-- **Password**: set or change it, by 3.1.
+  by the rules of 3.1, after the current password. Each saves on its own.
+- **Password**: change it after the current one, by 3.1.
 - **Sign out**: signs coere.ai out in this browser and clears the
   `coere_signed_in` hint. Coere stays connected there.
 - **Browsers**: every connected browser with **Revoke**, and **Sign out
@@ -956,7 +977,7 @@ session never opens it. It keeps its own look (`stats.css`). Sections:
 |---|---|
 | `/admin` | **Statistics**: the product's running totals (section 15). Accounts, organizations, total AI cost, tokens used, tokens saved, memories, chats, context imports, transfers, storage. Each by day and in total, with the top accounts and organizations by tokens saved. |
 | `/admin/analytics` | Site analytics, as `/statistics` showed them. |
-| `/admin/users` | Accounts: username, plan, status, organization, created, last seen, devices, this month's cost and requests, whether the free first build is used, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals, each limit in force with its spend as the gate reads it (the first build against the allowance while it runs, then this month after the build, today when a daily limit is set, and the lifetime limit when there is one), and its knowledge graph. Actions: change plan, set the person's daily, first build, monthly and lifetime dollar limits (blank means the plan's, shown as the placeholder; a daily limit the plan does not set shows "Off (plan)"), reset the free first build, suspend or restore, revoke every device, and set a new password for a person who forgot theirs. Every page shows the username, never the placeholder email. |
+| `/admin/users` | Accounts: username, plan, status, organization, created, last seen, devices, this month's cost and requests, whether the free first build is used, tokens saved, memory file size. Sign ups by day. Opening an account shows its totals, each limit in force with its spend as the gate reads it (the first build against the allowance while it runs, then this month after the build, today when a daily limit is set, and the lifetime limit when there is one), and its knowledge graph. Actions: change plan, set the person's daily, first build, monthly and lifetime dollar limits (blank means the plan's, shown as the placeholder; a daily limit the plan does not set shows "Off (plan)"), reset the free first build, suspend or restore, revoke every device, and set a new password or username for a person who forgot theirs (each writes its own `admin_set_` event naming the account). Every page shows the username, never the placeholder email. |
 | `/admin/organizations` | Every organization: name, members, plan, tokens saved, memories, chats, cost. **Create an organization** (name, plan, first admin picked from existing accounts by username). Opening one shows its members with their roles, access and totals, and the organization's knowledge graph, and lets the operator change its settings, add a member or admin from existing accounts, change roles, remove members and delete it. |
 | `/admin/interested` | **Interested** (section 16): three lists behind one switch, Developers (`developer_waitlist`), Coere Connect and Coere for Teams (`product_interest` by product). Each shows its count, the count by day, the newest entries and a CSV download; **Export all** is every list in one CSV with a product column. `/admin/waitlist` redirects to the Developers list. |
 | `/admin/launch` | **Launch countdown** (section 16): one plain block each for `/install` and `/try-teams`, with the countdown line the page shows (drawn by the page's own component), the moment in the operator's own time zone, +1 day, +1 week and 20 days from now as small text buttons, a show countdown switch, Save and one line that says whether it is saved. A moment in the past saves only after a confirm. |
@@ -993,7 +1014,7 @@ and is the only thing that writes.
 | `memory_files` | `user_id pk cascade, object_path, index_path, bytes, index_bytes, digest, format_version, generator_version, memories, entities, links, chats, documents, sections, includes_quotes, includes_sensitive, device_id set null, uploaded_at` | the owner |
 | `user_settings` | `user_id pk cascade, settings jsonb (object, at most 64 KiB), version bigint, updated_at, updated_by ('site'\|'extension')` | the owner |
 | `app_events` | `id bigint identity pk, user_id set null, device_id set null, kind (section 6.7), count, created_at` | server only |
-| `security_events` | `id bigint identity pk, user_id set null, org_id set null, kind, ip_hash, country, created_at`. Kinds: `sign_in`, `sign_in_failed`, `code_sent`, `sign_up`, `password_set`, `username_set`, `sign_out`, `device_connected`, `device_revoked`, `token_rejected`, `rate_limited`, `usage_limited`, `connect_refused`, `memory_deleted`, `memory_backup_on`, `account_deleted`, `org_created`, `org_deleted`, `org_invite_sent`, `org_joined`, `org_left`, `org_member_removed`, `admin_sign_in`, `admin_sign_in_failed`, `admin_viewed_memory` | server only |
+| `security_events` | `id bigint identity pk, user_id set null, org_id set null, kind, ip_hash, country, created_at`. Kinds: `sign_in`, `sign_in_failed`, `code_sent`, `sign_up`, `password_set`, `username_set`, `sign_out`, `device_connected`, `device_revoked`, `token_rejected`, `rate_limited`, `usage_limited`, `connect_refused`, `memory_deleted`, `memory_backup_on`, `account_deleted`, `org_created`, `org_deleted`, `org_invite_sent`, `org_joined`, `org_left`, `org_member_removed`, `admin_sign_in`, `admin_sign_in_failed`, `admin_viewed_memory`, `admin_set_password`, `admin_set_username` | server only |
 | `organizations` | `id uuid pk, name (1 to 80), slug unique, plan_id references plans default 'team', shared_sections text[] default '{work}', default_access jsonb default '{"read":"all","contribute":true}', created_at, updated_at`. Made only by the Coere operator in the admin panel. | its members |
 | `org_members` | `org_id cascade, user_id references profiles cascade unique, role ('admin'\|'member'), access jsonb (null means the organization's default_access), share_memory bool default true, added_by ('operator'\|'invite'), joined_at, pk (org_id, user_id)`. A person is in at most one organization. | members of the same organization |
 | `org_invites` | `id uuid pk, org_id cascade, user_id references profiles cascade (the invited account; it must exist), role ('admin'\|'member'), invited_by set null, created_at, expires_at (7 days), accepted_at, declined_at, revoked_at` | the organization's admins, and the invited person |
@@ -1066,12 +1087,17 @@ When `prices.ts` changes, change the site's copy in the same week.
 | `USER`, `PASSWORD` | The admin guard |
 
 Supabase's own settings (the owner sets these in the Supabase dashboard,
-listed in the frontend README and `docs/launch.md` 4.4): the Email provider
-on (it keeps the placeholder emails and runs the password sign in), Confirm
-email on or off (the server confirms each account itself; on is safer),
-Secure password change off, every other provider off, the Site URL set to
-the site, and no session time limit or inactivity timeout. No sender, SMTP
-or email template is set up.
+listed in the frontend README and `docs/launch.md` 4.4): Allow new users to
+sign up off (the server makes every account with the secret key, which the
+switch does not stop, so nobody can make one straight through Supabase),
+the Email provider on (it keeps the placeholder emails and runs the
+password sign in), Confirm email on or off (the server confirms each
+account itself), Secure password change off, every other provider off,
+every security notification email off, the Site URL set to the site, and
+no session time limit or inactivity timeout. No sender, SMTP or email
+template is set up. DNS publishes a null MX for `users.coere.ai`
+(`users.coere.ai. MX 0 .`), so the placeholder domain accepts no mail even
+behind a registrar's catch-all.
 
 ## 13. What coere.ai sees
 

@@ -283,7 +283,12 @@ this section is what the owner sets up by hand.
   confirmation. The address is never shown; every page shows the username.
   Sign in turns the username back into that address through `profiles`.
 - A forgotten password has no reset email. The person writes to the
-  contact email, and the operator sets a new one on `/admin/users`.
+  contact email, and the operator sets a new one (or a new username) on
+  `/admin/users`, which logs `admin_set_password` (or
+  `admin_set_username`) for that account.
+- Changing the username or the password on `/account` asks for the
+  current password, since a session lasts 400 days and there is no email
+  to win an account back with.
 
 - Every Supabase call runs on the server. The browser never talks to
   Supabase, so the content security policy keeps `connect-src 'self'`.
@@ -295,9 +300,11 @@ this section is what the owner sets up by hand.
 - The session cookies are httpOnly and last 400 days. A second cookie,
   `coere_signed_in=1`, is readable by scripts so the navbar can say
   Dashboard instead of Sign in; it grants nothing.
-- Sign in and sign up allow 10 tries in 15 minutes per network address and
-  per username. A wrong username and a wrong password get the same answer
-  after the same wait, so the form never says which usernames exist.
+- Sign in, sign up and the current password check allow 10 tries in 15
+  minutes per network address and 50 per username, counted only from
+  addresses within their own 10, so one machine cannot lock a username
+  out. A wrong username and a wrong password get the same answer after the
+  same wait, so the form never says which usernames exist.
 - `/connect` is the page the extension opens to get its device token.
 - `/sign-in`, `/sign-up` and `/connect` share one frame,
   `src/site/account/auth-shell.tsx`: the form alone on the white page.
@@ -336,7 +343,8 @@ copied here.
 - `/account` holds what a device token may never do, since a token copied
   out of a browser must not be able to: change the username or password,
   revoke any browser or all of them, turn the memory backup on, invite
-  someone or make an admin, and delete the account after a sign in from
+  someone or make an admin (the username and password only with the
+  current password typed again), and delete the account after a sign in from
   the last ten minutes and the username typed out. It also sets the display name and signs the site
   out. It needs no Coere, so it works from a phone.
 
@@ -356,12 +364,14 @@ below.
 
 `docs/launch.md` section 4.4 has the steps. In short:
 
+- **Authentication, Sign In / Providers, Allow new users to sign up**:
+  off. The server makes every account with the secret key, which this
+  switch does not stop; off, nobody can make one straight through Supabase
+  around the site's username rules and limits.
 - **Authentication, Sign In / Providers, Email**: on, since Supabase keeps
   the placeholder email for each account and password sign in runs through
-  it. **Confirm email** may be on or off, since the server confirms each
-  account when it makes it; on is safer, as an account made straight
-  through Supabase around the site then never signs in. **Minimum password
-  length** 10.
+  it. **Confirm email** may then be on or off, since the server confirms
+  each account when it makes it. **Minimum password length** 10.
 - **Authentication, Sign In / Providers, Email, Secure password change**:
   off. On, Supabase would email a code before a password change, and
   coere.ai sends no email; `/account` then says to sign in again.
@@ -374,6 +384,10 @@ below.
 - **Authentication, Rate Limits**: every sign in reaches Supabase from the
   site's servers, so raise **Rate limit for sign ups and sign ins**. No
   SMTP, sender or email template is needed.
+- **Authentication, Emails**: leave every security notification email off;
+  each would go to a placeholder address.
+- **DNS**: publish a null MX for `users.coere.ai` (`users.coere.ai. MX 0 .`)
+  so nothing ever accepts mail for a placeholder.
 
 ## API for the extension
 

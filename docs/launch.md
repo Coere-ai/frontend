@@ -61,11 +61,21 @@ the project team's addresses, a few an hour, so nothing may depend on it.
 
 Supabase Auth still needs an email for every account. The server gives each
 one a placeholder, `<username>@users.coere.ai`, marks it confirmed when it
-makes the account, and never shows it. No mail is ever sent to it.
+makes the account, and never shows it. No mail is ever sent to it, and a
+null MX record (section 4.4 step 7) makes sure nothing would accept any.
 
 A person who forgets their password writes to the site's contact email
 (`/sign-in` says so). You then set a new one on `/admin/users`, the account,
-**Set a new password**, and tell them; they change it on `/account`.
+**Set a new password**, and tell them; they change it on `/account`. A
+person who forgot their username gets one the same way, with **Set the
+username**. If they asked because someone else got into the account, also
+press **Revoke every device**: the new password signs the account out on
+coere.ai, but its Coere browsers stay connected until revoked.
+
+An account made before usernames, with an emailed code, has no username
+and no password, so it cannot sign in or be deleted by its owner. If
+`/admin/users` shows one with no username, give it one with **Set the
+username** and a password with **Set a new password**, and tell the person.
 
 ## 4. Supabase
 
@@ -91,7 +101,7 @@ A person who forgets their password writes to the site's contact email
    - **Storage** shows a private bucket named `memory`.
 5. If it fails, copy the error message (not the SQL) and send it to the
    developer. `npm run db:check` runs the same file locally on PGlite with
-   304 checks, so a failure on Supabase would be a Supabase difference.
+   332 checks, so a failure on Supabase would be a Supabase difference.
 
 This one file is every migration there is: site analytics, accounts, devices,
 usage and limits, the memory backup, settings sync, organizations, running
@@ -114,32 +124,47 @@ The secret key can read and change everything. Only Vercel may hold it.
 
 Everything here is under **Authentication** in the left menu.
 
-1. **Sign In / Providers**, then **Email**:
+1. **Sign In / Providers**, then **User Signups**: turn **Allow new users
+   to sign up** off. The server makes every account with the secret key
+   (`auth.admin.createUser`), which this switch does not stop. Off, nobody
+   holding the project URL and the publishable key can make an account
+   straight through Supabase, around the site's username rules and limits.
+   Save.
+2. **Sign In / Providers**, then **Email**:
    - **Enable Email provider**: on. Supabase keeps a placeholder email for
      each account, and the password sign in runs through this provider.
    - **Confirm email**: on or off, the site works either way: the server
      confirms each account when it makes it, so Supabase never sends a
-     confirmation. Leave it on. Then an account someone makes straight
-     through Supabase with the public key, around the site's username
-     rules, stays unconfirmed and can never sign in.
+     confirmation, and with step 1 off no other way in makes an account.
    - **Secure password change**: off. On, Supabase would email a code before
      a password change on `/account`, and coere.ai sends no email. If it is
      left on, the page says to sign in again instead.
    - **Minimum password length**: `10`.
    - Save.
-2. **Sign In / Providers**: leave every other provider off (no Google,
+3. **Sign In / Providers**: leave every other provider off (no Google,
    GitHub, phone, magic link or anonymous sign in).
-3. **URL Configuration**:
+4. **URL Configuration**:
    - **Site URL**: `https://www.coere.ai`
    - **Redirect URLs**: none are needed, since no email carries a link.
-4. **Sessions**: leave **Time-box user sessions** and **Inactivity timeout**
+5. **Sessions**: leave **Time-box user sessions** and **Inactivity timeout**
    off (the default), so people stay signed in until they sign out.
-5. **Rate Limits**: every sign in reaches Supabase from the site's servers,
+6. **Rate Limits**: every sign in reaches Supabase from the site's servers,
    not from the person's address, so raise **Rate limit for sign ups and
    sign ins** well above the default (for example 300 in 5 minutes). The
-   site keeps its own limit of 10 tries in 15 minutes for each address and
-   each username. The email rate limit does not matter, since nothing is
-   sent.
+   site keeps its own limits: 10 tries in 15 minutes for each address and
+   50 for each username. The email rate limit does not matter, since
+   nothing is sent.
+7. **Emails**: leave every security notification email (password changed,
+   email changed and the rest) off; each would go to a placeholder. Then,
+   at the registrar that runs `coere.ai`'s DNS, add a null MX record for
+   the placeholder domain, so no catch-all or wildcard ever accepts mail
+   for it:
+
+   | Type | Name | Value | Priority |
+   | --- | --- | --- | --- |
+   | MX | `users` | `.` | `0` |
+
+   Check it with `dig MX users.coere.ai`, which should answer `0 .`.
 
 ### 4.5 Storage
 
@@ -295,8 +320,8 @@ cut off.
    admin, check its section in the dashboard, then delete it.
 8. Make a second test account at `/sign-up`. On `/admin/users`, open it and
    use **Set a new password**, then sign in with the new password, to prove
-   the forgotten password path works. On `/account`, change its password,
-   sign in again within ten minutes, type its username and delete it, to
+   the forgotten password path works. On `/account`, change its password
+   (it asks for the current one first), sign in again within ten minutes, type its username and delete it, to
    prove deletion works on real Supabase.
 
 ## 10. Limits, countdown and launch
@@ -316,9 +341,9 @@ cut off.
 
 | What you see | Most likely cause | Fix |
 | --- | --- | --- |
-| "Too many tries" on sign in for everyone at once | Supabase's sign in rate limit, shared by the site's servers | Section 4.4 step 5 |
-| Sign up says the account could not be made | `SUPABASE_SECRET_KEY` missing, or the Email provider off | Section 4.4 step 1 and 7.2 |
-| Changing a password on `/account` says to sign in again | Secure password change is on | Section 4.4 step 1 |
+| Sign in says the username or password is wrong for everyone at once, and the server log shows `sign in refused over_request_rate_limit` | Supabase's sign in rate limit, shared by the site's servers | Section 4.4 step 6 |
+| Sign up says the account could not be made | `SUPABASE_SECRET_KEY` missing, or the Email provider off | Section 4.4 step 2 and 7.2 |
+| Changing a password on `/account` says to sign in again | Secure password change is on | Section 4.4 step 2 |
 | Someone forgot their password | there is no reset email | Section 3: set a new one on `/admin/users` |
 | `/admin` never accepts the password | `USER` or `PASSWORD` missing, or not redeployed | Section 7.2, then redeploy |
 | `/admin` says storage is not configured | `SUPABASE_URL` or `SUPABASE_SECRET_KEY` missing | Section 7.2 |
