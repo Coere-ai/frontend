@@ -5,16 +5,17 @@ import { headers } from "next/headers";
 import { adminAction, check, done, refused, type AdminResult } from "@/lib/admin/action";
 import { isUuid } from "@/lib/admin/http";
 import { LIMIT_COLUMNS, LIMIT_KINDS, readAccountLimits } from "@/lib/admin/limit-input";
-import { passwordProblem } from "@/lib/auth/identity";
+import { setUsername as writeUsername } from "@/lib/account/username";
+import { normalizeUsername, passwordProblem, usernameProblem } from "@/lib/auth/identity";
 import { logSecurityEvent } from "@/lib/security/events";
 import { supabase } from "@/lib/supabase";
 
 /**
  * What the operator changes on an account: its plan, its own dollar
  * limits (daily, first build, monthly and lifetime), its free first build,
- * suspend or restore, revoking every device, and a new password for a
- * person who forgot theirs. Each re-checks the admin
- * session and writes only the one account it names.
+ * suspend or restore, revoking every device, and a new password or
+ * username for a person who forgot theirs or has none. Each re-checks the
+ * admin session and writes only the one account it names.
  */
 
 const NO_ACCOUNT = "That account is gone. Reload the page.";
@@ -91,7 +92,10 @@ export async function revokeAllDevices(userId: string): Promise<AdminResult> {
  * Sets a new password for a person who forgot theirs and asked through the
  * contact email: coere.ai sends no reset email. The operator tells the
  * person the password some other way, and the person changes it on
- * /account. Written with the secret key; the event names the account.
+ * /account. Written with the secret key. Supabase signs every web session
+ * of the account out; the account's Coere browsers stay connected until
+ * Revoke every device. The event, `admin_set_password`, names the account
+ * and tells the operator's reset from the person's own change.
  */
 export async function setPassword(userId: string, form: FormData): Promise<AdminResult> {
   return adminAction("setPassword", async () => {
@@ -103,7 +107,27 @@ export async function setPassword(userId: string, form: FormData): Promise<Admin
     if (error?.status === 404 || error?.code === "user_not_found") return refused(NO_ACCOUNT);
     if (error?.code === "weak_password") return refused("Pick a stronger password.");
     check(error, "auth password update");
-    await logSecurityEvent("password_set", { userId, headers: await headers() });
-    return done("Password set. Tell the person, and ask them to change it on their account page.");
+    await logSecurityEvent("admin_set_password", { userId, headers: await headers() });
+    return done("Password set. Tell the person, and ask them to change it on their account page. If someone else had the account, revoke every device too.");
+  });
+}
+
+/**
+ * Sets the username of an account, for one that has none (made before
+ * accounts had usernames) or a person who forgot theirs. Unique, like the
+ * person's own change on /account; the placeholder email stays as it was.
+ * The event is `admin_set_username`, naming the account.
+ */
+export async function setUsername(userId: string, form: FormData): Promise<AdminResult> {
+  return adminAction("setUsername", async () => {
+    if (!isUuid(userId)) return refused(NO_ACCOUNT);
+    const raw = String(form.get("username") ?? "").slice(0, 64);
+    const name = normalizeUsername(raw);
+    if (!name) return refused(usernameProblem(raw) ?? "Use only letters, numbers and underscores.");
+    const result = await writeUsername(userId, name);
+    if (result === "taken") return refused("That username is taken.");
+    if (result === "unchanged") return done(`${name} is already this account's username.`);
+    await logSecurityEvent("admin_set_username", { userId, headers: await headers() });
+    return done(`Username set to ${name}. Tell the person to sign in with it.`);
   });
 }

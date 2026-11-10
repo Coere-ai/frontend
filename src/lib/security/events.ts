@@ -40,7 +40,9 @@ export type SecurityKind =
   | "org_member_removed"
   | "admin_sign_in"
   | "admin_sign_in_failed"
-  | "admin_viewed_memory";
+  | "admin_viewed_memory"
+  | "admin_set_password"
+  | "admin_set_username";
 
 /** The caller's address as the platform reports it. */
 export function addressOf(headers: Headers): string | null {

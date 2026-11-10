@@ -1,6 +1,6 @@
 "use client";
 
-import { revokeAllDevices, setLimits, setPassword, setPlan, setStatus } from "@/app/admin/users/actions";
+import { revokeAllDevices, setLimits, setPassword, setPlan, setStatus, setUsername } from "@/app/admin/users/actions";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/auth/identity";
 import { dollarField } from "@/lib/admin/money";
 import { fieldName, LIMIT_KINDS, type LimitKind } from "@/lib/admin/limit-input";
@@ -101,6 +101,26 @@ export function AccountActions({ data, reload }: { data: UserDetailPayload; relo
           </form>
           <p className="mt-3 text-[12px] text-[color:var(--color-ink)]">
             For a person who forgot theirs and wrote to the contact email. Nothing is emailed: tell them the password yourself, then they change it on their account page.
+            It signs the account out on coere.ai, but its Coere browsers stay connected: if someone else had the account, also use Revoke every device.
+          </p>
+        </Card>
+        <Card title="Set the username">
+          <form
+            action={(fd) => {
+              if (window.confirm(`Set the username of ${user.username ?? "this account"}? The old one stops working for sign in.`)) run(() => setUsername(user.id, fd));
+            }}
+            className="flex items-end gap-2"
+          >
+            <div className="flex-1">
+              <Label htmlFor="new-username">Username</Label>
+              <input id="new-username" name="username" type="text" autoComplete="off" autoCapitalize="none" spellCheck={false} maxLength={24} defaultValue={user.username ?? ""} placeholder="3 to 24 letters, numbers or underscores" className={fieldClass} style={fieldStyle} />
+            </div>
+            <Button strong disabled={pending}>
+              Set username
+            </Button>
+          </form>
+          <p className="mt-3 text-[12px] text-[color:var(--color-ink)]">
+            {user.username ? "For a person who forgot theirs." : "This account has no username, so it cannot sign in until it has one."} Then set a new password above and tell them both.
           </p>
         </Card>
       </div>

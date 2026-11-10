@@ -753,11 +753,13 @@ create table if not exists public.security_events (
     'sign_out', 'device_connected', 'device_revoked', 'token_rejected', 'rate_limited',
     'usage_limited', 'connect_refused', 'memory_deleted', 'account_deleted', 'org_created',
     'org_deleted', 'org_invite_sent', 'org_joined', 'org_left', 'org_member_removed',
-    'admin_sign_in', 'admin_sign_in_failed', 'admin_viewed_memory', 'memory_backup_on'))
+    'admin_sign_in', 'admin_sign_in_failed', 'admin_viewed_memory', 'memory_backup_on',
+    'admin_set_password', 'admin_set_username'))
 );
 
--- memory_backup_on came later, so a project that already has the table
--- takes the wider list here. On a fresh project this changes nothing.
+-- memory_backup_on, admin_set_password and admin_set_username came later, so
+-- a project that already has the table takes the wider list here. On a fresh
+-- project this changes nothing.
 alter table public.security_events
   drop constraint if exists security_events_kind_known,
   add constraint security_events_kind_known check (kind in (
@@ -765,7 +767,8 @@ alter table public.security_events
     'sign_out', 'device_connected', 'device_revoked', 'token_rejected', 'rate_limited',
     'usage_limited', 'connect_refused', 'memory_deleted', 'account_deleted', 'org_created',
     'org_deleted', 'org_invite_sent', 'org_joined', 'org_left', 'org_member_removed',
-    'admin_sign_in', 'admin_sign_in_failed', 'admin_viewed_memory', 'memory_backup_on'));
+    'admin_sign_in', 'admin_sign_in_failed', 'admin_viewed_memory', 'memory_backup_on',
+    'admin_set_password', 'admin_set_username'));
 
 create index if not exists security_events_created_idx on public.security_events (created_at desc, kind);
 create index if not exists security_events_user_idx    on public.security_events (user_id, created_at desc);

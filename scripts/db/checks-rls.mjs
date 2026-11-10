@@ -3,6 +3,9 @@
 // on the rows the other checks made. A is the organization's admin, B a
 // member once demoted below, C in no organization with one invite.
 
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+
 import { A, B, C } from "./checks-accounts.mjs";
 import { as, check, equal, one, refused, rows } from "./harness.mjs";
 
@@ -80,8 +83,21 @@ export async function checkStorage(db) {
   equal("A's own delete works", await one(db, "A object", "select count(*)::int from storage.objects where name = $1", [`${A}/index.json`]), 0);
 }
 
+/** Every kind the server can log, read from the SecurityKind type in src/lib/security/events.ts. */
+async function loggedKinds() {
+  const source = await readFile(fileURLToPath(new URL("../../src/lib/security/events.ts", import.meta.url)), "utf8");
+  const type = source.match(/export type SecurityKind =([^;]+);/)?.[1] ?? "";
+  return [...type.matchAll(/"([a-z_]+)"/g)].map((m) => m[1]);
+}
+
 export async function checkServerWrites(db) {
+  const kinds = await loggedKinds();
+  check("the server's security kinds are read", kinds.length > 20, `${kinds.length} kinds`);
   await as(db, "service_role", null, async () => {
+    for (const kind of kinds) {
+      const name = `security kind ${kind} is allowed`;
+      if ((await rows(db, name, "insert into public.security_events (kind) values ($1)", [kind])) !== null) check(name, true);
+    }
     const insert = "insert into public.developer_waitlist (email, source) values ($1, 'site') on conflict (email) do nothing";
     await rows(db, "waitlist insert", insert, ["dev@example.com"]);
     await rows(db, "waitlist repeat", insert, ["dev@example.com"]);
