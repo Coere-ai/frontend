@@ -72,9 +72,9 @@ pictures: [the site](docs/screenshots/site/README.md),
       <sub>Every Install button leads to the countdown until the extension is in the Chrome Web Store.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/sign-in-code.webp" alt="The sign in code step for maya@fernhillcreative.co, plain on the white page" />
+      <img src="docs/screenshots/site/sign-in.webp" alt="Sign in to Coere with a username and a password, maya_collins typed, plain on the white page" />
       <br />
-      <sub>Sign in with a code by email, or with a password.</sub>
+      <sub>Sign in with a username and a password. No email is asked for.</sub>
     </td>
   </tr>
 </table>
@@ -272,22 +272,32 @@ they are not customers.
 
 ## Accounts
 
-People sign in at `/sign-in` with a code emailed to them, or with a password,
-through Supabase Auth. `docs/accounts.md` is the contract for all of it; this
-section is what the owner sets up by hand.
+People make an account at `/sign-up` with a username and a password and
+sign in with them at `/sign-in`, through Supabase Auth. coere.ai collects
+no email and sends none. `docs/accounts.md` is the contract for all of it;
+this section is what the owner sets up by hand.
+
+- The server makes each account with the secret key
+  (`auth.admin.createUser`), at a placeholder address,
+  `<username>@users.coere.ai`, already confirmed, so Supabase never sends a
+  confirmation. The address is never shown; every page shows the username.
+  Sign in turns the username back into that address through `profiles`.
+- A forgotten password has no reset email. The person writes to the
+  contact email, and the operator sets a new one on `/admin/users`.
 
 - Every Supabase call runs on the server. The browser never talks to
   Supabase, so the content security policy keeps `connect-src 'self'`.
 - `src/proxy.ts` refreshes the session on the private paths only (`/sign-in`,
-  `/sign-up`, `/auth/*`, `/connect`, `/account` and `/dashboard/*`), and
+  `/sign-up`, `/connect`, `/account` and `/dashboard/*`), and
   gives them the nonce policy and noindex. Public pages stay static, and
   `next.config.ts` gives them `frame-src 'self'; frame-ancestors 'self'`
   so none of them can frame the Console.
 - The session cookies are httpOnly and last 400 days. A second cookie,
   `coere_signed_in=1`, is readable by scripts so the navbar can say
   Dashboard instead of Sign in; it grants nothing.
-- Each sign in path allows 10 tries in 15 minutes per network address and
-  per email, and a wrong code or password waits before it answers.
+- Sign in and sign up allow 10 tries in 15 minutes per network address and
+  per username. A wrong username and a wrong password get the same answer
+  after the same wait, so the form never says which usernames exist.
 - `/connect` is the page the extension opens to get its device token.
 - `/sign-in`, `/sign-up` and `/connect` share one frame,
   `src/site/account/auth-shell.tsx`: the form alone on the white page.
@@ -320,14 +330,14 @@ copied here.
   comes from the API below, called by the extension's background with the
   device token. Pages never call it.
 - Organizations are made in the admin panel, never from the dashboard. An
-  admin invites coworkers by the email or username of their Coere account
-  on `/account`, and the invite waits in the coworker's Organization
+  admin invites coworkers by the username of their Coere account on
+  `/account`, and the invite waits in the coworker's Organization
   section.
 - `/account` holds what a device token may never do, since a token copied
-  out of a browser must not be able to: set the username or password,
+  out of a browser must not be able to: change the username or password,
   revoke any browser or all of them, turn the memory backup on, invite
   someone or make an admin, and delete the account after a sign in from
-  the last ten minutes. It also sets the display name and signs the site
+  the last ten minutes and the username typed out. It also sets the display name and signs the site
   out. It needs no Coere, so it works from a phone.
 
 ### Settings
@@ -344,56 +354,26 @@ below.
 
 ### In the Supabase dashboard
 
-- **Authentication, Sign In / Providers, Email**: on, with **Confirm email**
-  on. Set **Email OTP Length** to 6 and **Minimum password length** to 10.
+`docs/launch.md` section 4.4 has the steps. In short:
+
+- **Authentication, Sign In / Providers, Email**: on, since Supabase keeps
+  the placeholder email for each account and password sign in runs through
+  it. **Confirm email** may be on or off, since the server confirms each
+  account when it makes it; on is safer, as an account made straight
+  through Supabase around the site then never signs in. **Minimum password
+  length** 10.
 - **Authentication, Sign In / Providers, Email, Secure password change**:
-  on or off. On, a session older than a day must type an emailed code to
-  change its password on `/account`; the **Reauthentication** template
-  must hold `{{ .Token }}`, as Supabase's own does.
+  off. On, Supabase would email a code before a password change, and
+  coere.ai sends no email; `/account` then says to sign in again.
+- Every other provider off.
 - **Authentication, URL Configuration**: Site URL `https://www.coere.ai`.
-  Redirect URLs `https://www.coere.ai/**`, plus `http://localhost:3000/**`
-  for development.
+  No Redirect URLs are needed.
 - **Authentication, Sessions**: leave **Time-box user sessions** and
   **Inactivity timeout** off, so a person stays signed in until they sign
   out.
-- **Authentication, Emails, SMTP Settings**: Supabase's own sender allows
-  only a few emails an hour, so set up a real one before launch.
-
-### Email templates
-
-Under **Authentication, Emails, Templates**. A new address that signs in by
-code gets **Confirm signup**, a known one gets **Magic Link**, so both hold
-the code and the link.
-
-**Magic Link**, subject `Your Coere sign in code`:
-
-```html
-<h2>Sign in to Coere</h2>
-<p>Your code is <strong>{{ .Token }}</strong>. Type it on the sign in page.</p>
-<p>Or open this link in the browser you want to sign in on:</p>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">Sign in to Coere</a></p>
-<p>If you did not ask to sign in, you can ignore this email.</p>
-```
-
-**Confirm signup**, subject `Confirm your Coere account`:
-
-```html
-<h2>Welcome to Coere</h2>
-<p>Open this link to confirm your email and sign in:</p>
-<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next={{ .RedirectTo }}">Confirm your email</a></p>
-<p>Or type this code on the sign in page: <strong>{{ .Token }}</strong></p>
-<p>If you did not make a Coere account, you can ignore this email.</p>
-```
-
-How the link finds its way back: the server sends `emailRedirectTo` as the
-site's origin plus the page to return to (for example
-`https://www.coere.ai/connect?ext=…&state=…`). Supabase puts that in
-`{{ .RedirectTo }}` when it matches a Redirect URL, and the Site URL
-otherwise. It is not encoded, so its own query runs on into the link's;
-`/auth/confirm` therefore reads everything after `next=` as the address,
-and `next` must stay last in the link. An address on another origin, or the
-bare Site URL, goes to `/dashboard`. `{{ .SiteURL }}` is always the live
-site, so in development type the code instead of opening the link.
+- **Authentication, Rate Limits**: every sign in reaches Supabase from the
+  site's servers, so raise **Rate limit for sign ups and sign ins**. No
+  SMTP, sender or email template is needed.
 
 ## API for the extension
 
