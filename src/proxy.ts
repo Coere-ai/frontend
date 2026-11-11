@@ -76,7 +76,7 @@ function notFound(): NextResponse {
 }
 
 /** The private account paths. Keep in step with the matcher below. */
-const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect|account|welcome)$|^\/dashboard(\/|$)/;
+const ACCOUNT_PATH = /^\/(sign-in|sign-up|sign-out|connect|account|welcome)$|^\/dashboard(\/|$)/;
 
 /** The dashboard and welcome host pages, the two places an extension frame may load. */
 const DASHBOARD_PATH = /^\/dashboard(\/|$)|^\/welcome$/;
@@ -152,6 +152,7 @@ export const config = {
     "/api/admin/:path*",
     "/sign-in",
     "/sign-up",
+    "/sign-out",
     "/connect",
     "/account",
     "/dashboard/:path*",

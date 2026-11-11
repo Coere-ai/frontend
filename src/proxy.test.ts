@@ -108,3 +108,10 @@ test("/welcome frames the allowed extension as /dashboard does, and no other pag
     delete process.env.COERE_EXTENSION_IDS;
   }
 });
+
+test("/sign-out is an account page: noindex and a nonce policy, with no extension frame", async () => {
+  const answer = await proxy(request("/sign-out", { coere_ext: "a".repeat(32) }));
+  assert.match(answer.headers.get("content-security-policy") ?? "", /nonce-/);
+  assert.doesNotMatch(answer.headers.get("content-security-policy") ?? "", /chrome-extension:/);
+  assert.equal(answer.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
+});

@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|auth(?:/|$)|connect$|account$|dashboard(?:/|$)).*)",
+        source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|sign-out$|auth(?:/|$)|connect$|account$|dashboard(?:/|$)).*)",
         headers: [
           { key: "Content-Security-Policy", value: "frame-src 'self'; frame-ancestors 'self'" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
