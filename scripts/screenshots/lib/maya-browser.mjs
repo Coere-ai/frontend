@@ -10,6 +10,7 @@ import { engineCall, tabMatching } from "./extension.mjs";
 
 const CONNECT = /^https:\/\/www\.coere\.ai\/(sign-in|connect)/;
 const ONBOARDING = /^chrome-extension:\/\/([a-p]{32})\/onboarding\.html/;
+const WELCOME = /^https:\/\/www\.coere\.ai\/welcome/;
 
 export async function connectMaya(context, memoryFile, now) {
   const tab = await tabMatching(context, CONNECT);
@@ -22,8 +23,13 @@ export async function connectMaya(context, memoryFile, now) {
   await tab.waitForFunction(() => performance.getEntriesByType("navigation")[0]?.name.includes("/connect?"), null, { timeout: 30_000 });
   await tab.waitForLoadState("load");
   await tab.getByRole("button", { name: "Connect Coere" }).click();
-  const onboarding = await tabMatching(context, ONBOARDING);
-  const extensionId = ONBOARDING.exec(onboarding.url())[1];
+  // The connect tab goes on to coere.ai/welcome, which frames the extension's own onboarding page (docs/accounts.md 6.9).
+  const onboarding = await tabMatching(context, WELCOME);
+  let frame = null;
+  for (const end = Date.now() + 60_000; !frame && Date.now() < end; await new Promise((r) => setTimeout(r, 250)))
+    frame = onboarding.frames().find((f) => ONBOARDING.test(f.url())) ?? null;
+  if (!frame) throw new Error("coere.ai/welcome framed no onboarding page");
+  const extensionId = ONBOARDING.exec(frame.url())[1];
   const consoleUrl = `chrome-extension://${extensionId}/console.html`;
 
   // Her chats, as Extract all would have saved them.
