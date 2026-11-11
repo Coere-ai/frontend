@@ -293,7 +293,8 @@ this section is what the owner sets up by hand.
 - Every Supabase call runs on the server. The browser never talks to
   Supabase, so the content security policy keeps `connect-src 'self'`.
 - `src/proxy.ts` refreshes the session on the private paths only (`/sign-in`,
-  `/sign-up`, `/connect`, `/account` and `/dashboard/*`), and
+  `/sign-up`, `/sign-out`, `/connect`, `/account`, `/welcome` and
+  `/dashboard/*`), and
   gives them the nonce policy and noindex. Public pages stay static, and
   `next.config.ts` gives them `frame-src 'self'; frame-ancestors 'self'`
   so none of them can frame the Console.
@@ -306,6 +307,13 @@ this section is what the owner sets up by hand.
   out. A wrong username and a wrong password get the same answer after the
   same wait, so the form never says which usernames exist.
 - `/connect` is the page the extension opens to get its device token.
+- Sign out in the navbar and on `/account` first asks Coere in this
+  browser to disconnect (`coere.sign_out` to the id in the `coere_ext`
+  cookie, 3 s at most, `src/site/account/sign-out-form.tsx`), so the next
+  person to sign in on the browser never sees the last person's Coere.
+  `/sign-out` is where the Console in its own tab goes after its Sign out:
+  it signs the session out as it loads, unless the visit came from another
+  site, where it waits for its button.
 - `/sign-in`, `/sign-up` and `/connect` share one frame,
   `src/site/account/auth-shell.tsx`: the form alone on the white page.
 

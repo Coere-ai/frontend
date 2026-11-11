@@ -155,6 +155,7 @@ nothing.
 |---|---|
 | `/sign-in` | A username and a password. A signed in person goes to `next` or `/dashboard`. |
 | `/sign-up` | Create an account with a username and a password. |
+| `/sign-out` | Where the Console in its own tab goes after Sign out (section 6.9). It signs this browser's session out as it loads when `Sec-Fetch-Site` is `none` or `same-origin`, and waits for its Sign out button on a visit from another site. A signed out visitor goes to `/sign-in`. |
 | `/connect` | Hands a connect code to the extension (section 4). |
 | `/account` | The steps a device token may not take, signed in on the site (section 7): the display name, username and password, Sign out, the browsers with Revoke, the backup switches, an admin's invites, deleting the account. |
 | `/dashboard/...` | The person's dashboard (section 7). |
@@ -228,6 +229,7 @@ and never with chat text, memory text or the token.
 | `{type:'coere.open', target}` | `/dashboard` and below | `{ok:true}` | Opens a local page. `target` is one of `library`, `memory`, `home`, `cori`, `settings-folder`, `settings-import`, `settings-logs`, `settings-transfer`. |
 | `{type:'coere.backup'}` | `/dashboard` and below | `{ok:true}` | Pushes the memory file now (section 6.5). |
 | `{type:'coere.settings'}` | `/dashboard` and below | `{ok:true}` | Pulls the synced settings now (section 6.6). |
+| `{type:'coere.sign_out'}` | any site page | `{ok:true}` | Disconnects Coere in this browser, as Settings' Disconnect does (the token revoked, the record cleared). The navbar's and `/account`'s Sign out send it, to the id in the `coere_ext` cookie, and wait at most 3 s before signing the site out (section 6.9). |
 
 Anything else answers `{ok:false, reason:'unknown'}`, and a page off the
 site gets no answer at all.
@@ -313,6 +315,33 @@ engine call on startup, on install and whenever `coere.account` changes.
 The worker also asks for it when it starts, since the worker restarts on
 its own. Jev's key function returns the device id, so a new sign in lifts
 Jev's refusal.
+
+Cori's route waits longer in v4, since each call goes through the site:
+Jev 4 s and Haiku 20 s in `memory.route`, and 35 s for `cori.ask`, with the
+thinking beat shown and a "Still working on it." line after 8 s. With no
+gates (the site has no Jev key, or Jev failed or was refused), act@1 is
+asked beside route@2 and code picks one (`cori-route/no-gates.ts`): a
+command that changes something wins, a plan of a kind Coere has wins over
+no command, an answer in words (unless the line asks how or what) or a
+read tool on a line not about the chats, and an `other` plan answers when
+route@2 settled nothing, so Cori says what it cannot do yet rather than
+"I don't write". A Jev call that fails or runs out of time rests five
+minutes for Cori (`jev-cool.ts`). A Haiku 429 whose retry-after fits is
+tried once more, and a refusal for the spend limit makes Cori say so
+(`site-haiku.ts`). The route's abort cancels the request.
+
+A mail line the notes would answer, such as "gmail please", goes to the
+route first, and a line that only asks for an email gets the Gmail draft
+offer when the route planned none (`cori/engine/route/mail.ts`). When an
+email plan cannot start (Browser Use off, no leave for Gmail, a refusal),
+the service worker writes it anyway with `memory.act.context` and
+`memory.act.write` on the person's thinking model, on the message
+`actions.draft`, and the chat shows it as a card to edit and copy
+(`DraftBlock` in `AllowBlock.tsx`, `DraftCard` in `AllowCard.tsx`). The
+card lives at the end of files every Actions build already holds, with
+their imports, so v2 and v3 keep their bytes. Nothing is typed on a page
+and nothing is sent. A plan that names nobody and nothing asks for that
+instead.
 
 ### 6.4 Signed out
 
@@ -492,9 +521,15 @@ onboarding page: install, the toolbar click, the tab after Connect Coere
 and any reopening of an unfinished onboarding open
 `https://www.coere.ai/welcome` (`lib/welcome.ts`), and an open welcome tab
 counts as the onboarding tab. Offline, the local page opens as before.
-v1 to v3 and v5 local keep their local page. The finish screen's Open the
+v1 to v3 and v5 local keep their local page. The tab after Connect Coere
+is worked out when Connect ends, so a worker that started offline still
+opens `/welcome` once the browser is online. The finish screen's Open the
 dashboard and the tour go to `https://www.coere.ai/dashboard` (with
-`?tour=1` for the tour), framed or not, while online.
+`?tour=1` for the tour), framed or not, while online. When a build
+onboarding started ends with its page closed, the finish screen opens at
+`https://www.coere.ai/dashboard/memory?finish=1` while online; the host
+page passes `finish=1` to the framed Console and drops it from its own
+address. Offline it opens the local Console as before.
 
 **The live build.** In v4 the onboarding's growing graph, the Memory page
 (a card at its top) and the processing popup draw one live view
@@ -505,13 +540,36 @@ grew, Cori teleporting there with his hammer at most about once a second,
 the chat in work by title and AI, each AI's rows, the memories each AI
 added, the chats that could not be read, a short log, and Pause, Resume,
 Stop and Continue. The runtime's `memory.work` event carries each job's
-start and end with the chat's id, title and AI; it goes to the extension's
+start and end with the chat's id, title and AI, and at the end the ids of
+the entities and folders its memories landed in; it goes to the extension's
 own pages only and is never logged, stored or sent to coere.ai. The log
 holds counts and section names, never a chat's title.
 `memory.control` takes `stop` (a pause kept as Stopped, every job left in
 the memory file) and `continue` (lifts it, tests a site stop at once,
-releases jobs waiting out a retry), so a build that broke carries on from
-the job it was at.
+releases jobs waiting out a retry and drops the pacer's own wait), so a
+build that broke carries on from the job it was at. A stopped build's line
+under the bar says Stopped, as its controls do.
+
+Each chat's dot keeps the place on the ring it got when it first showed,
+and is gone once it has flown in, so a new chat never moves the others. A
+read chat's dot flies into the first drawn place its own memories landed
+in, or that place's nearest drawn parent, rather than to where Cori stands.
+
+The time left and the bar come from one model
+(`pipeline/build-time.ts`). In v4 a stage is measured at its latest job
+end, not at the moment of reading, and the time left counts down from that
+end by at most one job's seconds, so a set of calls waiting on its answers
+never makes the time climb. The dashboard's steps card, like the
+onboarding's head, never draws its bar below what it drew before. The
+corner pill of the processing popup takes its percent, and its Linking,
+from the build's own progress, and a set with no chats of its own is never
+read as linking.
+
+While calls are still in flight the status reads `running`, never
+`waiting`, so the page offers Continue only for a wait it can shorten.
+coere.ai's `429` with `retry-after: 10` for spend held by other calls
+(section 8.10) waits those 10 s without lowering the calls in flight
+(`runtime/held-spend.ts`); a longer 429 still steps them down.
 
 **Sign out.** The v4 Console's rail has Sign out at its foot, always in
 view. It asks once ("Sign out of coere.ai on this browser?"), then
@@ -520,17 +578,24 @@ record cleared). Framed by coere.ai, it posts `{type: "coere.sign_out"}` to
 the parent at its exact site origin, nothing else in the message; the host
 page takes it only from its own frame's window at that extension's origin
 with that one type and no other field, signs the site session out and goes
-to `/sign-in`. In its own tab it opens `/sign-in` after disconnecting. The
-site's navbar shows Sign out beside Dashboard while signed in, and
-`/account` has Sign out at its top.
+to `/sign-in`. In its own tab it opens `/sign-out` after disconnecting,
+which signs the site session out and goes to `/sign-in` (section 3.3);
+`/sign-in` alone sends a signed in visitor straight on. The site's navbar
+shows Sign out beside Dashboard while signed in, and `/account` has Sign
+out at its top. Either Sign out first sends the bridge's `coere.sign_out`
+(section 5) to the extension in the `coere_ext` cookie, so Coere in this
+browser disconnects too, and the next person to sign in there never sees
+the last person's Coere.
 
 **Build memory prompt.** While saved chats wait for a build, v4's Home
 leads with a Build memory card (the count, the time it takes, Build memory
 and Not now), the toolbar popup shows the same card, and Cori offers it
 once beside his seat ("I can build your memory from 70 chats. Start?").
-Not now keeps the waiting count in `coere.memory.prompt`, and the offer
-comes back only when more chats wait. Build memory opens the Memory page's
-live view.
+Not now keeps the waiting count and its time in `coere.memory.prompt`
+(`{v: 1, chats, at}`), and Cori's offer keeps the same in
+`coere.memory.offer`. The offer comes back only after 10 more chats wait,
+or a day later with at least one more, so capture saving one chat does not
+bring it back. Build memory opens the Memory page's live view.
 
 ## 7. The person's dashboard on coere.ai
 
@@ -613,7 +678,8 @@ laptop is lost:
   by the rules of 3.1, after the current password. Each saves on its own.
 - **Password**: change it after the current one, by 3.1.
 - **Sign out**: signs coere.ai out in this browser and clears the
-  `coere_signed_in` hint. Coere stays connected there.
+  `coere_signed_in` hint, after asking Coere in this browser to disconnect
+  with `coere.sign_out` (section 5).
 - **Browsers**: every connected browser with **Revoke**, and **Sign out
   every browser**, which revokes them all at once (`revoked_reason =
   'user'`, one `device_revoked` event). Each asks first.
