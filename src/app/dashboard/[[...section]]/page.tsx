@@ -24,13 +24,16 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage({ params, searchParams }: PageProps<"/dashboard/[[...section]]">) {
   const { section } = await params;
-  // The finished onboarding opens the dashboard with Cori's tour running (the extension's own ?tour=1).
-  const tour = (await searchParams).tour === "1";
+  // The finished onboarding opens the dashboard with Cori's tour running (the extension's own ?tour=1),
+  // and a build onboarding started that ended with its page closed opens Memory on the finish screen (?finish=1).
+  const query = await searchParams;
+  const tour = query.tour === "1";
+  const finish = query.finish === "1";
   const tab = consoleTabFor(section);
   if (!tab) notFound();
   await requireUser(dashboardPath(section));
 
   const cookie = (await cookies()).get(EXTENSION_COOKIE)?.value;
   const rules = { ids: process.env.COERE_EXTENSION_IDS, production: process.env.NODE_ENV === "production" };
-  return <ConsoleHost target={{ page: "console", tab, tour }} frameId={frameExtensionId(cookie, rules)} candidates={helloCandidates(cookie, rules)} />;
+  return <ConsoleHost target={{ page: "console", tab, tour, finish }} frameId={frameExtensionId(cookie, rules)} candidates={helloCandidates(cookie, rules)} />;
 }

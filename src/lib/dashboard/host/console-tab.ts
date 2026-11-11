@@ -36,9 +36,14 @@ export function consoleTabFor(section: readonly string[] | undefined): string | 
   return Object.hasOwn(TABS, part) ? TABS[part] : null;
 }
 
-/** The framed Console's address: the extension's own page, told it is embedded, with Cori's tour when the finished onboarding asked for it. */
-export function consoleSrc(extensionId: string, tab: string, tour = false): string {
-  return `chrome-extension://${extensionId}/console.html?tab=${encodeURIComponent(tab)}${tour ? "&tour=1" : ""}&embed=1`;
+/**
+ * The framed Console's address: the extension's own page, told it is
+ * embedded, with Cori's tour when the finished onboarding asked for it, and
+ * the finish screen when a build onboarding started ended with its page
+ * closed (the extension opens /dashboard/memory?finish=1 then).
+ */
+export function consoleSrc(extensionId: string, tab: string, tour = false, finish = false): string {
+  return `chrome-extension://${extensionId}/console.html?tab=${encodeURIComponent(tab)}${tour ? "&tour=1" : ""}${finish ? "&finish=1" : ""}&embed=1`;
 }
 
 /** The page's own path, for the sign in page to come back to. */

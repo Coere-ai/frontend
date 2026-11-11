@@ -31,6 +31,7 @@ describe("consoleSrc", () => {
   it("is the extension's own console.html, embedded", () => {
     assert.equal(consoleSrc("a".repeat(32), "statistics"), `chrome-extension://${"a".repeat(32)}/console.html?tab=statistics&embed=1`);
     assert.equal(consoleSrc("a".repeat(32), "home", true), `chrome-extension://${"a".repeat(32)}/console.html?tab=home&tour=1&embed=1`);
+    assert.equal(consoleSrc("a".repeat(32), "memory", false, true), `chrome-extension://${"a".repeat(32)}/console.html?tab=memory&finish=1&embed=1`);
   });
 });
 

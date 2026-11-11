@@ -23,9 +23,10 @@ import { InstallNote } from "./install-note";
  */
 
 /** Which of the extension's pages the host frames: the Console at a section, or the onboarding with its query. */
-export type FrameTarget = { page: "console"; tab: string; tour?: boolean } | { page: "onboarding"; query: Record<string, string> };
+export type FrameTarget = { page: "console"; tab: string; tour?: boolean; finish?: boolean } | { page: "onboarding"; query: Record<string, string> };
 
-const srcFor = (id: string, target: FrameTarget): string => (target.page === "console" ? consoleSrc(id, target.tab, target.tour === true) : onboardingSrc(id, target.query));
+const srcFor = (id: string, target: FrameTarget): string =>
+  target.page === "console" ? consoleSrc(id, target.tab, target.tour === true, target.finish === true) : onboardingSrc(id, target.query);
 
 type View = { kind: "checking" } | { kind: "frame"; id: string } | { kind: "missing" };
 
@@ -95,6 +96,15 @@ export function ConsoleHost({ target, frameId, candidates }: { target: FrameTarg
       live = false;
     };
   }, [key, frameId]);
+
+  // The finish screen plays once: the frame has it, so a reload of this page does not play it again.
+  const finishing = target.page === "console" && target.finish === true;
+  useEffect(() => {
+    if (!shownId || !finishing) return;
+    const url = new URL(location.href);
+    url.searchParams.delete("finish");
+    history.replaceState(history.state, "", url.toString());
+  }, [shownId, finishing]);
 
   if (view.kind === "missing") return <InstallNote />;
   if (view.kind === "checking") return <main className="min-h-screen bg-white" aria-busy="true" />;
