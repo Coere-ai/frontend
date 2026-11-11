@@ -9,6 +9,9 @@ import { buttonClass } from "@/site/ui/button";
 
 import { signsOutAtOnce } from "./at-once";
 
+/** It reads the session and the request on every visit; drawn once at build it would only ever redirect. */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sign out",
   description: "Sign out of Coere in this browser.",
