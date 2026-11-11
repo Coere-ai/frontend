@@ -4,14 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
-import { signOut } from "@/lib/auth/sign-out";
 import { SIGNED_IN_COOKIE } from "@/lib/supabase/cookie-options";
+import { SignOutForm } from "@/site/account/sign-out-form";
 import { buttonClass } from "@/site/ui/button";
 
 /**
  * The navbar's Sign in button, which says Dashboard once this browser is
  * signed in, with a plain Sign out beside it (the owner's report of
- * 2026-11-11: signing out was hard to find).
+ * 2026-11-11: signing out was hard to find). Sign out signs Coere in this
+ * browser out too (sign-out-form.tsx).
  *
  * Public pages are static, so the server cannot know who is looking. It
  * always renders Sign in, and after hydration this reads the
@@ -47,12 +48,11 @@ export function AccountLink({ variant, className = "", onNavigate }: { variant: 
   return (
     <>
       {link}
-      <form action={signOut}>
-        <input type="hidden" name="next" value="/sign-in" />
+      <SignOutForm next="/sign-in">
         <button type="submit" onClick={onNavigate} className={buttonClass(variant, className)}>
           Sign out
         </button>
-      </form>
+      </SignOutForm>
     </>
   );
 }

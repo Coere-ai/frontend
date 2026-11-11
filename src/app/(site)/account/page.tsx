@@ -57,13 +57,13 @@ export default async function AccountPage() {
             <ButtonLink href="/dashboard" variant="secondary">
               Open the dashboard
             </ButtonLink>
-            <SignOutButton variant="secondary" next="/sign-in" />
+            <SignOutButton variant="secondary" next="/sign-in" coere />
           </div>
           <div className="mt-14 space-y-14">
             <Profile displayName={(profile?.display_name as string | null) ?? null} username={username} />
             <Password />
-            <Part title="Sign out" line="Sign out of coere.ai in this browser. Coere stays connected here; to sign it out too, revoke this browser below.">
-              <SignOutButton variant="secondary" />
+            <Part title="Sign out" line="Sign out of coere.ai in this browser. Coere in this browser signs out too.">
+              <SignOutButton variant="secondary" coere />
             </Part>
             <Browsers devices={devices} />
             <Backup sync={Boolean(profile?.memory_sync)} includeSensitive={Boolean(profile?.include_sensitive)} />
