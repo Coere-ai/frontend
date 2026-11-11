@@ -261,6 +261,12 @@ the local library and start Browser Use; it is gone.
   voice and Cori.
 - The memory runtime's batch size cap is 4 MiB in v4 (24 MiB in v2 and v3),
   because the site's host refuses a request body over 4.5 MB.
+- v4 sends no new batch: every memory job is a direct call, whatever a
+  click or Settings names, and Settings has no Large reads choice. A
+  batch's reservation holds its whole worst case until it is read, which
+  refuses every other call meanwhile, and a first build must land chat by
+  chat (2026-11-11). Calls in flight start at 6 and may reach 12, and
+  Haiku sorts 8 chats at once, since the site has no Jev key.
 - `tools/lint-manifest` and the build scans learn the v4 rules: no model
   host, no key, no fake key, no v3 marker, `externally_connectable` only in
   v4 and only with the site origins, and the one web accessible entry that
