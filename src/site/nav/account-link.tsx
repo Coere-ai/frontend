@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
+import { signOut } from "@/lib/auth/sign-out";
 import { SIGNED_IN_COOKIE } from "@/lib/supabase/cookie-options";
 import { buttonClass } from "@/site/ui/button";
 
 /**
  * The navbar's Sign in button, which says Dashboard once this browser is
- * signed in.
+ * signed in, with a plain Sign out beside it (the owner's report of
+ * 2026-11-11: signing out was hard to find).
  *
  * Public pages are static, so the server cannot know who is looking. It
  * always renders Sign in, and after hydration this reads the
@@ -36,9 +38,21 @@ export function AccountLink({ variant, className = "", onNavigate }: { variant: 
   // Read for its re-render: a sign in or out ends in a navigation, and each render reads the cookie again.
   usePathname();
   const signedIn = useSyncExternalStore(subscribe, readHint, serverHint);
-  return (
+  const link = (
     <Link href={signedIn ? "/dashboard" : "/sign-in"} onClick={onNavigate} className={buttonClass(variant, className)}>
       {signedIn ? "Dashboard" : "Sign in"}
     </Link>
+  );
+  if (!signedIn) return link;
+  return (
+    <>
+      {link}
+      <form action={signOut}>
+        <input type="hidden" name="next" value="/sign-in" />
+        <button type="submit" onClick={onNavigate} className={buttonClass(variant, className)}>
+          Sign out
+        </button>
+      </form>
+    </>
   );
 }

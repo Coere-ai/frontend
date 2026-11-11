@@ -59,7 +59,7 @@ export function Navbar() {
 
           <div className="col-start-3 flex items-center gap-2 justify-self-end" onMouseEnter={() => menu.hide(0)}>
             {/* Wrapped, because the button's own display class would beat "hidden". */}
-            <span className="hidden lg:block">
+            <span className="hidden lg:flex lg:items-center lg:gap-2">
               <AccountLink variant="ghost" />
             </span>
             <span className="hidden lg:block">

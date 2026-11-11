@@ -57,6 +57,7 @@ export default async function AccountPage() {
             <ButtonLink href="/dashboard" variant="secondary">
               Open the dashboard
             </ButtonLink>
+            <SignOutButton variant="secondary" next="/sign-in" />
           </div>
           <div className="mt-14 space-y-14">
             <Profile displayName={(profile?.display_name as string | null) ?? null} username={username} />
