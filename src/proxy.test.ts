@@ -93,3 +93,18 @@ test("the admin cookie is not an account session: account pages pass without it 
   assert.equal(res.headers.get("x-middleware-next"), "1");
   assert.equal(res.headers.get("location"), null);
 });
+
+test("/welcome frames the allowed extension as /dashboard does, and no other page does", async () => {
+  const id = "a".repeat(32);
+  process.env.COERE_EXTENSION_IDS = id;
+  try {
+    for (const path of ["/welcome", "/dashboard", "/dashboard/memory"]) {
+      const csp = (await proxy(request(path, { coere_ext: id }))).headers.get("content-security-policy") ?? "";
+      assert.match(csp, new RegExp(`frame-src chrome-extension://${id}/`), path);
+    }
+    const account = (await proxy(request("/account", { coere_ext: id }))).headers.get("content-security-policy") ?? "";
+    assert.doesNotMatch(account, /chrome-extension:/);
+  } finally {
+    delete process.env.COERE_EXTENSION_IDS;
+  }
+});

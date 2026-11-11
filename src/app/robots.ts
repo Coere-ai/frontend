@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site";
  * and the account pages. Pages hidden from the menus say noindex
  * themselves, so crawlers must still be let in to read that.
  */
-const PRIVATE = ["/preview/live/", "/admin", "/statistics", "/api/", "/sign-in", "/sign-up", "/connect", "/account", "/dashboard"];
+const PRIVATE = ["/preview/live/", "/admin", "/statistics", "/api/", "/sign-in", "/sign-up", "/connect", "/account", "/dashboard", "/welcome"];
 
 /**
  * Crawlers named one by one. A crawler with a group of its own reads only

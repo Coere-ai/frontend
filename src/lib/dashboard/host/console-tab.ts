@@ -36,10 +36,32 @@ export function consoleTabFor(section: readonly string[] | undefined): string | 
   return Object.hasOwn(TABS, part) ? TABS[part] : null;
 }
 
-/** The framed Console's address: the extension's own page, told it is embedded. */
-export function consoleSrc(extensionId: string, tab: string): string {
-  return `chrome-extension://${extensionId}/console.html?tab=${encodeURIComponent(tab)}&embed=1`;
+/** The framed Console's address: the extension's own page, told it is embedded, with Cori's tour when the finished onboarding asked for it. */
+export function consoleSrc(extensionId: string, tab: string, tour = false): string {
+  return `chrome-extension://${extensionId}/console.html?tab=${encodeURIComponent(tab)}${tour ? "&tour=1" : ""}&embed=1`;
 }
 
 /** The page's own path, for the sign in page to come back to. */
 export const dashboardPath = (section: readonly string[] | undefined): string => (section && section.length > 0 ? `/dashboard/${section.join("/")}` : "/dashboard");
+
+/** The onboarding's own query keys and values that may pass to the frame: short plain words only. */
+const QUERY_KEY = /^[a-z][a-z0-9_]{0,23}$/;
+const QUERY_VALUE = /^[A-Za-z0-9_.-]{0,64}$/;
+
+/**
+ * The framed onboarding's address at /welcome: the extension's own
+ * `onboarding.html`, told it is embedded, with the step and any state the
+ * local page took from its own query, passed on as plain words. Anything
+ * else in the query is left out, so the page can never be handed a script
+ * or another address.
+ */
+export function onboardingSrc(extensionId: string, query: Readonly<Record<string, string | string[] | undefined>> = {}): string {
+  const out = new URLSearchParams();
+  for (const [key, raw] of Object.entries(query)) {
+    const value = Array.isArray(raw) ? raw[0] : raw;
+    if (key === "embed" || !QUERY_KEY.test(key) || value === undefined || !QUERY_VALUE.test(value)) continue;
+    out.set(key, value);
+  }
+  out.set("embed", "1");
+  return `chrome-extension://${extensionId}/onboarding.html?${out.toString()}`;
+}

@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { signOut } from "@/lib/auth/sign-out";
 import { sendToExtension } from "@/lib/connect/bridge";
-import { consoleSrc } from "@/lib/dashboard/host/console-tab";
+import { consoleSrc, onboardingSrc } from "@/lib/dashboard/host/console-tab";
+import { isSignOutAsk } from "@/lib/dashboard/host/sign-out-message";
 import { extensionCookie, firstAnswering, hostStep } from "@/lib/dashboard/host/find-extension";
 import { helloMessage, readHello } from "@/site/bridge/messages";
 
@@ -15,8 +17,15 @@ import { InstallNote } from "./install-note";
  * runs as the extension itself, so every feature it has works here as it
  * does in its own tab. An id the policy does not name yet is remembered in
  * the cookie and the page loads once more; with no Coere answering, the
- * page says how to get it.
+ * page says how to get it. /welcome frames the extension's onboarding page
+ * the same way. Sign out in the Console's rail asks this page, once the
+ * extension has disconnected, to sign the site out too (sign-out-message.ts).
  */
+
+/** Which of the extension's pages the host frames: the Console at a section, or the onboarding with its query. */
+export type FrameTarget = { page: "console"; tab: string; tour?: boolean } | { page: "onboarding"; query: Record<string, string> };
+
+const srcFor = (id: string, target: FrameTarget): string => (target.page === "console" ? consoleSrc(id, target.tab, target.tour === true) : onboardingSrc(id, target.query));
 
 type View = { kind: "checking" } | { kind: "frame"; id: string } | { kind: "missing" };
 
@@ -47,9 +56,26 @@ async function answersHello(id: string): Promise<boolean> {
   return sent.ok && readHello(sent.answer) !== null;
 }
 
-export function ConsoleHost({ tab, frameId, candidates }: { tab: string; frameId: string | null; candidates: string[] }) {
+export function ConsoleHost({ target, frameId, candidates }: { target: FrameTarget; frameId: string | null; candidates: string[] }) {
   const [view, setView] = useState<View>({ kind: "checking" });
+  const frame = useRef<HTMLIFrameElement>(null);
   const key = candidates.join(",");
+  const shownId = view.kind === "frame" ? view.id : null;
+
+  // The framed extension's Sign out: only from this frame, at its own origin, with the one fixed type.
+  useEffect(() => {
+    if (!shownId) return;
+    let signingOut = false;
+    const onMessage = (e: MessageEvent) => {
+      if (signingOut || !isSignOutAsk(e, { origin: `chrome-extension://${shownId}`, window: frame.current?.contentWindow ?? null })) return;
+      signingOut = true;
+      const form = new FormData();
+      form.set("next", "/sign-in");
+      void signOut(form);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [shownId]);
 
   useEffect(() => {
     let live = true;
@@ -74,7 +100,8 @@ export function ConsoleHost({ tab, frameId, candidates }: { tab: string; frameId
   if (view.kind === "checking") return <main className="min-h-screen bg-white" aria-busy="true" />;
   return (
     <iframe
-      src={consoleSrc(view.id, tab)}
+      ref={frame}
+      src={srcFor(view.id, target)}
       title="Coere"
       allow="clipboard-write"
       className="fixed inset-0 h-full w-full border-0 bg-white"

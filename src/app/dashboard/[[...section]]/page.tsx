@@ -22,13 +22,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function DashboardPage({ params }: PageProps<"/dashboard/[[...section]]">) {
+export default async function DashboardPage({ params, searchParams }: PageProps<"/dashboard/[[...section]]">) {
   const { section } = await params;
+  // The finished onboarding opens the dashboard with Cori's tour running (the extension's own ?tour=1).
+  const tour = (await searchParams).tour === "1";
   const tab = consoleTabFor(section);
   if (!tab) notFound();
   await requireUser(dashboardPath(section));
 
   const cookie = (await cookies()).get(EXTENSION_COOKIE)?.value;
   const rules = { ids: process.env.COERE_EXTENSION_IDS, production: process.env.NODE_ENV === "production" };
-  return <ConsoleHost tab={tab} frameId={frameExtensionId(cookie, rules)} candidates={helloCandidates(cookie, rules)} />;
+  return <ConsoleHost target={{ page: "console", tab, tour }} frameId={frameExtensionId(cookie, rules)} candidates={helloCandidates(cookie, rules)} />;
 }

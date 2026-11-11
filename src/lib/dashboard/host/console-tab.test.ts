@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { consoleSrc, consoleTabFor, dashboardPath } from "./console-tab";
+import { consoleSrc, consoleTabFor, dashboardPath, onboardingSrc } from "./console-tab";
 
 describe("consoleTabFor", () => {
   it("opens Home at /dashboard", () => {
@@ -30,6 +30,7 @@ describe("consoleTabFor", () => {
 describe("consoleSrc", () => {
   it("is the extension's own console.html, embedded", () => {
     assert.equal(consoleSrc("a".repeat(32), "statistics"), `chrome-extension://${"a".repeat(32)}/console.html?tab=statistics&embed=1`);
+    assert.equal(consoleSrc("a".repeat(32), "home", true), `chrome-extension://${"a".repeat(32)}/console.html?tab=home&tour=1&embed=1`);
   });
 });
 
@@ -37,5 +38,18 @@ describe("dashboardPath", () => {
   it("rebuilds the address to come back to after signing in", () => {
     assert.equal(dashboardPath(undefined), "/dashboard");
     assert.equal(dashboardPath(["usage"]), "/dashboard/usage");
+  });
+});
+
+describe("onboardingSrc", () => {
+  const id = "a".repeat(32);
+  it("is the extension's own onboarding.html, embedded, with the step the local page took", () => {
+    assert.equal(onboardingSrc(id), `chrome-extension://${id}/onboarding.html?embed=1`);
+    assert.equal(onboardingSrc(id, { step: "build", tour: ["1", "2"] }), `chrome-extension://${id}/onboarding.html?step=build&tour=1&embed=1`);
+  });
+
+  it("passes no script, address or odd key to the frame", () => {
+    const src = onboardingSrc(id, { step: "<script>", next: "https://evil.example/", Embed: "0", embed: "0", ok: "fine" });
+    assert.equal(src, `chrome-extension://${id}/onboarding.html?ok=fine&embed=1`);
   });
 });

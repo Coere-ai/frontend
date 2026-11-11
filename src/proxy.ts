@@ -76,10 +76,10 @@ function notFound(): NextResponse {
 }
 
 /** The private account paths. Keep in step with the matcher below. */
-const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect|account)$|^\/dashboard(\/|$)/;
+const ACCOUNT_PATH = /^\/(sign-in|sign-up|connect|account|welcome)$|^\/dashboard(\/|$)/;
 
-/** The dashboard host page, the one place an extension frame may load. */
-const DASHBOARD_PATH = /^\/dashboard(\/|$)/;
+/** The dashboard and welcome host pages, the two places an extension frame may load. */
+const DASHBOARD_PATH = /^\/dashboard(\/|$)|^\/welcome$/;
 
 /**
  * The extension the dashboard may frame: the `coere_ext` cookie's id when
@@ -155,5 +155,6 @@ export const config = {
     "/connect",
     "/account",
     "/dashboard/:path*",
+    "/welcome",
   ],
 };
