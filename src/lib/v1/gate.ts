@@ -33,18 +33,15 @@ export type GateResult =
  * may always do about their own account: see and revoke their browsers,
  * and delete the account.
  */
-export async function gate(req: Request, o: { metered: boolean; lane?: Lane; suspended?: "allow" }): Promise<GateResult> {
+export async function gate(req: Request, o: { metered: boolean; lane?: Lane | "later"; suspended?: "allow" }): Promise<GateResult> {
   const auth = await authenticateDevice(req);
   if (!auth.ok) return { ok: false, refusal: auth.reason };
   const account = auth.account;
-  const who = { userId: account.userId, orgId: account.orgId, headers: req.headers };
   if (account.status === "suspended" && o.suspended !== "allow") return { ok: false, refusal: "suspended" };
 
-  const bucket = laneBucket(o.lane ?? "default", account.deviceId, account.requestsPerMinute);
-  const limit = deviceLimiter.hit(bucket.key, bucket.limit);
-  if (!limit.ok) {
-    if (securityOnce.firstIn(`rate:${bucket.key}`, 60_000)) logSecurityEventAfter("rate_limited", who);
-    return { ok: false, refusal: "rate_limited", retryAfter: rateRetryAfter(limit.retryAfterSeconds) };
+  if (o.lane !== "later") {
+    const rate = hitRate(account, o.lane ?? "default", req.headers);
+    if (rate) return rate;
   }
 
   const spent = o.metered ? spentLimit(account) : null;
@@ -53,6 +50,20 @@ export async function gate(req: Request, o: { metered: boolean; lane?: Lane; sus
     return { ok: false, refusal: "usage_limit", retryAfter: spendRetryAfter(spent), limit: spent };
   }
   return { ok: true, account };
+}
+
+/**
+ * The per minute check on its own, for a route that knows its lane only
+ * once it has read the body: the proxy counts a Haiku message in its own
+ * bucket (lanes.ts), and calls the gate with `lane: "later"`. Null when
+ * the call may go on.
+ */
+export function hitRate(account: DeviceAccount, lane: Lane, headers: Headers): Extract<GateResult, { ok: false }> | null {
+  const bucket = laneBucket(lane, account.deviceId, account.requestsPerMinute);
+  const limit = deviceLimiter.hit(bucket.key, bucket.limit);
+  if (limit.ok) return null;
+  if (securityOnce.firstIn(`rate:${bucket.key}`, 60_000)) logSecurityEventAfter("rate_limited", { userId: account.userId, orgId: account.orgId, headers });
+  return { ok: false, refusal: "rate_limited", retryAfter: rateRetryAfter(limit.retryAfterSeconds) };
 }
 
 /** Logs `usage_limited` once an hour per device, for the gate and for a refused spend reservation alike. */
