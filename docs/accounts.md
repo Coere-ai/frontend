@@ -476,6 +476,62 @@ the plan on coere.ai sets the limit. The Logs page's Memory table shows
 this month's spend with no limit beside it, since the person never sees a
 limit (section 8.10).
 
+### 6.9 Onboarding on coere.ai, the live build and Sign out
+
+The owner's report of 2026-11-11 asked for three things: the onboarding
+and its memory build on coere.ai with every detail, a build that can be
+watched, stopped and continued, and an easy Sign out.
+
+**Onboarding at `/welcome`.** The same `web_accessible_resources` entry
+holds `onboarding.html` beside `console.html`, with every file either page
+loads (`framedResources` in `build/console-resources.ts`);
+`tools/lint-manifest` allows those two pages and no other. The onboarding
+page runs the Console's frame check (`console/embed/guard.ts`) before it
+mounts. While the browser is online, a v4 build never opens the local
+onboarding page: install, the toolbar click, the tab after Connect Coere
+and any reopening of an unfinished onboarding open
+`https://www.coere.ai/welcome` (`lib/welcome.ts`), and an open welcome tab
+counts as the onboarding tab. Offline, the local page opens as before.
+v1 to v3 and v5 local keep their local page. The finish screen's Open the
+dashboard and the tour go to `https://www.coere.ai/dashboard` (with
+`?tour=1` for the tour), framed or not, while online.
+
+**The live build.** In v4 the onboarding's growing graph, the Memory page
+(a card at its top) and the processing popup draw one live view
+(`console/memory/live`) from the same status and progress: the steps with
+one count, one bar and one time left, each chat as a dot the moment a job
+takes it, lit while it is read and flying into the section whose memories
+grew, Cori teleporting there with his hammer at most about once a second,
+the chat in work by title and AI, each AI's rows, the memories each AI
+added, the chats that could not be read, a short log, and Pause, Resume,
+Stop and Continue. The runtime's `memory.work` event carries each job's
+start and end with the chat's id, title and AI; it goes to the extension's
+own pages only and is never logged, stored or sent to coere.ai. The log
+holds counts and section names, never a chat's title.
+`memory.control` takes `stop` (a pause kept as Stopped, every job left in
+the memory file) and `continue` (lifts it, tests a site stop at once,
+releases jobs waiting out a retry), so a build that broke carries on from
+the job it was at.
+
+**Sign out.** The v4 Console's rail has Sign out at its foot, always in
+view. It asks once ("Sign out of coere.ai on this browser?"), then
+disconnects (the background's `POST /api/v1/auth/revoke` and the account
+record cleared). Framed by coere.ai, it posts `{type: "coere.sign_out"}` to
+the parent at its exact site origin, nothing else in the message; the host
+page takes it only from its own frame's window at that extension's origin
+with that one type and no other field, signs the site session out and goes
+to `/sign-in`. In its own tab it opens `/sign-in` after disconnecting. The
+site's navbar shows Sign out beside Dashboard while signed in, and
+`/account` has Sign out at its top.
+
+**Build memory prompt.** While saved chats wait for a build, v4's Home
+leads with a Build memory card (the count, the time it takes, Build memory
+and Not now), the toolbar popup shows the same card, and Cori offers it
+once beside his seat ("I can build your memory from 70 chats. Start?").
+Not now keeps the waiting count in `coere.memory.prompt`, and the offer
+comes back only when more chats wait. Build memory opens the Memory page's
+live view.
+
 ## 7. The person's dashboard on coere.ai
 
 `coere.ai/dashboard` is the extension's own Console page, unchanged, in a
@@ -485,7 +541,9 @@ it is copied into the site. Its account data (Statistics, the Settings
 Account card, Organization) comes from the site through the background
 with the device token, by the routes of section 8.
 
-**The host page.** `/dashboard` and every address below it are one page,
+**The host page.** `/welcome` frames `onboarding.html?embed=1` the same way
+(section 6.9), passing on only the onboarding's own query words.
+`/dashboard` and every address below it are one page,
 `src/app/dashboard/[[...section]]/page.tsx`, outside the site's layout, so
 no navbar or footer shows. It renders per request, calls `requireUser`,
 and carries the nonce policy and noindex like the other account pages.
