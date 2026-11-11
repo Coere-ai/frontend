@@ -69,7 +69,8 @@ async function checkReserveSpend(db) {
   const reserve = (amount, batch = false) =>
     as(db, "service_role", null, async () => (await rows(db, `reserve ${amount}`, "select * from public.reserve_spend($1, $2, 900, $3)", [C, amount, batch]))?.[0]);
   check("a message that fits is held", (await reserve(1_000_000))?.hold_id !== null);
-  equal("a message past the limit is refused", (await reserve(4_500_000))?.refused, "monthly");
+  equal("a message that fits alone waits for the one in flight", (await reserve(4_500_000))?.refused, "pending");
+  equal("a message past the limit on its own is refused", (await reserve(5_500_000))?.refused, "monthly");
   check("a message that fits exactly is held", (await reserve(4_000_000))?.hold_id !== null);
   equal("a batch waits while holds fill the limit", (await reserve(1, true))?.refused, "monthly");
 

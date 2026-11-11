@@ -902,7 +902,7 @@ coere.ai/account and delete it there." The account is deleted on
 
 | What | Limit |
 |---|---|
-| Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance. Jev calls and `count_tokens` count in their own bucket per device, ten times that and at least 1,000, since the classifier sends one small call per item 16 at a time. A refusal's `retry-after` is at most 30 seconds, the longest the extension waits before giving an item up |
+| Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance. Jev calls, `count_tokens` and Haiku messages each count in their own bucket per device, ten times that and at least 1,000, since the classifier sends one small call per item 16 at a time, and without Jev Haiku sorts every chat of a build. A message's bucket is chosen by its model, so its per minute check runs once the body is read. A refusal's `retry-after` is at most 30 seconds, the longest the extension waits before giving an item up |
 | Monthly spend | the person's own `monthly_limit_micros` when the operator set one, else the plan's ($5 on Free, $20 on Plus, $100 on Team), per UTC month, once the account's free first build has finished, against the month's spend after that build, checked before every metered call |
 | Lifetime spend | the person's own `lifetime_limit_micros` when set, else the plan's (null on every seeded plan, meaning none), against `user_totals.cost_micros`, checked before every metered call, always |
 | First build allowance | the person's own `first_build_limit_micros` when set, else the plan's ($10 on every seeded plan), in place of the monthly and daily limits until the first memory build finishes, against everything spent since the free build began |
@@ -920,7 +920,12 @@ live hold (`spend_holds`, let go once the call is metered, and void after
 900 seconds) plus the `reserved_micros` of each batch not yet metered. A
 message must fit whole: the spend a limit is checked against, plus pending,
 plus its worst case, at most the limit, for every limit in force, or it gets
-the `usage_limit` 400. A batch may start while nothing is at a limit, since its worst case is
+the `usage_limit` 400. A message that would fit on its own, and is
+pushed past only by other messages' holds, is answered `429 rate_limited`
+with `retry-after: 10` instead (`reserve_spend()` names it `pending`):
+those holds go as each call answers, so a first build with many calls in
+flight slows near its allowance and never stops for an hour on a limit
+that is not spent. A batch may start while nothing is at a limit, since its worst case is
 far above what it costs and a small plan could otherwise never batch; its
 reservation then holds every other call back until its results are metered.
 A batch never metered within 30 days (its results expire after 29), or
@@ -1044,7 +1049,7 @@ come through signed upload URLs that the server makes.
 | `spend_state(p_user uuid)` | Every spend limit of one account resolved (the person's own, else the plan's), each with the spend it is checked against, and whether the first build is done (section 8.10). |
 | `reset_first_build(p_user uuid)` | The operator's reset: clears `first_build_at` and marks the spend so far, so the allowance counts from now and the monthly limit waits for the next finished build. False for no account. |
 | `charge_unmetered_batch(p_user uuid, p_batch text)` | Marks a batch deleted before it was metered as metered, and records its reservation as its cost. |
-| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under every limit in force from `spend_state()` with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under every limit in force from `spend_state()` with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`, or `pending` for a message that fits but for other messages' holds. |
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `usage_daily`, `user_totals`, the person's `org_totals`, today's `daily_totals` and today's `usage_model_daily` row for its model in one statement. |
 | `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. The first `memory_built` sets `first_build_at`. |
@@ -1338,7 +1343,7 @@ record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
   p_input bigint, p_output bigint, p_cache_write bigint, p_cache_read bigint,
   p_cost_micros bigint, p_status integer, p_duration_ms integer, p_request_id text) returns void
 
--- refused: 'lifetime', 'first_build', 'monthly' or 'daily'
+-- refused: 'lifetime', 'first_build', 'monthly', 'daily', or 'pending'
 reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)
   returns table (hold_id uuid, refused text)
 

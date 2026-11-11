@@ -1,7 +1,8 @@
 import "server-only";
 
-import { gate, noteUsageLimited } from "../gate";
-import { releaseHold, reserveSpend } from "../spend-holds";
+import { gate, hitRate, noteUsageLimited } from "../gate";
+import { messageLane } from "../lanes";
+import { PENDING_RETRY_SECONDS, releaseHold, reserveSpend } from "../spend-holds";
 import { anthropicFor } from "../refusals";
 import { relayAnswer } from "./answers";
 import { listOwnBatches } from "./batch-list";
@@ -15,7 +16,8 @@ import { prepareRequest } from "./prepare";
  * The Anthropic proxy (docs/accounts.md 8.4), in the order its checks run:
  * the path, the device (token, suspended, per minute, and the spend limits
  * for calls that start new spend), the server's key, the
- * request itself, batch ownership, the hold on the call's worst case, then
+ * request itself (a message's per minute check comes here, once its model
+ * names its lane), batch ownership, the hold on the call's worst case, then
  * the forward and the answer.
  */
 
@@ -27,12 +29,18 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   const op = matchAnthropicPath(req.method, segments);
   if (!op) return anthropicError("not_found");
 
-  const g = await gate(req, { metered: STARTS_SPEND.has(op.op), lane: op.op === "count_tokens" ? "count" : "default" });
+  // A message's per minute bucket follows its model, read from the body, so its check waits for the body.
+  const later = op.op === "message";
+  const g = await gate(req, { metered: STARTS_SPEND.has(op.op), lane: later ? "later" : op.op === "count_tokens" ? "count" : "default" });
   if (!g.ok) return anthropicFor(g.refusal, g.retryAfter, g.limit);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return anthropicError("unavailable");
 
   const prepared = await prepareRequest(req, op);
+  if (later) {
+    const rate = hitRate(g.account, messageLane(prepared.ok ? prepared.model : undefined), req.headers);
+    if (rate) return anthropicFor(rate.refusal, rate.retryAfter);
+  }
   if (!prepared.ok) return anthropicError(prepared.error, { model: prepared.model });
 
   if ("batchId" in op) {
@@ -51,6 +59,9 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   if (STARTS_SPEND.has(op.op)) {
     const held = await reserveSpend(g.account.userId, prepared.worstMicros, { batch: op.op === "batch_create" });
     if (!held.ok && !held.refused) return anthropicError("unavailable");
+    // Other messages in flight fill the limit for now: a short wait, as a per minute refusal, so a
+    // first build keeps going as their holds go instead of stopping for an hour on a spent limit.
+    if (!held.ok && held.refused === "pending") return anthropicError("rate_limited", { retryAfter: PENDING_RETRY_SECONDS });
     if (!held.ok) {
       noteUsageLimited(g.account, req.headers);
       return anthropicError("usage_limit", { limit: held.refused ?? undefined });

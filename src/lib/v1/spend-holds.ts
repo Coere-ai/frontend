@@ -17,7 +17,20 @@ import { refusedLimit } from "./spend";
 /** Longer than the proxy's 300 second ceiling, and the 800 a Pro team may raise it to, so a hold never lapses while its call can still run. */
 export const HOLD_SECONDS = 900;
 
-export type Reservation = { ok: true; holdId: string } | { ok: false; refused: SpentLimit } | { ok: false; refused: null };
+/**
+ * `pending`: the call fits the limit on its own, and only other messages
+ * still in flight push it past. Their holds go as each answers, so the
+ * proxy asks for a short wait instead of reporting a spent limit, which
+ * the extension holds for an hour (docs/accounts.md 8.10).
+ */
+export type Reservation =
+  | { ok: true; holdId: string }
+  | { ok: false; refused: SpentLimit }
+  | { ok: false; refused: null }
+  | { ok: false; refused: "pending" };
+
+/** The retry-after a pending refusal names: about how long a message call takes to answer. */
+export const PENDING_RETRY_SECONDS = 10;
 
 export async function reserveSpend(userId: string, amountMicros: number, o: { batch: boolean }): Promise<Reservation> {
   const { data, error } = await supabase().rpc("reserve_spend", {
@@ -32,6 +45,7 @@ export async function reserveSpend(userId: string, amountMicros: number, o: { ba
   }
   const row = (Array.isArray(data) ? data[0] : data) as { hold_id: string | null; refused: string | null } | undefined;
   if (row?.hold_id) return { ok: true, holdId: row.hold_id };
+  if (row?.refused === "pending") return { ok: false, refused: "pending" };
   return { ok: false, refused: refusedLimit(row?.refused) };
 }
 

@@ -173,12 +173,17 @@ export async function checkSpendReserve(db) {
   const clear = () => db.query("delete from public.spend_holds where user_id = $1", [C]);
 
   check("the first build may pass the monthly limit", (await reserve(9_000_000))?.hold_id !== null);
-  equal("but not its own allowance", (await reserve(1_500_000))?.refused, "first_build");
+  equal("a message that fits alone but not beside the first waits for it", (await reserve(1_500_000))?.refused, "pending");
+  equal("one past the allowance on its own is refused by it", (await reserve(10_500_000))?.refused, "first_build");
   check("a message that fills the allowance exactly is held", (await reserve(1_000_000))?.hold_id !== null);
   equal("a batch waits once it is full", (await reserve(1, true))?.refused, "first_build");
   await clear();
   check("a batch far past the allowance starts while nothing is spent", (await reserve(40_000_000, true))?.hold_id !== null);
-  equal("its hold keeps everything else back", (await reserve(1))?.refused, "first_build");
+  equal("its hold keeps every message back while it is made", (await reserve(1))?.refused, "pending");
+  await clear();
+  await db.query("insert into public.ai_batches (id, user_id, request_count, reserved_micros) values ('msgbatch_c1', $1, 1, 40000000)", [C]);
+  equal("a batch not yet metered refuses as the spent limit", (await reserve(1))?.refused, "first_build");
+  await db.query("delete from public.ai_batches where id = 'msgbatch_c1'");
   await clear();
 
   await meter(db, C, 9_000_000);
@@ -186,7 +191,7 @@ export async function checkSpendReserve(db) {
   await built(db, C);
   equal("once the build is done, its $9 is not in the month", (await spendOf(db, C, "C built"))?.slice(0, 2), [5000000, 0]);
   check("so the whole $5 month is still there", (await reserve(5_000_000))?.hold_id !== null);
-  equal("and the monthly limit applies after the build", (await reserve(1))?.refused, "monthly");
+  equal("and the monthly limit applies after the build, a message in flight waited for", (await reserve(1))?.refused, "pending");
   equal("to a batch too", (await reserve(1, true))?.refused, "monthly");
   await clear();
   await meter(db, C, 5_000_000);

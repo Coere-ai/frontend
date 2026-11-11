@@ -1525,6 +1525,10 @@ $$;
 -- limit and the daily limit when there is one. So any of them can be passed
 -- by one batch at most. Answers the hold's id, or which limit refused it:
 -- lifetime, first_build, monthly or daily, the one that lasts longest first.
+-- A message that would fit but for other messages still in flight is
+-- refused as 'pending' instead: their holds go within seconds, so the
+-- proxy answers it as a short per minute wait, never as a spent limit
+-- that would hold the extension's queue for an hour.
 create or replace function public.reserve_spend(
   p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean
 ) returns table (hold_id uuid, refused text)
@@ -1535,6 +1539,8 @@ as $$
 declare
   v_amount  bigint := greatest(coalesce(p_amount, 0), 0);
   v_need    bigint;
+  v_held    bigint;
+  v_alone   bigint;
   v_id      uuid;
   s         record;
   r         record;
@@ -1561,26 +1567,36 @@ begin
   -- pending hold and reservation, plus a message's whole worst case. For a
   -- batch it is 1 micro dollar, so in whole numbers "spend + need > limit"
   -- means the limit is already reached.
-  select coalesce(sum(h.amount_micros), 0) into v_need from public.spend_holds h where h.user_id = p_user;
-  v_need := v_need
-    + (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b where b.user_id = p_user and b.metered_at is null)
+  select coalesce(sum(h.amount_micros), 0) into v_held from public.spend_holds h where h.user_id = p_user;
+  -- What the call needs with no message hold beside it: batches not yet metered stay, since one
+  -- may hold for hours, and a refusal they cause is a spent limit as before.
+  v_alone := (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b where b.user_id = p_user and b.metered_at is null)
     + case when p_batch then 1 else v_amount end;
+  v_need := v_held + v_alone;
   select * into s from public.spend_state(p_user);
 
   if s.lifetime_limit_micros is not null and s.lifetime_cost_micros + v_need > s.lifetime_limit_micros then
-    return query select null::uuid, 'lifetime'::text;
+    return query select null::uuid,
+      case when not p_batch and v_held > 0 and s.lifetime_cost_micros + v_alone <= s.lifetime_limit_micros
+        then 'pending' else 'lifetime' end;
     return;
   end if;
   if not s.first_build_done and s.first_build_cost_micros + v_need > s.first_build_limit_micros then
-    return query select null::uuid, 'first_build'::text;
+    return query select null::uuid,
+      case when not p_batch and v_held > 0 and s.first_build_cost_micros + v_alone <= s.first_build_limit_micros
+        then 'pending' else 'first_build' end;
     return;
   end if;
   if s.first_build_done and s.month_cost_micros + v_need > s.monthly_limit_micros then
-    return query select null::uuid, 'monthly'::text;
+    return query select null::uuid,
+      case when not p_batch and v_held > 0 and s.month_cost_micros + v_alone <= s.monthly_limit_micros
+        then 'pending' else 'monthly' end;
     return;
   end if;
   if s.first_build_done and s.daily_limit_micros is not null and s.day_cost_micros + v_need > s.daily_limit_micros then
-    return query select null::uuid, 'daily'::text;
+    return query select null::uuid,
+      case when not p_batch and v_held > 0 and s.day_cost_micros + v_alone <= s.daily_limit_micros
+        then 'pending' else 'daily' end;
     return;
   end if;
 
