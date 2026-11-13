@@ -7,7 +7,8 @@ import { batchWorstCaseMicros, worstCaseMicros } from "./worst-case";
 /**
  * Everything the proxy checks about a request before it is forwarded
  * (docs/accounts.md 8.4): the beta header, the 4 MiB body cap, and each
- * request's params. Answers what to forward or which error to give.
+ * request's params. Answers what to forward, the checked body written out
+ * again, or which error to give.
  */
 
 export const BODY_CAP = 4 * 1024 * 1024;
@@ -45,5 +46,8 @@ export async function prepareRequest(req: Request, op: AnthropicOp): Promise<Pre
   const model = op.op === "message" ? ((parsed as { model?: string }).model ?? undefined) : undefined;
   const worstMicros =
     op.op === "message" ? worstCaseMicros(parsed as Record<string, unknown>, "direct") : op.op === "batch_create" ? batchWorstCaseMicros(parsed) : 0;
-  return { ok: true, beta, body: read.bytes, requestCount, worstMicros, ...(model ? { model } : {}) };
+  // What goes on is the parsed body written out again, so Anthropic reads exactly what was checked:
+  // in the caller's own bytes a name given twice could read one way here and another way there.
+  const body = new TextEncoder().encode(JSON.stringify(parsed));
+  return { ok: true, beta, body, requestCount, worstMicros, ...(model ? { model } : {}) };
 }

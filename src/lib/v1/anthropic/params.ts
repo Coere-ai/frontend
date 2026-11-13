@@ -115,7 +115,8 @@ export function checkParams(params: unknown): ParamsCheck {
   if (maxTokens !== undefined && (typeof maxTokens !== "number" || !Number.isInteger(maxTokens) || maxTokens < 1 || maxTokens > MAX_TOKENS_CAP)) {
     return { ok: false, reason: "bad_request" };
   }
-  if (stream === true) return { ok: false, reason: "bad_request" };
+  // Only a missing or false `stream` passes: a value another reader could take for true would come back as a stream.
+  if (stream !== undefined && stream !== false) return { ok: false, reason: "bad_request" };
   if (params.tools !== undefined && (!Array.isArray(params.tools) || params.tools.some(isServerTool))) return { ok: false, reason: "bad_request" };
   const blocks = allBlocks(params);
   // `cache_control` at the top of a request sets the cache for the whole prompt.

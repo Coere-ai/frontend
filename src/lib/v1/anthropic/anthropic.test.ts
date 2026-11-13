@@ -93,6 +93,12 @@ describe("checkParams", () => {
     assert.deepEqual(checkParams({ ...ok, max_tokens: 1 }), { ok: true });
   });
 
+  it("refuses a stream asked for in any form, and passes one turned off", () => {
+    // A value another reader could take for true would come back as a stream, which holds no usage to meter.
+    for (const stream of [1, "true", {}, null]) assert.deepEqual(checkParams({ ...ok, stream }), { ok: false, reason: "bad_request" });
+    assert.deepEqual(checkParams({ ...ok, stream: false }), { ok: true });
+  });
+
   it("passes the extension's own client tools and 5 minute cache", () => {
     const tool = { name: "save", input_schema: { type: "object" }, strict: true };
     const system = [{ type: "text", text: "s", cache_control: { type: "ephemeral" } }];

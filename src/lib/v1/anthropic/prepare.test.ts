@@ -28,6 +28,15 @@ describe("prepareRequest", () => {
     });
   });
 
+  it("forwards the body it checked, not bytes that could read another way", async () => {
+    // A name given twice: JSON.parse keeps the last, and another reader may keep the first.
+    const twice = `{"model":"claude-opus-4-8","stream":true,"model":"claude-haiku-5-5","stream":false,"max_tokens":100,"messages":[{"role":"user","content":"caf\u00e9"}]}`;
+    const p = await prepareRequest(req(twice), { op: "message" });
+    assert.equal(p.ok, true);
+    const sent = new TextDecoder().decode((p.ok && p.body) || new Uint8Array());
+    assert.equal(sent, JSON.stringify({ model: "claude-haiku-5-5", stream: false, max_tokens: 100, messages: [{ role: "user", content: "café" }] }));
+  });
+
   it("counts a batch's requests and sends no body on a bare path", async () => {
     const batch = { requests: [{ custom_id: "a", params: message }, { custom_id: "b", params: message }] };
     const p = await prepareRequest(req(JSON.stringify(batch)), { op: "batch_create" });
