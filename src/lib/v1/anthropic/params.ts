@@ -90,10 +90,21 @@ function hasUnsizedSource(block: Record<string, unknown>): boolean {
 }
 
 /**
+ * True when the request asks for a way of running the model that Anthropic
+ * bills above the price table: fast mode, at twice the price, or inference
+ * held to one region, at a tenth more. `usage` reports the same tokens
+ * either way, so the meter and the reservation would both come out low.
+ */
+function hasDearerRun(params: Record<string, unknown>): boolean {
+  const { speed, inference_geo: geo } = params;
+  return (speed !== undefined && speed !== "standard") || (geo !== undefined && geo !== "global");
+}
+
+/**
  * One request's params: an allowed model, max_tokens from 1 to 64,000, no
- * stream, nothing the meter cannot price (a server tool, or a cache longer
- * than 5 minutes, which Anthropic bills at twice input), and no input the
- * reservation cannot size.
+ * stream, nothing the meter cannot price (a server tool, a cache longer
+ * than 5 minutes, which Anthropic bills at twice input, a fallback list,
+ * fast mode or a region), and no input the reservation cannot size.
  */
 export function checkParams(params: unknown): ParamsCheck {
   if (!isRecord(params)) return { ok: false, reason: "bad_request" };
@@ -107,7 +118,11 @@ export function checkParams(params: unknown): ParamsCheck {
   if (stream === true) return { ok: false, reason: "bad_request" };
   if (params.tools !== undefined && (!Array.isArray(params.tools) || params.tools.some(isServerTool))) return { ok: false, reason: "bad_request" };
   const blocks = allBlocks(params);
-  if (blocks.some(hasLongCache) || blocks.some(hasUnsizedSource)) return { ok: false, reason: "bad_request" };
+  // `cache_control` at the top of a request sets the cache for the whole prompt.
+  if (hasLongCache(params) || blocks.some(hasLongCache) || blocks.some(hasUnsizedSource)) return { ok: false, reason: "bad_request" };
+  // The extension only asks for the default fallback; a list could name a model outside the three.
+  if (params.fallbacks !== undefined && params.fallbacks !== "default") return { ok: false, reason: "bad_request" };
+  if (hasDearerRun(params)) return { ok: false, reason: "bad_request" };
   return { ok: true };
 }
 

@@ -114,6 +114,25 @@ describe("checkParams", () => {
     }
   });
 
+  it("refuses a 1 hour cache asked for the whole request, and passes the 5 minute one", () => {
+    assert.deepEqual(checkParams({ ...ok, cache_control: { type: "ephemeral", ttl: "1h" } }), { ok: false, reason: "bad_request" });
+    assert.deepEqual(checkParams({ ...ok, cache_control: { type: "ephemeral" } }), { ok: true });
+    assert.deepEqual(checkParams({ ...ok, cache_control: { type: "ephemeral", ttl: "5m" } }), { ok: true });
+  });
+
+  it("passes the fallback the extension asks for and refuses a list, which could name any model", () => {
+    assert.deepEqual(checkParams({ ...ok, fallbacks: "default" }), { ok: true });
+    for (const fallbacks of [[{ model: "claude-opus-4-8" }], [{ model: "claude-sonnet-5-5" }], [], "all", null]) {
+      assert.deepEqual(checkParams({ ...ok, fallbacks }), { ok: false, reason: "bad_request" });
+    }
+  });
+
+  it("refuses the dearer ways to run a model, which the price table does not hold", () => {
+    assert.deepEqual(checkParams({ ...ok, model: "claude-opus-5-5", speed: "fast" }), { ok: false, reason: "bad_request" });
+    assert.deepEqual(checkParams({ ...ok, inference_geo: "us" }), { ok: false, reason: "bad_request" });
+    assert.deepEqual(checkParams({ ...ok, speed: "standard", inference_geo: "global" }), { ok: true });
+  });
+
   // A picture as coere-v2 packages/memory/src/actions/models.ts sends it.
   const picture = { type: "image", source: { type: "base64", media_type: "image/png", data: "iVBORw0KGgo=" } };
   const turn = (...content: object[]) => ({ ...ok, messages: [{ role: "user", content }] });
