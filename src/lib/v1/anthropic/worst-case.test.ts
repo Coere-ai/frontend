@@ -33,6 +33,24 @@ describe("worstCaseMicros", () => {
   });
 });
 
+describe("a picture's worst case", () => {
+  const picture = { type: "image", source: { type: "base64", media_type: "image/png", data: "iVBORw0KGgo=" } };
+  const withPictures = (...content: object[]) => ({ model: "claude-opus-5-5", max_tokens: 1, messages: [{ role: "user", content }] });
+
+  it("counts a full size picture however small its file is", () => {
+    // A plain picture of 2576 px a side is a few hundred bytes of PNG and still 4,784 tokens.
+    const full = costMicros("claude-opus-5-5", { input: 4_784, output: 1, cacheRead: 0, cacheWrite: 0 }, "direct");
+    assert.ok(worstCaseMicros(withPictures(picture), "direct") >= full);
+    assert.ok(worstCaseMicros(withPictures(picture, picture, picture), "direct") >= 3 * full);
+  });
+
+  it("counts a picture inside a tool result and inside a document", () => {
+    const full = costMicros("claude-opus-5-5", { input: 4_784, output: 1, cacheRead: 0, cacheWrite: 0 }, "direct");
+    assert.ok(worstCaseMicros(withPictures({ type: "tool_result", tool_use_id: "a", content: [picture] }), "direct") >= full);
+    assert.ok(worstCaseMicros(withPictures({ type: "document", source: { type: "content", content: [picture] } }), "direct") >= full);
+  });
+});
+
 describe("batchWorstCaseMicros", () => {
   it("adds every entry at batch price", () => {
     const entry = { custom_id: "a", params: message("hello", 16_000) };

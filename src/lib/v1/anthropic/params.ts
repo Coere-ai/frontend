@@ -45,30 +45,55 @@ function isServerTool(tool: unknown): boolean {
   return !isRecord(tool) || (tool.type !== undefined && tool.type !== "custom");
 }
 
-/** True when a block asks for a cache other than the 5 minute one, which the price table assumes. */
-function hasLongCache(block: unknown): boolean {
-  if (!isRecord(block)) return false;
-  const cache = block.cache_control;
-  if (isRecord(cache) && cache.ttl !== undefined && cache.ttl !== "5m") return true;
-  // A tool result holds blocks of its own.
-  return Array.isArray(block.content) && block.content.some(hasLongCache);
-}
+/**
+ * Every block of a request, the ones inside another included: the system
+ * blocks, the tools, each message's content, a tool result's content and a
+ * document made of blocks.
+ */
+export function allBlocks(params: Record<string, unknown>): Record<string, unknown>[] {
+  const todo: unknown[] = [];
+  const add = (list: unknown) => {
+    if (Array.isArray(list)) for (const item of list) todo.push(item);
+  };
+  add(params.system);
+  add(params.tools);
+  if (Array.isArray(params.messages)) for (const m of params.messages) if (isRecord(m)) add(m.content);
 
-/** Every block that can carry `cache_control`: the system blocks, the tools and each message's content. */
-function cacheBlocks(params: Record<string, unknown>): unknown[] {
-  const blocks: unknown[] = [];
-  if (Array.isArray(params.system)) blocks.push(...params.system);
-  if (Array.isArray(params.tools)) blocks.push(...params.tools);
-  if (Array.isArray(params.messages)) {
-    for (const m of params.messages) if (isRecord(m) && Array.isArray(m.content)) blocks.push(...m.content);
+  const blocks: Record<string, unknown>[] = [];
+  while (todo.length > 0) {
+    const block = todo.pop();
+    if (!isRecord(block)) continue;
+    blocks.push(block);
+    add(block.content);
+    if (isRecord(block.source)) add(block.source.content);
   }
   return blocks;
 }
 
+/** True when a block asks for a cache other than the 5 minute one, which the price table assumes. */
+function hasLongCache(block: Record<string, unknown>): boolean {
+  const cache = block.cache_control;
+  return isRecord(cache) && cache.ttl !== undefined && cache.ttl !== "5m";
+}
+
+/**
+ * True when a block's input is not sized by the request's own bytes, which
+ * is all the spend reservation can count: a picture or a document Anthropic
+ * fetches from an address or a stored file, and a PDF, read page by page at
+ * up to thousands of tokens each however small the file. Text, blocks and a
+ * picture's own base64 pass.
+ */
+function hasUnsizedSource(block: Record<string, unknown>): boolean {
+  const source = block.source;
+  if (!isRecord(source) || source.type === "text" || source.type === "content") return false;
+  return !(block.type === "image" && source.type === "base64");
+}
+
 /**
  * One request's params: an allowed model, max_tokens from 1 to 64,000, no
- * stream, and nothing the meter cannot price (a server tool, or a cache
- * longer than 5 minutes, which Anthropic bills at twice input).
+ * stream, nothing the meter cannot price (a server tool, or a cache longer
+ * than 5 minutes, which Anthropic bills at twice input), and no input the
+ * reservation cannot size.
  */
 export function checkParams(params: unknown): ParamsCheck {
   if (!isRecord(params)) return { ok: false, reason: "bad_request" };
@@ -81,7 +106,8 @@ export function checkParams(params: unknown): ParamsCheck {
   }
   if (stream === true) return { ok: false, reason: "bad_request" };
   if (params.tools !== undefined && (!Array.isArray(params.tools) || params.tools.some(isServerTool))) return { ok: false, reason: "bad_request" };
-  if (cacheBlocks(params).some(hasLongCache)) return { ok: false, reason: "bad_request" };
+  const blocks = allBlocks(params);
+  if (blocks.some(hasLongCache) || blocks.some(hasUnsizedSource)) return { ok: false, reason: "bad_request" };
   return { ok: true };
 }
 

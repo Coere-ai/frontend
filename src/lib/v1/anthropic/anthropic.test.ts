@@ -91,6 +91,43 @@ describe("checkParams", () => {
     }
   });
 
+  // A picture as coere-v2 packages/memory/src/actions/models.ts sends it.
+  const picture = { type: "image", source: { type: "base64", media_type: "image/png", data: "iVBORw0KGgo=" } };
+  const turn = (...content: object[]) => ({ ...ok, messages: [{ role: "user", content }] });
+
+  it("passes input that is in the request itself", () => {
+    for (const good of [
+      turn(picture, { type: "text", text: "{}" }),
+      turn({ type: "document", source: { type: "text", media_type: "text/plain", data: "notes" } }),
+      turn({ type: "document", source: { type: "content", content: [{ type: "text", text: "notes" }, picture] } }),
+      turn({ type: "tool_result", tool_use_id: "a", content: [picture] }),
+      // A search result's source is a label, not something Anthropic fetches.
+      turn({ type: "search_result", source: "https://fernhill.test/brief", title: "Brief", content: [{ type: "text", text: "notes" }] }),
+    ]) {
+      assert.deepEqual(checkParams(good), { ok: true });
+    }
+  });
+
+  it("refuses input Anthropic would fetch or page through, which the reservation cannot size", () => {
+    const pdf = { type: "base64", media_type: "application/pdf", data: "JVBERi0=" };
+    for (const source of [
+      { type: "url", url: "https://files.fernhill.test/a.pdf" },
+      { type: "file", file_id: "file_01" },
+      pdf,
+    ]) {
+      assert.deepEqual(checkParams(turn({ type: "document", source })), { ok: false, reason: "bad_request" });
+    }
+    for (const bad of [
+      turn({ type: "image", source: { type: "url", url: "https://files.fernhill.test/a.png" } }),
+      turn({ type: "image", source: { type: "file", file_id: "file_01" } }),
+      turn({ type: "tool_result", tool_use_id: "a", content: [{ type: "image", source: { type: "url", url: "https://files.fernhill.test/a.png" } }] }),
+      turn({ type: "document", source: { type: "content", content: [{ type: "document", source: pdf }] } }),
+    ]) {
+      assert.deepEqual(checkParams(bad), { ok: false, reason: "bad_request" });
+    }
+    assert.deepEqual(checkBatchBody({ requests: [{ custom_id: "a", params: turn({ type: "document", source: { type: "url", url: "https://files.fernhill.test/a.pdf" } }) }] }), { ok: false, reason: "bad_request" });
+  });
+
   it("checks every entry of a batch", () => {
     const entry = (params: object) => ({ custom_id: "a", params });
     assert.deepEqual(checkBatchBody({ requests: [entry(ok), entry(ok)] }), { ok: true, count: 2 });
