@@ -781,11 +781,11 @@ The paths the extension uses, and nothing else:
 |---|---|---|
 | POST | `v1/messages` | metered |
 | POST | `v1/messages/count_tokens` | counted, cost 0 |
-| POST | `v1/messages/batches` | the batch id is stored as the caller's |
+| POST | `v1/messages/batches` | the batch id is stored as the caller's, also when the caller goes away before the answer |
 | GET | `v1/messages/batches` | answered from the caller's own `ai_batches` rows of the last 30 days, newest first, each item fetched from Anthropic by id (one gone there is left out); `limit` at most 100, `after_id` pages on, and `first_id`, `last_id` and `has_more` describe the caller's own rows only |
 | GET | `v1/messages/batches/{id}` | own batches only |
 | POST | `v1/messages/batches/{id}/cancel` | own batches only |
-| DELETE | `v1/messages/batches/{id}` | own batches only; a batch deleted before its results were metered is charged its reservation, then its row goes |
+| DELETE | `v1/messages/batches/{id}` | own batches only; a batch deleted before its results were metered is charged its reservation, then its row goes, also when Anthropic answers 404 because an earlier delete got through |
 | GET | `v1/messages/batches/{id}/results` | own batches only, streamed, metered once at batch price |
 
 Another path answers 404. Before forwarding:
@@ -793,11 +793,22 @@ Another path answers 404. Before forwarding:
 - **Body.** At most 4 MiB.
 - **Each request's params** (one for a message, each entry for a batch):
   `model` is one of `claude-opus-5-5`, `claude-sonnet-5-5`,
-  `claude-haiku-5-5`; `max_tokens` is at most 64,000; `stream` is not
-  true; every tool is a client tool (no `type`, or `custom`), since a
-  server tool's per use fee is not in `usage`; and no `cache_control`
-  asks for a `ttl` other than `5m`, since the price table has only the 5
-  minute cache write.
+  `claude-haiku-5-5`; `max_tokens` is from 1 to 64,000; `stream` is
+  missing or false; every tool is a client tool (no `type`, or `custom`),
+  since a server tool's per use fee is not in `usage`; no `cache_control`,
+  on a block or at the top of the request, asks for a `ttl` other than
+  `5m`, since the price table has only the 5 minute cache write;
+  `fallbacks` is missing or `default`, since a list can name another
+  model; and `speed` is missing or `standard` and `inference_geo` missing
+  or `global`, since fast mode and a named region are billed above the
+  table.
+- **Pictures and documents** are in the request itself: a picture as
+  base64, a document as text or as blocks. One given by address or by
+  stored file, and a PDF, are refused, since the spend reservation counts
+  the request's bytes and these cost far more than their bytes say
+  (section 8.10).
+- **The body forwarded** is the parsed body written out again, so Anthropic
+  reads exactly what was checked.
 - **A batch** has at most 500 entries, and each names `max_tokens` of at
   most 16,000: the extension's own ceilings, which bound how far one batch's
   worst case can reach past a limit (section 8.10).
@@ -830,7 +841,9 @@ priced at its own model, the declined attempt included, as the extension's
 own counter does.
 Batch results are read as they stream through; when the stream ends, one
 row per model is written at half price and the batch is marked metered, so
-reading the results twice counts once.
+reading the results twice counts once. When that write fails twice, the
+read breaks instead of ending, so the extension reads again in a minute
+rather than deleting a batch that was not metered.
 
 `maxDuration` is 300 seconds on every route, which works on every Vercel
 plan: it is the most Hobby allows and Pro's default with Fluid compute. Most
@@ -1044,8 +1057,8 @@ coere.ai/account and delete it there." The account is deleted on
 already recorded, which lands only after Anthropic answers. So before a
 message or a batch is forwarded, the proxy holds its worst case with
 `reserve_spend()`: input counted as one token per two bytes of the
-request's JSON, priced as cache writes, plus `max_tokens` (or 64,000) of
-output, at the asked model's price, half for a batch. Pending spend is every
+request's JSON and 5,000 more for each picture, priced as cache writes,
+plus `max_tokens` (or 64,000) of output, at the asked model's price, half for a batch. Pending spend is every
 live hold (`spend_holds`, let go once the call is metered, and void after
 900 seconds) plus the `reserved_micros` of each batch not yet metered. A
 message must fit whole: the spend a limit is checked against, plus pending,
