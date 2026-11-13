@@ -30,6 +30,18 @@ describe("meteredResults", () => {
     assert.equal(seen[0]?.get("claude-sonnet-5-5")?.costMicros, 2000);
   });
 
+  it("breaks the read when the metering fails, so the reader does not take it for a whole read", async () => {
+    // The extension deletes a batch after one whole read, and a batch deleted unmetered is charged its worst case.
+    const parts = [line("claude-sonnet-5-5", 1000)];
+    const out = meteredResults(streamOf(parts), async () => {
+      throw new Error("not metered");
+    });
+    const reader = out.getReader();
+    const first = await reader.read();
+    assert.equal(new TextDecoder().decode(first.value), parts[0]);
+    await assert.rejects(reader.read());
+  });
+
   it("meters nothing when the stream breaks", async () => {
     let called = false;
     const out = meteredResults(streamOf([line("claude-haiku-5-5", 10)], true), async () => {

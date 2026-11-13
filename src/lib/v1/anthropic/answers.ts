@@ -66,7 +66,9 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
     const body = meteredResults(up.body, async (totals) => {
       // A batch whose every item failed costs nothing, and is marked metered all the same.
       const rows = [...totals].map(([model, t]) => ({ model, tokens: t.tokens, costMicros: t.costMicros }));
-      await meterBatch(c.account, op.batchId, rows, { status, durationMs: Date.now() - c.started, requestId });
+      const metered = await meterBatch(c.account, op.batchId, rows, { status, durationMs: Date.now() - c.started, requestId });
+      // Thrown so the read breaks rather than ends, and the extension reads again instead of deleting the batch.
+      if (!metered) throw new Error("batch not metered");
     });
     return new Response(body, { status, headers });
   }

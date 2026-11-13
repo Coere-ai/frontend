@@ -48,15 +48,17 @@ export interface BatchRow {
  * Meters a batch's results once. The claim and the usage rows are one
  * transaction (meter_batch), so a failed write leaves the batch unmetered
  * and the next full read of the results meters it again; two readers racing
- * to the end meter once between them.
+ * to the end meter once between them. Tried twice. False when both failed,
+ * so the caller can break the read: a batch already metered is not a
+ * failure.
  */
 export async function meterBatch(
   a: Pick<DeviceAccount, "userId" | "deviceId">,
   id: string,
   rows: BatchRow[],
   o: { status: number; durationMs: number; requestId: string | null },
-): Promise<void> {
-  const { error } = await supabase().rpc("meter_batch", {
+): Promise<boolean> {
+  const args = {
     p_user: a.userId,
     p_device: a.deviceId,
     p_batch: id,
@@ -64,8 +66,17 @@ export async function meterBatch(
     p_status: o.status,
     p_duration_ms: Math.max(0, Math.round(o.durationMs)),
     p_request_id: o.requestId?.slice(0, 120) ?? null,
-  });
-  if (error) console.error("meter_batch failed", error.code);
+  };
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { error } = await supabase().rpc("meter_batch", args);
+      if (!error) return true;
+      console.error("meter_batch failed", error.code);
+    } catch {
+      console.error("meter_batch failed");
+    }
+  }
+  return false;
 }
 
 /**
