@@ -40,6 +40,18 @@ export function matchAnthropicPath(method: string, segments: readonly string[]):
   return null;
 }
 
+/**
+ * True for a call the proxy sees through after its caller has gone. Once
+ * Anthropic has a batch create or a batch delete, the proxy must store or
+ * forget the row: a new batch with no row runs and bills with nobody able
+ * to read it, and the extension, finding it in no list, sends its requests
+ * again. Every other call stops with its caller, so a closed tab stops the
+ * spend.
+ */
+export function outlivesCaller(op: AnthropicOp): boolean {
+  return op.op === "batch_create" || op.op === "batch_delete";
+}
+
 /** The upstream address: the same path and query on Anthropic's host. */
 export function upstreamUrl(segments: readonly string[], search: string): string {
   return `https://api.anthropic.com/${segments.map(encodeURIComponent).join("/")}${search}`;

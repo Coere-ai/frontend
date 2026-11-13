@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { answerHeaders, upstreamHeaders } from "./headers";
 import { checkBatchBody, checkBeta, checkParams } from "./params";
-import { matchAnthropicPath, upstreamSearch, upstreamUrl } from "./paths";
+import { matchAnthropicPath, outlivesCaller, upstreamSearch, upstreamUrl } from "./paths";
 import { attemptsOf, byModel, createBatchTally, usageOf } from "./usage";
 
 const seg = (p: string) => p.split("/");
@@ -35,6 +35,18 @@ describe("matchAnthropicPath", () => {
     ] as const) {
       assert.equal(matchAnthropicPath(m, seg(p)), null, `${m} ${p}`);
     }
+  });
+
+  it("sees a batch create and a batch delete through when the caller goes away", () => {
+    // Once Anthropic has either, the proxy must store or forget the row, or the batch runs with nobody able to read it.
+    assert.equal(outlivesCaller({ op: "batch_create" }), true);
+    assert.equal(outlivesCaller({ op: "batch_delete", batchId: "msgbatch_01" }), true);
+    // A message, a count and a results read stop with their caller, so a closed tab stops the spend.
+    assert.equal(outlivesCaller({ op: "message" }), false);
+    assert.equal(outlivesCaller({ op: "count_tokens" }), false);
+    assert.equal(outlivesCaller({ op: "batch_results", batchId: "msgbatch_01" }), false);
+    assert.equal(outlivesCaller({ op: "batch_get", batchId: "msgbatch_01" }), false);
+    assert.equal(outlivesCaller({ op: "batch_cancel", batchId: "msgbatch_01" }), false);
   });
 
   it("keeps the SDK's query keys only", () => {

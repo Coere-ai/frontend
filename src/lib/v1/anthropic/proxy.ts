@@ -9,7 +9,7 @@ import { listOwnBatches } from "./batch-list";
 import { ownsBatch } from "./batches";
 import { anthropicError } from "./errors";
 import { forwardToAnthropic } from "./forward";
-import { matchAnthropicPath, upstreamSearch, upstreamUrl, type AnthropicOp } from "./paths";
+import { matchAnthropicPath, outlivesCaller, upstreamSearch, upstreamUrl, type AnthropicOp } from "./paths";
 import { prepareRequest } from "./prepare";
 
 /**
@@ -70,7 +70,7 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   }
   try {
     const url = upstreamUrl(segments, upstreamSearch(new URL(req.url).searchParams));
-    const up = await forwardToAnthropic(req, { url, apiKey, beta: prepared.beta, body: prepared.body });
+    const up = await forwardToAnthropic(req, { url, apiKey, beta: prepared.beta, body: prepared.body, seenThrough: outlivesCaller(op) });
     if (!up) return anthropicError("upstream");
     return await relayAnswer(up, {
       account: g.account,
