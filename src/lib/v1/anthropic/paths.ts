@@ -52,6 +52,17 @@ export function outlivesCaller(op: AnthropicOp): boolean {
   return op.op === "batch_create" || op.op === "batch_delete";
 }
 
+/**
+ * True when Anthropic's answer to a delete means the batch is gone there:
+ * the delete worked, or it answers 404 because an earlier delete got
+ * through and the proxy's own bookkeeping did not. Either way the proxy
+ * forgets its row, or the row, and a reservation not yet metered, would
+ * stay behind a batch the extension already counts as gone.
+ */
+export function goneUpstream(op: AnthropicOp, status: number): boolean {
+  return op.op === "batch_delete" && ((status >= 200 && status < 300) || status === 404);
+}
+
 /** The upstream address: the same path and query on Anthropic's host. */
 export function upstreamUrl(segments: readonly string[], search: string): string {
   return `https://api.anthropic.com/${segments.map(encodeURIComponent).join("/")}${search}`;

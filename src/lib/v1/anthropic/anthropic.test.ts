@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { answerHeaders, upstreamHeaders } from "./headers";
 import { checkBatchBody, checkBeta, checkParams } from "./params";
-import { matchAnthropicPath, outlivesCaller, upstreamSearch, upstreamUrl } from "./paths";
+import { goneUpstream, matchAnthropicPath, outlivesCaller, upstreamSearch, upstreamUrl } from "./paths";
 import { attemptsOf, byModel, createBatchTally, usageOf } from "./usage";
 
 const seg = (p: string) => p.split("/");
@@ -47,6 +47,17 @@ describe("matchAnthropicPath", () => {
     assert.equal(outlivesCaller({ op: "batch_results", batchId: "msgbatch_01" }), false);
     assert.equal(outlivesCaller({ op: "batch_get", batchId: "msgbatch_01" }), false);
     assert.equal(outlivesCaller({ op: "batch_cancel", batchId: "msgbatch_01" }), false);
+  });
+
+  it("counts a batch as gone when its delete worked, and when Anthropic no longer knows it", () => {
+    const del = { op: "batch_delete", batchId: "msgbatch_01" } as const;
+    assert.equal(goneUpstream(del, 200), true);
+    // An earlier delete got through and its bookkeeping did not: the retry answers 404 and the row must still go.
+    assert.equal(goneUpstream(del, 404), true);
+    assert.equal(goneUpstream(del, 409), false);
+    assert.equal(goneUpstream(del, 500), false);
+    assert.equal(goneUpstream({ op: "batch_get", batchId: "msgbatch_01" }, 404), false);
+    assert.equal(goneUpstream({ op: "batch_cancel", batchId: "msgbatch_01" }, 200), false);
   });
 
   it("keeps the SDK's query keys only", () => {

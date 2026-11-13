@@ -7,7 +7,7 @@ import { forgetBatch, meterBatch, storeBatch } from "./batches";
 import { anthropicError } from "./errors";
 import { cancelUpstreamBatch } from "./forward";
 import { answerHeaders } from "./headers";
-import type { AnthropicOp } from "./paths";
+import { goneUpstream, type AnthropicOp } from "./paths";
 import { meteredResults } from "./results-stream";
 import { serverAccountError } from "./server-errors";
 import { attemptsOf, byModel } from "./usage";
@@ -73,7 +73,11 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Respo
     return new Response(body, { status, headers });
   }
 
-  if (failure !== null) return new Response(failure, { status, headers });
+  if (failure !== null) {
+    // A 404 to a delete: the batch went at Anthropic on an earlier try, so its row goes now.
+    if (op.op === "batch_delete" && goneUpstream(op, status)) await forgetBatch(c.account.userId, op.batchId);
+    return new Response(failure, { status, headers });
+  }
   const text = await up.text();
   const data = parse(text);
 
