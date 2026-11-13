@@ -24,7 +24,8 @@ const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "obj
 export function worstCaseMicros(params: Record<string, unknown>, via: "direct" | "batch"): number {
   const model = typeof params.model === "string" ? params.model : "";
   const input = Math.ceil(encoder.encode(JSON.stringify(params)).byteLength / BYTES_PER_TOKEN);
-  const output = typeof params.max_tokens === "number" ? params.max_tokens : MAX_TOKENS_CAP;
+  // Never below 0, so one entry of a batch cannot lower the others' share.
+  const output = typeof params.max_tokens === "number" ? Math.max(0, params.max_tokens) : MAX_TOKENS_CAP;
   return costMicros(model, { input: 0, output, cacheRead: 0, cacheWrite: input }, via);
 }
 

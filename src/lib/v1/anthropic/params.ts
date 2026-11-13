@@ -66,7 +66,7 @@ function cacheBlocks(params: Record<string, unknown>): unknown[] {
 }
 
 /**
- * One request's params: an allowed model, max_tokens at most 64,000, no
+ * One request's params: an allowed model, max_tokens from 1 to 64,000, no
  * stream, and nothing the meter cannot price (a server tool, or a cache
  * longer than 5 minutes, which Anthropic bills at twice input).
  */
@@ -75,7 +75,8 @@ export function checkParams(params: unknown): ParamsCheck {
   const { model, max_tokens: maxTokens, stream } = params;
   if (typeof model !== "string") return { ok: false, reason: "bad_request" };
   if (!ALLOWED_MODELS.has(model)) return { ok: false, reason: "model", model: model.slice(0, 80) };
-  if (maxTokens !== undefined && (typeof maxTokens !== "number" || !Number.isInteger(maxTokens) || maxTokens > MAX_TOKENS_CAP)) {
+  // A value below 1 would lower the spend reservation: a batch adds its entries' worst cases up.
+  if (maxTokens !== undefined && (typeof maxTokens !== "number" || !Number.isInteger(maxTokens) || maxTokens < 1 || maxTokens > MAX_TOKENS_CAP)) {
     return { ok: false, reason: "bad_request" };
   }
   if (stream === true) return { ok: false, reason: "bad_request" };

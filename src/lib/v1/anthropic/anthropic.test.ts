@@ -62,6 +62,14 @@ describe("checkParams", () => {
     assert.deepEqual(checkParams([]), { ok: false, reason: "bad_request" });
   });
 
+  it("refuses max_tokens below 1, which would lower the spend reservation", () => {
+    for (const maxTokens of [0, -1, -1_000_000_000_000]) {
+      assert.deepEqual(checkParams({ ...ok, max_tokens: maxTokens }), { ok: false, reason: "bad_request" });
+      assert.deepEqual(checkBatchBody({ requests: [{ custom_id: "a", params: ok }, { custom_id: "b", params: { ...ok, max_tokens: maxTokens } }] }), { ok: false, reason: "bad_request" });
+    }
+    assert.deepEqual(checkParams({ ...ok, max_tokens: 1 }), { ok: true });
+  });
+
   it("passes the extension's own client tools and 5 minute cache", () => {
     const tool = { name: "save", input_schema: { type: "object" }, strict: true };
     const system = [{ type: "text", text: "s", cache_control: { type: "ephemeral" } }];

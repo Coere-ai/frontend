@@ -39,4 +39,11 @@ describe("batchWorstCaseMicros", () => {
     assert.equal(batchWorstCaseMicros({ requests: [entry, entry] }), 2 * worstCaseMicros(entry.params, "batch"));
     assert.equal(batchWorstCaseMicros({}), 0);
   });
+
+  it("never lets one entry lower another's share", () => {
+    const real = { custom_id: "a", params: message("hello", 16_000) };
+    const negative = { custom_id: "b", params: message("hello", -1_000_000_000_000) };
+    assert.ok(worstCaseMicros(negative.params, "batch") >= 0);
+    assert.ok(batchWorstCaseMicros({ requests: [real, negative] }) >= worstCaseMicros(real.params, "batch"));
+  });
 });
