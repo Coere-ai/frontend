@@ -1,4 +1,4 @@
-import { executives, founders, siteConfig, type TeamMember } from "@/lib/site";
+import { founders, siteConfig, type TeamMember } from "@/lib/site";
 import { Container } from "@/site/ui/container";
 import { Reveal } from "@/site/ui/reveal";
 import { SectionHeading } from "@/site/ui/section-heading";
@@ -26,7 +26,6 @@ export function TeamSection() {
       <Container>
         <SectionHeading eyebrow="Our team" title="The people building Coere" description={siteConfig.notCohere} />
         <Group title="Founders" members={founders} />
-        <Group title="Executive team" members={executives} />
       </Container>
     </section>
   );

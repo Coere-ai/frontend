@@ -95,20 +95,3 @@ export const founders: readonly TeamMember[] = [
     photo: "/founders/edison-law.jpeg",
   },
 ] as const;
-
-export const executives: readonly TeamMember[] = [
-  {
-    name: "Sarah Shelke",
-    role: "COO and CMO",
-    school: "UC Berkeley",
-    majors: ["Economics", "Neuroscience"],
-    highlights: [
-      "Co-founded Mind4Youth at 14, now one of the largest youth-led mental health nonprofits in the world",
-      "170+ chapters, 25,000+ volunteers in 71 countries, 2.5 million people reached and $519,000+ raised",
-      "Partnerships with the United Nations, Google and BetterHelp",
-      "Named to TIME's inaugural Visionaries list and a Forbes 30 Under 30 semifinalist",
-      "Top 3 finalist for the International Children's Peace Prize and winner of the JED Foundation's Student Voice of Mental Health Award",
-    ],
-    photo: "/founders/sarah-shelke.jpeg",
-  },
-] as const;

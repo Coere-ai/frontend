@@ -33,7 +33,6 @@ Coere is in pre-launch. The developer waitlist is open: https://www.coere.ai/dev
 
 - Michelle Dong, Co-founder and CEO (UC Berkeley, Business and Computer Science)
 - Edison Law, Co-founder and CTO (UC Berkeley, EECS and Bioengineering)
-- Sarah Shelke, COO and CMO (UC Berkeley, Economics and Neuroscience)
 - [About Coere](https://www.coere.ai/about)
 
 ## Contact

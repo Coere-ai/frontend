@@ -1,4 +1,4 @@
-import { executives, founders, siteConfig, type TeamMember } from "@/lib/site";
+import { founders, siteConfig, type TeamMember } from "@/lib/site";
 import type { Faq } from "@/site/content/faqs";
 import type { Product } from "@/site/content/products";
 
@@ -49,7 +49,6 @@ export const siteGraph = {
       logo: { "@type": "ImageObject", url: `${siteConfig.url}/coere-logo.png`, width: 1024, height: 1024 },
       sameAs: siteConfig.profiles,
       founder: founders.map(person),
-      employee: executives.map(person),
     },
   ],
 };
