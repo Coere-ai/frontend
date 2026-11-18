@@ -13,10 +13,17 @@ export function dollars(micros: number): string {
 /** A count as people read it: 950, 12.4K, 3.1M. */
 export function compact(n: number): string {
   const v = Number.isFinite(n) ? n : 0;
-  if (Math.abs(v) < 1000) return Math.round(v).toLocaleString("en-US");
-  const [div, unit] = Math.abs(v) < 1e6 ? [1e3, "K"] : Math.abs(v) < 1e9 ? [1e6, "M"] : [1e9, "B"];
-  const short = v / div;
-  return `${short >= 100 ? Math.round(short) : short.toFixed(1).replace(/\.0$/, "")}${unit}`;
+  if (Math.abs(Math.round(v)) < 1000) return Math.round(v).toLocaleString("en-US");
+  const units: Array<[number, string]> = [[1e3, "K"], [1e6, "M"], [1e9, "B"]];
+  const shortOf = (div: number) => {
+    const short = Math.abs(v) / div;
+    return short >= 100 ? Math.round(short) : Math.round(short * 10) / 10;
+  };
+  // The unit whose rounded figure stays under 1,000, so 999,600 reads 1M and not 1000K.
+  let i = 0;
+  while (i < units.length - 1 && shortOf(units[i]![0]) >= 1000) i++;
+  const [div, unit] = units[i]!;
+  return `${v < 0 ? "-" : ""}${shortOf(div)}${unit}`;
 }
 
 /** A whole number with separators. */
@@ -29,8 +36,10 @@ export function bytes(n: number): string {
   const units = ["KB", "MB", "GB"];
   let size = v / 1024;
   let i = 0;
-  for (; size >= 1024 && i < units.length - 1; i++) size /= 1024;
-  return `${size >= 10 ? Math.round(size) : size.toFixed(1).replace(/\.0$/, "")} ${units[i]}`;
+  const shown = (n: number) => (n >= 10 ? Math.round(n) : Math.round(n * 10) / 10);
+  // Up a unit while the rounded figure reaches 1,024, so 1,048,575 bytes reads 1 MB and not 1024 KB.
+  for (; shown(size) >= 1024 && i < units.length - 1; i++) size /= 1024;
+  return `${shown(size)} ${units[i]}`;
 }
 
 /** A date as "Nov 3, 2026", in UTC so the server and the page agree. Empty for none. */

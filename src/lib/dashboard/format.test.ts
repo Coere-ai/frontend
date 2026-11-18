@@ -19,6 +19,14 @@ describe("dashboard formats", () => {
     assert.equal(compact(250_000), "250K");
   });
 
+  it("moves up a unit when rounding reaches the next one", () => {
+    assert.equal(compact(999_600), "1M");
+    assert.equal(compact(999_999_999), "1B");
+    assert.equal(compact(-999_600), "-1M");
+    assert.equal(bytes(1_048_575), "1 MB");
+    assert.equal(bytes(1023), "1023 B");
+  });
+
   it("writes sizes in steps of 1,024", () => {
     assert.equal(bytes(512), "512 B");
     assert.equal(bytes(1536), "1.5 KB");
