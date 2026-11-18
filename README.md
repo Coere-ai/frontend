@@ -143,7 +143,7 @@ pictures: [the site](docs/screenshots/site/README.md),
       <sub>After Connect Coere, coere.ai/welcome frames the extension's own onboarding.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/dashboard/welcome-building.webp" alt="The memory build live on coere.ai/welcome: Building memories, the graph growing among her chats on the stage, the steps, Pause and Stop, Reading Lisbon trip in January from ChatGPT, and the log of what Coere just did" />
+      <img src="docs/screenshots/dashboard/welcome-building.webp" alt="The memory build live on coere.ai/welcome: Building memories, the graph growing among her chats on the stage, the steps, Pause and Stop, Reading Lisbon trip in January from ChatGPT, the memories each AI added, each AI's row, and the log of what Coere just did" />
       <br />
       <sub>Her memory building live on coere.ai: the chat in work, the graph as it grows, and Pause and Stop.</sub>
     </td>

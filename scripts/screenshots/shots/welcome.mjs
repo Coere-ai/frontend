@@ -103,6 +103,10 @@ export async function shootWelcome(playwright, shooter, { coereV2, proxy, supaba
     await ob.getByTestId("coere-live-now").filter({ hasText: /^Now(Sorting|Reading|Checking|Linking) / }).waitFor({ timeout: 90_000 });
     // Past sorting, with a chat read and others still waiting, so the log says what a read found.
     await until(() => ob.getByTestId("coere-live-log").innerText({ timeout: 5000 }), (t) => /Read an? .*chat, added \d+ memor/.test(t), 300_000, "a chat read with memories");
+    // The window as tall as the framed page, so the picture ends under the log and cuts nothing.
+    const inner = welcome.frames().find((f) => f !== welcome.mainFrame());
+    const height = await inner.evaluate(() => Math.ceil(document.documentElement.scrollHeight));
+    await welcome.setViewportSize({ width: VIEWPORT.width, height: Math.max(1500, height) });
     await welcome.waitForTimeout(1500);
     await shooter.shot(welcome, "dashboard", "welcome-building");
   } finally {
