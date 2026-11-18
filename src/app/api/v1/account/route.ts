@@ -7,12 +7,14 @@ import { problemFor } from "@/lib/v1/refusals";
 //
 // The account, its plan, this month's usage, the memory copy, the calling
 // device, the organization, the running totals and the settings version.
+// A suspended account reads it too: the Console shows the backup switches
+// from it, and turning the backup off must stay in reach (8.12).
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request): Promise<Response> {
-  const g = await gate(req, { metered: false });
+  const g = await gate(req, { metered: false, suspended: "allow" });
   if (!g.ok) return problemFor(g.refusal, g.retryAfter);
   try {
     const body = await readAccount(g.account);

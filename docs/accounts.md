@@ -776,6 +776,9 @@ Revokes the calling token (`revoked_reason = 'signed_out'`). `204`.
   "settingsVersion": 0 }
 ```
 
+A suspended account gets this answer too, since the Console's backup
+switches read it and turning the backup off stays in reach (8.12).
+
 ### 8.4 Anthropic: `/api/v1/anthropic/v1/...`
 
 The paths the extension uses, and nothing else:
