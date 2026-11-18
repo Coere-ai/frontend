@@ -3,12 +3,14 @@ import "server-only";
 import { supabase } from "@/lib/supabase";
 
 import type { Audience } from "../types";
+import { readNewestFirst } from "./paging";
 import { LEGACY_SECTION_COLUMNS, SECTION_COLUMNS, type SectionRow } from "./rows";
 
 // Pulling rows out of Supabase.
 //
-// Every read pages through the table instead of trusting one response, and
-// every failure carries Postgres's own code into the server log.
+// Every read pages through the table instead of trusting one response,
+// newest first so a cap keeps the latest rows (see paging.ts), and every
+// failure carries Postgres's own code into the server log.
 
 /** Supabase caps a single response; page through rather than silently truncate. */
 const PAGE = 1000;
@@ -36,29 +38,30 @@ export async function fetchAll<T>(
   audience: Audience,
 ): Promise<T[]> {
   const db = supabase();
-  const rows: T[] = [];
-  for (let from = 0; from < MAX_ROWS; from += PAGE) {
-    const base = db
-      .from(table)
-      .select(columns)
-      .gte("created_at", sinceIso)
-      .order("created_at", { ascending: true })
-      .range(from, from + PAGE - 1);
+  return readNewestFirst<T>(
+    async (from, to) => {
+      const base = db
+        .from(table)
+        .select(columns)
+        .gte("created_at", sinceIso)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .range(from, to);
 
-    // Only visits carry the bot flag; events and sections inherit their
-    // visit's audience when the rollups join them back.
-    const q =
-      table === "site_visits" && audience !== "all"
-        ? base.eq("is_bot", audience === "bot")
-        : base;
+      // Only visits carry the bot flag; events and sections inherit their
+      // visit's audience when the rollups join them back.
+      const q =
+        table === "site_visits" && audience !== "all"
+          ? base.eq("is_bot", audience === "bot")
+          : base;
 
-    const { data, error } = await q;
-    if (error) throw describe(table, error);
-    const batch = (data ?? []) as unknown as T[];
-    rows.push(...batch);
-    if (batch.length < PAGE) break;
-  }
-  return rows;
+      const { data, error } = await q;
+      if (error) throw describe(table, error);
+      return (data ?? []) as unknown as T[];
+    },
+    PAGE,
+    MAX_ROWS,
+  );
 }
 
 /** True when an error means a table or column is not there yet. Code reaches
