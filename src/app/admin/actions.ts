@@ -3,6 +3,7 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { createAttemptLimiter } from "@/lib/auth/attempts";
 import { configuredCredentials, credentialsMatch, wrongGuessDelay } from "@/lib/auth/credentials";
 import { cookieOptions } from "@/lib/auth/session";
 import { SESSION_COOKIE, SESSION_MAX_AGE_SECONDS, issueSessionToken } from "@/lib/auth/session-token";
@@ -27,22 +28,7 @@ const REJECTED = "Those details were not recognised.";
  * for a site with one operator: a shared store would be a dependency bought
  * for nothing.
  */
-const ATTEMPTS = { windowMs: 15 * 60_000, max: 10 };
-const attempts = new Map<string, { count: number; resetAt: number }>();
-
-function tooManyAttempts(ip: string): boolean {
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (!entry || now >= entry.resetAt) {
-    attempts.set(ip, { count: 1, resetAt: now + ATTEMPTS.windowMs });
-    if (attempts.size > 5000) {
-      for (const [k, v] of attempts) if (now >= v.resetAt) attempts.delete(k);
-    }
-    return false;
-  }
-  entry.count += 1;
-  return entry.count > ATTEMPTS.max;
-}
+const attempts = createAttemptLimiter({ max: 10, windowMs: 15 * 60_000 });
 
 export type SignInState = { error: string | null };
 
@@ -50,7 +36,7 @@ export async function signIn(_prev: SignInState, formData: FormData): Promise<Si
   const head = await headers();
   const ip = head.get("x-forwarded-for")?.split(",")[0]?.trim() || head.get("x-real-ip") || "unknown";
 
-  if (tooManyAttempts(ip)) {
+  if (attempts.hit(ip)) {
     await logSecurityEvent("rate_limited", { headers: head });
     return { error: "Too many attempts. Try again in a few minutes." };
   }
