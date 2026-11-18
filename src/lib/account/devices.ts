@@ -1,7 +1,7 @@
 import "server-only";
 
 import { supabase } from "@/lib/supabase";
-import type { DeviceRow } from "@/lib/v1/devices-body";
+import { DEVICE_LIST_MAX, deviceList, type DeviceRow } from "@/lib/v1/devices-body";
 
 /**
  * The person's connected browsers, read and revoked with the secret key
@@ -9,16 +9,16 @@ import type { DeviceRow } from "@/lib/v1/devices-body";
  * else's account reads as not there.
  */
 
-/** The 50 newest, as the dashboard listed them. The token hash is never asked for. */
+/** Up to 50, newest first, every live browser among them (deviceList). The token hash is never asked for. */
 export async function listDevices(userId: string): Promise<DeviceRow[]> {
-  const { data, error } = await supabase()
-    .from("devices")
-    .select("id, name, token_hint, extension_version, created_at, last_used_at, revoked_at")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(50);
+  const read = (live: boolean) => {
+    const query = supabase().from("devices").select("id, name, token_hint, extension_version, created_at, last_used_at, revoked_at").eq("user_id", userId);
+    return (live ? query.is("revoked_at", null) : query.not("revoked_at", "is", null)).order("created_at", { ascending: false }).limit(DEVICE_LIST_MAX);
+  };
+  const [live, revoked] = await Promise.all([read(true), read(false)]);
+  const error = live.error ?? revoked.error;
   if (error) throw new Error(`devices read failed: ${error.code}`);
-  return (data ?? []) as DeviceRow[];
+  return deviceList((live.data ?? []) as DeviceRow[], (revoked.data ?? []) as DeviceRow[]);
 }
 
 /**

@@ -16,6 +16,23 @@ export interface DeviceRow {
   revoked_at: string | null;
 }
 
+/** The most browsers a list holds, as the dashboard listed them. */
+export const DEVICE_LIST_MAX = 50;
+
+/**
+ * The list from two reads, the newest live browsers and the newest revoked
+ * ones: every live browser has a place first, the revoked fill the rest,
+ * and the whole is newest first, at most 50. The 50 newest rows alone left
+ * out a browser still connected once 50 later connects came after it, and
+ * with those all revoked /account said no browser was connected and hid
+ * Sign out every browser.
+ */
+export function deviceList(live: readonly DeviceRow[], revoked: readonly DeviceRow[]): DeviceRow[] {
+  const newest = (rows: readonly DeviceRow[]) => [...rows].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  const kept = newest(live).slice(0, DEVICE_LIST_MAX);
+  return newest([...kept, ...newest(revoked).slice(0, DEVICE_LIST_MAX - kept.length)]);
+}
+
 export interface DeviceItem {
   id: string;
   name: string;
