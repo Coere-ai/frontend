@@ -23,12 +23,21 @@ export type Committed =
   | { ok: true; bytes: number; digest: string; uploadedAt: string; counts: MemoryCounts }
   | { ok: false; reason: "not_found" | "too_large" | "bad_request" | "memory_sync_off" | "sensitive_off" | "unavailable" };
 
-/** Whether the person still wants a backup, read fresh: on, off, gone (no profile), or unknown when the read failed. */
-async function backupWanted(userId: string): Promise<"on" | "off" | "gone" | "unknown"> {
-  const { data, error } = await supabase().from("profiles").select("memory_sync").eq("id", userId).maybeSingle<{ memory_sync: boolean }>();
+/**
+ * Whether the person still wants a backup, read fresh: on, on without
+ * sensitive memories, off, gone (no profile), or unknown when the read
+ * failed.
+ */
+async function backupWanted(userId: string): Promise<"on" | "plain" | "off" | "gone" | "unknown"> {
+  const { data, error } = await supabase()
+    .from("profiles")
+    .select("memory_sync, include_sensitive")
+    .eq("id", userId)
+    .maybeSingle<{ memory_sync: boolean; include_sensitive: boolean }>();
   if (error) return "unknown";
   if (!data) return "gone";
-  return data.memory_sync ? "on" : "off";
+  if (!data.memory_sync) return "off";
+  return data.include_sensitive ? "on" : "plain";
 }
 
 export async function commitMemory(a: DeviceAccount, staged: string): Promise<Committed> {
@@ -95,13 +104,18 @@ export async function commitMemory(a: DeviceAccount, staged: string): Promise<Co
     if ((await backupWanted(a.userId)) === "gone") await removePaths([userMemoryPath(a.userId), userIndexPath(a.userId)]);
     return { ok: false, reason: "unavailable" };
   }
-  // The backup was turned off while this ran. Checked after the writes, not
-  // before: setBackup writes the flag before it deletes, so either this sees
-  // it off and cleans up itself, or its own delete runs after these writes.
+  // The backup, or sensitive memories, were turned off while this ran.
+  // Checked after the writes, not before: setMemoryBackup writes the flag
+  // before it deletes, so either this sees it off and cleans up itself, or
+  // its own delete runs after these writes.
   const wanted = await backupWanted(a.userId);
   if (wanted === "off" || wanted === "gone") {
     await deleteMemory(a.userId, a.orgId);
     return { ok: false, reason: "memory_sync_off" };
+  }
+  if (wanted === "plain" && built.includesSensitive) {
+    await deleteMemory(a.userId, a.orgId);
+    return { ok: false, reason: "sensitive_off" };
   }
   const totals = await db.rpc("set_memory_totals", { p_user: a.userId });
   if (totals.error) console.error("set_memory_totals failed", totals.error.code);

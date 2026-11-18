@@ -366,7 +366,10 @@ access hook at `memory.changed`.
 - It runs 5 minutes after the last `memory.changed` (at most 30 minutes
   after the first), 10 seconds after `memory.built`, an import, a forget or
   a chat deletion, at browser start when the last push is over 24 hours
-  old, and on the bridge's `coere.backup`.
+  old, and on the bridge's `coere.backup` and after a backup switch the
+  Console set. It also runs 10 seconds after the account read every 30
+  minutes finds a switch changed, or the stored copy gone while the backup
+  is on.
 - It skips when the manifest's `digest` equals the one the site holds
   (from `GET /api/v1/account`, kept up to date by its own commit and skip
   answers), when the person turned the backup off, or when the file is over
@@ -1030,7 +1033,13 @@ You can turn it off here.": a copied token could otherwise make the
 person's own browser upload its memory, sensitive memories too, for the
 copy to download. `sync: false` also removes the stored file, its index
 and the person's part of their organization's graph, and writes
-`memory_deleted`. Answers `200 { memory: { sync, includeSensitive } }` as
+`memory_deleted`. `includeSensitive: false` removes the same three when
+the stored file holds sensitive memories, so the copy never keeps what the
+person opted out of, and the extension sends a copy without them soon
+after: at once when the Console changed the switch, and at its next account
+read (every 30 minutes) when `/account` did. A commit already under way
+reads both switches again after its writes and removes its own file when
+either went off. Answers `200 { memory: { sync, includeSensitive } }` as
 they now stand. A suspended account may use it too, since off removes its
 data.
 
