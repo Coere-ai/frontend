@@ -24,9 +24,20 @@ export const MOMENT_ERRORS = {
   past: "That moment has passed. Confirm to save it, and the page will say it is here.",
 } as const;
 
+/**
+ * True when the written date and time exist on a calendar. Date.parse rolls
+ * 31 February over into March and reads 24:00 as the next day, as the form
+ * already refuses (fromLocalInput).
+ */
+function onCalendar(text: string): boolean {
+  const [y, mo, d, h, mi, sec] = [text.slice(0, 4), text.slice(5, 7), text.slice(8, 10), text.slice(11, 13), text.slice(14, 16), text[16] === ":" ? text.slice(17, 19) : "0"].map(Number) as [number, number, number, number, number, number];
+  const day = new Date(Date.UTC(y, mo - 1, d));
+  return day.getUTCFullYear() === y && day.getUTCMonth() === mo - 1 && day.getUTCDate() === d && h < 24 && mi < 60 && sec < 60;
+}
+
 /** The moment in its stored form (UTC, with milliseconds), or null when it is not one. */
 export function parseMoment(raw: unknown): string | null {
-  if (typeof raw !== "string" || !ISO.test(raw.trim())) return null;
+  if (typeof raw !== "string" || !ISO.test(raw.trim()) || !onCalendar(raw.trim())) return null;
   const ms = Date.parse(raw.trim());
   if (!Number.isFinite(ms) || ms < EARLIEST || ms >= LATEST) return null;
   return new Date(ms).toISOString();

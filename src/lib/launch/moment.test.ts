@@ -80,3 +80,11 @@ test("an empty or impossible picker value is null", () => {
     assert.equal(fromLocalInput(value), null, value);
   }
 });
+
+test("a date that does not exist is not a moment, whatever its zone", () => {
+  assert.equal(parseMoment("2026-02-31T10:00Z"), null);
+  assert.equal(parseMoment("2026-04-31T10:00:00+02:00"), null);
+  assert.equal(parseMoment("2026-02-29T10:00Z"), null);
+  assert.equal(parseMoment("2028-02-29T10:00Z"), "2028-02-29T10:00:00.000Z");
+  assert.equal(parseMoment("2026-11-23T24:00Z"), null);
+});
