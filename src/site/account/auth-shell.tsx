@@ -9,10 +9,10 @@ import { SizedPhoto } from "@/site/ui/sized-photo";
 const CORI = "/preview/images/agents/cori-general.svg";
 
 /**
- * The frame of the sign in, sign up and connect pages. On a wide screen it
- * is two halves under the navbar: Coere's brand on a blue background, and
- * the page's one task on white. On a phone the brand is a short band above
- * the form.
+ * The frame of the sign in, sign up, sign out and connect pages. On a wide
+ * screen it is two halves under the navbar: Coere's brand on a blue
+ * background, and the page's one task on white. On a phone the brand is
+ * a short band above the form.
  */
 export function AuthShell({ eyebrow, title, lede, children }: { eyebrow: string; title: string; lede?: ReactNode; children: ReactNode }) {
   return (

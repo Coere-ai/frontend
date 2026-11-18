@@ -26,7 +26,7 @@
 Every picture is the real page, served by `next dev` against a stand in for
 Supabase filled with a made up world, and taken by
 `scripts/screenshots/run.mjs`. The dashboard pictures are the extension's
-own Console, framed by coere.ai. Maya Collins, Fernhill Creative and every
+own Console, and the welcome pictures its onboarding, framed by coere.ai. Maya Collins, Fernhill Creative and every
 other name and number are made up. Each area has a page with all of its
 pictures: [the site](docs/screenshots/site/README.md),
 [the dashboard](docs/screenshots/dashboard/README.md) and
@@ -35,7 +35,7 @@ pictures: [the site](docs/screenshots/site/README.md),
 ### The site
 
 <p align="center">
-  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The home page's first screen: Own your memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
+  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The home page's first screen: Own your Memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
   <br />
   <sub>The home page opens on what Coere is, in one line. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
 </p>
@@ -72,9 +72,33 @@ pictures: [the site](docs/screenshots/site/README.md),
       <sub>Every Install button leads to the countdown until the extension is in the Chrome Web Store.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/sign-in.webp" alt="Sign in to Coere with a username and a password, maya_collins typed, plain on the white page" />
+      <img src="docs/screenshots/site/sign-in.webp" alt="Sign in to Coere with a username and a password, maya_collins typed, beside Coere's line and Cori on blue" />
       <br />
       <sub>Sign in with a username and a password. No email is asked for.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/site/account-top.webp" alt="Your account, signed in as maya_collins: Open the dashboard and Sign out at the top, then Profile with her name and username, and the navbar's Dashboard and Sign out" />
+      <br />
+      <sub>/account, with Sign out at the top and in the navbar. <a href="docs/screenshots/site/account.webp">The whole page</a>.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/site/sign-out.webp" alt="Sign out of Coere: Sign out of coere.ai in this browser, Coere here signs out too, and one Sign out button" />
+      <br />
+      <sub>/sign-out, reached from another site, waits for its button. Typed, it signs out at once.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/site/privacy-top.webp" alt="The privacy policy: What Coere reads, keeps and sends, with the short version beside the list of its parts" />
+      <br />
+      <sub>The privacy policy, the short version first. <a href="docs/screenshots/site/privacy.webp">The whole policy</a>.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/site/connect.webp" alt="Connect Coere to your account, signed in as maya_collins, with Connect Coere" />
+      <br />
+      <sub>/connect, where the extension gets its device token.</sub>
     </td>
   </tr>
 </table>
@@ -90,9 +114,9 @@ pictures: [the site](docs/screenshots/site/README.md),
 <table>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/dashboard/home.webp" alt="The Console's Home: 41 memories from 12 chats, the chats saved last and the AIs she uses" />
+      <img src="docs/screenshots/dashboard/home.webp" alt="The Console's Home: Build memory from 34 chats, 41 memories from 12 chats, the chats saved last and the AIs she uses, with Sign out at the foot of the rail" />
       <br />
-      <sub>Home: what memory holds and the chats saved last.</sub>
+      <sub>Home: Build memory while chats wait, what memory holds and the chats saved last.</sub>
     </td>
     <td width="50%">
       <img src="docs/screenshots/dashboard/library-chat.webp" alt="The Library with a chat open beside the list" />
@@ -110,6 +134,18 @@ pictures: [the site](docs/screenshots/site/README.md),
       <img src="docs/screenshots/dashboard/organization-admin.webp" alt="Organization as an admin: Fernhill Creative, the share switch and the shared memory graph" />
       <br />
       <sub>Organization, with the graph the members share.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/dashboard/welcome.webp" alt="coere.ai/welcome framing the extension's onboarding: Hi, I'm Cori, Which AI chats do you use, with ChatGPT, Claude and Gemini chosen and Save" />
+      <br />
+      <sub>After Connect Coere, coere.ai/welcome frames the extension's own onboarding.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/dashboard/welcome-building.webp" alt="The memory build live on coere.ai/welcome: Building memories, the graph growing among her chats on the stage, the steps, Pause and Stop, Reading Lisbon trip in January from ChatGPT, and the log of what Coere just did" />
+      <br />
+      <sub>Her memory building live on coere.ai: the chat in work, the graph as it grows, and Pause and Stop.</sub>
     </td>
   </tr>
 </table>
@@ -161,9 +197,11 @@ use `npx next dev --webpack` and `npx next build --webpack`.
 ```
 src/app/(site)/       routes: home, products, industries and each industry,
                       resources (the developer docs), the guides, about,
-                      install, try-teams, privacy, sign in, sign up, connect,
-                      blog, careers, and a 404 inside the site's layout
+                      install, try-teams, privacy, sign in, sign up, sign
+                      out, connect, account, blog, careers, and a 404 inside
+                      the site's layout
 src/app/dashboard/    the dashboard host: the extension's own Console, framed
+src/app/welcome/      the extension's own onboarding, framed the same way
 src/app/admin/        the admin pages and their server actions
 src/app/api/          v1 (the extension's API), admin (the panels' data),
                       site/track (the analytics beacon)
@@ -178,7 +216,8 @@ src/site/home/        the home page: one part per product
 src/site/products/    one page design per product
 src/site/industries/  the industries page and each industry's page
 src/site/docs/        the docs layout and the Markdown renderer
-src/site/account/     the frame sign in, sign up and connect share
+src/site/account/     the frame sign in, sign up, sign out and connect share,
+                      and the Sign out form
 src/site/console-host/
                       the dashboard host's frame and its install note
 src/site/memory/      the memory explorer the admin panel shows
@@ -300,7 +339,7 @@ this section is what the owner sets up by hand.
   so none of them can frame the Console.
 - The session cookies are httpOnly and last 400 days. A second cookie,
   `coere_signed_in=1`, is readable by scripts so the navbar can say
-  Dashboard instead of Sign in; it grants nothing.
+  Dashboard and Sign out instead of Sign in; it grants nothing.
 - Sign in, sign up and the current password check allow 10 tries in 15
   minutes per network address and 50 per username, counted only from
   addresses within their own 10, so one machine cannot lock a username
@@ -314,8 +353,9 @@ this section is what the owner sets up by hand.
   `/sign-out` is where the Console in its own tab goes after its Sign out:
   it signs the session out as it loads, unless the visit came from another
   site, where it waits for its button.
-- `/sign-in`, `/sign-up` and `/connect` share one frame,
-  `src/site/account/auth-shell.tsx`: the form alone on the white page.
+- `/sign-in`, `/sign-up`, `/sign-out` and `/connect` share one frame,
+  `src/site/account/auth-shell.tsx`: Coere's name, its line and Cori on
+  blue beside the page's one task on white.
 
 ### The dashboard
 
@@ -341,6 +381,11 @@ copied here.
   `/dashboard/account` Settings, `/dashboard/organization` Organization,
   and the last part of any other address is the Console's own section id
   (`src/lib/dashboard/host/console-tab.ts`). An unknown one is a 404.
+- `/welcome` (`src/app/welcome/page.tsx`) frames the extension's own
+  onboarding page the same way. A v4 build that is online opens it in
+  place of its local onboarding: on install, after Connect Coere, and when
+  an unfinished onboarding opens again, so the first run and the memory
+  build show live on coere.ai (`docs/accounts.md` 6.9).
 - The Console's account data (Statistics, the Account card, Organization)
   comes from the API below, called by the extension's background with the
   device token. Pages never call it.
@@ -587,9 +632,10 @@ and gives each a line for its card. A page can also tag elements with
 starts a stand in for Supabase (the real migration in PGlite behind the REST,
 Auth and Storage routes supabase-js calls), fills it with a made up world,
 runs the site on `next dev --webpack` against it, and photographs the site,
-the admin panel (signed in with the `--user` and `--password` it is given)
-and the dashboard, with coere-v2's fake v4 build of the extension loaded and
-the site served as `www.coere.ai`. `scripts/screenshots/README.md` has what
+the admin panel (signed in with the `--user` and `--password` it is given),
+the dashboard and `/welcome`, with coere-v2's fake v4 build of the extension
+loaded and the site served as `www.coere.ai`. For the memory build on
+`/welcome` it hands the Claude proxy's calls to coere-v2's fake Claude. `scripts/screenshots/README.md` has what
 it needs and how each part works.
 
 ## Tests
