@@ -8,7 +8,7 @@ Maya Collins, made up for these pictures.
 ## Home
 
 <p align="center">
-  <img src="home-hero.webp" width="100%" alt="The home page's first screen: Own your memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
+  <img src="home-hero.webp" width="100%" alt="The home page's first screen: Own your Memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
   <br />
   <sub>The first screen: what Coere is, in one line, and the way in.</sub>
 </p>
@@ -50,8 +50,8 @@ The whole page: [home.webp](home.webp).
 | | |
 |---|---|
 | <img src="resources.webp" alt="The developer docs' first page, with the list of pages on the left" /><br /><sub>The developer docs</sub> | <img src="resources-endpoints.webp" alt="The docs' Endpoints page, with each route and its parameters" /><br /><sub>One docs page: Endpoints</sub> |
-| <img src="about.webp" alt="The about page: four steps from AI is fragmented to the memory is yours, then the founders and the executive team" /><br /><sub>About</sub> | <img src="portable-ai-memory.webp" alt="The Portable AI memory guide" /><br /><sub>A guide: Portable AI memory</sub> |
-| <img src="privacy.webp" alt="The privacy policy" /><br /><sub>The privacy policy</sub> | <img src="developer-waitlist.webp" alt="Give your app's users memory from day one, with a work email field, Join the waitlist and a TypeScript sample beside it" /><br /><sub>The developer waitlist</sub> |
+| <img src="about.webp" alt="The about page down to its team: four steps from AI is fragmented to the memory is yours" /><br /><sub>About, down to where the team starts</sub> | <img src="portable-ai-memory.webp" alt="The Portable AI memory guide" /><br /><sub>A guide: Portable AI memory</sub> |
+| <img src="privacy-top.webp" alt="The privacy policy: What Coere reads, keeps and sends, with the short version beside the list of its parts" /><br /><sub>The privacy policy, the short version first. <a href="privacy.webp">The whole policy</a></sub> | <img src="developer-waitlist.webp" alt="Give your app's users memory from day one, with a work email field, Join the waitlist and a TypeScript sample beside it" /><br /><sub>The developer waitlist</sub> |
 
 ## Coming soon
 
@@ -66,4 +66,5 @@ The whole page: [home.webp](home.webp).
 |---|---|
 | <img src="sign-in.webp" alt="Sign in to Coere with a username and a password, maya_collins typed, and Forgot your password? Contact us under the card" /><br /><sub>Sign in: a username and a password</sub> | <img src="sign-up.webp" alt="Create your Coere account, with a username, a password and the password again" /><br /><sub>Sign up: no email asked for</sub> |
 | <img src="connect.webp" alt="Connect Coere to your account, signed in as maya_collins, with Connect Coere" /><br /><sub>/connect, where the extension gets its device token</sub> | <img src="phone-sign-in.webp" width="195" alt="Sign in at phone width" /><br /><sub>Sign in at 390 wide</sub> |
-| <img src="account.webp" alt="Your account, signed in as maya_collins: Profile with her name and username behind her current password, Password asking for the current one first, Sign out, Browsers, the memory backup switches, Fernhill Creative's invite form and Make admin, and Delete account asking to sign in again first" /><br /><sub>/account: what a device token may not do, from any browser</sub> | |
+| <img src="account.webp" alt="Your account, signed in as maya_collins: Open the dashboard and Sign out at the top, Profile with her name and username behind her current password, Password asking for the current one first, Sign out, Browsers, the memory backup switches, Fernhill Creative's invite form and Make admin, and Delete account asking to sign in again first" /><br /><sub>/account: what a device token may not do, from any browser</sub> | <img src="account-top.webp" alt="The top of /account: Your account, Open the dashboard and Sign out, then Profile, with Dashboard and Sign out in the navbar" /><br /><sub>/account's first screen. Signed in, the navbar says Dashboard and Sign out</sub> |
+| <img src="sign-out.webp" alt="Sign out of Coere: Sign out of coere.ai in this browser, Coere here signs out too, and one Sign out button" /><br /><sub>/sign-out from a link on another site waits for its button. Typed, or from this site, it signs out at once</sub> | |
