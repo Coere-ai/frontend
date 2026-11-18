@@ -29,12 +29,18 @@ const converted = (rows: VisitRow[]) => rows.filter((r) => r.converted).length;
 const avgSeconds = (rows: VisitRow[]) =>
   Math.round(mean(rows.map((r) => r.duration_seconds)));
 
-/** One point per day of the window, oldest first, zero-filled. */
+/**
+ * One point per day of the window, oldest first, zero-filled. The days step
+ * back from today on the wall clock carrier, not in absolute time: a local
+ * day of 23 or 25 hours would otherwise name one day twice or skip one in
+ * the hour after or before midnight.
+ */
 export function dailySeries(visits: VisitRow[], days: number, tz: string, now: Date): SiteDailyPoint[] {
   const byDay = groupBy(visits, (v) => dayKeyOf(localCarrier(new Date(v.created_at), tz)));
+  const today = localCarrier(now, tz);
   const out: SiteDailyPoint[] = [];
   for (let i = days - 1; i >= 0; i--) {
-    const key = dayKeyOf(localCarrier(new Date(now.getTime() - i * DAY_MS), tz));
+    const key = dayKeyOf(today - i * DAY_MS);
     const rows = byDay.get(key) ?? [];
     out.push({
       date: key,
