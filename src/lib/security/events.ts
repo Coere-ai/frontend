@@ -58,11 +58,12 @@ export function ipHash(headers: Headers): string | null {
   return createHmac("sha256", salt).update(address).digest("hex").slice(0, 16);
 }
 
+/** True once the row is stored. Most callers ignore it; a read that must be on the record checks it. */
 export async function logSecurityEvent(
   kind: SecurityKind,
   o: { userId?: string | null; orgId?: string | null; headers?: Headers } = {},
-): Promise<void> {
-  if (!supabaseConfigured()) return;
+): Promise<boolean> {
+  if (!supabaseConfigured()) return false;
   try {
     const { error } = await supabase()
       .from("security_events")
@@ -73,10 +74,12 @@ export async function logSecurityEvent(
         ip_hash: o.headers ? ipHash(o.headers) : null,
         country: o.headers?.get("x-vercel-ip-country") ?? null,
       });
-    if (error) console.error("security event not stored", kind, error.code);
+    if (!error) return true;
+    console.error("security event not stored", kind, error.code);
   } catch {
     console.error("security event not stored", kind);
   }
+  return false;
 }
 
 /**

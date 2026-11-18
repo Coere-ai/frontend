@@ -13,8 +13,13 @@ import type { MemoryPayload } from "./types";
  * A person's or an organization's knowledge graph for the operator, read
  * through the secret key (docs/accounts.md 9). Every read writes an
  * admin_viewed_memory event naming whose graph it was, before the graph
- * leaves the server, so no view goes unrecorded.
+ * leaves the server. When the event cannot be stored the graph is not
+ * sent, so no view goes unrecorded.
  */
+
+async function recordView(o: { userId?: string; orgId?: string }, headers: Headers): Promise<void> {
+  if (!(await logSecurityEvent("admin_viewed_memory", { ...o, headers }))) throw new Error("admin_viewed_memory not stored");
+}
 
 /** Display name, then username: what the operator knows a person by. The placeholder email is never shown. */
 export const personName = (p: { display_name?: string | null; username?: string | null }): string => p.display_name || p.username || "An account";
@@ -22,7 +27,7 @@ export const personName = (p: { display_name?: string | null; username?: string 
 export async function loadUserMemory(userId: string, headers: Headers): Promise<MemoryPayload | null> {
   const { data: profile } = await supabase().from("profiles").select("display_name, username").eq("id", userId).maybeSingle();
   if (!profile) return null;
-  await logSecurityEvent("admin_viewed_memory", { userId, headers });
+  await recordView({ userId }, headers);
   const index = await getJson<MemoryIndex>(userIndexPath(userId));
   return { center: personName(profile), names: {}, view: index && index.v === 1 ? toView(index) : null };
 }
@@ -31,7 +36,7 @@ export async function loadOrgMemory(orgId: string, headers: Headers): Promise<Me
   const db = supabase();
   const { data: org } = await db.from("organizations").select("name").eq("id", orgId).maybeSingle<{ name: string }>();
   if (!org) return null;
-  await logSecurityEvent("admin_viewed_memory", { orgId, headers });
+  await recordView({ orgId }, headers);
   const index = await readOrgIndex(orgId);
   const view = index && index.v === 1 ? toView(index) : null;
 
