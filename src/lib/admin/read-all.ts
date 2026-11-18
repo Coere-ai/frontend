@@ -2,7 +2,10 @@ import "server-only";
 
 /**
  * Reads every row of a query in pages of 1,000, the most PostgREST answers
- * at once. `page(from, to)` builds the same query for one range. Stops at
+ * at once. `page(from, to)` builds the same query for one range, ordered by
+ * a unique key: without one Postgres may answer the rows of two pages in
+ * different orders, and a row updated between them (user_totals is, on
+ * every call) moves, so one row is read twice and another is missed. Stops at
  * `max` rows, so a table that grows past what a panel can draw costs a
  * capped read instead of a timeout. A failure throws with the error's code
  * only, which names no person.

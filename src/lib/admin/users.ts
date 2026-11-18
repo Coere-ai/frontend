@@ -29,17 +29,17 @@ export async function readPlans() {
 
 export async function loadUsers(): Promise<UsersPayload> {
   const db = supabase();
-  const profiles = await readAll<ProfileRow>((a, b) => db.from("profiles").select(PROFILE_COLUMNS).order("created_at", { ascending: false }).range(a, b), MAX_USERS + 1);
+  const profiles = await readAll<ProfileRow>((a, b) => db.from("profiles").select(PROFILE_COLUMNS).order("created_at", { ascending: false }).order("id").range(a, b), MAX_USERS + 1);
   const [members, devices, month, totals, files, plans] = await Promise.all([
     readAll<{ user_id: string; org_id: string; role: string; organizations: { name: string } | { name: string }[] | null }>((a, b) =>
-      db.from("org_members").select("user_id, org_id, role, organizations(name)").range(a, b),
+      db.from("org_members").select("user_id, org_id, role, organizations(name)").order("user_id").range(a, b),
     ),
-    readAll<{ user_id: string }>((a, b) => db.from("devices").select("user_id").is("revoked_at", null).range(a, b), 200_000),
+    readAll<{ user_id: string }>((a, b) => db.from("devices").select("user_id").is("revoked_at", null).order("id").range(a, b), 200_000),
     readAll<{ user_id: string; requests: unknown; cost_micros: unknown }>((a, b) =>
-      db.from("usage_monthly").select("user_id, requests, cost_micros").eq("month", monthKey()).range(a, b),
+      db.from("usage_monthly").select("user_id, requests, cost_micros").eq("month", monthKey()).order("user_id").range(a, b),
     ),
-    readAll<{ user_id: string; tokens_saved: unknown; cost_micros: unknown }>((a, b) => db.from("user_totals").select("user_id, tokens_saved, cost_micros").range(a, b)),
-    readAll<{ user_id: string; bytes: unknown }>((a, b) => db.from("memory_files").select("user_id, bytes").range(a, b)),
+    readAll<{ user_id: string; tokens_saved: unknown; cost_micros: unknown }>((a, b) => db.from("user_totals").select("user_id, tokens_saved, cost_micros").order("user_id").range(a, b)),
+    readAll<{ user_id: string; bytes: unknown }>((a, b) => db.from("memory_files").select("user_id, bytes").order("user_id").range(a, b)),
     readPlans(),
   ]);
 

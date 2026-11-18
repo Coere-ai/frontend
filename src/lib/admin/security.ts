@@ -21,7 +21,7 @@ const RECENT_VIEWS = 50;
 export async function loadSecurity(days: number): Promise<SecurityPayload> {
   const db = supabase();
   const [events, tables, views] = await Promise.all([
-    readAll<SecurityEventRow>((a, b) => db.from("security_events").select("kind, created_at").gte("created_at", windowStart(days)).order("created_at").range(a, b), MAX_EVENTS),
+    readAll<SecurityEventRow>((a, b) => db.from("security_events").select("kind, created_at").gte("created_at", windowStart(days)).order("created_at", { ascending: false }).order("id", { ascending: false }).range(a, b), MAX_EVENTS),
     readTableStats(),
     db.from("security_events").select("user_id, org_id, created_at").eq("kind", "admin_viewed_memory").order("created_at", { ascending: false }).limit(RECENT_VIEWS),
   ]);

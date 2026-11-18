@@ -21,7 +21,7 @@ export async function loadStatistics(): Promise<StatisticsPayload> {
   const db = supabase();
   const [daily, levels, accounts, orgs, storage, topUsers, topOrgs] = await Promise.all([
     readAll<DailyTotalsRow>((a, b) => db.from("daily_totals").select("*").order("day").range(a, b), 20_000),
-    readAll<{ memories: unknown; chats: unknown }>((a, b) => db.from("user_totals").select("memories, chats").range(a, b), 200_000),
+    readAll<{ memories: unknown; chats: unknown }>((a, b) => db.from("user_totals").select("memories, chats").order("user_id").range(a, b), 200_000),
     db.from("profiles").select("id", { count: "exact", head: true }),
     db.from("organizations").select("id", { count: "exact", head: true }),
     readStorageUsage(),

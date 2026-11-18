@@ -13,7 +13,7 @@ import type { WaitlistPayload } from "./types";
 type Row = { email: string; source: string | null; created_at: string };
 
 const readRows = () =>
-  readAll<Row>((a, b) => supabase().from("developer_waitlist").select("email, source, created_at").order("created_at", { ascending: false }).range(a, b), 100_000);
+  readAll<Row>((a, b) => supabase().from("developer_waitlist").select("email, source, created_at").order("created_at", { ascending: false }).order("id", { ascending: false }).range(a, b), 100_000);
 
 export async function loadWaitlist(): Promise<WaitlistPayload> {
   const rows = await readRows();

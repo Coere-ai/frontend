@@ -20,8 +20,8 @@ const MAX = 100_000;
 function readRows(list: InterestList): Promise<InterestRow[]> {
   const read =
     list === "developers"
-      ? readAll<Row>((a, b) => supabase().from("developer_waitlist").select("email, source, created_at").order("created_at", { ascending: false }).range(a, b), MAX)
-      : readAll<Row>((a, b) => supabase().from("product_interest").select("email, source, created_at").eq("product", list).order("created_at", { ascending: false }).range(a, b), MAX);
+      ? readAll<Row>((a, b) => supabase().from("developer_waitlist").select("email, source, created_at").order("created_at", { ascending: false }).order("id", { ascending: false }).range(a, b), MAX)
+      : readAll<Row>((a, b) => supabase().from("product_interest").select("email, source, created_at").eq("product", list).order("created_at", { ascending: false }).order("id", { ascending: false }).range(a, b), MAX);
   return read.then((rows) => rows.map((r) => ({ email: r.email, source: r.source, createdAt: r.created_at })));
 }
 
