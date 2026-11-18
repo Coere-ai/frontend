@@ -27,12 +27,23 @@ const nextConfig: NextConfig = {
    * Console, which the extension lets coere.ai load for /dashboard alone
    * (docs/accounts.md 6.8). The private paths are left out here, since
    * src/proxy.ts gives each of them its own nonce policy, and two policies
-   * on one answer would both apply.
+   * on one answer would both apply. /welcome is one of them: it frames the
+   * extension's onboarding as /dashboard frames its Console.
+   *
+   * Every answer also says not to guess content types and to send only the
+   * origin to other sites.
    */
   async headers() {
     return [
       {
-        source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|sign-out$|auth(?:/|$)|connect$|account$|dashboard(?:/|$)).*)",
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+      {
+        source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|sign-out$|auth(?:/|$)|connect$|account$|welcome$|dashboard(?:/|$)).*)",
         headers: [
           { key: "Content-Security-Policy", value: "frame-src 'self'; frame-ancestors 'self'" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
