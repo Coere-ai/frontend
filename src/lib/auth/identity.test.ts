@@ -44,6 +44,11 @@ describe("passwords", () => {
     assert.equal(passwordProblem("1234567890"), null);
   });
 
+  it("counts characters, not UTF-16 units, so five emoji are five characters", () => {
+    assert.equal(passwordProblem("\u{1F511}".repeat(5)), "Use at least 10 characters.");
+    assert.equal(passwordProblem("\u{1F511}".repeat(10)), null);
+  });
+
   it("stops at 72 bytes", () => {
     assert.equal(passwordProblem("a".repeat(72)), null);
     assert.equal(passwordProblem("a".repeat(73)), "Use at most 72 characters.");

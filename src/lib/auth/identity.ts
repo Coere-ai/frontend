@@ -40,7 +40,8 @@ export function usernameProblem(raw: string): string | null {
 
 /** Why a new password will not do, or null when it is fine. */
 export function passwordProblem(raw: string): string | null {
-  if (raw.length < PASSWORD_MIN) return `Use at least ${PASSWORD_MIN} characters.`;
+  // Counted by code point: `length` counts UTF-16 units, so five emoji passed as ten characters.
+  if ([...raw].length < PASSWORD_MIN) return `Use at least ${PASSWORD_MIN} characters.`;
   if (new TextEncoder().encode(raw).length > PASSWORD_MAX) return `Use at most ${PASSWORD_MAX} characters.`;
   return null;
 }
