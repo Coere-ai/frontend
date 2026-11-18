@@ -184,18 +184,28 @@ limit must be at least 50 MB (the free plan's default is 50 MB).
 
 ## 6. Build the v4 extension zip
 
-The zip is already built from the latest code (`coere-v4-1.1.3.zip`). To build
-it yourself:
+Build it from the latest `main` of coere-v2. `COERE_SITE_URL` is set on the
+command line, so a different value in your `.env` (a dev server, say) can
+never end up in the store build:
 
 ```bash
 cd coere-v2
-pnpm install
-pnpm build:v4
-cd apps/extension/.output/chrome-mv3-v4 && zip -r ../coere-v4.zip .
+git pull
+pnpm install --frozen-lockfile
+COERE_SITE_URL=https://www.coere.ai pnpm build:v4
+pnpm lint:manifest
+cd apps/extension/.output/chrome-mv3-v4
+rm -f ../coere-v4-1.1.3.zip && zip -r -X ../coere-v4-1.1.3.zip . -x '.*'
 ```
 
-The zip must have `manifest.json` at its top. The build holds no API key and
-talks only to `https://www.coere.ai`.
+`pnpm lint:manifest` must print `chrome-mv3-v4 (v4) is clean`. Then open
+`apps/extension/.output/chrome-mv3-v4/manifest.json` and check that
+`host_permissions` ends with `https://www.coere.ai/*` and `https://coere.ai/*`
+and names no other coere.ai address. The zip has `manifest.json` at its top,
+holds no API key, and is about 32 MB. The version in its name is the
+`version` in that manifest; for every new upload raise it in
+`apps/extension/build/version.ts` and `apps/extension/package.json`
+together, since the store refuses a version it already has.
 
 ## 7. Vercel
 
@@ -249,8 +259,10 @@ Vercel Authentication covers **Production**, turn it off (or exempt
 
 ### 7.4 Function duration
 
-Every route asks for 300 seconds, the most Hobby allows. On Pro you may raise
-the Claude route to 800 seconds in
+The Claude route and the memory commit route ask for 300 seconds, the most
+Hobby allows; every other route is short and keeps Vercel's default. Leave
+**Fluid Compute** on (Settings, then Functions), which is the default for new
+projects. On Pro you may raise the Claude route to 800 seconds in
 `src/app/api/v1/anthropic/[...path]/route.ts`, so a very long answer is never
 cut off.
 
@@ -270,36 +282,73 @@ cut off.
 ## 8. Chrome Web Store
 
 1. Go to chrome.google.com/webstore/devconsole with the Google account that
-   will own Coere, and pay the one time $5 registration.
-2. **New item**, upload `coere-v4-1.1.3.zip`.
-3. Copy the item's **ID** (32 letters), shown right away. Put it into
-   `COERE_EXTENSION_IDS` on Vercel and redeploy. Without it coere.ai refuses
-   to connect the extension and will not show the dashboard.
+   will own Coere, and pay the one time $5 registration. Fill in the
+   account's publisher name and contact email, and verify the email.
+2. **New item**, upload `coere-v4-1.1.3.zip` from section 6.
+3. Copy the item's **ID** (32 letters a to p), shown at the top of the item
+   right away. This is Coere's id for good: every update keeps it. On Vercel,
+   **Settings**, **Environment Variables**, edit `COERE_EXTENSION_IDS` for
+   Production to that id, save, then **Deployments**, the latest one's menu,
+   **Redeploy**. Nothing else pins the id: the extension trusts coere.ai by
+   its address, and the site builds its frame policy, the `coere_ext` cookie
+   check and the connect check from this one variable on every request.
+   Without it coere.ai refuses to connect the extension and will not show the
+   dashboard.
 4. To test before review: in Chrome open `chrome://extensions`, turn on
    **Developer mode**, **Load unpacked**, and pick the unzipped folder. Its
    id differs from the store's; add it too:
    `COERE_EXTENSION_IDS=storeid,unpackedid`, and redeploy. Remove the
-   unpacked id before you go public.
-5. The listing:
-   - **Privacy policy**: `https://www.coere.ai/privacy`. Add the company's
-     legal name and address there first.
-   - **Single purpose**: "Saves your AI chats and builds one memory you own,
-     added to new chats on every AI."
-   - **Permission justifications**: the nine AI sites (read and save the
-     person's chats there and add their memory to new chats); `www.coere.ai`
-     (the person's account and every AI request); `externally_connectable`
-     for coere.ai (the sign in hands the extension its token); web accessible
-     `console.html` for coere.ai (coere.ai shows the extension's own
-     dashboard); `scripting`, `offscreen`, `storage`, `unlimitedStorage` (the
-     local library and memory); `downloads` (exports); `tabGroups` (grouping
-     the tabs Extract all opens); `activeTab`, `contextMenus`, `search`
-     (Coere Actions).
-   - **Data use**: declare authentication information (the account's
-     username and device token, kept in the browser), user activity and
-     website content (the chats it saves locally, and the cleaned AI requests
-     and memory backup that go to coere.ai), and confirm the Limited Use
-     statement; the privacy page makes it.
-6. Submit for review.
+   unpacked id, and redeploy, before you go public.
+5. **Store listing**: the description, category, screenshots (five at 1280
+   by 800), the small promo tile (440 by 280) and the 128 pixel icon. The
+   build's `icon/128.png` is the icon.
+6. **Privacy practices**:
+   - **Single purpose**: "Coere saves the person's AI chats and builds one
+     memory they own from them, which it adds to new chats on any AI site."
+   - **Permission justifications**, one line each:
+     - `storage`: keeps settings, the sign in and progress in the browser.
+     - `unlimitedStorage`: the saved chats and the memory live in a local
+       database that can grow past the default quota.
+     - `downloads`: saves chats or the memory file when the person presses
+       Download or Export, and a file a Cori task they started downloads.
+     - `scripting`: puts Cori's page script, which ships in the extension,
+       into the one tab the person asked Cori to work on.
+     - `offscreen`: runs the local database, the search model and voice
+       mode, which a service worker cannot hold.
+     - `tabGroups`: puts the tabs Extract all and Cori open into one Coere
+       group.
+     - `activeTab`: lets Cori read the page the person is on only when they
+       press the Coere button or a Coere menu item.
+     - `contextMenus`: Rewrite with Cori and Ask Cori on selected text.
+     - `search`: runs a search the person asked Cori for in their own search
+       engine.
+     - The nine AI sites: read and save the person's chats there when they
+       ask, show saved chats while they type, and add their memory to a new
+       chat when they send.
+     - `www.coere.ai` and `coere.ai`: the account, the memory backup, synced
+       settings and every AI request, which coere.ai forwards to Anthropic.
+     - Optional `mail.google.com` and `calendar.google.com`: asked only when
+       the person allows Cori to draft an email or add an event.
+     - Optional `https://*/*` and `http://*/*`: asked for one Browser Use
+       task the person started, and given back when it ends.
+   - **Remote code**: No. Every script and WebAssembly file ships in the zip.
+     Voice mode downloads model weights (data, not code) from huggingface.co
+     on first use.
+   - **Data usage**: tick personally identifiable information, health
+     information, financial and payment information (these three can appear
+     in chat text and memories; sensitive ones stay out of the backup unless
+     the person turns them on), authentication information (the device
+     token), personal communications (the chats, and with Browser Use up to
+     three past Gmail emails as style examples), location (the country and a
+     keyed address hash in security records), user activity (feature counts)
+     and website content (the chats, and the page Cori works on). Leave web
+     history unticked. Tick all three certifications.
+   - **Privacy policy**: `https://www.coere.ai/privacy`. Add the publisher's
+     legal name and postal address there first, in
+     `src/site/content/privacy.ts` under "Who runs Coere".
+7. **Distribution**: free, public (or unlisted for a soft launch), all
+   regions. Submit for review. Broad optional hosts and Coere Actions can
+   send the item to a longer manual review.
 
 ## 9. The first real run (before you go public)
 
