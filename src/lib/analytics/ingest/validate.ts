@@ -1,4 +1,4 @@
-import { MAX_LABEL, SECTION_ID, cleanLabel } from "@/lib/analytics/sections/ids";
+import { MAX_LABEL, SECTION_ID, cleanLabel, wellFormed } from "@/lib/analytics/sections/ids";
 
 // Turning an untrusted beacon body into values we are willing to store.
 //
@@ -29,7 +29,7 @@ export const num = (v: unknown, min: number, max: number): number => {
 };
 
 export const text = (v: unknown, max: number): string | null =>
-  typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null;
+  typeof v === "string" && v.trim() ? wellFormed(v.trim().slice(0, max)) || null : null;
 
 /** Keep only the referrer's HOST. A query string can carry a person's search
  *  terms, which are not ours to store. */
@@ -51,7 +51,7 @@ export function safePath(path: unknown): string {
   const clean = path.split("?")[0]!.split("#")[0]!.trim();
   if (!clean.startsWith("/")) return "/";
   const trimmed = clean.length > 1 ? clean.replace(/\/+$/, "") : clean;
-  return (trimmed || "/").slice(0, 256);
+  return wellFormed((trimmed || "/").slice(0, 256)) || "/";
 }
 
 /** The section batch. Duplicates and bad ids are dropped; label and position
@@ -65,7 +65,7 @@ export function parseSections(raw: unknown): SectionInput[] {
     const e = entry as { id?: unknown; seconds?: unknown; label?: unknown; position?: unknown };
     if (typeof e.id !== "string" || !SECTION_ID.test(e.id) || seen.has(e.id)) continue;
     seen.add(e.id);
-    const label = typeof e.label === "string" ? cleanLabel(e.label).slice(0, MAX_LABEL) : "";
+    const label = typeof e.label === "string" ? wellFormed(cleanLabel(e.label).slice(0, MAX_LABEL)) : "";
     out.push({
       section: e.id,
       seconds: Math.round(num(e.seconds, 0, 86_400)),

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { parseSections, safePath, safeReferrer } from "./validate";
+import { parseSections, safePath, safeReferrer, text } from "./validate";
 
 test("parseSections keeps label and position, drops bad entries", () => {
   const out = parseSections([
@@ -38,4 +38,15 @@ test("safePath groups variants of one page", () => {
 test("safeReferrer keeps only the host", () => {
   assert.equal(safeReferrer("https://www.Google.com/search?q=private"), "www.google.com");
   assert.equal(safeReferrer(""), null);
+});
+
+test("a cut that splits an emoji leaves no half of it, which Postgres's JSON refuses", () => {
+  const lone = /[\uD800-\uDFFF]/;
+  const label = `${"a".repeat(78)}😀 more words`;
+  const [section] = parseSections([{ id: "hero", seconds: 1, label }]);
+  assert.ok(section?.label && !lone.test(section.label.replace(/😀/g, "")), section?.label ?? "");
+  const cut = text(`${"b".repeat(119)}😀`, 120);
+  assert.ok(cut !== null && !lone.test(cut.replace(/😀/g, "")), cut ?? "");
+  assert.equal(text("half \uD83D of one", 120), "half  of one");
+  assert.equal(safePath(`/${"c".repeat(254)}😀`).length, 255);
 });

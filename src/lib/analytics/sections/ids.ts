@@ -32,11 +32,21 @@ export function slugify(text: string): string {
     .replace(/-+$/g, "");
 }
 
+/**
+ * The text without any half of a surrogate pair. A cut by length can split
+ * an emoji, and Postgres refuses JSON that holds the half, which loses the
+ * whole beacon it came in.
+ */
+export function wellFormed(text: string): string {
+  // A whole pair matches first and stays; a half on its own goes.
+  return text.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g, (m) => (m.length === 2 ? m : ""));
+}
+
 /** Collapse whitespace and cap the length, so a label is one tidy line. */
 export function cleanLabel(text: string | null | undefined): string {
-  const flat = (text ?? "").replace(/\s+/g, " ").trim();
+  const flat = wellFormed((text ?? "").replace(/\s+/g, " ").trim());
   if (flat.length <= MAX_LABEL) return flat;
-  return `${flat.slice(0, MAX_LABEL - 1).trimEnd()}…`;
+  return `${wellFormed(flat.slice(0, MAX_LABEL - 1)).trimEnd()}…`;
 }
 
 /**
