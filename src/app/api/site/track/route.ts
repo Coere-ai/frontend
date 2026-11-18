@@ -21,6 +21,7 @@ import {
   safeReferrer,
   text,
 } from "@/lib/analytics/ingest/validate";
+import { isTrackedPath } from "@/lib/analytics/tracked-paths";
 import { supabaseConfigured } from "@/lib/supabase";
 
 // POST /api/site/track
@@ -86,6 +87,8 @@ export async function POST(req: Request): Promise<Response> {
   if (!sessionId || !visitorId) return noContent();
 
   const path = safePath(body.path);
+  // A private page is never counted, whatever an older tab still sends.
+  if (!isTrackedPath(path)) return noContent();
   // The header, not the body: a client can put anything in the body, and this
   // one is set by the transport.
   const userAgent = req.headers.get("user-agent")?.slice(0, 512) ?? null;

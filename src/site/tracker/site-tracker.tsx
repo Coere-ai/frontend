@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { clickListener } from "@/lib/analytics/beacon/clicks";
 import { sectionClock } from "@/lib/analytics/beacon/section-clock";
 import { framed, send, uuid, visitorId } from "@/lib/analytics/beacon/transport";
+import { isTrackedPath } from "@/lib/analytics/tracked-paths";
 
 // Site analytics, client side.
 //
@@ -25,12 +26,6 @@ const FLUSH_SECONDS = 15;
  *  a page with many sections. */
 const SECTIONS_PER_BEACON = 20;
 
-/** The admin panel is not the site. Counting our own visits to /admin would
- *  put the operator in their own numbers. Checked here as well as by where the
- *  tracker is mounted, so moving it cannot start counting them. The account
- *  pages sit inside the site's layout but are private, so they are left out
- *  too. */
-const IGNORED = /^\/(admin|statistics|sign-in|sign-up|auth|connect|dashboard|join)(\/|$)/;
 
 export function SiteTracker() {
   const pathname = usePathname();
@@ -39,7 +34,10 @@ export function SiteTracker() {
   // page view, and folding it into the previous one would attribute the second
   // page's reading time to the first.
   useEffect(() => {
-    if (!pathname || IGNORED.test(pathname) || framed()) return;
+    // Private pages are never counted (lib/analytics/tracked-paths.ts). Checked
+    // here as well as by where the tracker is mounted, so moving it cannot
+    // start counting them.
+    if (!pathname || !isTrackedPath(pathname) || framed()) return;
 
     const base = (() => {
       const fields = { sessionId: uuid(), visitorId: visitorId(), path: pathname };
