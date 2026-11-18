@@ -115,3 +115,15 @@ test("/sign-out is an account page: noindex and a nonce policy, with no extensio
   assert.doesNotMatch(answer.headers.get("content-security-policy") ?? "", /chrome-extension:/);
   assert.equal(answer.headers.get("x-robots-tag"), "noindex, nofollow, noarchive");
 });
+
+test("the public frame headers in next.config.ts leave every page the proxy gives a policy to alone", async () => {
+  const { getPathMatch } = await import("next/dist/shared/lib/router/utils/path-match.js");
+  const nextConfig = (await import("../next.config")).default;
+  const rules = ((await nextConfig.headers?.()) ?? []).filter((rule) => rule.headers.some((h) => /^(content-security-policy|x-frame-options)$/i.test(h.key)));
+  const framed = (path: string) => rules.some((rule) => getPathMatch(rule.source, { strict: true })(path) !== false);
+  // Two policies on one answer both apply, so the public frame-src 'self' would block the extension frame.
+  for (const path of ["/welcome", "/dashboard", "/dashboard/memory", "/sign-in", "/sign-up", "/sign-out", "/connect", "/account", "/admin", "/admin/users"]) {
+    assert.equal(framed(path), false, path);
+  }
+  for (const path of ["/", "/about", "/install", "/welcome-pack", "/accounts"]) assert.equal(framed(path), true, path);
+});
