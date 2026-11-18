@@ -51,8 +51,8 @@ export async function shootDashboard(playwright, shooter, { coereV2, proxy, supa
 
     let f = await openSection(page, "/dashboard/memory");
     await s("memory");
-    // Room enough above the search box that the Graph and List switch beside it clears the page's header.
-    await scrollTo(f.locator("input[type=search], [role=searchbox]").first(), 140);
+    // From the Graph and List switch down, so the build cards above it are wholly out of view rather than cut.
+    await scrollTo(f.getByText("Graph", { exact: true }).first(), 16);
     await s("memory-graph");
 
     f = await openSection(page, "/dashboard/library");

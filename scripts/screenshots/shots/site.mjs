@@ -1,6 +1,6 @@
 // The public site's pictures, signed out, at 1440 wide (the whole page
 // when it is long) and a few at 390, plus the account pages: sign in,
-// sign up, the connect page and /account.
+// sign up, the connect page, /account and /sign-out.
 
 import { MAYA } from "../seed/people.mjs";
 
@@ -50,10 +50,18 @@ export async function shootSite(browser, base, shooter, { scale }) {
     await open(page, base, `/industries/${slug}`);
     await s(`industry-${slug}`);
   }
-  for (const [name, path] of [["resources", "/resources"], ["about", "/about"], ["developer-waitlist", "/developers/waitlist"], ["install", "/install"], ["try-teams", "/try-teams"], ["privacy", "/privacy"], ["portable-ai-memory", "/portable-ai-memory"]]) {
+  // About, down to where its team starts: no real person's name or photo goes into a picture.
+  await open(page, base, "/about");
+  const team = await page.locator("section#team").evaluate((el) => Math.round(el.getBoundingClientRect().top + window.scrollY));
+  await s("about", { full: true, clip: { x: 0, y: 0, width: 1440, height: team } });
+  for (const [name, path] of [["resources", "/resources"], ["developer-waitlist", "/developers/waitlist"], ["install", "/install"], ["try-teams", "/try-teams"], ["privacy", "/privacy"], ["portable-ai-memory", "/portable-ai-memory"]]) {
     await open(page, base, path);
     await s(name, { full: true });
   }
+
+  // The privacy policy's first screen, for the README; privacy.webp is the whole policy.
+  await open(page, base, "/privacy");
+  await s("privacy-top");
 
   await open(page, base, "/resources/endpoints");
   await s("resources-endpoints");
@@ -78,6 +86,14 @@ export async function shootSite(browser, base, shooter, { scale }) {
   // /account, signed in as Maya: what a device token may not do, from any browser.
   await open(page, base, "/account");
   await s("account", { full: true });
+  await s("account-top");
+  // /sign-out as a link from another site leaves it, waiting for its button. Typed, or from this site, it signs out at once.
+  await page.goto("about:blank");
+  await page.setContent(`<a href="${base}/sign-out">Sign out</a>`);
+  await page.getByRole("link", { name: "Sign out" }).click();
+  await page.getByRole("heading", { name: "Sign out of Coere" }).waitFor({ timeout: 60_000 });
+  await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
+  await s("sign-out");
   // Without the extension, the dashboard says how to get it.
   await open(page, base, "/dashboard");
   // The host asks each allowed id with coere.hello before it says Coere is missing, which outlasts a fixed wait on a cold dev server.
