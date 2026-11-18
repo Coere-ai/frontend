@@ -59,6 +59,17 @@ export async function listFolder(folder: string): Promise<string[]> {
   return data.filter((f) => f.id !== null).map((f) => f.name);
 }
 
+/** Each file directly in a folder with a stamp that changes whenever it is written again. */
+export async function listStamps(folder: string): Promise<Map<string, string>> {
+  const { data, error } = await bucket().list(folder, { limit: 1000 });
+  if (error || !data) return new Map();
+  return new Map(
+    data
+      .filter((f) => f.id !== null)
+      .map((f) => [f.name, `${f.updated_at ?? ""}|${(f.metadata as { eTag?: string } | null)?.eTag ?? ""}`]),
+  );
+}
+
 /**
  * Writes bytes over a stored file in one call. The old file stays until the
  * new one is in place, so a failed write leaves the copy that was there,

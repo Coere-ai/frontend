@@ -109,3 +109,14 @@ export function mergeParts(parts: readonly MemberPart[], sharedSections: readonl
     truncated,
   };
 }
+
+/**
+ * What a merge read, as a key to compare two reads by: each contributing
+ * member with the stamp of their stored part (`stamps` maps a part's file
+ * name to its Storage stamp). A part written again while a merge ran changes
+ * the key even when the members did not, so the merge runs once more instead
+ * of keeping that member's older part. Pure.
+ */
+export function partsKey(live: Iterable<string>, stamps: ReadonlyMap<string, string>): string {
+  return [...live].sort().map((userId) => `${userId}=${stamps.get(`${userId}.json`) ?? ""}`).join(",");
+}

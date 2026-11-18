@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 
 import { orgIndexPath, orgMemberPartPath, userIndexPath, type MemoryIndex } from "./index-types";
 import { memberPart } from "./org-cut";
-import { mergeParts, type MemberPart } from "./org-merge";
-import { getJson, listFolder, putJson, removePaths } from "./storage";
+import { mergeParts, partsKey, type MemberPart } from "./org-merge";
+import { getJson, listFolder, listStamps, putJson, removePaths } from "./storage";
 
 /**
  * The organization's shared knowledge graph on the server (docs/accounts.md
@@ -64,13 +64,14 @@ export async function removeMemberPart(orgId: string, userId: string): Promise<v
 /** Rebuilds after one whose members changed while it ran, before giving up on a busy organization. */
 const REBUILD_ROUNDS = 3;
 
-/** The members who contribute now, as a sorted key to compare two reads by. */
+/** The members who contribute now and their stored parts, as a key to compare two reads by. */
 async function liveMembers(orgId: string): Promise<{ live: Set<string>; key: string } | null> {
   const org = await readOrg(orgId);
   if (!org) return null;
   const members = await readMembers(orgId);
   const live = new Set(members.filter((m) => memberContributes(m, org)).map((m) => m.user_id));
-  return { live, key: [...live].sort().join(",") + `|${(org.shared_sections ?? []).join(",")}` };
+  const stamps = await listStamps(`org/${orgId}/members`);
+  return { live, key: partsKey(live, stamps) + `|${(org.shared_sections ?? []).join(",")}` };
 }
 
 /**
@@ -79,9 +80,10 @@ async function liveMembers(orgId: string): Promise<{ live: Set<string>; key: str
  * off) is deleted here, so the graph heals even if a removal was missed.
  *
  * Rebuilds are not serialised, so one that read the members before someone
- * left could write last and put their facts back. Each run reads the members
- * again after writing and runs once more when they changed, so the last
- * writer always matches the members as they are.
+ * left, or read a member's part before their next commit wrote it, could
+ * write last and put the old facts back. Each run reads the members and
+ * their parts' stamps again after writing and runs once more when they
+ * changed, so the last writer always matches the parts as they are.
  */
 export async function rebuildOrgIndex(orgId: string): Promise<void> {
   for (let round = 0; round < REBUILD_ROUNDS; round++) {

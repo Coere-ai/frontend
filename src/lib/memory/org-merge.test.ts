@@ -7,7 +7,7 @@ import { openCoere } from "./coere-zip";
 import { SAM_FOLDER, zipFolder } from "./fixture-zip";
 import type { IndexFact, MemoryIndex } from "./index-types";
 import { cutToSections, memberPart } from "./org-cut";
-import { mergeParts, normalName } from "./org-merge";
+import { mergeParts, normalName, partsKey } from "./org-merge";
 
 const fact = (id: string, subject: string, over: Partial<IndexFact> = {}): IndexFact => ({
   id, subject, under: null, kind: "note", key: null, text: id, importance: 3, status: "active",
@@ -144,5 +144,19 @@ describe("access", () => {
     assert.equal(contributes(true, own), false);
     assert.equal(contributes(false, { read: "all", contribute: true }), false);
     assert.equal(contributes(true, { read: "all", contribute: true }), true);
+  });
+});
+
+describe("partsKey", () => {
+  const stamps = (entries: [string, string][]) => new Map(entries);
+  it("changes when a contributing member's part is written again while the members stay the same", () => {
+    const live = ["u-a", "u-b"];
+    const before = partsKey(live, stamps([["u-a.json", "t1"], ["u-b.json", "t1"]]));
+    assert.notEqual(partsKey(live, stamps([["u-a.json", "t1"], ["u-b.json", "t2"]])), before);
+    assert.equal(partsKey([...live].reverse(), stamps([["u-b.json", "t1"], ["u-a.json", "t1"]])), before);
+  });
+  it("ignores the parts of members who no longer contribute, which the merge removes", () => {
+    const before = partsKey(["u-a"], stamps([["u-a.json", "t1"], ["u-gone.json", "t1"]]));
+    assert.equal(partsKey(["u-a"], stamps([["u-a.json", "t1"]])), before);
   });
 });
