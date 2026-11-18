@@ -12,7 +12,12 @@ const CONNECT = /^https:\/\/www\.coere\.ai\/(sign-in|connect)/;
 const ONBOARDING = /^chrome-extension:\/\/([a-p]{32})\/onboarding\.html/;
 const WELCOME = /^https:\/\/www\.coere\.ai\/welcome/;
 
-export async function connectMaya(context, memoryFile, now) {
+/**
+ * Install opens the connect page; Maya signs in and presses Connect Coere,
+ * and the tab goes on to coere.ai/welcome framing the extension's
+ * onboarding. Returns that tab and the extension's id, read from the frame.
+ */
+export async function signInAndConnect(context) {
   const tab = await tabMatching(context, CONNECT);
   await tab.waitForLoadState("load");
   await tab.getByLabel("Username").fill(MAYA.username);
@@ -30,7 +35,11 @@ export async function connectMaya(context, memoryFile, now) {
     frame = onboarding.frames().find((f) => ONBOARDING.test(f.url())) ?? null;
   if (!frame) throw new Error("coere.ai/welcome framed no onboarding page");
   const extensionId = ONBOARDING.exec(frame.url())[1];
-  const consoleUrl = `chrome-extension://${extensionId}/console.html`;
+  return { extensionId, consoleUrl: `chrome-extension://${extensionId}/console.html`, welcome: onboarding };
+}
+
+export async function connectMaya(context, memoryFile, now) {
+  const { extensionId, consoleUrl, welcome: onboarding } = await signInAndConnect(context);
 
   // Her chats, as Extract all would have saved them.
   await onboarding.goto(`${consoleUrl}?tab=home`);

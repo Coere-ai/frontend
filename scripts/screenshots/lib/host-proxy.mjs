@@ -7,6 +7,10 @@
 // The dev server only hands its own scripts and live reload socket to its
 // own origin, so for those the proxy says the request came from localhost.
 // Pages and API calls keep www.coere.ai as their host and origin.
+//
+// A run has no Anthropic key, so once useAi(port) names a stand in for the
+// AI (lib/fake-ai.mjs), the Claude proxy's calls go there instead of to the
+// site. Only the welcome pictures, which show a memory build live, do that.
 
 import { request } from "node:http";
 import { createServer } from "node:https";
@@ -14,6 +18,8 @@ import { connect } from "node:net";
 import { runCert } from "./tls.mjs";
 
 export const SITE_HOST = "www.coere.ai";
+
+const ANTHROPIC = "/api/v1/anthropic/";
 
 /** Headers for the dev server: its own assets and socket see a localhost origin. */
 function forwarded(req, target) {
@@ -29,8 +35,13 @@ function forwarded(req, target) {
 export async function startHostProxy(targetPort) {
   const tls = runCert([SITE_HOST]);
   const target = `http://localhost:${targetPort}`;
+  let aiPort = null;
   const server = createServer({ key: tls.key, cert: tls.cert }, (req, res) => {
-    const up = request({ host: "127.0.0.1", port: targetPort, method: req.method, path: req.url, headers: forwarded(req, target) }, (r) => {
+    const ai = aiPort !== null && req.url.startsWith(ANTHROPIC);
+    const to = ai
+      ? { port: aiPort, path: `/${req.url.slice(ANTHROPIC.length)}`, headers: req.headers }
+      : { port: targetPort, path: req.url, headers: forwarded(req, target) };
+    const up = request({ host: "127.0.0.1", method: req.method, ...to }, (r) => {
       res.writeHead(r.statusCode ?? 502, r.headers);
       r.pipe(res);
     });
@@ -59,6 +70,10 @@ export async function startHostProxy(targetPort) {
   return {
     port: server.address().port,
     spki: tls.spki,
+    /** Sends the Claude proxy's calls to the stand in on this port, or back to the site with null. */
+    useAi: (port) => {
+      aiPort = port;
+    },
     close: async () => {
       server.closeAllConnections?.();
       await new Promise((resolve) => server.close(() => resolve()));

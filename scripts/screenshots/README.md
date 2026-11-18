@@ -1,9 +1,9 @@
 # The screenshot tool
 
-Takes every picture under `docs/screenshots`: the public site, the dashboard
-and the admin panel, against a stand in for Supabase filled with a made up
-world. Nothing it runs is part of the site; the pages are the real ones,
-served by `next dev`.
+Takes every picture under `docs/screenshots`: the public site, the dashboard,
+the admin panel and the welcome page, against a stand in for Supabase filled
+with a made up world. Nothing it runs is part of the site; the pages are the
+real ones, served by `next dev`.
 
 ```bash
 node scripts/screenshots/run.mjs --user owner --password 'a long password'
@@ -13,7 +13,7 @@ node scripts/screenshots/run.mjs --user owner --password 'a long password'
 | --- | --- |
 | `--user`, `--password` | The `/admin` sign in for this run. Required; they are handed to the site as `USER` and `PASSWORD` |
 | `--coere-v2 <dir>` | The coere-v2 checkout (default `../coere-v2`, or `COERE_V2`) |
-| `--only site,admin,dashboard` | Some of the three areas |
+| `--only site,admin,dashboard,welcome` | Some of the four areas |
 | `--port 3210` | The dev server's port |
 | `--scale 1` | Pixels per CSS pixel |
 | `--out docs/screenshots` | Where the pictures go |
@@ -34,6 +34,11 @@ Set `SHOTS_VERBOSE=1` to see the dev server's log, and
 - Playwright with Chromium. The tool takes a `playwright` on the module path
   first, else the `@playwright/test` coere-v2 installs.
 - `openssl`, for the certificates each run makes.
+- Where the network goes through a proxy, `HTTPS_PROXY` and
+  `NODE_EXTRA_CA_CERTS` set in the shell. The dev server gets them, so
+  `next/font` can fetch Geist from Google Fonts. Without Google Fonts every
+  page is drawn in the fallback font, so check the pictures before keeping
+  them.
 
 ## How it works
 
@@ -67,7 +72,19 @@ Set `SHOTS_VERBOSE=1` to see the dev server's log, and
    own commit merges the organization graph. Each dashboard picture is
    `www.coere.ai/dashboard` framing the extension's Console.
 5. **The site and admin pictures**, in a plain Chromium, signed out, then
-   signed in to `/admin`.
+   signed in to `/admin`. `/sign-out` is opened from a link on another
+   page, where it waits for its button; typed, it would sign out at once.
+6. **The welcome pictures**, last, in a second browser with the fake v4
+   build, since it joins Maya's account as one more browser. After Connect
+   Coere the tab is `www.coere.ai/welcome` framing the extension's own
+   onboarding. Her chats go into the Library and a memory build starts as
+   Build my memory starts one, so the onboarding shows it live. The run has
+   no Anthropic key, so the host proxy hands the Claude proxy's calls to
+   coere-v2's fake Claude (`lib/fake-ai.mjs`, under `tsx`), slowed as
+   coere-v2's own live build spec slows it. The fake reads a chat with
+   sentence rules, so in this browser alone her first ten chats each end
+   with one more line in her voice that the rules know, each a fact of her
+   made up world.
 
 For the picture of Organization as a member, the tool sets Maya's role to
 member in the stand in's database, as an admin's Make member would, and
@@ -87,6 +104,6 @@ run.mjs                 the command: starts everything, takes the pictures, stop
 fake-supabase/          the stand in: server, REST (rest.mjs, rest-parse.mjs), Auth, Storage
 seed/                   the made up world: people, accounts, usage and totals, the org graph, the site
 maya/                   Maya's chats and the memory file made from them
-lib/                    the dev server, the proxy, certificates, the extension's browser, Maya's setup, the shooter
-shots/                  the pictures: site.mjs, dashboard.mjs, admin.mjs
+lib/                    the dev server, the proxy, certificates, the extension's browser, Maya's setup, the fake AI, the shooter
+shots/                  the pictures: site.mjs, dashboard.mjs, admin.mjs, welcome.mjs
 ```

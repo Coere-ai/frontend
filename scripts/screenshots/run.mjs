@@ -1,9 +1,10 @@
 // Takes every picture under docs/screenshots: the public site, the
 // dashboard (the extension's Console framed by coere.ai) and the admin
-// panel, against a fake Supabase seeded with a made up world. See
+// panel, and coere.ai/welcome framing the extension's onboarding with a
+// memory build live, against a fake Supabase seeded with a made up world. See
 // scripts/screenshots/README.md.
 //
-//   node scripts/screenshots/run.mjs --user owner --password 'a long password' [--coere-v2 ../coere-v2] [--only site,admin,dashboard]
+//   node scripts/screenshots/run.mjs --user owner --password 'a long password' [--coere-v2 ../coere-v2] [--only site,admin,dashboard,welcome]
 
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";
@@ -17,6 +18,7 @@ import { FERNHILL, MAYA } from "./seed/people.mjs";
 import { shootAdmin } from "./shots/admin.mjs";
 import { shootDashboard } from "./shots/dashboard.mjs";
 import { shootSite } from "./shots/site.mjs";
+import { shootWelcome } from "./shots/welcome.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
@@ -32,11 +34,11 @@ function args(argv) {
 
 const a = args(process.argv.slice(2));
 if (!a.user || !a.password) {
-  console.error("usage: node scripts/screenshots/run.mjs --user <admin user> --password <admin password> [--coere-v2 <dir>] [--only site,admin,dashboard] [--port 3210] [--scale 1]");
+  console.error("usage: node scripts/screenshots/run.mjs --user <admin user> --password <admin password> [--coere-v2 <dir>] [--only site,admin,dashboard,welcome] [--port 3210] [--scale 1]");
   process.exit(2);
 }
 const coereV2 = resolve(a["coere-v2"] ?? process.env.COERE_V2 ?? join(ROOT, "../coere-v2"));
-const only = new Set((a.only ?? "site,admin,dashboard").split(","));
+const only = new Set((a.only ?? "site,admin,dashboard,welcome").split(","));
 const port = Number(a.port ?? 3210);
 const scale = Number(a.scale ?? 1);
 const outDir = resolve(a.out ?? join(ROOT, "docs/screenshots"));
@@ -78,6 +80,11 @@ try {
     } finally {
       await browser.close();
     }
+  }
+  // Last, since its browser joins Maya's account as one more.
+  if (only.has("welcome")) {
+    console.log("Welcome");
+    await shootWelcome(playwright, shooter, { coereV2, proxy: stack.proxy, supabaseSpki: stack.fake.tls.spki, now, scale });
   }
 } catch (error) {
   console.error(error);
