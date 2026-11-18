@@ -402,7 +402,11 @@ access hook at `memory.changed`.
   key whose value differs. A write it made itself is not pushed back.
 - **Push.** A change to a synced key in `chrome.storage.local` is pushed
   with `PUT /api/v1/settings` after 3 seconds. The newest write of a key
-  wins.
+  wins. A changed key's name (never its value) waits under
+  `coere.account.settingsPending` in `chrome.storage.local` until the site
+  has it, so a change made while coere.ai cannot be reached outlives the
+  service worker. Each pull pushes what waits first, so it never writes
+  the site's older value over it.
 - **First connect.** If the server has no settings, it pushes every synced
   key once.
 
