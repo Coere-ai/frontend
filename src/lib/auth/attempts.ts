@@ -16,13 +16,16 @@ const SWEEP_AT = 5000;
 
 export function createAttemptLimiter({ max, windowMs }: { max: number; windowMs: number }): AttemptLimiter {
   const windows = new Map<string, { count: number; resetAt: number }>();
+  let sweepAt = SWEEP_AT;
   return {
     hit(key, now = Date.now()) {
       const entry = windows.get(key);
       if (!entry || now >= entry.resetAt) {
         windows.set(key, { count: 1, resetAt: now + windowMs });
-        if (windows.size > SWEEP_AT) {
+        if (windows.size > sweepAt) {
           for (const [k, v] of windows) if (now >= v.resetAt) windows.delete(k);
+          // While most windows are live a sweep frees little, so the next waits for the map to double, not for one more key.
+          sweepAt = Math.max(SWEEP_AT, windows.size * 2);
         }
         return false;
       }

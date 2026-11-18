@@ -14,14 +14,19 @@ export interface Once {
 
 export function createOnce(now: () => number = Date.now): Once {
   const lastSeen = new Map<string, number>();
+  let sweepAt = SWEEP_AT;
   return {
     firstIn(key, ms) {
       const t = now();
       const at = lastSeen.get(key);
       if (at !== undefined && t - at < ms) return false;
       lastSeen.set(key, t);
-      // Drop old keys once the map grows, so it cannot grow without end.
-      if (lastSeen.size > SWEEP_AT) for (const [k, s] of lastSeen) if (t - s >= ms) lastSeen.delete(k);
+      // Drop old keys once the map grows, so it cannot grow without end. A
+      // sweep that frees little waits for the map to double before the next.
+      if (lastSeen.size > sweepAt) {
+        for (const [k, s] of lastSeen) if (t - s >= ms) lastSeen.delete(k);
+        sweepAt = Math.max(SWEEP_AT, lastSeen.size * 2);
+      }
       return true;
     },
   };

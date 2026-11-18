@@ -17,11 +17,14 @@ export interface Limiter {
 
 export function createLimiter(now: () => number = Date.now): Limiter {
   const windows = new Map<string, { count: number; resetAt: number }>();
+  let sweepAt = SWEEP_AT;
 
-  // Drop ended windows once the map grows, so it cannot grow without end.
+  // Drop ended windows once the map grows, so it cannot grow without end. A
+  // sweep that frees little waits for the map to double before the next.
   const sweep = (t: number) => {
-    if (windows.size <= SWEEP_AT) return;
+    if (windows.size <= sweepAt) return;
     for (const [k, w] of windows) if (t >= w.resetAt) windows.delete(k);
+    sweepAt = Math.max(SWEEP_AT, windows.size * 2);
   };
 
   return {

@@ -3,6 +3,22 @@ import { describe, it } from "node:test";
 
 import { createAttemptLimiter, createSignInLimiter } from "./attempts";
 
+/** How many times `run` walks a Map, which is what each sweep does. */
+function mapWalks(run: () => void): number {
+  const walk = Map.prototype[Symbol.iterator];
+  let walks = 0;
+  Map.prototype[Symbol.iterator] = function (this: Map<unknown, unknown>) {
+    walks += 1;
+    return walk.call(this);
+  };
+  try {
+    run();
+  } finally {
+    Map.prototype[Symbol.iterator] = walk;
+  }
+  return walks;
+}
+
 describe("createAttemptLimiter", () => {
   it("allows max attempts in a window, then refuses", () => {
     const limiter = createAttemptLimiter({ max: 3, windowMs: 1000 });
@@ -14,6 +30,12 @@ describe("createAttemptLimiter", () => {
     assert.equal(limiter.hit("a", 0), false);
     assert.equal(limiter.hit("a", 999), true);
     assert.equal(limiter.hit("a", 1000), false);
+  });
+
+  it("sweeps once per doubling, not once per key, while every window is live", () => {
+    const limiter = createAttemptLimiter({ max: 1, windowMs: 1000 });
+    assert.ok(mapWalks(() => { for (let i = 0; i < 40_000; i++) limiter.hit(`k${i}`, 0); }) < 10);
+    assert.equal(limiter.hit("k0", 0), true);
   });
 
   it("counts each key apart", () => {
