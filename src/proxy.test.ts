@@ -62,9 +62,29 @@ test("an account session never opens the admin panel", async () => {
   assert.equal(api.status, 404);
 });
 
+/**
+ * The token with its signature's first character changed. That character
+ * carries six whole bits. The last one carries only four, and the old edit
+ * changed the last two characters, which about once in a thousand tokens
+ * decoded to the same signature, so the test let a valid cookie through.
+ */
+function editSignature(token: string): string {
+  const dot = token.lastIndexOf(".");
+  const first = token[dot + 1];
+  return `${token.slice(0, dot + 1)}${first === "A" ? "B" : "A"}${token.slice(dot + 2)}`;
+}
+
+test("an edited signature always decodes to other bytes", () => {
+  // Endings the old edit left decoding to the same bytes: a second to last A and a last B, C or D.
+  for (const sig of ["A".repeat(41) + "AB", "Q".repeat(41) + "AD", "z".repeat(41) + "BA"]) {
+    const token = `eyJ4IjoxfQ.${sig}`;
+    const bytes = (t: string) => Buffer.from(t.slice(t.lastIndexOf(".") + 1), "base64url");
+    assert.notDeepEqual(bytes(editSignature(token)), bytes(token));
+  }
+});
+
 test("a forged or edited admin cookie is refused", async () => {
-  const token = issueSessionToken();
-  const edited = `${token.slice(0, -2)}${token.endsWith("A") ? "B" : "A"}A`;
+  const edited = editSignature(issueSessionToken());
   assert.equal((await proxy(request("/api/admin/users", { [SESSION_COOKIE]: edited }))).status, 404);
   assert.equal((await proxy(request("/api/admin/users", { [SESSION_COOKIE]: "x.y" }))).status, 404);
 });
