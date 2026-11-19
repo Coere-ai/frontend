@@ -24,6 +24,13 @@ export const metadata: Metadata = {
 };
 
 /**
+ * Per request, always. The page reads the session only once Supabase is
+ * configured, so a build without those settings would otherwise serve one
+ * static redirect to sign in, which a signed in person bounces off forever.
+ */
+export const dynamic = "force-dynamic";
+
+/**
  * /account: the steps a device token may not take (docs/accounts.md 7),
  * signed in on coere.ai, and how the person signs in (3.1). It sets the
  * display name, changes the username and the password, signs this browser out,
