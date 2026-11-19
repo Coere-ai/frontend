@@ -20,3 +20,9 @@ test("launch.md names Back up now only when a page can send it", () => {
   const sends = sources(join(root, "src")).some((path) => readFileSync(path, "utf8").includes("coere.backup"));
   if (!sends) assert.doesNotMatch(launch, /Back up now/);
 });
+
+// The migration's check count grows with every change to it, and launch.md
+// said 332 while db:check ran 335. The page names no count, so it cannot drift.
+test("launch.md names no count of migration checks", () => {
+  assert.doesNotMatch(launch, /\d+\s+checks/);
+});

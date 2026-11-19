@@ -100,8 +100,8 @@ username** and a password with **Set a new password**, and tell the person.
    - `plans` has three rows: free, plus and team.
    - **Storage** shows a private bucket named `memory`.
 5. If it fails, copy the error message (not the SQL) and send it to the
-   developer. `npm run db:check` runs the same file locally on PGlite with
-   332 checks, so a failure on Supabase would be a Supabase difference.
+   developer. `npm run db:check` runs the same file locally on PGlite and checks
+   it, so a failure on Supabase would be a Supabase difference.
 
 This one file is every migration there is: site analytics, accounts, devices,
 usage and limits, the memory backup, settings sync, organizations, running
