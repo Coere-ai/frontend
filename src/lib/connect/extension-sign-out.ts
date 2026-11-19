@@ -40,3 +40,17 @@ export async function signOutExtension(cookie: string, send: Send): Promise<void
   if (!id) return;
   await send(id, EXTENSION_SIGN_OUT, EXTENSION_SIGN_OUT_WAIT_MS).catch(() => undefined);
 }
+
+/**
+ * The sign out form's press: ask the connected Coere, then submit the form
+ * again in a task of its own (sign-out-form.tsx). A browser runs promise
+ * callbacks between the listeners of the press's own submit event, and a
+ * form ignores requestSubmit while it fires that event. With no Coere
+ * connected, or no extension bridge in this browser, the ask settles at
+ * once, so a resubmit straight from the promise was dropped and the Sign
+ * out button did nothing.
+ */
+export async function signOutThenSubmit(cookie: string, send: Send, submit: () => void, later: (run: () => void) => void = (run) => setTimeout(run, 0)): Promise<void> {
+  await signOutExtension(cookie, send);
+  later(submit);
+}

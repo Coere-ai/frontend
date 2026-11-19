@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 import { signOut } from "@/lib/auth/sign-out";
 import { sendToExtension } from "@/lib/connect/bridge";
-import { signOutExtension } from "@/lib/connect/extension-sign-out";
+import { signOutThenSubmit } from "@/lib/connect/extension-sign-out";
 
 /**
  * A Sign out form that signs Coere in this browser out too
@@ -29,7 +29,7 @@ export function SignOutForm({ next, auto = false, children }: { next?: string; a
         if (asked.current) return;
         e.preventDefault();
         asked.current = true;
-        void signOutExtension(document.cookie, sendToExtension).finally(() => form.current?.requestSubmit());
+        void signOutThenSubmit(document.cookie, sendToExtension, () => form.current?.requestSubmit());
       }}
     >
       {next ? <input type="hidden" name="next" value={next} /> : null}
