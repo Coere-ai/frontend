@@ -3,6 +3,7 @@ import { siteConfig } from "@/lib/site";
 import { docPages } from "@/site/content/docs";
 import { guides } from "@/site/content/guides";
 import { industries } from "@/site/content/industries";
+import { PRIVACY_EFFECTIVE } from "@/site/content/privacy";
 import { products } from "@/site/content/products";
 
 /**
@@ -13,7 +14,8 @@ import { products } from "@/site/content/products";
 const UPDATED = {
   site: "2026-11-03",
   docs: "2026-10-29",
-  privacy: "2026-11-04",
+  // The policy's own effective date, so the two cannot drift apart.
+  privacy: PRIVACY_EFFECTIVE,
 } as const;
 
 /**

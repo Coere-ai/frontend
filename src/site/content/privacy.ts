@@ -6,8 +6,8 @@
  */
 
 /** The day this text took effect, as a date and as the page says it. */
-export const PRIVACY_EFFECTIVE = "2026-11-10";
-export const PRIVACY_EFFECTIVE_LABEL = "November 10, 2026";
+export const PRIVACY_EFFECTIVE = "2026-11-19";
+export const PRIVACY_EFFECTIVE_LABEL = "November 19, 2026";
 
 /** One part of the policy: a heading, its paragraphs, and an optional list after them. */
 export type PrivacySection = { id: string; title: string; paragraphs: string[]; list?: string[]; after?: string[] };
@@ -74,7 +74,7 @@ export const privacySections: PrivacySection[] = [
       "The backup is on by default. With it on, the extension uploads a copy of your memory to coere.ai a few minutes after your memory changes. The copy holds your memories with their quotes, the documents Coere writes from them (such as a project's notes or plan), and the titles of the chats they come from. It never holds the chats themselves.",
       "Memories Coere marks sensitive, such as health and money, are left out unless you turn on Include sensitive memories.",
       "coere.ai uses the copy to show your memory and the titles of its chats in your dashboard, to let you download it, and to build your organization's shared memory if you are in one.",
-      "To turn it off, open your dashboard on coere.ai, go to Settings and turn off Back up memory to coere.ai. That deletes the stored copy, its index and your part of your organization's shared memory, and the extension stops uploading. Your memory in Coere stays in your browser. Delete the memory copy, under Account, deletes the stored copy too, but with the backup on a new copy arrives at the next upload.",
+      "To turn it off, open your dashboard on coere.ai, go to Settings and turn off Back up memory to coere.ai. That deletes the stored copy, its index and your part of your organization's shared memory, and the extension stops uploading. Your memory in Coere stays in your browser. Delete memory copy, beside it, deletes the stored copy too, but with the backup on a new copy arrives at the next upload.",
     ],
   },
   {
@@ -114,7 +114,7 @@ export const privacySections: PrivacySection[] = [
     id: "analytics",
     title: "Site analytics",
     paragraphs: [
-      "coere.ai counts its own visits with its own code. It sets no cookie for this and does not identify you. It does not run on the sign in, connect or dashboard pages. For each page view it records:",
+      "coere.ai counts its own visits with its own code. It sets no cookie for this and does not identify you. It does not run on the account pages: sign in, sign up, sign out, connect, your account, the dashboard and the welcome page. For each page view it records:",
     ],
     list: [
       "the page, and the site you came from",
