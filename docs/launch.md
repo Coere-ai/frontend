@@ -360,8 +360,9 @@ cut off.
 4. Open `https://www.coere.ai/dashboard`: it shows Coere's own dashboard with
    your memory, library and Statistics. In Settings, the Account card shows
    your username and the backup.
-5. Press **Back up now**, then in Supabase **Storage**, `memory`, check for a
-   folder named by your user id.
+5. A finished build sends the memory backup by itself within a minute. Then
+   in Supabase **Storage**, `memory`, check for a folder named by your user
+   id.
 6. In `/admin`: **Users** shows your account and its cost, **Cost** shows
    tokens by model, **Security** shows your sign ins and the connected
    device.
