@@ -8,13 +8,14 @@ Maya Collins, made up for these pictures.
 ## Home
 
 <p align="center">
-  <img src="home-hero.webp" width="100%" alt="The home page's first screen: Own your Memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
+  <img src="home-hero.webp" width="100%" alt="The home page's first screen under the glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left, and Extract all, the dashboard and the memory graph stacked on the right over blue slats, with a beam landing on the dashboard" />
   <br />
-  <sub>The first screen: what Coere is, in one line, and the way in.</sub>
+  <sub>The first screen under the glass navbar: what Coere does, the way in, and Extract all, the dashboard and the memory graph stacked beside it.</sub>
 </p>
 
 | | |
 |---|---|
+| <img src="home-ais.webp" alt="Transfer memory across every AI: ChatGPT, Claude, Gemini, Perplexity, Grok, Copilot, Meta AI, Kimi and DeepSeek moving past in a line that fades at both edges" /><br /><sub>Every AI Coere works with, under the hero</sub> | <img src="home-blog.webp" alt="From the blog: the three newest posts as cards, each with its picture, date, title and line, and Read the blog" /><br /><sub>The three newest posts, near the end</sub> |
 | <img src="home-solves.webp" alt="Every AI starts from zero, with the switch on Without Coere: three drawn chats where context is lost, switching AI to AI, a new chat and one long chat" /><br /><sub>What Coere solves on Without Coere, each scene on the still it settles on</sub> | <img src="home-solves-coere.webp" alt="Memory that follows the person, not the app, with the switch on With Coere: the same three chats, each with Coere's line over the box saying what it added" /><br /><sub>The same scenes on With Coere, each with the line Coere adds</sub> |
 | <img src="home-demo.webp" alt="The product film in its frame, on Cori asking which AI chats you use, with the chapters Onboarding, Import, Memory and Features under it" /><br /><sub>The product film, with its chapters</sub> | <img src="home-connect.webp" alt="One memory across every AI, with a ChatGPT window beside four features: Context added as you type, Your memory graph, Import every chat and Coere Actions" /><br /><sub>Coere Connect: one memory across every AI</sub> |
 | <img src="home-solutions.webp" alt="One memory for the whole company, with the company memory graph beside it and Try it free" /><br /><sub>Coere Solutions: one memory for the whole company</sub> | <img src="home-forge.webp" alt="Your app knows its users from day one, with the Apps page beside it and Join the waitlist" /><br /><sub>Coere Forge: memory for the apps developers build</sub> |

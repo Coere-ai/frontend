@@ -35,9 +35,9 @@ pictures: [the site](docs/screenshots/site/README.md),
 ### The site
 
 <p align="center">
-  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The home page's first screen: Own your Memory, a line on what Coere is, Install Coere, Coere for Teams and Coere for Developers, and the start of the product film" />
+  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The home page's first screen under the glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left, and on the right Extract all, the dashboard with tokens saved, efficiency, time saved and recent chats, and the memory graph, stacked over blue slats with a beam landing on the dashboard" />
   <br />
-  <sub>The home page opens on what Coere is, in one line. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
+  <sub>The home page under the glass navbar: what Coere does, and Extract all, the dashboard and the memory graph stacked beside it. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
 </p>
 
 <table>
@@ -69,7 +69,7 @@ pictures: [the site](docs/screenshots/site/README.md),
     <td width="50%">
       <img src="docs/screenshots/site/install.webp" alt="Coming soon on the Chrome Web Store, a countdown and I'm interested" />
       <br />
-      <sub>Every Install button leads to the countdown until the extension is in the Chrome Web Store.</sub>
+      <sub>Start for free and every Install button lead to the countdown until the extension is in the Chrome Web Store.</sub>
     </td>
     <td width="50%">
       <img src="docs/screenshots/site/sign-in.webp" alt="Sign in to Coere with a username and a password, maya_collins typed, beside Coere's line and Cori on blue" />
@@ -79,7 +79,7 @@ pictures: [the site](docs/screenshots/site/README.md),
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/site/account-top.webp" alt="Your account, signed in as maya_collins: Open the dashboard and Sign out at the top, then Profile with her name and username, and the navbar's Dashboard and Sign out" />
+      <img src="docs/screenshots/site/account-top.webp" alt="Your account, signed in as maya_collins: Open the dashboard and Sign out at the top, then Profile with her name and username, and Dashboard and Sign out in the glass navbar" />
       <br />
       <sub>/account, with Sign out at the top and in the navbar. <a href="docs/screenshots/site/account.webp">The whole page</a>.</sub>
     </td>
