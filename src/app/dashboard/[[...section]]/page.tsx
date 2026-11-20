@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/user";
+import { darkViewport } from "@/lib/seo";
 import { consoleTabFor, dashboardPath } from "@/lib/dashboard/host/console-tab";
 import { frameExtensionId, helloCandidates } from "@/lib/dashboard/host/frame-id";
 import { EXTENSION_COOKIE } from "@/lib/supabase/cookie-options";
@@ -16,6 +17,9 @@ import { ConsoleHost } from "@/site/console-host/console-host";
  * exactly the extension `frameId` below and nothing else.
  */
 export const dynamic = "force-dynamic";
+
+/** The host page is dark like the site, from the first paint. */
+export const viewport = darkViewport;
 
 export const metadata: Metadata = {
   title: "Dashboard",

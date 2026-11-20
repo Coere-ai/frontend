@@ -8,6 +8,7 @@ import { consoleSrc, onboardingSrc } from "@/lib/dashboard/host/console-tab";
 import { isSignOutAsk } from "@/lib/dashboard/host/sign-out-message";
 import { extensionCookie, firstAnswering, hostStep } from "@/lib/dashboard/host/find-extension";
 import { helloMessage, readHello } from "@/site/bridge/messages";
+import { DarkPage } from "@/site/ui/page-theme";
 
 import { InstallNote } from "./install-note";
 
@@ -20,6 +21,8 @@ import { InstallNote } from "./install-note";
  * page says how to get it. /welcome frames the extension's onboarding page
  * the same way. Sign out in the Console's rail asks this page, once the
  * extension has disconnected, to sign the site out too (sign-out-message.ts).
+ * The host's own page is in the dark theme like the rest of the site, so
+ * the window is near black, never white, until the frame draws itself.
  */
 
 /** Which of the extension's pages the host frames: the Console at a section, or the onboarding with its query. */
@@ -107,14 +110,17 @@ export function ConsoleHost({ target, frameId, candidates }: { target: FrameTarg
   }, [shownId, finishing]);
 
   if (view.kind === "missing") return <InstallNote />;
-  if (view.kind === "checking") return <main className="min-h-screen bg-white" aria-busy="true" />;
+  if (view.kind === "checking")
+    return (
+      <main aria-busy="true">
+        <DarkPage className="min-h-screen">{null}</DarkPage>
+      </main>
+    );
   return (
-    <iframe
-      ref={frame}
-      src={srcFor(view.id, target)}
-      title="Coere"
-      allow="clipboard-write"
-      className="fixed inset-0 h-full w-full border-0 bg-white"
-    />
+    <main>
+      <DarkPage>
+        <iframe ref={frame} src={srcFor(view.id, target)} title="Coere" allow="clipboard-write" className="fixed inset-0 h-full w-full border-0 bg-night" />
+      </DarkPage>
+    </main>
   );
 }

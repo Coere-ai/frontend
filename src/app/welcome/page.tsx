@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 
 import { requireUser } from "@/lib/auth/user";
+import { darkViewport } from "@/lib/seo";
 import { frameExtensionId, helloCandidates } from "@/lib/dashboard/host/frame-id";
 import { EXTENSION_COOKIE } from "@/lib/supabase/cookie-options";
 import { ConsoleHost } from "@/site/console-host/console-host";
@@ -16,6 +17,9 @@ import { ConsoleHost } from "@/site/console-host/console-host";
  * plain words (onboardingSrc).
  */
 export const dynamic = "force-dynamic";
+
+/** The host page is dark like the site, from the first paint. */
+export const viewport = darkViewport;
 
 export const metadata: Metadata = {
   title: "Welcome",
