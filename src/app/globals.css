@@ -174,29 +174,30 @@ body {
 }
 
 /*
- * The home heading's first word: light ice blue to Coere blue, with a soft
- * white band of light that sweeps across it every few seconds. The colours
- * sit on a wide strip clipped to the letters, and the strip slides.
+ * The home heading's first word: light ice blue to Coere blue with a soft
+ * white band of light. The colours repeat on tiles of one fixed width that
+ * start and end on the same colour, and the strip slides by exactly one
+ * tile at a steady speed, so the loop never shows a seam or a restart.
  */
 .coere-shimmer {
-  background-image: linear-gradient(100deg, #8fb8ff 0%, #b9d6ff 22%, #e8f3ff 34%, #ffffff 40%, #cfe3ff 46%, #8fb8ff 60%, #6c86ff 78%, #8fb8ff 100%);
-  background-size: 250% 100%;
-  background-position: 100% 50%;
+  background-image: linear-gradient(90deg, #8fb8ff 0%, #a9c9ff 14%, #e6f1ff 26%, #ffffff 32%, #d4e6ff 40%, #8fb8ff 54%, #6c86ff 74%, #8fb8ff 100%);
+  background-size: 9em 100%;
+  background-repeat: repeat-x;
+  background-position: 0 50%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: coere-shimmer 6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  animation: coere-shimmer 7s linear infinite;
   filter: drop-shadow(0 0 18px rgba(110, 150, 255, 0.28));
 }
 
 @keyframes coere-shimmer {
-  0% {
-    background-position: 100% 50%;
+  from {
+    background-position: 0 50%;
   }
-  55%,
-  100% {
-    background-position: 0% 50%;
+  to {
+    background-position: 9em 50%;
   }
 }
 
