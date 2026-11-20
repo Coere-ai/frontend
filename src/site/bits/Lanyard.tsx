@@ -46,6 +46,13 @@ export interface LanyardProps {
   introFrom?: IntroFrom;
   /** Each change turns the card over, for a button that flips it from the keyboard. */
   flipSignal?: number;
+  /**
+   * Free roaming: the canvas lets every click and touch through except on
+   * the card itself, so it can be made much larger than the card's resting
+   * place, overlap text or another lanyard, and never clip a swing. Read
+   * once, when the scene is made.
+   */
+  roam?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -177,6 +184,9 @@ const CARD_SIZES: Record<string, [number, number]> = {
   landscape: [2.25, 1.6]
 };
 const ANCHORS: Record<string, number> = { left: 0.27, center: 0.5, right: 0.73 };
+
+/** Presses a card has taken, so where two roaming canvases overlap only one card is grabbed. */
+const claimed = new WeakSet<Event>();
 const THICKNESS = 0.018;
 const BEVEL = 0.007;
 const JOINTS = 4;
@@ -910,10 +920,12 @@ const Lanyard = ({
   intro = true,
   introFrom = 'side',
   flipSignal = 0,
+  roam = false,
   className = '',
   style
 }: LanyardProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const roamRef = useRef(roam);
   const applyRef = useRef<(() => void) | null>(null);
 
   const settings: Settings = {
@@ -1383,10 +1395,12 @@ const Lanyard = ({
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (!settingsRef.current!.interactive || event.button > 0) return;
+      if (!settingsRef.current!.interactive || event.button > 0 || claimed.has(event)) return;
       toPointer(event);
       const hit = pickCard();
       if (!hit) return;
+      claimed.add(event);
+      if (roaming) canvas.style.pointerEvents = 'auto';
       sim.grab = {
         local: hit.point.clone().sub(sim.body.position).applyQuaternion(sim.body.quaternion.clone().invert()),
         rotation: sim.body.quaternion.clone(),
@@ -1421,8 +1435,31 @@ const Lanyard = ({
       if (press && event.type === 'pointerup' && performance.now() - press.time < 450) flip(press.point);
       press = null;
       canvas.releasePointerCapture?.(event.pointerId);
-      setCursor(hovering && event.pointerType !== 'touch' ? 'grab' : '');
+      if (event.pointerType === 'touch') hovering = false;
+      setCursor(hovering ? 'grab' : '');
+      if (roaming) canvas.style.pointerEvents = hovering ? 'auto' : 'none';
       start();
+    };
+
+    // Free roaming: the canvas takes no pointer events of its own, so the
+    // page under it keeps working. The page's own events are watched
+    // instead: over the card, the canvas takes the pointer (for the grab
+    // cursor and a mouse press), and a touch that lands on the card starts
+    // a grab from the document.
+    const roaming = roamRef.current;
+    const onRoamMove = (event: PointerEvent) => {
+      if (sim.grab || event.pointerType === 'touch' || !visible) return;
+      toPointer(event);
+      hovering = !!pickCard();
+      canvas.style.pointerEvents = hovering ? 'auto' : 'none';
+      setCursor(hovering ? 'grab' : '');
+    };
+    const onRoamDown = (event: PointerEvent) => {
+      if (event.target === canvas || !visible) return;
+      onPointerDown(event);
+    };
+    const onRoamTouch = (event: TouchEvent) => {
+      if (event.target !== canvas && visible) onTouchStart(event);
     };
 
     const onTouchStart = (event: TouchEvent) => {
@@ -1432,6 +1469,12 @@ const Lanyard = ({
     };
 
     canvas.addEventListener('pointerdown', onPointerDown);
+    if (roaming) {
+      canvas.style.pointerEvents = 'none';
+      window.addEventListener('pointermove', onRoamMove, { passive: true });
+      document.addEventListener('pointerdown', onRoamDown, true);
+      document.addEventListener('touchstart', onRoamTouch, { capture: true, passive: false });
+    }
     canvas.addEventListener('pointermove', onPointerMove);
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerUp);
@@ -1470,6 +1513,9 @@ const Lanyard = ({
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
       canvas.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onRoamMove);
+      document.removeEventListener('pointerdown', onRoamDown, true);
+      document.removeEventListener('touchstart', onRoamTouch, true);
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
       canvas.removeEventListener('pointercancel', onPointerUp);
