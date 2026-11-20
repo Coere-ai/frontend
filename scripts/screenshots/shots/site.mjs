@@ -52,6 +52,8 @@ export async function shootSite(browser, base, shooter, { scale }) {
     await open(page, base, `/industries/${slug}`);
     await s(`industry-${slug}`);
   }
+  await open(page, base, "/pricing");
+  await s("pricing", { full: true });
   // About, down to where its team starts: no real person's name or photo goes into a picture.
   await open(page, base, "/about");
   const team = await page.locator("section#team").evaluate((el) => Math.round(el.getBoundingClientRect().top + window.scrollY));
@@ -112,7 +114,7 @@ export async function shootSite(browser, base, shooter, { scale }) {
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: scale, isMobile: true, hasTouch: true });
   const p = await phone.newPage();
   await shooter.prepare(p, { allNear: true });
-  for (const [name, path] of [["phone-home", "/"], ["phone-product-connect", "/products/connect"], ["phone-install", "/install"], ["phone-sign-in", "/sign-in"], ["phone-about", "/about"], ["phone-blog", "/blog"]]) {
+  for (const [name, path] of [["phone-home", "/"], ["phone-product-connect", "/products/connect"], ["phone-pricing", "/pricing"], ["phone-install", "/install"], ["phone-sign-in", "/sign-in"], ["phone-about", "/about"], ["phone-blog", "/blog"]]) {
     await open(p, base, path);
     await shooter.shot(p, "site", name, { full: name === "phone-home", still: name === "phone-install" || name === "phone-home", settle: 3000 });
   }
