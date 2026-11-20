@@ -20,7 +20,10 @@ export default function AboutPage() {
     <DarkPage className={UNDER_NAV}>
       <AboutHero
         line="We're building the memory layer people own"
-        story="Coere started when Michelle kept explaining the same project to every AI she switched to. Each one knew a piece of her, and none of them knew the rest."
+        story={[
+          "Coere started when Michelle kept explaining the same project to every AI she switched to. Each one knew a piece of her, and none of them knew the rest.",
+          "As AI users and developers, we saw the need for a user owned, unified memory across every AI. So we built one place that keeps what each AI learns about you, brings it into every new chat, and stays yours.",
+        ]}
       />
       <StoryDiagram />
       <TeamSection />

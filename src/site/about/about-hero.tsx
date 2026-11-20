@@ -25,7 +25,7 @@ const CENTER_CALM = "radial-gradient(ellipse 40% 50% at 50% 60%, rgba(0,0,0,0.06
  * fade into the page's flat near black at the foot. The paint uses React
  * Bits' own chrome settings.
  */
-export function AboutHero({ line, story }: { line: string; story: string }) {
+export function AboutHero({ line, story }: { line: string; story: readonly string[] }) {
   return (
     <section className="relative isolate overflow-hidden pt-[112px] pb-20 md:pt-[128px] md:pb-28">
       <div aria-hidden="true" className="absolute inset-0 -z-10" style={{ maskImage: FOOT_FADE, WebkitMaskImage: FOOT_FADE }}>
@@ -40,7 +40,11 @@ export function AboutHero({ line, story }: { line: string; story: string }) {
         </div>
         <h1 className="relative mt-2 text-5xl font-semibold tracking-[-0.05em] text-white md:mt-4 md:text-[5.5rem] md:leading-[0.98]">About us</h1>
         <p className="mx-auto mt-6 max-w-2xl text-2xl font-medium tracking-[-0.025em] text-white/90 text-balance md:text-[1.75rem] md:leading-snug">{line}</p>
-        <p className="mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-white/65 text-pretty">{story}</p>
+        {story.map((paragraph, index) => (
+          <p key={index} className={`mx-auto max-w-xl text-[17px] leading-relaxed text-white/65 text-pretty ${index === 0 ? "mt-5" : "mt-4"}`}>
+            {paragraph}
+          </p>
+        ))}
       </div>
     </section>
   );
