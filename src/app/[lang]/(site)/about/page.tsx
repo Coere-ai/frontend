@@ -5,29 +5,28 @@ import { AboutClosing } from "@/site/about/about-closing";
 import { AboutHero } from "@/site/about/about-hero";
 import { StoryDiagram } from "@/site/about/story-diagram";
 import { TeamSection } from "@/site/about/team-section";
+import { getLocale, getMessages } from "@/site/i18n/server";
 import { UNDER_NAV } from "@/site/nav/nav-space";
 import { DarkPage } from "@/site/ui/page-theme";
 
-export const metadata: Metadata = pageMetadata({ ...aboutSeo, path: "/about" });
+export async function generateMetadata(): Promise<Metadata> {
+  const [locale, { about }] = await Promise.all([getLocale(), getMessages()]);
+  return pageMetadata({ ...aboutSeo, ...about.seo, path: "/about", locale, translated: true });
+}
 
 /**
  * The About page, dark from the top down to the footer: flat near black,
  * with ASCII Tiles behind the hero only. The whole page is in the dark
  * theme, so the glass navbar and the footer stay dark with it.
  */
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { about } = await getMessages();
   return (
     <DarkPage className={UNDER_NAV}>
-      <AboutHero
-        line="We're building the memory layer people own"
-        story={[
-          "Coere started when we kept explaining the same projects to every AI we switched to. Each one knew a piece of us, and none of them knew the rest.",
-          "As AI users and developers, we saw the need for a user owned, unified memory across every AI. So we built one place that keeps what each AI learns about you, brings it into every new chat, and stays yours.",
-        ]}
-      />
-      <StoryDiagram />
+      <AboutHero title={about.title} line={about.line} story={about.story} />
+      <StoryDiagram words={about.diagram} />
       <TeamSection />
-      <AboutClosing title="Help us put people back together." text="We're hiring a founding team, and we'd love to hear from you." />
+      <AboutClosing title={about.closing.title} text={about.closing.text} />
     </DarkPage>
   );
 }

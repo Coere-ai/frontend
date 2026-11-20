@@ -4,21 +4,26 @@ import { CenterHero } from "@/site/blocks/center-hero";
 import { industriesSeo } from "@/site/content/seo";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { SECTION_Y, SOFT_FIELD } from "@/site/home/look";
+import { getLocale, getMessages } from "@/site/i18n/server";
 import { ApplicationsGrid } from "@/site/industries/applications-grid";
 import { IndustryGrid, PhotoCredits } from "@/site/industries/industry-grid";
 import { Container } from "@/site/ui/container";
 import { DarkPage } from "@/site/ui/page-theme";
 
-export const metadata: Metadata = pageMetadata({ ...industriesSeo, path: "/industries" });
+export async function generateMetadata(): Promise<Metadata> {
+  const [locale, { industryPages }] = await Promise.all([getLocale(), getMessages()]);
+  return pageMetadata({ ...industriesSeo, ...industryPages.index.seo, path: "/industries", locale, translated: true });
+}
 
-export default function IndustriesPage() {
+export default async function IndustriesPage() {
+  const t = (await getMessages()).industryPages.index;
   return (
     <DarkPage>
-      <CenterHero plain title="Memory for every industry" line="Coere gives people, teams and apps a memory they control. Start with who it is for, then open your field." />
+      <CenterHero plain title={t.title} line={t.line} />
       <section className="pb-8">
         <Container>
           <div className={`${SOFT_FIELD} px-5 py-12 sm:px-8 md:px-12 md:py-16`}>
-            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white">Who it&apos;s for</h2>
+            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white">{t.whoFor}</h2>
             <div className="mt-8">
               <ApplicationsGrid />
             </div>
@@ -27,14 +32,14 @@ export default function IndustriesPage() {
       </section>
       <section className={SECTION_Y}>
         <Container>
-          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white">Industries</h2>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white">{t.industries}</h2>
           <div className="mt-8">
             <IndustryGrid />
           </div>
           <PhotoCredits />
         </Container>
       </section>
-      <ClosingCta title="Bring memory to your field." text="Tell us about your industry and what your people repeat to AI every day." />
+      <ClosingCta title={t.closing.title} text={t.closing.text} />
     </DarkPage>
   );
 }

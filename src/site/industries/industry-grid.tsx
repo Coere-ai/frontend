@@ -1,7 +1,9 @@
 import Link from "@/site/i18n/link";
 import { PixelPicture } from "@/site/art/pixel-picture";
 import { standardNames } from "@/site/content/compliance";
-import { industries } from "@/site/content/industries";
+import { industriesIn } from "@/site/content/industries";
+import { getMessages } from "@/site/i18n/server";
+import { format } from "@/site/i18n/types";
 import { Underlined } from "@/site/ui/underlined";
 import { IndustryIcon } from "@/site/ui/icons/industry-icons";
 import { Reveal } from "@/site/ui/reveal";
@@ -10,7 +12,9 @@ import { Reveal } from "@/site/ui/reveal";
  * Every industry as a card that opens its page, its photo drawn as the
  * same pixel picture the page opens on, still and small.
  */
-export function IndustryGrid() {
+export async function IndustryGrid() {
+  const { catalog, industryPages } = await getMessages();
+  const industries = industriesIn(catalog);
   return (
     <div className="grid gap-x-6 gap-y-14 sm:grid-cols-2 xl:grid-cols-3">
       {industries.map((industry, index) => (
@@ -32,7 +36,7 @@ export function IndustryGrid() {
               ))}
             </ul>
             {standardNames(industry.slug) ? (
-              <p className="mt-4 text-[13px] leading-relaxed text-neutral-500 dark:text-white/55">Coere will meet {standardNames(industry.slug)}.</p>
+              <p className="mt-4 text-[13px] leading-relaxed text-neutral-500 dark:text-white/55">{format(industryPages.index.willMeet, { standards: standardNames(industry.slug) ?? "" })}</p>
             ) : null}
           </Link>
         </Reveal>
@@ -42,7 +46,8 @@ export function IndustryGrid() {
 }
 
 /** Credit for the photos, which come from Unsplash. */
-export function PhotoCredits() {
-  const names = industries.map((industry) => industry.photo.by).join(", ");
-  return <p className="mt-16 text-[13px] text-neutral-400 dark:text-white/50">Photos on Unsplash by {names}.</p>;
+export async function PhotoCredits() {
+  const { catalog, industryPages } = await getMessages();
+  const names = industriesIn(catalog).map((industry) => industry.photo.by).join(", ");
+  return <p className="mt-16 text-[13px] text-neutral-400 dark:text-white/50">{format(industryPages.index.credits, { names })}</p>;
 }

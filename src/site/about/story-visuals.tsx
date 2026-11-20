@@ -36,17 +36,17 @@ export function ScatteredApps() {
 }
 
 /** Step two: the same tiles, each holding the one piece of you it knows. */
-export function AppPieces() {
+export function AppPieces({ pieces }: { pieces: readonly string[] }) {
   return (
     <SlantTiles
       columns={3}
       className={DARK_TILES}
-      items={storyApps.map((app) => ({
+      items={storyApps.map((app, i) => ({
         key: app.name,
         content: (
           <span className="flex flex-col items-center gap-2">
             <Logo app={app} size={22} />
-            <span className="text-[13px] text-white/75">{app.piece}</span>
+            <span className="text-[13px] text-white/75">{pieces[i] ?? app.piece}</span>
           </span>
         ),
       }))}
@@ -55,20 +55,20 @@ export function AppPieces() {
 }
 
 /** Step three: every piece in one Coere memory. */
-export function OneMemory() {
+export function OneMemory({ pieces, title, from }: { pieces: readonly string[]; title: string; from: string }) {
   return (
     <div className={GLASS_CARD}>
       <BrandLockup white height={22} />
-      <p className="mt-5 text-[13px] text-white/55">Your memory</p>
+      <p className="mt-5 text-[13px] text-white/55">{title}</p>
       <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
-        {storyApps.map((app) => (
+        {storyApps.map((app, i) => (
           <li key={app.name} className="text-[14px] font-medium text-brand-200">
-            {app.piece}
+            {pieces[i] ?? app.piece}
           </li>
         ))}
       </ul>
       <p className="mt-6 flex items-center gap-2 text-[13px] text-white/55">
-        From
+        {from}
         {storyApps.map((app) => (
           <Logo key={app.name} app={app} size={16} />
         ))}
@@ -78,16 +78,16 @@ export function OneMemory() {
 }
 
 /** Step four: the person decides which AIs may read it. */
-export function YourChoice() {
+export function YourChoice({ title, allowed, notAllowed }: { title: string; allowed: string; notAllowed: string }) {
   return (
     <div className={GLASS_CARD}>
-      <p className="text-[15px] font-medium text-white">Who can read your memory</p>
+      <p className="text-[15px] font-medium text-white">{title}</p>
       <ul className="mt-4 divide-y divide-white/10">
         {storyApps.map((app) => (
           <li key={app.name} className="flex items-center gap-3 py-2.5">
             <Logo app={app} size={20} />
             <span className="flex-1 text-[14px] text-white/85">{app.name}</span>
-            <span aria-label={app.allowed ? "Allowed" : "Not allowed"} className={`relative h-5 w-9 rounded-full ${app.allowed ? "bg-brand-500" : "bg-white/15"}`}>
+            <span aria-label={app.allowed ? allowed : notAllowed} className={`relative h-5 w-9 rounded-full ${app.allowed ? "bg-brand-500" : "bg-white/15"}`}>
               <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white ${app.allowed ? "left-[18px]" : "left-0.5"}`} />
             </span>
           </li>

@@ -57,7 +57,7 @@ export function AgentsReel({ parts, label }: { parts: ReelPart[]; label: string 
     if (!auto) return;
     const cap = window.setTimeout(() => go((shown + 1) % parts.length), CAP);
     return () => clearTimeout(cap);
-  }, [auto, go, shown]);
+  }, [auto, go, shown, parts.length]);
 
   const onState = useCallback(
     (next: DemoState) => {
@@ -79,7 +79,7 @@ export function AgentsReel({ parts, label }: { parts: ReelPart[]; label: string 
       setEnded(true);
       hold.current = window.setTimeout(() => go((shown + 1) % parts.length), HOLD);
     },
-    [auto, ended, go, incoming, shown, to],
+    [auto, ended, go, incoming, shown, to, parts.length],
   );
 
   // The faded in still now covers the frame: start the next film beneath it.

@@ -5,13 +5,13 @@ import { Container } from "@/site/ui/container";
 import { Underlined } from "@/site/ui/underlined";
 
 /** Three other industries as cards with their pixel pictures, so a reader can move across fields. */
-export function MoreIndustries({ current, all }: { current: string; all: Industry[] }) {
+export function MoreIndustries({ current, all, title }: { current: string; all: Industry[]; title: string }) {
   const start = all.findIndex((i) => i.slug === current);
   const others = [1, 2, 3].map((step) => all[(start + step) % all.length]);
   return (
     <section className="py-16 md:py-20">
       <Container>
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white">More industries</h2>
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white">{title}</h2>
         <ul className="mt-6 grid gap-6 md:grid-cols-3">
           {others.map((industry) => (
             <li key={industry.slug}>

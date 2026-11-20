@@ -81,3 +81,18 @@ test("format fills holes and leaves unknown ones visible", () => {
   assert.equal(format("{a} and {b}", { a: 1, b: "x" }), "1 and x");
   assert.equal(format("{a} and {c}", { a: 1 }), "1 and {c}");
 });
+
+test("no translated standard or fact says Coere is certified, compliant or audited, since it holds none of these yet", () => {
+  const claims: Record<string, RegExp> = {
+    en: /\b(certified|certification|compliant|audited|accredited|approved)\b/i,
+    es: /certificad|certificación|conforme|auditad|acreditad|aprobad/i,
+    fr: /certifié|certification|conforme|audité|accrédité|approuvé/i,
+    nl: /gecertificeerd|certificering|conform|geaudit|geaccrediteerd|goedgekeurd/i,
+    ja: /認証取得|準拠済み|監査済み|認定済み|承認済み/,
+  };
+  for (const locale of locales) {
+    const pages = allMessages[locale].industryPages;
+    const lines = [...pages.facts, ...Object.values(pages.fields).flatMap((f) => f.standards.map((s) => ("where" in s ? `${s.where} ${s.why}` : s.why)))];
+    for (const line of lines) assert.doesNotMatch(line, claims[locale], `${locale}: ${line}`);
+  }
+});

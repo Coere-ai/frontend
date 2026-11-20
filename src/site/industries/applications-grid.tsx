@@ -1,13 +1,17 @@
 import Link from "@/site/i18n/link";
-import { applications } from "@/site/content/industries";
+import { applicationsIn } from "@/site/content/industries";
 import { productBySlug } from "@/site/content/products";
+import { getMessages } from "@/site/i18n/server";
+import { format } from "@/site/i18n/types";
 import { SOFT_CARD } from "@/site/home/look";
 import { Underlined } from "@/site/ui/underlined";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { applicationVisuals } from "./application-visuals";
 
 /** Who Coere is for: consumer, developer and business, each with a small picture of what it gets. */
-export function ApplicationsGrid() {
+export async function ApplicationsGrid() {
+  const { catalog, industryPages } = await getMessages();
+  const applications = applicationsIn(catalog);
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {applications.map((app) => {
@@ -22,7 +26,7 @@ export function ApplicationsGrid() {
               <h3 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 dark:text-white"><Underlined big>{app.name}</Underlined></h3>
               <p className="mt-2 flex-1 text-[15px] leading-relaxed text-neutral-500 dark:text-white/65">{app.summary}</p>
               <span className="mt-6 inline-flex items-center gap-1.5 text-[15px] font-medium text-neutral-950 dark:text-white">
-                With {product.name}
+                {format(industryPages.withProduct, { product: product.name })}
                 <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-0.5" />
               </span>
             </div>

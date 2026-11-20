@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
 import { featuresIn, type Feature } from "@/site/content/features";
@@ -21,7 +21,8 @@ const HASH = "#capability-";
  * page on that feature.
  */
 export function Capabilities({ words }: { words: { title: string; line: string; label: string } }) {
-  const features = featuresIn(useMessages("catalog"));
+  const catalog = useMessages("catalog");
+  const features = useMemo(() => featuresIn(catalog), [catalog]);
   const section = useRef<HTMLElement>(null);
   const [active, setActive] = useState<Feature>(features[0]);
 
@@ -37,7 +38,7 @@ export function Capabilities({ words }: { words: { title: string; line: string; 
     follow();
     addEventListener("hashchange", follow);
     return () => removeEventListener("hashchange", follow);
-  }, []);
+  }, [features]);
 
   const pick = (feature: Feature) => {
     setActive(feature);

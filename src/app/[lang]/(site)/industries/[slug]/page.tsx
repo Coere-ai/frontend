@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { pageMetadata } from "@/lib/seo";
-import { industries } from "@/site/content/industries";
+import { industries, industriesIn } from "@/site/content/industries";
 import { industryPage } from "@/site/content/industry-stories";
 import { industryAudience } from "@/site/content/seo";
+import { getLocale, getMessages } from "@/site/i18n/server";
 import { IndustryPage } from "@/site/industries/industry-page";
 
 /** Only the listed industries have pages; any other slug is a 404. */
@@ -13,29 +14,29 @@ export function generateStaticParams() {
   return industries.map((industry) => ({ slug: industry.slug }));
 }
 
-function find(slug: string) {
+export async function generateMetadata({ params }: PageProps<"/[lang]/industries/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
   const industry = industries.find((i) => i.slug === slug);
   const content = industryPage(slug);
-  return industry && content ? { industry, content } : null;
-}
-
-export async function generateMetadata({ params }: PageProps<"/[lang]/industries/[slug]">): Promise<Metadata> {
-  const found = find((await params).slug);
-  if (!found) return {};
-  const { industry, content } = found;
+  if (!industry || !content) return {};
+  const [locale, { industryPages }] = await Promise.all([getLocale(), getMessages()]);
+  const words = industryPages.fields[industry.slug as keyof typeof industryPages.fields];
   const audience = industryAudience[industry.slug] ?? industry.name.toLowerCase();
-  // The AIs it works across, when the field's own line leaves room for them in a result.
-  const full = `${content.line} One AI memory for ${audience}, across ChatGPT, Claude and Gemini.`;
   return pageMetadata({
-    title: `Coere for ${industry.name.toLowerCase()}: AI memory for ${audience}`,
-    description: full.length <= 160 ? full : `${content.line} One AI memory for ${audience}.`,
+    title: words.seoTitle,
+    description: words.seoDescription,
     path: `/industries/${industry.slug}`,
     keywords: [`AI for ${audience}`, `AI memory for ${audience}`, `ChatGPT for ${audience}`, ...content.highlights],
+    locale,
+    translated: true,
   });
 }
 
 export default async function Page({ params }: PageProps<"/[lang]/industries/[slug]">) {
-  const found = find((await params).slug);
-  if (!found) notFound();
-  return <IndustryPage industry={found.industry} content={found.content} />;
+  const { slug } = await params;
+  const { catalog } = await getMessages();
+  const industry = industriesIn(catalog).find((i) => i.slug === slug);
+  const content = industryPage(slug);
+  if (!industry || !content) notFound();
+  return <IndustryPage industry={industry} content={content} />;
 }

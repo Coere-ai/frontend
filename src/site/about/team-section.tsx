@@ -1,4 +1,5 @@
-import { founders, siteConfig } from "@/lib/site";
+import { founders } from "@/lib/site";
+import { getLocale, getMessages } from "@/site/i18n/server";
 import { AsciiStream } from "@/site/art/ascii-stream";
 import { Container } from "@/site/ui/container";
 import { Reveal } from "@/site/ui/reveal";
@@ -21,7 +22,14 @@ const HEADING_CALM = "radial-gradient(ellipse 34% 22% at 50% 15%, rgba(0,0,0,0.1
  * level with the cards. It takes no clicks, so the cards drag and flip
  * as before.
  */
-export function TeamSection() {
+export async function TeamSection() {
+  const [locale, { about }] = await Promise.all([getLocale(), getMessages()]);
+  const t = about.team;
+  // The founders' facts in the page's language; names, schools and photos stay as they are.
+  const members = founders.map((member, i) => {
+    const words = t.founders[i];
+    return words ? { ...member, role: words.role, majors: [...words.majors], highlights: [...words.highlights] } : member;
+  });
   return (
     <section id="team" className="relative isolate scroll-mt-24 overflow-hidden pt-24 pb-28 md:pt-32">
       <Container>
@@ -32,20 +40,20 @@ export function TeamSection() {
             </div>
           </div>
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold text-brand-300">Our team</p>
+            <p className="text-sm font-semibold text-brand-300">{t.eyebrow}</p>
             <h2 className="mt-3 text-4xl font-semibold tracking-[-0.045em] text-white text-balance md:text-[3.5rem] md:leading-[1.04]">
-              The people building Coere
+              {t.title}
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/65 text-pretty">{siteConfig.notCohere}</p>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/65 text-pretty">{t.notCohere}</p>
           </div>
           <div className="mx-auto mt-4 max-w-6xl">
-            <TeamLanyards members={founders} />
+            <TeamLanyards members={members} />
           </div>
         </div>
         <div className="mx-auto mt-16 grid max-w-5xl gap-6 md:grid-cols-2">
-          {founders.map((member, index) => (
+          {members.map((member, index) => (
             <Reveal key={member.name} delay={index * 0.06} className="h-full">
-              <TeamCard member={member} />
+              <TeamCard member={member} locale={locale} />
             </Reveal>
           ))}
         </div>
