@@ -32,7 +32,7 @@ export function DeleteAccount({ username, fresh, signInAgain }: { username: stri
             maxLength={64}
             placeholder={username}
             aria-label="Type your username"
-            className="h-11 min-w-0 flex-1 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950 placeholder:text-neutral-400 focus-visible:border-neutral-950 focus-visible:outline-none"
+            className="h-11 min-w-0 flex-1 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950 placeholder:text-neutral-400 focus-visible:border-neutral-950 focus-visible:outline-none dark:border-white/15 dark:bg-white/[0.05] dark:text-white dark:placeholder:text-white/50 dark:focus-visible:border-brand-400 dark:focus-visible:ring-4 dark:focus-visible:ring-brand-500/25"
           />
           <button type="submit" disabled={pending} className={buttonClass("secondary", "disabled:opacity-60")}>
             Delete account
@@ -40,7 +40,7 @@ export function DeleteAccount({ username, fresh, signInAgain }: { username: stri
         </form>
       ) : (
         <div>
-          <p className="mb-4 text-[15px] text-neutral-500">To delete your account, sign in again first. You then have ten minutes.</p>
+          <p className="mb-4 text-[15px] text-neutral-500 dark:text-white/65">To delete your account, sign in again first. You then have ten minutes.</p>
           {signInAgain}
         </div>
       )}

@@ -3,30 +3,34 @@ import type { ReactNode } from "react";
 
 import { LogoMark } from "@/components/logo";
 import { backgrounds } from "@/site/content/backgrounds";
+import { DarkPage } from "@/site/ui/page-theme";
 import { SizedPhoto } from "@/site/ui/sized-photo";
 
 /** Cori, happy and still, in the brand blue (scripts/agents/build-cori.mts). */
 const CORI = "/preview/images/agents/cori-general.svg";
 
 /**
- * The frame of the sign in, sign up, sign out and connect pages. On a wide
- * screen it is two halves under the navbar: Coere's brand on a blue
- * background, and the page's one task on white. On a phone the brand is
- * a short band above the form.
+ * The frame of the sign in, sign up, sign out and connect pages, in the
+ * dark page theme like the rest of the site. On a wide screen it is two
+ * halves under the navbar: Coere's brand on a blue background, and the
+ * page's one task on the near black. On a phone the brand is a short band
+ * above the form.
  */
 export function AuthShell({ eyebrow, title, lede, children }: { eyebrow: string; title: string; lede?: ReactNode; children: ReactNode }) {
   return (
-    <section className="grid lg:min-h-[calc(100dvh-72px)] lg:grid-cols-2">
-      <BrandPanel />
-      <div className="flex items-center justify-center px-4 pt-10 pb-20 sm:px-6 lg:px-12 lg:py-20">
-        <div className="w-full max-w-[440px]">
-          <p className="text-sm font-medium text-brand-600">{eyebrow}</p>
-          <h1 className="mt-3 text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[2.5rem]">{title}</h1>
-          {lede ? <p className="mt-4 text-[17px] leading-relaxed text-neutral-500 text-pretty">{lede}</p> : null}
-          <div className="mt-8">{children}</div>
+    <DarkPage>
+      <section className="grid lg:min-h-[calc(100dvh-72px)] lg:grid-cols-2">
+        <BrandPanel />
+        <div className="flex items-center justify-center px-4 pt-10 pb-20 sm:px-6 lg:px-12 lg:py-20">
+          <div className="w-full max-w-[440px]">
+            <p className="text-sm font-medium text-brand-600 dark:text-brand-300">{eyebrow}</p>
+            <h1 className="mt-3 text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] text-neutral-950 text-balance dark:text-white md:text-[2.5rem]">{title}</h1>
+            {lede ? <p className="mt-4 text-[17px] leading-relaxed text-neutral-500 text-pretty dark:text-white/65">{lede}</p> : null}
+            <div className="mt-8">{children}</div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </DarkPage>
   );
 }
 
@@ -77,12 +81,13 @@ function Mark({ size }: { size: "sm" | "lg" }) {
   );
 }
 
-/** The card a form sits in, alone on the white side. */
-export const authCardClass = "rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_1px_2px_rgba(8,14,36,0.04),0_16px_40px_-24px_rgba(8,14,36,0.18)] sm:p-8";
+/** The card a form sits in, alone on the page's side: dark glass on the near black. */
+export const authCardClass =
+  "rounded-3xl border border-neutral-200 bg-white p-6 shadow-[0_1px_2px_rgba(8,14,36,0.04),0_16px_40px_-24px_rgba(8,14,36,0.18)] sm:p-8 dark:border-white/10 dark:bg-white/[0.045] dark:shadow-none";
 
 /** The quiet button under a form's main one, for the other ways through it. */
 export const textButtonClass =
-  "group rounded-md text-[14px] text-neutral-500 transition-colors hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-950";
+  "group rounded-md text-[14px] text-neutral-500 transition-colors hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-950 dark:text-white/65 dark:hover:text-white dark:focus-visible:outline-white";
 
 /**
  * The line a form shows its error or notice in, read out as it changes. It
@@ -91,7 +96,7 @@ export const textButtonClass =
  */
 export function FormStatus({ error, notice }: { error: string | null; notice?: string | null }) {
   return (
-    <p role="status" aria-live="polite" className={`min-h-5 text-[13px] empty:-mt-6 empty:min-h-0 ${error ? "text-red-600" : "text-neutral-500"}`}>
+    <p role="status" aria-live="polite" className={`min-h-5 text-[13px] empty:-mt-6 empty:min-h-0 ${error ? "text-red-600 dark:text-red-400" : "text-neutral-500 dark:text-white/60"}`}>
       {error ?? notice ?? ""}
     </p>
   );

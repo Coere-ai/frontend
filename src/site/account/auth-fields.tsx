@@ -11,7 +11,7 @@ import type { IconProps } from "@/site/ui/icons/icon";
  */
 
 /** The focus ring the account fields add to the shared input look. */
-const focusRing = "focus:ring-4 focus:ring-brand-100";
+const focusRing = "focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-500/25";
 
 /**
  * An input with an icon inside it, at the start. The icon follows the
@@ -27,8 +27,8 @@ export function IconInput({
     <div className="relative">
       <input {...props} className={`peer ${inputClass(invalid)} h-12 pl-11 ${focusRing} ${className}`} />
       <span
-        className={`pointer-events-none absolute bottom-0 left-0 grid h-12 w-11 place-items-center pl-1 transition-colors peer-focus:text-neutral-950 ${
-          invalid ? "text-red-500" : "text-neutral-500"
+        className={`pointer-events-none absolute bottom-0 left-0 grid h-12 w-11 place-items-center pl-1 transition-colors peer-focus:text-neutral-950 dark:peer-focus:text-white ${
+          invalid ? "text-red-500 dark:text-red-400" : "text-neutral-500 dark:text-white/55"
         }`}
       >
         <Glyph size={18} />

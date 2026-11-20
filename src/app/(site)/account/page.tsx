@@ -16,6 +16,7 @@ import { Profile } from "@/site/account/web/profile";
 import { Part } from "@/site/account/web/rows";
 import { ButtonLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
+import { DarkPage } from "@/site/ui/page-theme";
 
 export const metadata: Metadata = {
   title: "Your account",
@@ -53,32 +54,34 @@ export default async function AccountPage() {
   const org = membership?.role === "admin" ? await readOrgPage(membership).catch(() => null) : null;
 
   return (
-    <section className="bg-white pt-16 pb-28 md:pt-24 md:pb-36">
-      <Container>
-        <div className="mx-auto max-w-[720px]">
-          <h1 className="text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] text-neutral-950 md:text-[2.5rem]">Your account</h1>
-          <p className="mt-4 text-[17px] leading-relaxed text-neutral-500">
-            Signed in as <span className="text-neutral-950 break-all">{username ?? "your account"}</span>. Your dashboard runs inside Coere; these steps are here so they work from any browser.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <ButtonLink href="/dashboard" variant="secondary">
-              Open the dashboard
-            </ButtonLink>
-            <SignOutButton variant="secondary" next="/sign-in" coere />
+    <DarkPage>
+      <section className="pt-16 pb-28 md:pt-24 md:pb-36">
+        <Container>
+          <div className="mx-auto max-w-[720px]">
+            <h1 className="text-[2rem] leading-[1.1] font-medium tracking-[-0.04em] text-neutral-950 dark:text-white md:text-[2.5rem]">Your account</h1>
+            <p className="mt-4 text-[17px] leading-relaxed text-neutral-500 dark:text-white/65">
+              Signed in as <span className="text-neutral-950 break-all dark:text-white">{username ?? "your account"}</span>. Your dashboard runs inside Coere; these steps are here so they work from any browser.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <ButtonLink href="/dashboard" variant="secondary">
+                Open the dashboard
+              </ButtonLink>
+              <SignOutButton variant="secondary" next="/sign-in" coere />
+            </div>
+            <div className="mt-14 space-y-14">
+              <Profile displayName={(profile?.display_name as string | null) ?? null} username={username} />
+              <Password />
+              <Part title="Sign out" line="Sign out of coere.ai in this browser. Coere in this browser signs out too.">
+                <SignOutButton variant="secondary" coere />
+              </Part>
+              <Browsers devices={devices} />
+              <Backup sync={Boolean(profile?.memory_sync)} includeSensitive={Boolean(profile?.include_sensitive)} />
+              {org ? <Organization name={org.name} members={org.members.map((m) => ({ userId: m.userId, name: m.name, role: m.role }))} /> : null}
+              <DeleteAccount username={username ?? ""} fresh={fresh} signInAgain={<SignOutButton variant="secondary" label="Sign in again" next="/sign-in?next=%2Faccount" />} />
+            </div>
           </div>
-          <div className="mt-14 space-y-14">
-            <Profile displayName={(profile?.display_name as string | null) ?? null} username={username} />
-            <Password />
-            <Part title="Sign out" line="Sign out of coere.ai in this browser. Coere in this browser signs out too.">
-              <SignOutButton variant="secondary" coere />
-            </Part>
-            <Browsers devices={devices} />
-            <Backup sync={Boolean(profile?.memory_sync)} includeSensitive={Boolean(profile?.include_sensitive)} />
-            {org ? <Organization name={org.name} members={org.members.map((m) => ({ userId: m.userId, name: m.name, role: m.role }))} /> : null}
-            <DeleteAccount username={username ?? ""} fresh={fresh} signInAgain={<SignOutButton variant="secondary" label="Sign in again" next="/sign-in?next=%2Faccount" />} />
-          </div>
-        </div>
-      </Container>
-    </section>
+        </Container>
+      </section>
+    </DarkPage>
   );
 }

@@ -10,7 +10,7 @@ import { Part, Row, rowButtonClass } from "./rows";
 export function Backup({ sync, includeSensitive }: { sync: boolean; includeSensitive: boolean }) {
   return (
     <Part title="Memory backup" line="With the backup on, Coere keeps a copy of your memory file on coere.ai. Turning it off removes that copy.">
-      <ul className="divide-y divide-neutral-100">
+      <ul className="divide-y divide-neutral-100 dark:divide-white/10">
         <Row name="Back up memory to coere.ai" detail={sync ? "On" : "Off"}>
           <Switch field="sync" on={sync} />
         </Row>

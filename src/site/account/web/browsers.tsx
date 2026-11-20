@@ -16,10 +16,10 @@ export function Browsers({ devices }: { devices: DeviceRow[] }) {
   return (
     <Part title="Browsers" line="Coere is connected in these browsers. Revoke one you lost or no longer use, and Coere there is signed out at once.">
       {live.length === 0 ? (
-        <p className="text-[15px] text-neutral-500">No browser is connected.</p>
+        <p className="text-[15px] text-neutral-500 dark:text-white/65">No browser is connected.</p>
       ) : (
         <>
-          <ul className="divide-y divide-neutral-100">
+          <ul className="divide-y divide-neutral-100 dark:divide-white/10">
             {live.map((d) => (
               <Row
                 key={d.id}

@@ -68,11 +68,11 @@ export function ConnectCard({ username, params }: { username: string | null; par
   if (done) {
     return (
       <div role="status" className={`${authCardClass} text-center`}>
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600">
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
           <CheckIcon size={22} />
         </span>
-        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">Connected</p>
-        <p className="mt-2 text-[15px] text-neutral-500">Coere is connected. You can close this tab.</p>
+        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">Connected</p>
+        <p className="mt-2 text-[15px] text-neutral-500 dark:text-white/65">Coere is connected. You can close this tab.</p>
       </div>
     );
   }
@@ -81,15 +81,15 @@ export function ConnectCard({ username, params }: { username: string | null; par
     <div className={`space-y-6 ${authCardClass}`}>
       <div>
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
             <UserIcon size={20} />
           </span>
           <div className="min-w-0">
-            <p className="text-[13px] text-neutral-500">Signed in as</p>
-            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950">{username ?? "Your account"}</p>
+            <p className="text-[13px] text-neutral-500 dark:text-white/60">Signed in as</p>
+            <p className="text-[17px] font-medium tracking-[-0.01em] break-all text-neutral-950 dark:text-white">{username ?? "Your account"}</p>
           </div>
         </div>
-        <p className="mt-4 text-[14px] leading-relaxed text-neutral-500">
+        <p className="mt-4 text-[14px] leading-relaxed text-neutral-500 dark:text-white/65">
           Coere in this browser will use this account. Only connect if you opened this page from Coere.
         </p>
       </div>

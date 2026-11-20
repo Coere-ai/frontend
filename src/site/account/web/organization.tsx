@@ -11,7 +11,7 @@ import { Part, Row, rowButtonClass } from "./rows";
 const initial: FormState = { error: null, notice: null };
 
 const inputClass =
-  "h-11 min-w-0 flex-1 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950 placeholder:text-neutral-400 focus-visible:border-neutral-950 focus-visible:outline-none";
+  "h-11 min-w-0 flex-1 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950 placeholder:text-neutral-400 focus-visible:border-neutral-950 focus-visible:outline-none dark:border-white/15 dark:bg-white/[0.05] dark:text-white dark:placeholder:text-white/50 dark:focus-visible:border-brand-400 dark:focus-visible:ring-4 dark:focus-visible:ring-brand-500/25";
 
 /**
  * For an organization's admins: invite a coworker and make a member an
@@ -26,7 +26,7 @@ export function Organization({ name, members }: { name: string; members: Array<{
     <Part title={`Organization: ${name}`} line="Invite a coworker by the username of their Coere account, and make a member an admin. The rest is in Coere.">
       <form action={inviteAction} className="flex flex-wrap gap-3">
         <input name="login" required maxLength={64} autoComplete="off" autoCapitalize="none" spellCheck={false} placeholder="Username" aria-label="Username" className={inputClass} />
-        <select name="role" aria-label="Role" defaultValue="member" className="h-11 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950">
+        <select name="role" aria-label="Role" defaultValue="member" className="h-11 rounded-full border border-neutral-200 bg-white px-4 text-[15px] text-neutral-950 dark:border-white/15 dark:bg-white/[0.05] dark:text-white">
           <option value="member">Member</option>
           <option value="admin">Admin</option>
         </select>
@@ -39,7 +39,7 @@ export function Organization({ name, members }: { name: string; members: Array<{
       </div>
       {plain.length > 0 ? (
         <form action={roleAction} className="mt-6">
-          <ul className="divide-y divide-neutral-100">
+          <ul className="divide-y divide-neutral-100 dark:divide-white/10">
             {plain.map((m) => (
               <Row key={m.userId} name={m.name} detail="Member">
                 <button type="submit" name="userId" value={m.userId} disabled={promoting} className={rowButtonClass}>

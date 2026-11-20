@@ -109,7 +109,7 @@ function OneField({
           </div>
         </FormField>
       ) : null}
-      <p role="status" aria-live="polite" className="mt-1.5 text-[13px] text-neutral-500 empty:mt-0">
+      <p role="status" aria-live="polite" className="mt-1.5 text-[13px] text-neutral-500 empty:mt-0 dark:text-white/60">
         {state.notice ?? ""}
       </p>
     </form>

@@ -26,15 +26,15 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
   return (
     <AuthShell eyebrow="Account" title="Sign in to Coere" lede="Use your username and the password you set.">
       <SignInForm next={next} />
-      <p className="mt-6 text-center text-[14px] text-neutral-500">
+      <p className="mt-6 text-center text-[14px] text-neutral-500 dark:text-white/60">
         New to Coere?{" "}
-        <Link href={signUp} className="group font-medium text-neutral-950">
+        <Link href={signUp} className="group font-medium text-neutral-950 dark:text-white">
           <Underlined>Create an account</Underlined>
         </Link>
       </p>
-      <p className="mt-3 text-center text-[13px] text-neutral-400">
+      <p className="mt-3 text-center text-[13px] text-neutral-400 dark:text-white/55">
         Forgot your password?{" "}
-        <a href={`mailto:${siteConfig.email}`} className="group text-neutral-500 hover:text-neutral-950">
+        <a href={`mailto:${siteConfig.email}`} className="group text-neutral-500 hover:text-neutral-950 dark:text-white/70 dark:hover:text-white">
           <Underlined>Contact us</Underlined>
         </a>
         .

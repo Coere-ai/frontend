@@ -25,9 +25,9 @@ export default async function SignUpPage({ searchParams }: PageProps<"/sign-up">
   return (
     <AuthShell eyebrow="Account" title="Create your account" lede="Pick a username and a password. No email needed.">
       <SignUpForm next={next} />
-      <p className="mt-6 text-center text-[14px] text-neutral-500">
+      <p className="mt-6 text-center text-[14px] text-neutral-500 dark:text-white/60">
         Already have an account?{" "}
-        <Link href={signIn} className="group font-medium text-neutral-950">
+        <Link href={signIn} className="group font-medium text-neutral-950 dark:text-white">
           <Underlined>Sign in</Underlined>
         </Link>
       </p>
