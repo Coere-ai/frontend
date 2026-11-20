@@ -28,7 +28,7 @@ export function ClosingCta({
             <ButtonLink href={primary.href} className="dark:bg-brand-500 dark:shadow-[0_12px_30px_-12px_rgba(82,103,247,0.9)] dark:hover:bg-brand-600 dark:focus-visible:outline-white">
               {primary.label}
             </ButtonLink>
-            <ButtonLink href="/#demo" variant="secondary" className="dark:border-white/20 dark:bg-white/10 dark:text-white dark:backdrop-blur-md dark:hover:border-white/20 dark:hover:bg-white/15 dark:focus-visible:outline-white">
+            <ButtonLink href="/demo" variant="secondary" className="dark:border-white/20 dark:bg-white/10 dark:text-white dark:backdrop-blur-md dark:hover:border-white/20 dark:hover:bg-white/15 dark:focus-visible:outline-white">
               Watch the demo
             </ButtonLink>
           </div>

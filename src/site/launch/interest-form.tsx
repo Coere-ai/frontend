@@ -81,7 +81,7 @@ export function InterestForm({ product }: { product: LaunchProduct }) {
           )}
         </AnimatePresence>
       </div>
-      <ArrowLink href="/#demo" className="mt-8 text-neutral-950">
+      <ArrowLink href="/demo" className="mt-8 text-neutral-950">
         Watch the demo
       </ArrowLink>
     </div>

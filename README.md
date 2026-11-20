@@ -55,9 +55,9 @@ pictures: [the site](docs/screenshots/site/README.md),
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/site/home-connect.webp" alt="One memory across every AI on the dark home page, with a ChatGPT window beside four features" />
+      <img src="docs/screenshots/site/home-products.webp" alt="One memory for you, your team and your app: Coere Connect, Coere Solutions and Coere Forge side by side as dark cards, each with who it is for, one line and its artwork" />
       <br />
-      <sub>Each product has its part of the home page, Coere Connect first.</sub>
+      <sub>The three products side by side under the AIs, each a way to its page.</sub>
     </td>
     <td width="50%">
       <img src="docs/screenshots/site/home-ais.webp" alt="Transfer memory across every AI on near black: the AI logos moving past in a line that fades at both edges, the black ones drawn white" />

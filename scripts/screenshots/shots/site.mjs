@@ -6,7 +6,7 @@ import { MAYA } from "../seed/people.mjs";
 
 const PRODUCTS = ["connect", "solutions", "forge", "agents"];
 const INDUSTRIES = ["finance", "technology", "commerce", "consumer", "manufacturing", "energy", "education", "legal"];
-const HOME_SECTIONS = ["ais", "demo", "solves", "connect", "solutions", "forge", "blog"];
+const HOME_SECTIONS = ["ais", "products", "solves", "blog"];
 
 async function open(page, base, path) {
   await page.goto(`${base}${path}`, { waitUntil: "load" });

@@ -23,10 +23,7 @@ export type SectionMeta = {
 
 export const SECTIONS: readonly SectionMeta[] = [
   { id: "hero", label: "Hero", blurb: "The opening line and what Coere is for." },
-  { id: "demo", label: "Demo", blurb: "The full product film." },
-  { id: "connect", label: "Coere Connect", blurb: "One memory across every AI." },
-  { id: "solutions", label: "Coere Solutions", blurb: "One memory for the whole company." },
-  { id: "forge", label: "Coere Forge", blurb: "Memory for the apps developers build." },
+  { id: "products", label: "Products", blurb: "Coere Connect, Solutions and Forge, side by side." },
 ] as const;
 
 /**

@@ -19,6 +19,13 @@ export const homeSeo: Seo = {
   absolute: true,
 };
 
+/** The product film on its own page. */
+export const demoSeo: Seo = {
+  title: "Coere demo: the product, played live",
+  description: "Watch Coere set up, import your chats from every AI, build one memory you own and bring it into each new chat, played live on Coere's own code.",
+  keywords: ["Coere demo", "AI memory demo", "Coere Connect demo"],
+};
+
 /** Each product's own phrase: Connect cross-AI memory, Solutions team memory, Forge the memory API, Agents the agent. */
 export const productSeo: Record<Product["slug"], Seo> = {
   connect: {
