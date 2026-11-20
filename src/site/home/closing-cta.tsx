@@ -1,4 +1,6 @@
-import { contactHref, contactLabel } from "@/site/content/navigation";
+import { contactHref } from "@/site/content/navigation";
+import type { Locale } from "@/site/i18n/locales";
+import { getMessages } from "@/site/i18n/server";
 import { ButtonLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 
@@ -8,16 +10,23 @@ import { Container } from "@/site/ui/container";
  * is plain glass with a fine light border and the main button Coere blue,
  * as on About.
  */
-export function ClosingCta({
-  title = "Your memory belongs to you.",
-  text = "Talk to the founders about Coere for you, your team or your app.",
-  primary = { href: contactHref, label: contactLabel },
+export async function ClosingCta({
+  title,
+  text,
+  primary,
+  locale,
 }: {
   title?: string;
   text?: string;
   /** The main button: the waitlist, or a page's own (Solutions books a demo). */
   primary?: { href: string; label: string };
+  /** English on a page whose words are not translated yet, so its last word matches the rest. */
+  locale?: Locale;
 }) {
+  const { home, chrome } = await getMessages(locale);
+  title ??= home.closing.title;
+  text ??= home.closing.text;
+  primary ??= { href: contactHref, label: chrome.common.waitlist };
   return (
     <section className="pt-8 pb-24 md:pt-12 md:pb-32">
       <Container>
@@ -29,7 +38,7 @@ export function ClosingCta({
               {primary.label}
             </ButtonLink>
             <ButtonLink href="/demo" variant="secondary" className="dark:border-white/20 dark:bg-white/10 dark:text-white dark:backdrop-blur-md dark:hover:border-white/20 dark:hover:bg-white/15 dark:focus-visible:outline-white">
-              Watch the demo
+              {chrome.common.watchDemo}
             </ButtonLink>
           </div>
         </div>

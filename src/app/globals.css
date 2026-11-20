@@ -250,3 +250,43 @@ body {
 .u-line.u-on {
   background-size: 100% var(--u-weight, 1px);
 }
+
+/*
+ * Japanese pages. Geist has no Japanese, so Noto Sans JP (loaded only on
+ * these pages, see src/site/root/root-document.tsx) follows it, then the
+ * system's own Japanese fonts. Lines break between phrases, not inside a
+ * word (auto-phrase, in Chrome 119 and up; keep-all where it is not known),
+ * and the tight negative tracking the Latin headings use opens up a little,
+ * since kana and kanji crowd when pulled together.
+ */
+:root:lang(ja) {
+  --font-sans: var(--font-geist-sans), var(--font-noto-jp), "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+}
+
+:lang(ja) {
+  line-break: strict;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+@supports (word-break: auto-phrase) {
+  :lang(ja) {
+    word-break: auto-phrase;
+  }
+}
+
+:lang(ja) :is(h1, h2, h3, h4) {
+  letter-spacing: -0.01em;
+  font-feature-settings: "palt";
+}
+
+/* The English body of a page not translated yet keeps the Latin rules. */
+:lang(ja) [lang="en"] {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+:lang(ja) [lang="en"] :is(h1, h2, h3, h4) {
+  letter-spacing: revert-layer;
+  font-feature-settings: normal;
+}

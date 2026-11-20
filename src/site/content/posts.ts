@@ -1,5 +1,7 @@
 import type { CoverKind } from "@/site/blog/covers";
 import { founders } from "@/lib/site";
+import type { Locale } from "@/site/i18n/locales";
+import type { Messages } from "@/site/i18n/messages/types";
 
 /**
  * Blog posts. The funding post is the owner's news, hidden for now. The others are
@@ -156,6 +158,14 @@ export function readingMinutes(body: Block[]): number {
 /** Newest first. The first is the blog's featured post, and the blog menu shows the first three. */
 export const posts: Post[] = input.filter((post) => !post.hidden).map((post) => ({ ...post, image: `/blog/${post.slug}/cover.svg`, readMinutes: readingMinutes(post.body) }));
 
+/**
+ * The posts with their titles and summaries in a language, for the lists
+ * that show them. A post's body stays in English for now.
+ */
+export function postsIn(words: Messages["blog"]): Post[] {
+  return posts.map((post) => ({ ...post, ...(words.posts[post.slug as keyof Messages["blog"]["posts"]] ?? {}) }));
+}
+
 export function postBySlug(slug: string): Post | undefined {
   return posts.find((p) => p.slug === slug);
 }
@@ -173,9 +183,12 @@ export function readNext(post: Post, count = 3): Post[] {
   return [...same, ...others.filter((p) => p.category !== post.category)].slice(0, count);
 }
 
-/** "2026-10-28" as "October 28, 2026", fixed to UTC so server and browser agree. */
-export function formatPostDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
+/** The date style each language writes: "October 28, 2026", "28 de octubre de 2026", "2026年10月28日". */
+const DATE_LOCALES: Record<Locale, string> = { en: "en-US", es: "es-ES", fr: "fr-FR", nl: "nl-NL", ja: "ja-JP" };
+
+/** "2026-10-28" as "October 28, 2026" in English, fixed to UTC so server and browser agree. */
+export function formatPostDate(iso: string, locale: Locale = "en"): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(DATE_LOCALES[locale], {
     month: "long",
     day: "numeric",
     year: "numeric",

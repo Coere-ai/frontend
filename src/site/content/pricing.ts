@@ -1,3 +1,4 @@
+import type { Messages } from "@/site/i18n/messages/types";
 import { contactHref, demoHref, demoLabel, startHref, startLabel } from "./navigation";
 
 /**
@@ -60,3 +61,11 @@ export const plans: Plan[] = [
     cta: { href: contactHref, label: "Join the waitlist" },
   },
 ];
+
+/** The plans in a language: the same cards and links, each word from that language's messages. */
+export function plansIn(words: Messages["pricing"]): Plan[] {
+  return plans.map((plan) => {
+    const { cta, features, ...copy } = words.plans[plan.key];
+    return { ...plan, ...copy, features: [...features], cta: { href: plan.cta.href, label: cta } };
+  });
+}

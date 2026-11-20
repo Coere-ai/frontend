@@ -15,9 +15,12 @@ export async function getLocale(): Promise<Locale> {
   return value;
 }
 
-/** The messages of the page's language. */
-export async function getMessages(): Promise<Messages> {
-  return messagesFor(await getLocale());
+/**
+ * The messages of the page's language, or of `locale` when a part of the
+ * page is still English in every language (see EnglishOnly).
+ */
+export async function getMessages(locale?: Locale): Promise<Messages> {
+  return messagesFor(locale ?? (await getLocale()));
 }
 
 /** For the pages that exist in English only for now (the account pages): any other language is a 404. */

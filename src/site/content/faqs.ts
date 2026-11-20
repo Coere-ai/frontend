@@ -1,4 +1,7 @@
 import { agents, siteConfig } from "@/lib/site";
+import type { Locale } from "@/site/i18n/locales";
+import type { Messages } from "@/site/i18n/messages/types";
+import { format } from "@/site/i18n/types";
 import { emailHref } from "./navigation";
 
 /**
@@ -52,3 +55,21 @@ export const homeFaqs: Faq[] = [
   },
   pending,
 ];
+
+/** Every AI Coere saves chats from, as a list in a language: "ChatGPT, Claude ... y Kimi". */
+export function aiListIn(locale: Locale): string {
+  return new Intl.ListFormat(locale, { style: "long", type: "conjunction" }).format(agents.map((a) => a.name));
+}
+
+/** Where each home question's link goes, in the order of the questions. */
+const homeLinks = [homeFaqs[0].link, undefined, homeFaqs[2].link, undefined, homeFaqs[4].link, undefined, pending.link];
+
+/** The home page's questions in a language, with the same links as in English. */
+export function homeFaqsIn(words: Messages["faqs"]["home"], locale: Locale): Faq[] {
+  const ais = locale === "en" ? AI_LIST : aiListIn(locale);
+  return words.map((faq, i) => {
+    const href = homeLinks[i]?.href;
+    const label = "link" in faq ? faq.link : undefined;
+    return { q: faq.q, a: format(faq.a, { ais }), ...(href && label ? { link: { href, label } } : {}) };
+  });
+}

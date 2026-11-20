@@ -55,12 +55,12 @@ function NewestPost({ post }: { post: Post }) {
  * as a large card on the right. The hero marks itself dark, so the glass
  * navbar over it turns dark too.
  */
-export function BlogHero({ post }: { post: Post }) {
+export function BlogHero({ post, words }: { post: Post; words: { title: string; line: string; readNewest: string } }) {
   return (
     <SplitHero
-      title="The Coere blog"
-      line="News, launches and notes from the team building the memory layer you own."
-      primary={{ href: `/blog/${post.slug}`, label: "Read the newest post" }}
+      title={words.title}
+      line={words.line}
+      primary={{ href: `/blog/${post.slug}`, label: words.readNewest }}
       app={<NewestPost post={post} />}
       appFit="contained"
       backdrop={<BlogBackdrop />}

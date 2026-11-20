@@ -1,4 +1,8 @@
+"use client";
+
 import { formatPostDate, postAuthor, type Post } from "@/site/content/posts";
+import { useLocale, useMessages } from "@/site/i18n/client";
+import { format } from "@/site/i18n/types";
 
 /**
  * A post's category, date and reading time on one quiet line, set apart by
@@ -6,11 +10,13 @@ import { formatPostDate, postAuthor, type Post } from "@/site/content/posts";
  * category to its breadcrumb.
  */
 export function PostMeta({ post, dark = false, category = true, className = "" }: { post: Post; dark?: boolean; category?: boolean; className?: string }) {
+  const locale = useLocale();
+  const t = useMessages("blog");
   return (
     <p className={`flex flex-wrap items-center gap-x-5 gap-y-1 text-[13.5px] ${dark ? "text-white/60" : "text-neutral-500 dark:text-white/60"} ${className}`}>
-      {category ? <span className={`font-semibold ${dark ? "text-brand-300" : "text-brand-600 dark:text-brand-300"}`}>{post.category}</span> : null}
-      <time dateTime={post.date}>{formatPostDate(post.date)}</time>
-      <span>{post.readMinutes} min read</span>
+      {category ? <span className={`font-semibold ${dark ? "text-brand-300" : "text-brand-600 dark:text-brand-300"}`}>{t.categories[post.category]}</span> : null}
+      <time dateTime={post.date}>{formatPostDate(post.date, locale)}</time>
+      <span>{format(t.minutes, { minutes: post.readMinutes })}</span>
     </p>
   );
 }

@@ -1,32 +1,34 @@
 import Image from "next/image";
 import Link from "@/site/i18n/link";
 import { PostMeta } from "@/site/blog/post-meta";
-import { posts } from "@/site/content/posts";
+import { postsIn } from "@/site/content/posts";
+import { getMessages } from "@/site/i18n/server";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 import { Underlined } from "@/site/ui/underlined";
 import { SECTION_TITLE, SECTION_Y, SOFT_CARD } from "./look";
 
-/** The three newest posts, by date, whatever order the list is kept in. */
-const newest = [...posts].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
 
 /**
  * From the blog, near the end of the home page: the three newest posts as
  * soft cards, each opening its post, and a way to the whole blog. It reads
  * the posts list, so a new post shows here by itself.
  */
-export function BlogSection() {
+export async function BlogSection() {
+  const { blog, home } = await getMessages();
+  // The three newest posts, by date, whatever order the list is kept in.
+  const newest = postsIn(blog).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   return (
     <section id="blog" aria-labelledby="blog-title" className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <h2 id="blog-title" className={SECTION_TITLE}>
-              News from the team
+              {home.blog.title}
             </h2>
           </div>
           <ArrowLink href="/blog" className="text-neutral-950">
-            Read the blog
+            {home.blog.read}
           </ArrowLink>
         </div>
 

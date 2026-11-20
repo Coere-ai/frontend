@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { solves, type Side, type SideWords } from "@/site/content/solves";
+import type { Side } from "@/site/content/solves";
+import { useMessages } from "@/site/i18n/client";
+import type { Messages } from "@/site/i18n/messages/types";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 import { PillTabs, tabId } from "@/site/ui/pill-tabs";
@@ -9,7 +11,8 @@ import { SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "./look";
 import { SceneRow } from "./solves/scene-row";
 import { Swap } from "./solves/swap";
 
-const { today, coere: withCoere } = solves.sides;
+type SideWords = Messages["home"]["solves"]["today"];
+
 const SWITCH = "solves-side";
 
 /**
@@ -22,6 +25,8 @@ const SWITCH = "solves-side";
  */
 export function SolvesSection() {
   const [side, setSide] = useState<Side>("today");
+  const solves = useMessages("home").solves;
+  const { today, coere: withCoere } = solves;
   const coere = side === "coere";
   return (
     <section id="solves" className={`scroll-mt-24 ${SECTION_Y}`}>
@@ -48,7 +53,7 @@ export function SolvesSection() {
         />
 
         <div id={`${SWITCH}-panel`} role="tabpanel" aria-labelledby={tabId(SWITCH, side)} className={`mt-12 px-5 py-10 sm:px-8 md:mt-14 md:px-12 md:py-14 ${SOFT_FIELD}`}>
-          <SceneRow coere={coere} />
+          <SceneRow coere={coere} words={{ today: today.scenes, coere: withCoere.scenes }} />
           <p className="mx-auto mt-14 max-w-2xl text-center text-[17px] leading-relaxed text-neutral-500 text-balance md:mt-16 dark:text-white/60">
             <Swap
               coere={coere}

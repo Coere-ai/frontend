@@ -2,7 +2,8 @@
 
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { solves } from "@/site/content/solves";
+import type { SceneKey } from "@/site/content/solves";
+import type { Messages } from "@/site/i18n/messages/types";
 import { lastStep, scenes } from "./scenes";
 import { SWAP_IN_MS, SWAP_OUT_MS, Swap } from "./swap";
 
@@ -25,8 +26,11 @@ const START_MS = 400;
 /** How long a scene holds its still before the next scene plays, in ms. It keeps showing it after. */
 const HOLD_MS = 2400;
 
-const words = solves.sides;
-const keys = words.today.scenes.map((s) => s.key);
+/** The three scenes, in the order they play. */
+const keys: SceneKey[] = ["switch", "newChat", "longChat"];
+
+/** Each side's title and line for each scene, in the page's language. */
+type SceneWords = Record<"today" | "coere", Messages["home"]["solves"]["today"]["scenes"]>;
 
 /** The first scene in view from index `from` on, going round, or -1 when none is. */
 function nextInView(seen: boolean[], from: number): number {
@@ -117,7 +121,7 @@ function useStill(): boolean {
  * again and again (inSight). When the switch flips, every scene fades to the new side and the
  * first scene in view plays at once.
  */
-export function SceneRow({ coere }: { coere: boolean }) {
+export function SceneRow({ coere, words }: { coere: boolean; words: SceneWords }) {
   const ref = useRef<HTMLUListElement>(null);
   const still = useStill();
   const [seen, setSeen] = useState<boolean[]>(() => keys.map(() => false));
@@ -177,10 +181,10 @@ export function SceneRow({ coere }: { coere: boolean }) {
               </AnimatePresence>
             </div>
             <h3 className="mt-6 text-[19px] font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">
-              <Swap coere={coere} today={words.today.scenes[i].title} withCoere={words.coere.scenes[i].title} />
+              <Swap coere={coere} today={words.today[key].title} withCoere={words.coere[key].title} />
             </h3>
             <p className="mt-2 text-[15px] leading-relaxed text-neutral-500 text-pretty dark:text-white/60">
-              <Swap coere={coere} today={words.today.scenes[i].line} withCoere={words.coere.scenes[i].line} />
+              <Swap coere={coere} today={words.today[key].line} withCoere={words.coere[key].line} />
             </p>
           </li>
         );

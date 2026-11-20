@@ -6,6 +6,7 @@ import { articleGraph } from "@/site/blog/article-graph";
 import { PostArticle } from "@/site/blog/post-article";
 import { PostCard } from "@/site/blog/post-card";
 import { postAuthor, postBySlug, posts, readNext } from "@/site/content/posts";
+import { EnglishOnly } from "@/site/i18n/english-only";
 import { JsonLd } from "@/site/seo/json-ld";
 import { Container } from "@/site/ui/container";
 import { DarkPage } from "@/site/ui/page-theme";
@@ -46,29 +47,31 @@ export default async function PostPage({ params }: PageProps<"/[lang]/blog/[slug
   const post = postBySlug((await params).slug);
   if (!post) notFound();
   return (
-    <DarkPage>
-      <JsonLd data={articleGraph(post)} />
-      <PostArticle post={post} />
-      <section aria-labelledby="read-next" className="border-t border-neutral-200/80 bg-[#f7f8fc] py-20 md:py-24 dark:border-white/10 dark:bg-white/[0.02]">
-        <Container>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 id="read-next" className="text-3xl font-semibold tracking-[-0.035em] text-neutral-950 dark:text-white md:text-4xl">
-              Read next
-            </h2>
-            <Link href="/blog" className="group inline-flex items-center gap-1.5 rounded-sm text-[15px] font-medium text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 dark:text-white dark:focus-visible:outline-brand-300">
-              All posts
-              <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-          <ul className="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 md:mt-12">
-            {readNext(post).map((p) => (
-              <li key={p.slug}>
-                <PostCard post={p} />
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </section>
-    </DarkPage>
+    <EnglishOnly parts={["blog"]}>
+      <DarkPage>
+        <JsonLd data={articleGraph(post)} />
+        <PostArticle post={post} />
+        <section aria-labelledby="read-next" className="border-t border-neutral-200/80 bg-[#f7f8fc] py-20 md:py-24 dark:border-white/10 dark:bg-white/[0.02]">
+          <Container>
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <h2 id="read-next" className="text-3xl font-semibold tracking-[-0.035em] text-neutral-950 dark:text-white md:text-4xl">
+                Read next
+              </h2>
+              <Link href="/blog" className="group inline-flex items-center gap-1.5 rounded-sm text-[15px] font-medium text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 dark:text-white dark:focus-visible:outline-brand-300">
+                All posts
+                <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+            <ul className="mt-10 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 md:mt-12">
+              {readNext(post).map((p) => (
+                <li key={p.slug}>
+                  <PostCard post={p} />
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </section>
+      </DarkPage>
+    </EnglishOnly>
   );
 }

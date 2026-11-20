@@ -3,18 +3,23 @@ import { pageMetadata } from "@/lib/seo";
 import { CenterHero } from "@/site/blocks/center-hero";
 import { pricingSeo } from "@/site/content/seo";
 import { ClosingCta } from "@/site/home/closing-cta";
+import { getLocale, getMessages } from "@/site/i18n/server";
 import { PricingSection } from "@/site/pricing/pricing-section";
 import { DarkPage } from "@/site/ui/page-theme";
 
-export const metadata: Metadata = pageMetadata({ ...pricingSeo, path: "/pricing" });
+export async function generateMetadata(): Promise<Metadata> {
+  const [locale, { seo }] = await Promise.all([getLocale(), getMessages()]);
+  return pageMetadata({ ...pricingSeo, ...seo.pricing, path: "/pricing", locale, translated: true });
+}
 
 /** Pricing: the three plans, free for one person, then a word with the founders, dark from top to footer. */
-export default function PricingPage() {
+export default async function PricingPage() {
+  const { pricing } = await getMessages();
   return (
     <DarkPage>
-      <CenterHero title="A plan for you, your team or your app" line="Coere is free for one person. Teams and developers talk to us." />
+      <CenterHero title={pricing.title} line={pricing.line} />
       <PricingSection bare />
-      <ClosingCta title="Not sure which plan fits?" text="Talk to the founders about Coere for you, your team or your app." />
+      <ClosingCta title={pricing.closing.title} text={pricing.closing.text} />
     </DarkPage>
   );
 }
