@@ -20,7 +20,7 @@ import { ProductSection } from "./product-section";
 export function ForgePage() {
   return (
     <>
-      <ProductHero copy={forgeHero} backdrop={<ForgeBackdrop />} tone="dark" app={<CodeTabs samples={contextSamples} />} appFit="contained" secondary={{ href: "/resources", label: "Read the docs" }} />
+      <ProductHero copy={forgeHero} backdrop={<ForgeBackdrop />} tone="dark" laser app={<CodeTabs samples={contextSamples} />} appFit="contained" secondary={{ href: "/resources", label: "Read the docs" }} />
       <section className={SECTION_Y}>
         <Container>
           <div className="mx-auto max-w-3xl text-center">
