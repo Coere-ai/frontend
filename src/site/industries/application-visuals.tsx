@@ -23,12 +23,12 @@ function FolderCard() {
     { icon: "folder", name: "Halvorsen Freight", note: "Contacts and promises" },
   ] as const;
   return (
-    <ul className="divide-y divide-neutral-100 rounded-2xl bg-white px-4 ring-1 ring-neutral-200">
+    <ul className="divide-y divide-neutral-100 rounded-2xl bg-white px-4 ring-1 ring-neutral-200 dark:divide-white/10 dark:bg-white/[0.05] dark:ring-white/10">
       {rows.map((row) => (
         <li key={row.name} className="flex items-center gap-3 py-3">
-          <FeatureIcon name={row.icon} size={20} className="text-neutral-950" />
-          <span className="flex-1 text-[14px] text-neutral-950">{row.name}</span>
-          <span className="text-[12px] text-neutral-500">{row.note}</span>
+          <FeatureIcon name={row.icon} size={20} className="text-neutral-950 dark:text-brand-300" />
+          <span className="flex-1 text-[14px] text-neutral-950 dark:text-white">{row.name}</span>
+          <span className="text-[12px] text-neutral-500 dark:text-white/60">{row.note}</span>
         </li>
       ))}
     </ul>
