@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { applications } from "@/site/content/industries";
 import { productBySlug } from "@/site/content/products";
+import { SOFT_CARD } from "@/site/home/look";
 import { Underlined } from "@/site/ui/underlined";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { applicationVisuals } from "./application-visuals";
@@ -13,12 +14,12 @@ export function ApplicationsGrid() {
         const product = productBySlug(app.product);
         if (!product) return null;
         return (
-          <Link key={app.slug} id={app.slug} href={`/products/${product.slug}`} className="group flex scroll-mt-28 flex-col rounded-3xl bg-white p-3 ring-1 ring-neutral-200">
-            <div className="flex aspect-[4/3] items-center rounded-2xl bg-neutral-50 p-6">
+          <Link key={app.slug} id={app.slug} href={`/products/${product.slug}`} className={`group flex scroll-mt-28 flex-col p-3 transition-transform duration-300 hover:-translate-y-1 ${SOFT_CARD}`}>
+            <div className="flex aspect-[4/3] items-center rounded-[20px] bg-[#f5f6fb] p-6">
               <div className="w-full">{applicationVisuals[app.slug]}</div>
             </div>
             <div className="flex flex-1 flex-col px-3 pt-6 pb-4">
-              <h3 className="text-2xl font-medium tracking-[-0.03em] text-neutral-950"><Underlined big>{app.name}</Underlined></h3>
+              <h3 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950"><Underlined big>{app.name}</Underlined></h3>
               <p className="mt-2 flex-1 text-[15px] leading-relaxed text-neutral-500">{app.summary}</p>
               <span className="mt-6 inline-flex items-center gap-1.5 text-[15px] font-medium text-neutral-950">
                 With {product.name}

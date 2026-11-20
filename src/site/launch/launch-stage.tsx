@@ -54,7 +54,7 @@ export function LaunchStage({ product, setting, children, here: after }: { produ
   return (
     <MotionConfig reducedMotion="user">
       <div className="text-center">
-        <h1 className="mx-auto max-w-4xl text-[2.125rem] leading-[1.08] font-medium tracking-[-0.045em] text-neutral-950 text-balance sm:text-5xl md:text-[4.25rem] md:leading-[1.02]">
+        <h1 className="mx-auto max-w-4xl text-[2.125rem] leading-[1.08] font-semibold tracking-[-0.045em] text-neutral-950 text-balance sm:text-5xl md:text-[4.25rem] md:leading-[1.02]">
           <Title text={here ? copy.here : copy.title} markBefore={copy.markBefore} />
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-neutral-600 text-pretty">{here ? copy.hereLine : copy.line}</p>

@@ -9,17 +9,17 @@ export function MoreIndustries({ current, all }: { current: string; all: Industr
   const start = all.findIndex((i) => i.slug === current);
   const others = [1, 2, 3].map((step) => all[(start + step) % all.length]);
   return (
-    <section className="border-t border-neutral-100 bg-neutral-50 py-24">
+    <section className="py-16 md:py-20">
       <Container>
-        <p className="text-sm font-medium text-neutral-500">More industries</p>
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950">More industries</h2>
         <ul className="mt-6 grid gap-6 md:grid-cols-3">
           {others.map((industry) => (
             <li key={industry.slug}>
               <Link href={`/industries/${industry.slug}`} className="group block">
-                <div className="relative aspect-[16/10] overflow-hidden rounded-3xl bg-neutral-200">
+                <div className="relative aspect-[16/10] overflow-hidden rounded-[28px] bg-neutral-200 shadow-[0_28px_70px_-34px_rgba(23,27,77,0.35)]">
                   <SizedPhoto src={industry.photo.src} alt={industry.photo.alt} fill sizes="(min-width: 768px) 30vw, 100vw" className="object-cover" />
                 </div>
-                <p className="mt-4 text-xl font-medium tracking-[-0.02em] text-neutral-950"><Underlined big>{industry.name}</Underlined></p>
+                <p className="mt-4 text-xl font-semibold tracking-[-0.02em] text-neutral-950"><Underlined big>{industry.name}</Underlined></p>
               </Link>
             </li>
           ))}

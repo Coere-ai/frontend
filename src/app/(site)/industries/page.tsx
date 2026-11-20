@@ -1,39 +1,33 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
+import { CenterHero } from "@/site/blocks/center-hero";
 import { industriesSeo } from "@/site/content/seo";
 import { ClosingCta } from "@/site/home/closing-cta";
+import { SECTION_Y, SOFT_FIELD } from "@/site/home/look";
 import { ApplicationsGrid } from "@/site/industries/applications-grid";
 import { IndustryGrid, PhotoCredits } from "@/site/industries/industry-grid";
 import { Container } from "@/site/ui/container";
-import { SectionHeading } from "@/site/ui/section-heading";
 
 export const metadata: Metadata = pageMetadata({ ...industriesSeo, path: "/industries" });
 
 export default function IndustriesPage() {
   return (
     <>
-      <section className="pt-20 pb-20 md:pt-28">
+      <CenterHero eyebrow="Industries" title="Memory for every industry" line="Coere gives people, teams and apps a memory they control. Start with who it is for, then open your field." />
+      <section className="pb-8">
         <Container>
-          <SectionHeading
-            as="h1"
-            eyebrow="Industries"
-            title="Memory for every industry"
-            description="Coere gives people, teams and apps a memory they control. Start with who it is for, then open your field."
-          />
-        </Container>
-      </section>
-      <section className="border-t border-neutral-100 bg-neutral-50 py-24">
-        <Container>
-          <h2 className="text-sm font-medium text-neutral-500">Who it&apos;s for</h2>
-          <div className="mt-6">
-            <ApplicationsGrid />
+          <div className={`${SOFT_FIELD} px-5 py-12 sm:px-8 md:px-12 md:py-16`}>
+            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950">Who it&apos;s for</h2>
+            <div className="mt-8">
+              <ApplicationsGrid />
+            </div>
           </div>
         </Container>
       </section>
-      <section className="py-24">
+      <section className={SECTION_Y}>
         <Container>
-          <h2 className="text-sm font-medium text-neutral-500">Industries</h2>
-          <div className="mt-6">
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950">Industries</h2>
+          <div className="mt-8">
             <IndustryGrid />
           </div>
           <PhotoCredits />

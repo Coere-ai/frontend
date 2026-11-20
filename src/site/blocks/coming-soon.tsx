@@ -1,6 +1,7 @@
 import { launchSettings } from "@/lib/launch/store";
 import type { LaunchProduct } from "@/site/content/launch";
 import { InterestForm } from "@/site/launch/interest-form";
+import { SoftBackdrop } from "./soft-backdrop";
 import { LaunchStage } from "@/site/launch/launch-stage";
 import { buttonClass } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
@@ -18,12 +19,16 @@ const storeUrl = () => process.env.COERE_STORE_URL || "https://chromewebstore.go
  * Coere Connect's, Try it free to Coere for Teams'. The heading, a countdown
  * to the moment the operator set in /admin/launch, and I'm interested, which
  * takes an email for the admin panel's Interested list. Once Coere Connect
- * is out, Add to Chrome takes the place of I'm interested.
+ * is out, Add to Chrome takes the place of I'm interested. It sits on the
+ * soft backdrop the other page openings use.
  */
 export async function ComingSoon({ product }: { product: LaunchProduct }) {
   const setting = (await launchSettings())[product];
   return (
-    <section className="bg-white pt-20 pb-28 md:pt-28 md:pb-40">
+    <section className="relative isolate overflow-hidden bg-white pt-20 pb-28 md:pt-28 md:pb-40">
+      <div aria-hidden="true" className="absolute inset-0 -z-10">
+        <SoftBackdrop />
+      </div>
       <Container>
         <LaunchStage
           product={product}
