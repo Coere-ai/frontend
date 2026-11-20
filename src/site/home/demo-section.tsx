@@ -3,10 +3,10 @@ import { films } from "@/site/content/films";
 import { Container } from "@/site/ui/container";
 import { FilmShowcase } from "@/site/ui/film-showcase";
 
-/** The full v2 demo, right under the hero. */
+/** The full v2 demo, under the hero and the AIs it works with. Watch demo in the hero opens the same film. */
 export function DemoSection() {
   return (
-    <section id="demo" className="scroll-mt-24 pb-32">
+    <section id="demo" className="scroll-mt-24 pb-8 md:pb-12">
       <Container>
         <FilmShowcase film={films.v2} backdrop={backgrounds.ribbons} />
       </Container>

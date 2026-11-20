@@ -5,6 +5,7 @@ import { solves, type Side, type SideWords } from "@/site/content/solves";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 import { PillTabs, tabId } from "@/site/ui/pill-tabs";
+import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "./look";
 import { SceneRow } from "./solves/scene-row";
 import { Swap } from "./solves/swap";
 
@@ -23,7 +24,7 @@ export function SolvesSection() {
   const [side, setSide] = useState<Side>("today");
   const coere = side === "coere";
   return (
-    <section id="solves" className="scroll-mt-24 border-t border-neutral-100 py-28 md:py-36">
+    <section id="solves" className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         {/*
           The section's name stays put, and the two intros share one place under it, from its top, so the
@@ -31,8 +32,8 @@ export function SolvesSection() {
           With Coere's does.
         */}
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[15px] font-medium text-brand-500">{solves.eyebrow}</p>
-          <Swap block coere={coere} className="mt-3" today={<Intro words={today} narrow />} withCoere={<Intro words={withCoere} />} />
+          <p className={EYEBROW}>{solves.eyebrow}</p>
+          <Swap block coere={coere} className="mt-5" today={<Intro words={today} narrow />} withCoere={<Intro words={withCoere} />} />
         </div>
 
         <PillTabs
@@ -47,9 +48,9 @@ export function SolvesSection() {
           ]}
         />
 
-        <div id={`${SWITCH}-panel`} role="tabpanel" aria-labelledby={tabId(SWITCH, side)} className="mt-14 md:mt-16">
+        <div id={`${SWITCH}-panel`} role="tabpanel" aria-labelledby={tabId(SWITCH, side)} className={`mt-12 px-5 py-10 sm:px-8 md:mt-14 md:px-12 md:py-14 ${SOFT_FIELD}`}>
           <SceneRow coere={coere} />
-          <p className="mx-auto mt-16 max-w-2xl text-center text-[17px] leading-relaxed text-neutral-500 text-balance md:mt-20">
+          <p className="mx-auto mt-14 max-w-2xl text-center text-[17px] leading-relaxed text-neutral-500 text-balance md:mt-16">
             <Swap
               coere={coere}
               today={<DeveloperLine text={today.developers} />}
@@ -74,7 +75,7 @@ export function SolvesSection() {
 function Intro({ words, narrow = false }: { words: SideWords; narrow?: boolean }) {
   return (
     <div>
-      <h2 className={`mx-auto text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04] ${narrow ? "md:max-w-md" : ""}`}>{words.title}</h2>
+      <h2 className={`mx-auto ${SECTION_TITLE} ${narrow ? "md:max-w-md" : ""}`}>{words.title}</h2>
       <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{words.line}</p>
     </div>
   );

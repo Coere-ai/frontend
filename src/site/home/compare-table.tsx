@@ -6,6 +6,7 @@ import { compareTables, type CompareTable as Table, type Mark } from "@/site/con
 import { Container } from "@/site/ui/container";
 import { CheckIcon, CloseIcon } from "@/site/ui/icons/interface-icons";
 import { PillTabs, tabId } from "@/site/ui/pill-tabs";
+import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_CARD } from "./look";
 
 /** A half filled circle, for "partly". */
 const Half = () => (
@@ -88,11 +89,11 @@ export function CompareTable({ id = "compare" }: { id?: string }) {
   const table = compareTables.find((t) => t.key === picked) ?? compareTables[0];
 
   return (
-    <section id={id} className="scroll-mt-24 pb-28 md:pb-36">
+    <section id={id} className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[15px] font-medium text-brand-500">How Coere compares</p>
-          <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04]">One memory that knows you everywhere</h2>
+          <p className={EYEBROW}>How Coere compares</p>
+          <h2 className={`mt-5 ${SECTION_TITLE}`}>One memory that knows you everywhere</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">Each AI remembers only what you told it. Coere knows you on day one, in every AI, and acts on it.</p>
         </div>
 
@@ -114,7 +115,7 @@ export function CompareTable({ id = "compare" }: { id?: string }) {
         />
 
         {/* relative: the marks' screen reader words are absolutely placed, and must stay inside this scroller, not widen the page on a phone. */}
-        <div id={`${id}-pick-panel`} role="tabpanel" aria-labelledby={tabId(`${id}-pick`, table.key)} className="relative mx-auto mt-14 max-w-6xl overflow-x-auto py-3">
+        <div id={`${id}-pick-panel`} role="tabpanel" aria-labelledby={tabId(`${id}-pick`, table.key)} className={`relative mx-auto mt-12 max-w-6xl overflow-x-auto px-4 py-8 md:px-10 md:py-10 ${SOFT_CARD}`}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={table.key} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
               <Board table={table} />

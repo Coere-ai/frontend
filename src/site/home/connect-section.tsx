@@ -4,6 +4,7 @@ import { films } from "@/site/content/films";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { ActionsReel } from "./actions-reel";
+import { SECTION_Y, SOFT_FIELD } from "./look";
 import { SectionIntro } from "./section-intro";
 
 const items: ShowcaseItem[] = [
@@ -50,7 +51,7 @@ const items: ShowcaseItem[] = [
 /** Coere Connect on the home page: context as you type, the memory, how it fills, and what Cori does with it. */
 export function ConnectSection() {
   return (
-    <section id="connect" className="scroll-mt-24 border-t border-neutral-100 py-28 md:py-36">
+    <section id="connect" className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <SectionIntro
           eyebrow="Coere Connect"
@@ -59,7 +60,7 @@ export function ConnectSection() {
           href="/products/connect"
           linkLabel="Explore Coere Connect"
         />
-        <div className="mt-20">
+        <div className={`mt-14 p-3 sm:p-5 md:mt-16 md:p-8 lg:p-10 ${SOFT_FIELD}`}>
           <AccordionShowcase items={items} background={backgrounds.dune} />
         </div>
       </Container>
