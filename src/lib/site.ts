@@ -56,8 +56,12 @@ export type TeamMember = {
   highlights: readonly string[];
   /** Portrait in /public. Falls back to initials when missing. */
   photo?: string;
-  /** Extra classes on the portrait, e.g. to zoom a wide crop in on the face. */
-  photoClassName?: string;
+  /**
+   * Zooms a wide portrait in on the face, so every portrait frames its face
+   * alike: scaled by `zoom` around the point `x`, `y` (fractions of the
+   * photo's width and height), as a CSS scale with that origin would.
+   */
+  photoCrop?: { zoom: number; x: number; y: number };
 };
 
 export const founders: readonly TeamMember[] = [
@@ -75,8 +79,8 @@ export const founders: readonly TeamMember[] = [
       "Competed in the 2024 Blue Ocean Student Entrepreneur Competition",
     ],
     photo: "/founders/michelle-dong.jpeg",
-    // Zooms the wide-framed original in on the face so both portraits match.
-    photoClassName: "scale-[2.1] origin-[51%_46%]",
+    // The original is framed wide, so it zooms in to match the other portrait.
+    photoCrop: { zoom: 2.1, x: 0.51, y: 0.46 },
   },
   {
     name: "Edison Law",
