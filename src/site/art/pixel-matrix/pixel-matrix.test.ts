@@ -73,6 +73,12 @@ describe("palette", () => {
     assert.equal(rampPosition([1, 1, 1], logo, 0), 0.25);
     assert.equal(rampPosition([1, 1, 1], logo, 1), 0.75);
   });
+
+  it("puts every cell of a mono mark on the sweep, whatever its hue", () => {
+    const mono = { ...logo, mono: true };
+    assert.equal(rampPosition([1, 0.2, 0.6], mono, 0.5), 0.5);
+    assert.equal(rampPosition([0.1, 0.9, 0.3], mono, 0), 0.25);
+  });
 });
 
 describe("layout", () => {

@@ -15,6 +15,8 @@ export type MatrixLogo = {
   src: string;
   tone: number;
   hue: number;
+  /** Colors the whole mark along one soft sweep of the ramp, ignoring its own hues. */
+  mono?: boolean;
 };
 
 const coereSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><path d="${LOGO_BLADE}"/><path d="${LOGO_BLADE}" transform="rotate(180 256 256)"/></svg>`;
@@ -24,7 +26,7 @@ export const MATRIX_LOGOS: Record<MatrixLogoId, MatrixLogo> = {
   chatgpt: { id: "chatgpt", label: "ChatGPT", src: "/openai.svg", tone: 0.06, hue: 0 },
   claude: { id: "claude", label: "Claude", src: "/claude-color.svg", tone: 0.93, hue: 15 },
   gemini: { id: "gemini", label: "Gemini", src: "/gemini-color.svg", tone: 0.4, hue: 217 },
-  copilot: { id: "copilot", label: "Copilot", src: "/copilot-color.svg", tone: 0.55, hue: 200 },
+  copilot: { id: "copilot", label: "Copilot", src: "/copilot-color.svg", tone: 0.45, hue: 200, mono: true },
   perplexity: { id: "perplexity", label: "Perplexity", src: "/perplexity-color.svg", tone: 0.02, hue: 186 },
   grok: { id: "grok", label: "Grok", src: "/grok.svg", tone: 0.66, hue: 0 },
   deepseek: { id: "deepseek", label: "DeepSeek", src: "/deepseek-color.svg", tone: 0.34, hue: 230 },

@@ -58,11 +58,13 @@ export function hueGap(a: number, b: number): number {
  * on the ramp, and a brand hue that maps onto it. A colored cell moves along
  * the ramp by how far its hue is from the brand hue, so a logo with several
  * colors (Gemini, Copilot) keeps its parts apart in the new palette. White
- * and gray cells, and every cell of a one color mark, follow a soft
- * gradient across the logo instead, `across` running from 0 to 1.
+ * and gray cells, every cell of a one color mark, and a mark set `mono`
+ * (Copilot, whose many brand hues land on the ramp as clashing bands),
+ * follow a soft gradient across the logo instead, `across` running from 0 to 1.
  */
-export function rampPosition(cell: Rgb, logo: { tone: number; hue: number }, across: number): number {
+export function rampPosition(cell: Rgb, logo: { tone: number; hue: number; mono?: boolean }, across: number): number {
   const sweep = logo.tone + (across - 0.5) * 0.5;
+  if (logo.mono) return clamp01(sweep);
   const { hue, saturation } = hueAndSaturation(cell);
   if (saturation < 0.2) return clamp01(sweep);
   const brand = logo.tone + (hueGap(hue, logo.hue) / 360) * 1.1;
