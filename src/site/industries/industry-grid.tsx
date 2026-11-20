@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { standardNames } from "@/site/content/compliance";
 import { industries } from "@/site/content/industries";
 import { Underlined } from "@/site/ui/underlined";
 import { IndustryIcon } from "@/site/ui/icons/industry-icons";
@@ -36,6 +37,9 @@ export function IndustryGrid() {
                 </li>
               ))}
             </ul>
+            {standardNames(industry.slug) ? (
+              <p className="mt-4 text-[13px] leading-relaxed text-neutral-500 dark:text-white/55">Coere will meet {standardNames(industry.slug)}.</p>
+            ) : null}
           </Link>
         </Reveal>
       ))}
