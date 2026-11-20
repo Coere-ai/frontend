@@ -70,3 +70,23 @@
 .docs-prose th { text-align: left; font-weight: 500; color: var(--color-neutral-950); background: var(--color-neutral-50); }
 .docs-prose th, .docs-prose td { padding: 0.65em 0.9em; vertical-align: top; border-bottom: 1px solid var(--color-neutral-200); }
 .docs-prose tr:last-child td { border-bottom: 0; }
+
+/*
+ * The docs in the dark page theme (DarkPage): light words on the near
+ * black, fine light rules, and code panels a shade above the page with a
+ * fine edge, so they stand apart from it.
+ */
+:where([data-theme="dark"]) .docs-prose { color: rgb(255 255 255 / 0.72); }
+:where([data-theme="dark"]) .docs-prose :is(h2, h3, h4, h5),
+:where([data-theme="dark"]) .docs-prose strong,
+:where([data-theme="dark"]) .docs-prose th { color: #fff; }
+:where([data-theme="dark"]) .docs-prose a { color: #fff; text-decoration-color: rgb(255 255 255 / 0.35); }
+:where([data-theme="dark"]) .docs-prose a:hover { text-decoration-color: #fff; }
+:where([data-theme="dark"]) .docs-prose li::marker { color: rgb(255 255 255 / 0.4); }
+:where([data-theme="dark"]) .docs-prose hr { border-color: rgb(255 255 255 / 0.1); }
+:where([data-theme="dark"]) .docs-prose blockquote { background: rgb(255 255 255 / 0.045); border-color: rgb(255 255 255 / 0.1); }
+:where([data-theme="dark"]) .docs-prose :not(pre) > code { color: #fff; background: rgb(255 255 255 / 0.1); }
+:where([data-theme="dark"]) .docs-prose pre { background: #10132a; color: rgb(255 255 255 / 0.9); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1); }
+:where([data-theme="dark"]) .docs-table { border-color: rgb(255 255 255 / 0.1); }
+:where([data-theme="dark"]) .docs-prose th { background: rgb(255 255 255 / 0.045); }
+:where([data-theme="dark"]) .docs-prose :is(th, td) { border-bottom-color: rgb(255 255 255 / 0.1); }

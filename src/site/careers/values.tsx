@@ -11,9 +11,9 @@ export function Values() {
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {values.map((value, index) => (
-        <Reveal key={value.title} delay={index * 0.06} className="rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,17,15,0.04),0_24px_48px_-36px_rgba(40,50,133,0.3)] ring-1 ring-neutral-200/70">
-          <h3 className="text-xl font-semibold tracking-[-0.025em] text-neutral-950">{value.title}</h3>
-          <p className="mt-3 text-[16px] leading-relaxed text-neutral-600">{value.text}</p>
+        <Reveal key={value.title} delay={index * 0.06} className="rounded-[28px] bg-white p-7 shadow-[0_1px_2px_rgba(20,17,15,0.04),0_24px_48px_-36px_rgba(40,50,133,0.3)] ring-1 ring-neutral-200/70 dark:bg-white/[0.045] dark:shadow-none dark:ring-white/10">
+          <h3 className="text-xl font-semibold tracking-[-0.025em] text-neutral-950 dark:text-white">{value.title}</h3>
+          <p className="mt-3 text-[16px] leading-relaxed text-neutral-600 dark:text-white/70">{value.text}</p>
         </Reveal>
       ))}
     </div>

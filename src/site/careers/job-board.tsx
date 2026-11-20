@@ -29,10 +29,10 @@ export function JobBoard({ team }: { team?: Team }) {
     <div className="grid gap-10 lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:gap-14">
       <div>
         <JobFilters filters={filters} onChange={setFilters} types={types} teams={teams} locations={locations} />
-        <p className="mt-8 text-[13px] text-neutral-500">
+        <p className="mt-8 text-[13px] text-neutral-500 dark:text-white/60">
           {matches.length} open {matches.length === 1 ? "role" : "roles"}
         </p>
-        <ul className="mt-3 divide-y divide-neutral-200 border-y border-neutral-200">
+        <ul className="mt-3 divide-y divide-neutral-200 border-y border-neutral-200 dark:divide-white/10 dark:border-white/10">
           {matches.map((role) => {
             const active = role.slug === shown?.slug;
             return (
@@ -47,21 +47,21 @@ export function JobBoard({ team }: { team?: Team }) {
             );
           })}
         </ul>
-        {matches.length === 0 ? <p className="mt-6 text-[15px] text-neutral-500">No roles match. Try fewer filters.</p> : null}
+        {matches.length === 0 ? <p className="mt-6 text-[15px] text-neutral-500 dark:text-white/60">No roles match. Try fewer filters.</p> : null}
       </div>
       <div className="hidden lg:sticky lg:top-28 lg:block lg:self-start">{shown ? <JobDetail role={shown} /> : null}</div>
     </div>
   );
 }
 
-/** One role in the list. The picked one is underlined in black. */
+/** One role in the list. The picked one is underlined in black, or white on a dark page. */
 function RoleRow({ role, active }: { role: Role; active: boolean }) {
   return (
     <>
-      <span className="block text-[16px] font-medium text-neutral-950">
+      <span className="block text-[16px] font-medium text-neutral-950 dark:text-white">
         <Underlined on={active}>{role.title}</Underlined>
       </span>
-      <span className="mt-1 block text-[13px] text-neutral-500">
+      <span className="mt-1 block text-[13px] text-neutral-500 dark:text-white/60">
         {/* "Internships, Internship" would say the same thing twice. */}
         {role.team === "Internships" ? role.type : `${role.team}, ${role.type}`}, {role.location}
       </span>

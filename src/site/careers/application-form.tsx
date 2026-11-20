@@ -40,13 +40,13 @@ export function ApplicationForm({ role }: { role: Role }) {
 
   if (state === "sent") {
     return (
-      <div role="status" className="rounded-3xl bg-neutral-50 p-10 text-center">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-neutral-950 text-white">
+      <div role="status" className="rounded-3xl bg-neutral-50 p-10 text-center dark:bg-white/[0.045] dark:ring-1 dark:ring-white/10">
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-neutral-950 text-white dark:bg-brand-500">
           <CheckIcon size={22} />
         </span>
-        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">Thanks, {form.name.trim().split(" ")[0]}.</p>
-        <p className="mt-2 text-[15px] text-neutral-500">Your application for {role.title} is complete.</p>
-        <p className="mt-6 text-[13px] text-neutral-400">This is a preview, so applications aren&apos;t sent anywhere yet.</p>
+        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">Thanks, {form.name.trim().split(" ")[0]}.</p>
+        <p className="mt-2 text-[15px] text-neutral-500 dark:text-white/65">Your application for {role.title} is complete.</p>
+        <p className="mt-6 text-[13px] text-neutral-400 dark:text-white/50">This is a preview, so applications aren&apos;t sent anywhere yet.</p>
       </div>
     );
   }
@@ -54,10 +54,10 @@ export function ApplicationForm({ role }: { role: Role }) {
   const describedBy = (field: keyof Application) => (errors[field] ? `${field}-error` : undefined);
 
   return (
-    <form noValidate onSubmit={onSubmit} className="space-y-6 rounded-3xl border border-neutral-200 p-7 md:p-9">
+    <form noValidate onSubmit={onSubmit} className="space-y-6 rounded-3xl border border-neutral-200 p-7 md:p-9 dark:border-white/10 dark:bg-white/[0.045]">
       <div>
-        <p className="text-[13px] text-neutral-500">Apply for</p>
-        <p className="mt-1 text-xl font-medium tracking-[-0.02em] text-neutral-950">{role.title}</p>
+        <p className="text-[13px] text-neutral-500 dark:text-white/60">Apply for</p>
+        <p className="mt-1 text-xl font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">{role.title}</p>
       </div>
       <FormField id="name" label="Full name" error={errors.name}>
         <input id="name" autoComplete="name" value={form.name} onChange={(e) => set("name", e.target.value)} aria-invalid={Boolean(errors.name)} aria-describedby={describedBy("name")} className={`${inputClass(Boolean(errors.name))} h-12`} />
@@ -69,7 +69,7 @@ export function ApplicationForm({ role }: { role: Role }) {
         <input id="link" type="url" placeholder="https://" value={form.link} onChange={(e) => set("link", e.target.value)} aria-invalid={Boolean(errors.link)} aria-describedby={describedBy("link")} className={`${inputClass(Boolean(errors.link))} h-12`} />
       </FormField>
       <FormField id="resume" label="Resume" error={errors.resume}>
-        <label htmlFor="resume" className={`${inputClass(Boolean(errors.resume))} flex h-12 cursor-pointer items-center gap-3 text-neutral-500`}>
+        <label htmlFor="resume" className={`${inputClass(Boolean(errors.resume))} flex h-12 cursor-pointer items-center gap-3 text-neutral-500 dark:text-white/60`}>
           <UploadIcon size={18} />
           <span className="truncate">{form.resume || "Choose a PDF"}</span>
         </label>

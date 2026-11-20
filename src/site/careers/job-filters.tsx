@@ -3,11 +3,11 @@ import { SearchIcon } from "@/site/ui/icons/interface-icons";
 import { SelectMenu } from "@/site/ui/select-menu";
 import { ANY_LOCATION, toggle, type RoleFilters } from "./filter-roles";
 
-/** A plain checkbox with a black tick, for one filter value. */
+/** A plain checkbox with a black tick (Coere blue on a dark page), for one filter value. */
 function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2.5 text-[14px] text-neutral-700">
-      <input type="checkbox" checked={checked} onChange={onChange} className="h-4 w-4 accent-neutral-950" />
+    <label className="flex cursor-pointer items-center gap-2.5 text-[14px] text-neutral-700 dark:text-white/75">
+      <input type="checkbox" checked={checked} onChange={onChange} className="h-4 w-4 accent-neutral-950 dark:accent-brand-500" />
       {label}
     </label>
   );
@@ -29,21 +29,21 @@ export function JobFilters({
 }) {
   return (
     <div className="space-y-6">
-      <label className="flex h-12 items-center gap-3 rounded-full border border-neutral-200 px-5 focus-within:border-neutral-950">
-        <SearchIcon size={18} className="text-neutral-500" />
+      <label className="flex h-12 items-center gap-3 rounded-full border border-neutral-200 px-5 transition-[border-color,box-shadow] focus-within:border-neutral-950 dark:border-white/15 dark:bg-white/[0.05] dark:focus-within:border-brand-400 dark:focus-within:ring-4 dark:focus-within:ring-brand-500/25">
+        <SearchIcon size={18} className="text-neutral-500 dark:text-white/55" />
         <span className="sr-only">Search roles</span>
         <input
           type="search"
           value={filters.query}
           onChange={(event) => onChange({ ...filters, query: event.target.value })}
           placeholder="Search roles"
-          className="h-full w-full bg-transparent text-[15px] text-neutral-950 outline-none placeholder:text-neutral-400"
+          className="h-full w-full bg-transparent text-[15px] text-neutral-950 outline-none placeholder:text-neutral-400 dark:text-white dark:placeholder:text-white/50"
         />
       </label>
 
       <div className="grid grid-cols-2 gap-6">
         <fieldset>
-          <legend className="text-[13px] font-medium text-neutral-500">Type</legend>
+          <legend className="text-[13px] font-medium text-neutral-500 dark:text-white/60">Type</legend>
           <div className="mt-3 space-y-2">
             {types.map((type) => (
               <Check key={type} label={type} checked={filters.types.includes(type)} onChange={() => onChange({ ...filters, types: toggle(filters.types, type) })} />
@@ -51,7 +51,7 @@ export function JobFilters({
           </div>
         </fieldset>
         <fieldset>
-          <legend className="text-[13px] font-medium text-neutral-500">Team</legend>
+          <legend className="text-[13px] font-medium text-neutral-500 dark:text-white/60">Team</legend>
           <div className="mt-3 space-y-2">
             {teams.map((team) => (
               <Check key={team} label={team} checked={filters.teams.includes(team)} onChange={() => onChange({ ...filters, teams: toggle(filters.teams, team) })} />
