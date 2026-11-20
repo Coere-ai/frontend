@@ -35,12 +35,12 @@ export function HeroStack() {
   return (
     <>
       <div className="relative hidden lg:block">
-        {/* Taller than the hero on purpose: the column is centred below the navbar, the hero clips the ends, and the top fades out under the glass so the bar never sits on a white tile, and the foot fades into the next section. */}
-        <div className="absolute inset-0 flex flex-col justify-center gap-5 pt-[72px] [mask-image:linear-gradient(to_bottom,transparent_52px,black_112px,black_calc(100%-300px),transparent_calc(100%-40px))]">
+        {/* Taller than the hero on purpose: the column is centred below the navbar, the hero clips the ends, and the top fades out under the glass so the bar never sits on a white tile. */}
+        <div className="absolute inset-0 flex flex-col justify-center gap-5 pt-[72px] [mask-image:linear-gradient(to_bottom,transparent_52px,black_112px)]">
           <Tile delay={150} drift={0} className="aspect-[1300/813] w-[92%] self-end">
             <Image src="/preview/hero/extraction.webp" alt="Coere saving Maya's chats: 74 of 570 chats saved, about 5 minutes left, and ChatGPT at 18 of 240" width={1300} height={813} unoptimized className="h-full w-full object-cover object-bottom" />
           </Tile>
-          <Tile delay={380} drift={2.5}>
+          <Tile delay={380} drift={2.5} className="relative z-20">
             <ScaleBox width={CONSOLE_SIZE.width} height={CONSOLE_SIZE.height}>
               <ConsoleDashboard />
             </ScaleBox>
@@ -48,6 +48,8 @@ export function HeroStack() {
           <Tile delay={610} drift={5} className="aspect-[1300/696] w-[92%] self-end">
             <Image src="/preview/hero/memory-graph.webp" alt="The Memory page's graph: Personal info, People, Tone and voice, Writing style and Work branching from the person" width={1300} height={696} unoptimized className="h-full w-full object-cover object-top" />
           </Tile>
+          {/* The foot of the hero darkens into the page's near black over the bottom tile; the dashboard sits above this layer, so it never dims, and nothing turns see through. */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40 bg-[linear-gradient(to_bottom,rgba(11,10,18,0),#0b0a12_90%)]" />
         </div>
       </div>
 

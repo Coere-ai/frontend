@@ -31,23 +31,25 @@ const WIDE_CENTER: Spot[] = [
 ];
 
 /**
- * Round a hero whose copy fills the left half from top to foot and whose
- * app sits on the right under a beam: most logos float above and below the
- * app, clear of the beam's column, and the copy's side only gets a few far
- * marks at the very edge.
+ * Round a hero whose copy fills the left half and whose app sits on the
+ * right: the logos spread evenly round the whole hero, along the top and
+ * the foot from edge to edge and down both sides, so no corner holds a
+ * crowd. Marks near the copy sit at the very edge or past it, and far
+ * back, so the words stay clear. The first spots are spread wide on their
+ * own, so a wall with only a few logos is spread too.
  */
 const WIDE_FRAME: Spot[] = [
-  { x: -0.2, y: -0.84, z: 150, size: 150 },
-  { x: 0.24, y: -0.84, z: -60, size: 140 },
-  { x: 0.86, y: -0.8, z: 160, size: 175 },
-  { x: -0.97, y: -0.62, z: -200, size: 120 },
-  { x: 0.06, y: 0.86, z: 170, size: 165 },
-  { x: -0.96, y: 0.64, z: 60, size: 130 },
-  { x: 0.33, y: 0.9, z: -120, size: 140 },
-  { x: 0.68, y: -0.92, z: -320, size: 105 },
-  { x: 0.6, y: 0.88, z: -60, size: 160 },
-  { x: 0.94, y: 0.78, z: 110, size: 165 },
-  { x: -0.5, y: -0.96, z: -400, size: 100 },
+  { x: -0.12, y: -0.84, z: 150, size: 150 },
+  { x: 0.55, y: -0.86, z: -40, size: 150 },
+  { x: -0.62, y: -0.88, z: -120, size: 130 },
+  { x: 0.3, y: 0.88, z: 170, size: 160 },
+  { x: -0.55, y: 0.92, z: 40, size: 140 },
+  { x: 0.99, y: -0.08, z: -200, size: 125 },
+  { x: 0.93, y: -0.78, z: 160, size: 170 },
+  { x: -1.02, y: -0.3, z: -300, size: 110 },
+  { x: 0.78, y: 0.9, z: -60, size: 150 },
+  { x: -0.98, y: 0.8, z: 60, size: 120 },
+  { x: -0.1, y: 0.97, z: -380, size: 100 },
 ];
 
 /** A phone held upright: fewer, smaller logos stacked around the copy. */
