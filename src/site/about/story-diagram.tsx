@@ -13,22 +13,22 @@ const visuals: ReactNode[] = [<ScatteredApps key="apps" />, <AppPieces key="piec
  */
 export function StoryDiagram() {
   return (
-    <section aria-label="Why Coere" className="border-t border-neutral-100 py-24">
+    <section aria-label="Why Coere" className="py-20 md:py-28">
       <Container>
         <ol className="mx-auto max-w-5xl">
           {storySteps.map((step, index) => (
             <li key={step.title}>
               <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] md:gap-14">
                 <div>
-                  <p className="text-[13px] font-medium text-neutral-500">Step {index + 1}</p>
-                  <h2 className="mt-2 text-3xl font-medium tracking-[-0.035em] text-neutral-950 md:text-[2.5rem] md:leading-[1.1]">{step.title}</h2>
-                  <p className="mt-4 text-[17px] leading-relaxed text-neutral-500 text-pretty">{step.text}</p>
+                  <p className="inline-flex rounded-full bg-brand-50 px-3 py-1 text-[13px] font-semibold text-brand-700">Step {index + 1}</p>
+                  <h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[2.75rem] md:leading-[1.06]">{step.title}</h2>
+                  <p className="mt-4 text-[17px] leading-relaxed text-neutral-600 text-pretty">{step.text}</p>
                 </div>
-                <div className="rounded-[28px] bg-neutral-50 p-6 md:p-10">{visuals[index]}</div>
+                <div className="rounded-[32px] bg-[linear-gradient(160deg,#f7f8ff_0%,#eef1ff_100%)] p-6 ring-1 ring-brand-100/70 md:p-10">{visuals[index]}</div>
               </div>
               {index < storySteps.length - 1 ? (
                 <div className="grid py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] md:gap-14" aria-hidden="true">
-                  <ChevronDownIcon size={28} className="mx-auto text-neutral-400 md:col-start-2" />
+                  <ChevronDownIcon size={28} className="mx-auto text-brand-300 md:col-start-2" />
                 </div>
               ) : null}
             </li>

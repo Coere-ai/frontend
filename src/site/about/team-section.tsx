@@ -1,31 +1,32 @@
-import { founders, siteConfig, type TeamMember } from "@/lib/site";
+import { founders, siteConfig } from "@/lib/site";
 import { Container } from "@/site/ui/container";
 import { Reveal } from "@/site/ui/reveal";
-import { SectionHeading } from "@/site/ui/section-heading";
 import { TeamCard } from "./team-card";
+import { TeamLanyards } from "./team-lanyards";
 
-function Group({ title, members }: { title: string; members: readonly TeamMember[] }) {
-  return (
-    <div className="mt-14">
-      <p className="text-sm font-medium text-neutral-500">{title}</p>
-      <div className="mt-5 grid gap-6 md:grid-cols-2">
-        {members.map((member, index) => (
-          <Reveal key={member.name} delay={index * 0.06}>
-            <TeamCard member={member} />
-          </Reveal>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/** The people behind Coere, from the same data the current site uses. */
+/** The people behind Coere: their lanyards, then each founder's record in two columns. */
 export function TeamSection() {
   return (
-    <section id="team" className="scroll-mt-24 border-t border-neutral-100 py-28">
+    <section id="team" className="relative scroll-mt-24 overflow-hidden bg-[linear-gradient(180deg,#ffffff_0%,#f5f7ff_55%,#ffffff_100%)] pt-24 pb-28 md:pt-32">
       <Container>
-        <SectionHeading eyebrow="Our team" title="The people building Coere" description={siteConfig.notCohere} />
-        <Group title="Founders" members={founders} />
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold text-brand-600">Our team</p>
+          <h2 className="mt-3 text-4xl font-semibold tracking-[-0.045em] text-neutral-950 text-balance md:text-[3.5rem] md:leading-[1.04]">
+            The people building Coere
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-pretty">{siteConfig.notCohere}</p>
+        </div>
+        <div className="mx-auto mt-4 max-w-6xl">
+          <TeamLanyards members={founders} />
+          <p className="mt-4 hidden text-center text-[14px] text-neutral-500 sm:block">Drag a card to swing it, or click it to turn it over.</p>
+        </div>
+        <div className="mx-auto mt-16 grid max-w-5xl gap-6 md:grid-cols-2">
+          {founders.map((member, index) => (
+            <Reveal key={member.name} delay={index * 0.06} className="h-full">
+              <TeamCard member={member} />
+            </Reveal>
+          ))}
+        </div>
       </Container>
     </section>
   );
