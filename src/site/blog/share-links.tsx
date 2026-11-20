@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { CheckIcon } from "@/site/ui/icons/interface-icons";
 
-const BUTTON = "grid h-10 w-10 place-items-center rounded-full bg-white text-neutral-700 ring-1 ring-neutral-950/10 transition hover:text-neutral-950 hover:ring-neutral-950/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
+/** A bare icon with room round it to tap: no circle, no ring, only the mark darkening on hover. */
+const BUTTON = "grid h-10 w-10 place-items-center rounded-md text-neutral-500 transition-colors hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-brand-500";
 
 function LinkIcon() {
   return (
@@ -57,7 +58,7 @@ export function ShareLinks({ url, title, layout = "row" }: { url: string; title:
   const linkedIn = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   return (
-    <div className={`flex items-center gap-2 ${layout === "column" ? "flex-col" : ""}`}>
+    <div className={`flex items-center gap-1 ${layout === "column" ? "flex-col" : ""}`}>
       <button type="button" onClick={copy} className={BUTTON} aria-label={copied ? "Link copied" : "Copy link"} title={copied ? "Link copied" : "Copy link"}>
         {copied ? <CheckIcon size={17} className="text-brand-600" /> : <LinkIcon />}
       </button>

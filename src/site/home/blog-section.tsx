@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { formatPostDate, posts } from "@/site/content/posts";
+import { PostMeta } from "@/site/blog/post-meta";
+import { posts } from "@/site/content/posts";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 import { Underlined } from "@/site/ui/underlined";
@@ -37,9 +38,7 @@ export function BlogSection() {
                   <Image src={post.image} alt="" width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]" />
                 </div>
                 <div className="flex flex-1 flex-col px-3.5 pt-5 pb-4">
-                  <p className="text-[13px] text-neutral-500">
-                    {formatPostDate(post.date)}, {post.readMinutes} min read
-                  </p>
+                  <PostMeta post={post} className="text-[13px]" />
                   <h3 className="mt-2 text-[19px] leading-snug font-semibold tracking-[-0.02em] text-neutral-950 text-balance">
                     <Underlined big>{post.title}</Underlined>
                   </h3>

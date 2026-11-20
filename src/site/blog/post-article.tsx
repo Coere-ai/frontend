@@ -37,9 +37,8 @@ export function PostArticle({ post }: { post: Post }) {
           </nav>
           <h1 className="mx-auto mt-6 max-w-[800px] text-[2.5rem] leading-[1.04] font-semibold tracking-[-0.045em] text-neutral-950 text-balance md:text-[3.75rem] lg:text-[4.25rem]">{post.title}</h1>
           <p className="mx-auto mt-6 max-w-[680px] text-[19px] leading-relaxed text-neutral-600 text-pretty md:text-[21px]">{post.excerpt}</p>
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-4">
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <PostAuthor post={post} />
-            <span aria-hidden="true" className="hidden h-8 w-px bg-neutral-200 sm:block" />
             <PostMeta post={post} category={false} className="text-[14.5px]" />
           </div>
         </header>
