@@ -3,7 +3,6 @@ import { pageMetadata } from "@/lib/seo";
 import { CheckList } from "@/site/blocks/check-list";
 import { CodeTabs } from "@/site/blocks/code-tabs";
 import { FaqSection } from "@/site/blocks/faq";
-import { SoftBackdrop } from "@/site/blocks/soft-backdrop";
 import { SplitHero } from "@/site/blocks/split-hero";
 import { backgrounds } from "@/site/content/backgrounds";
 import { contextSamples, mcpSamples } from "@/site/content/code/context-api";
@@ -30,7 +29,6 @@ export default function AiAgentMemoryPage() {
     <>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["AI agent memory", "Model Context Protocol", "Memory API"], faqs: agentMemory.faqs })} />
       <SplitHero
-        backdrop={<SoftBackdrop />}
         {...agentMemory.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "/resources/mcp", label: "Read the MCP docs" }}

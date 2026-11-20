@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { docPages, type DocPage } from "@/site/content/docs";
-import { SoftBackdrop } from "@/site/blocks/soft-backdrop";
 import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "@/site/ui/container";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
@@ -14,8 +13,7 @@ const hrefOf = (slug: string) => (slug === "overview" ? "/resources" : `/resourc
 
 /**
  * A docs page: the pages on the left, the page in the middle, and its
- * headings on the right on wide screens, under a band of the soft backdrop
- * that fades into the page. The Markdown is ours, built from the coere-v2
+ * headings on the right on wide screens, on plain white. The Markdown is ours, built from the coere-v2
  * source, so it is drawn as HTML as is.
  */
 export function DocView({ page }: { page: DocPage }) {
@@ -24,19 +22,12 @@ export function DocView({ page }: { page: DocPage }) {
   const next = docPages[index + 1];
   return (
     <div className={`relative isolate ${UNDER_NAV}`}>
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[540px] overflow-hidden [mask-image:linear-gradient(to_bottom,black_40%,transparent)]">
-        <SoftBackdrop />
-      </div>
       <Container className="grid gap-12 pt-[136px] pb-28 md:pt-[152px] lg:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_220px] xl:gap-16">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <DocsSidebar />
         </aside>
         <article className="min-w-0 max-w-3xl">
-          <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-[13px] font-medium text-brand-700 ring-1 ring-brand-500/15 backdrop-blur-md">
-            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-500" />
-            Coere API
-          </p>
-          <h1 className="mt-5 text-4xl font-semibold tracking-[-0.045em] text-neutral-950 md:text-[3.5rem] md:leading-[1.04]">{page.title}</h1>
+          <h1 className="text-4xl font-semibold tracking-[-0.045em] text-neutral-950 md:text-[3.5rem] md:leading-[1.04]">{page.title}</h1>
           <p className="mt-4 text-lg text-neutral-600">{page.summary}</p>
           <div className="docs-prose mt-10" dangerouslySetInnerHTML={{ __html: html }} />
           {next ? (

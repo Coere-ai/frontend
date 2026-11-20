@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import { SoftBackdrop } from "@/site/blocks/soft-backdrop";
 import { SplitHero } from "@/site/blocks/split-hero";
 import { FaqSection } from "@/site/blocks/faq";
 import { backgrounds } from "@/site/content/backgrounds";
@@ -28,8 +27,6 @@ export default function PortableAiMemoryPage() {
     <>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Portable AI memory", "AI memory layer"], faqs: portable.faqs })} />
       <SplitHero
-        backdrop={<SoftBackdrop />}
-        laser
         {...portable.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "How it works" }}

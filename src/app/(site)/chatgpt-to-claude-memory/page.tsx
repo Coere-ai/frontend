@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
-import { SoftBackdrop } from "@/site/blocks/soft-backdrop";
 import { SplitHero } from "@/site/blocks/split-hero";
 import { FaqSection } from "@/site/blocks/faq";
 import { backgrounds } from "@/site/content/backgrounds";
@@ -28,8 +27,6 @@ export default function ChatgptToClaudeMemoryPage() {
     <>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Moving ChatGPT memory to Claude", "Importing AI chat history"], faqs: switching.faqs })} />
       <SplitHero
-        backdrop={<SoftBackdrop />}
-        laser
         {...switching.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "How it works" }}
