@@ -114,11 +114,14 @@ export function mountStage(host: HTMLElement, opts: StageOptions): () => void {
   function tick(now: number) {
     raf = 0;
     if (stopped) return;
-    const dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
+    const raw = last ? (now - last) / 1000 : 0;
+    // Time moves on by at most a tenth of a second a frame, so a stall never jumps the scene.
+    const dt = Math.min(raw, 0.1);
     last = now;
     frame.time += dt * opts.speed;
-    // Past two seconds of frames slower than 45 a second, draw fewer pixels.
-    slow = dt > 1 / 45 ? slow + dt : Math.max(slow - dt * 0.5, 0);
+    // Past two seconds of frames slower than 45 a second, draw fewer pixels. This counts the real time between frames, so a very slow device steps down just as soon.
+    const spent = Math.min(raw, 0.5);
+    slow = spent > 1 / 45 ? slow + spent : Math.max(slow - spent * 0.5, 0);
     if (slow > 2 && cap > opts.floor) {
       cap = lowerCap(cap, opts.floor);
       slow = 0;

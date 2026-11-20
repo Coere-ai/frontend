@@ -58,8 +58,9 @@ export function LiquidLines({ palette = "coere", angle = 45, speed = 1, density 
     const p = shaderPalette(JSON.parse(paletteKey) as LiquidLinesPalette);
     const rad = (angle * Math.PI) / 180;
     return mountStage(el, {
-      cap: 2,
-      phoneCap: 1.5,
+      // Soft light needs fewer pixels than glyphs or type: 1.5 keeps the sharp cores crisp at a little over half the cost of 2.
+      cap: 1.5,
+      phoneCap: 1.25,
       floor: 1,
       speed,
       stillTime: 37,

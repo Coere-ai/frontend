@@ -5,8 +5,9 @@
  * and meet like a liquid. Each depth layer cuts the bent `v` into strips;
  * a strip may hold one streak with its own place, slant, focus, brightness
  * and a run of light that travels along it. Every pixel looks at its own
- * strip and the two beside it in each layer, so the cost is fixed whatever
- * the number of streaks.
+ * strip and the two beside it in each layer, and skips a streak as soon as
+ * it is too far to add light, so the cost is fixed whatever the number of
+ * streaks.
  *
  * A streak is a sharp core with a faint wide bloom. Its warm and cool
  * copies sit a little to either side and the core sits between them,
@@ -44,22 +45,24 @@ uint mixBits(uint x) {
   return x;
 }
 
-// Eight steady random numbers from 0 to 1 for one strip of one layer.
+// Eight steady random numbers from 0 to 1 for one strip of one layer: four
+// bytes of one hash, and four more stirred from them, which is cheap and
+// random enough for where and how a streak runs.
 void strip(int layer, float cell, out vec4 a, out vec4 b) {
   uint h = mixBits(uint(int(cell) + 1048576) * 1664525u + uint(layer) * 1013904223u + 374761393u);
-  uint g = mixBits(h ^ 0x9e3779b9u);
-  uint k = mixBits(g + 0x632be5abu);
-  uint m = mixBits(k ^ 0x85ebca6bu);
-  a = vec4(float(h & 0xffffu), float(h >> 16), float(g & 0xffffu), float(g >> 16)) / 65535.0;
-  b = vec4(float(k & 0xffffu), float(k >> 16), float(m & 0xffffu), float(m >> 16)) / 65535.0;
+  a = vec4(h & 255u, (h >> 8) & 255u, (h >> 16) & 255u, h >> 24) / 255.0;
+  b = fract(a.yzwx * 7.13 + a.wxyz * 3.71);
 }
 
 // A streak across its width. In focus the core is flat topped with a crisp
 // edge; out of focus it softens into a gaussian. A faint wide bloom sits
 // under both.
-float profile(float d, float w, float shape) {
-  float x = abs(d) / w;
-  return exp(-pow(x, shape)) + 0.03 * exp(-abs(d) / (w * 2.5 + 6.0));
+float profile(float d, float w, float soft, float cut) {
+  float x2 = d * d / (w * w);
+  // x to the power 4 in focus, x squared out of focus, in one exp. The
+  // bloom eases to nothing at cut, where the streak stops being drawn.
+  float bloom = 0.03 * exp(-abs(d) / (w * 2.5 + 6.0)) * (1.0 - smoothstep(0.5 * cut, cut, abs(d)));
+  return exp(-x2 * mix(x2, 1.0, soft)) + bloom;
 }
 
 // A colored edge: a soft gaussian with no bloom.
@@ -88,6 +91,10 @@ vec3 layer(int id, float u, float v, float wave, float t, float spacing, float d
     if (a.x > density * group) continue;
     float center = (c + 0.5 + (a.y - 0.5) * 0.85) * spacing + (b.x - 0.5) * 0.055 * u;
     float d = vv - center;
+    float blur = mix(focus.x, focus.y, a.z);
+    // Past the widest this streak can bloom, it adds nothing here: skip the rest.
+    float cut = 8.0 * mix(1.3, 11.0, blur * blur) * 1.15 * 1.5 + 48.0;
+    if (abs(d) > cut) continue;
     // A run of light travels along the streak with the flow, so it brightens and fades as it goes.
     float pace = mix(45.0, 150.0, b.z);
     float phase = a.w * 6.2832;
@@ -96,18 +103,18 @@ vec3 layer(int id, float u, float v, float wave, float t, float spacing, float d
     light *= light;
     float energy = bright * mix(0.3, 1.3, b.w) * light;
     if (energy < 0.002) continue;
-    float blur = mix(focus.x, focus.y, a.z);
     // The streak swells where its light runs and thins to a point where it fades, like a long spindle.
     float sigma = max(mix(1.3, 11.0, blur * blur) * mix(0.6, 1.15, light), minSigma);
-    energy *= pow(sigma, -0.32);
+    // Wider streaks spread the same light thinner (sigma to the power of minus a quarter).
+    energy *= inversesqrt(sqrt(sigma));
     // One side of a streak is crisper than the other, like the lit edge of a ribbon.
     float s = d < 0.0 ? sigma : sigma * mix(0.6, 1.5, b.y);
-    float shape = mix(4.0, 2.0, smoothstep(0.1, 0.6, blur));
+    float soft = smoothstep(0.1, 0.6, blur);
     // The warm and cool edges sit just past each side of the core and overlap its rim.
     float split = sigma * 0.8 + uFringe * (0.35 + sigma * 0.3);
     float rim = sigma * 0.6 + 0.45;
     vec3 cool = mix(uCool, uAccent, step(0.72, b.x));
-    acc += energy * (uCore * profile(d, s, shape) + uFringe * (1.0 - 0.65 * blur) * (uWarm * edge(d + split, rim) + cool * edge(d - split, rim)));
+    acc += energy * (uCore * profile(d, s, soft, cut) + uFringe * (1.0 - 0.65 * blur) * (uWarm * edge(d + split, rim) + cool * edge(d - split, rim)));
   }
   return acc;
 }
