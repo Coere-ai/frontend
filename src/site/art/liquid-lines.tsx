@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { type CSSProperties, useEffect, useRef } from "react";
 import { link } from "./pixel-matrix/gl";
 import { LIQUID_PALETTES, type LiquidLinesPalette, type LiquidLinesPaletteName, shaderPalette } from "./liquid-lines/palette";
 import { LIQUID_FRAG } from "./liquid-lines/shader";
@@ -21,6 +21,8 @@ export type LiquidLinesProps = {
   fringe?: number;
   /** Overall light, 1 the default. */
   exposure?: number;
+  /** Plays the intro once when it first starts: the streaks shoot in from off screen as the field brightens from black. Skipped under reduced motion. */
+  intro?: boolean;
   className?: string;
 };
 
@@ -45,18 +47,25 @@ function stillBackground(p: LiquidLinesPalette, angle: number): string {
  * holds one frame under reduced motion, pauses off screen and in a hidden
  * tab, draws at a capped pixel ratio (and skips the faintest layer on a
  * phone), and frees its context when it unmounts.
+ *
+ * With `intro` it starts on plain black and plays the intro once per
+ * mount, over about two seconds. The intro runs on the stage's clock,
+ * which stops off screen and in a hidden tab, so coming back never plays
+ * it again. Under reduced motion the CSS picture shows at once and the
+ * settled still frame follows.
  */
-export function LiquidLines({ palette = "coere", angle = 45, speed = 1, density = 1, fringe = 1, exposure = 1, className = "" }: LiquidLinesProps) {
+export function LiquidLines({ palette = "coere", angle = 45, speed = 1, density = 1, fringe = 1, exposure = 1, intro = true, className = "" }: LiquidLinesProps) {
   const host = useRef<HTMLDivElement>(null);
   const colors = typeof palette === "string" ? LIQUID_PALETTES[palette] : palette;
   const paletteKey = JSON.stringify(colors);
+  const still = stillBackground(colors, angle);
 
   useEffect(() => {
     const el = host.current;
     if (!el) return;
     const p = shaderPalette(JSON.parse(paletteKey) as LiquidLinesPalette);
     const rad = (angle * Math.PI) / 180;
-    return mountStage(el, {
+    const stop = mountStage(el, {
       // Soft light needs fewer pixels than glyphs or type: 1.5 keeps the sharp cores crisp at a little over half the cost of 2.
       cap: 1.5,
       phoneCap: 1.25,
@@ -84,6 +93,8 @@ export function LiquidLines({ palette = "coere", angle = 45, speed = 1, density 
             // Streaks keep their size on a laptop and grow a little finer on a small screen.
             g.uniform1f(prog.at("uScale"), Math.min(Math.max(Math.min(f.width, f.height * 1.6) / 1200, 0.72), 1.25));
             g.uniform1f(prog.at("uTime"), f.time);
+            // Past 2.1 seconds the shader skips the intro; 3 keeps the number small.
+            g.uniform1f(prog.at("uIntro"), intro ? Math.min(f.clock, 3) : 3);
             g.drawArrays(g.TRIANGLES, 0, 3);
           },
           dispose(g) {
@@ -93,7 +104,12 @@ export function LiquidLines({ palette = "coere", angle = 45, speed = 1, density 
         };
       },
     });
-  }, [paletteKey, angle, speed, density, fringe, exposure]);
+    // Without WebGL there is no canvas and no intro: show the CSS picture in place of the black the intro starts from.
+    if (intro && !el.querySelector("canvas")) el.style.background = still;
+    return stop;
+  }, [paletteKey, angle, speed, density, fringe, exposure, intro, still]);
 
-  return <div ref={host} aria-hidden="true" className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`} style={{ background: stillBackground(colors, angle) }} />;
+  // The intro starts from black, so the CSS picture waits; under reduced motion there is no intro and it shows at once (marked important to beat the inline black).
+  const style = (intro ? { background: colors.background, "--liquid-still": still } : { background: still }) as CSSProperties;
+  return <div ref={host} aria-hidden="true" className={`pointer-events-none absolute inset-0 overflow-hidden ${intro ? "motion-reduce:[background:var(--liquid-still)]!" : ""} ${className}`} style={style} />;
 }

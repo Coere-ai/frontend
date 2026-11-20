@@ -1,7 +1,14 @@
 import { drawRatio, lowerCap } from "./math";
 
-/** What a scene is told each frame. Width and height are in CSS pixels; the canvas holds them times `dpr`. */
-export type StageFrame = { time: number; width: number; height: number; dpr: number; phone: boolean };
+/**
+ * What a scene is told each frame. Width and height are in CSS pixels; the
+ * canvas holds them times `dpr`. `time` is the scene's own time, moved on at
+ * its speed; `clock` is the real seconds it has played since it mounted,
+ * whatever the speed, for an intro that plays once. The clock stops while
+ * the stage is paused, so an intro picks up where it was, and under reduced
+ * motion it is Infinity, so an intro shows its settled end.
+ */
+export type StageFrame = { time: number; clock: number; width: number; height: number; dpr: number; phone: boolean };
 
 /** A scene drawn on the stage's context: it draws a frame and frees what it made. */
 export type Scene = { draw: (gl: WebGL2RenderingContext, f: StageFrame) => void; dispose: (gl: WebGL2RenderingContext) => void };
@@ -79,7 +86,7 @@ export function mountStage(host: HTMLElement, opts: StageOptions): () => void {
   const live = scene;
 
   let cap = phone ? opts.phoneCap : opts.cap;
-  const frame: StageFrame = { time: reduce ? opts.stillTime : 0, width: 1, height: 1, dpr: 1, phone };
+  const frame: StageFrame = { time: reduce ? opts.stillTime : 0, clock: reduce ? Infinity : 0, width: 1, height: 1, dpr: 1, phone };
   let visible = true;
   let stopped = false;
   let raf = 0;
@@ -119,6 +126,7 @@ export function mountStage(host: HTMLElement, opts: StageOptions): () => void {
     const dt = Math.min(raw, 0.1);
     last = now;
     frame.time += dt * opts.speed;
+    frame.clock += dt;
     // Past two seconds of frames slower than 45 a second, draw fewer pixels. This counts the real time between frames, so a very slow device steps down just as soon.
     const spent = Math.min(raw, 0.5);
     slow = spent > 1 / 45 ? slow + spent : Math.max(slow - spent * 0.5, 0);

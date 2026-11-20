@@ -16,6 +16,13 @@
  * dimmer and split more. Light adds in linear space, then a soft curve
  * keeps bright overlaps from clipping and a tiny dither keeps the dark
  * gradients smooth.
+ *
+ * The intro plays once, over the first two seconds: each streak's light
+ * shoots in along the diagonal from off screen with a bright head and
+ * settles into its flow, the near layer first and each streak a beat
+ * apart, while the field brightens from black. At its end every intro
+ * term is exactly 1, so the flow carries on with no seam, and after it
+ * the intro code is skipped.
  */
 export const LIQUID_FRAG = `#version 300 es
 precision highp float;
@@ -35,6 +42,14 @@ uniform vec3 uCool;
 uniform vec3 uAccent;
 uniform vec3 uWarm;
 uniform vec3 uGlow;
+// Seconds since the intro began; INTRO_END or more once it has played.
+uniform float uIntro;
+
+#define INTRO_END 2.1
+
+// Set in main for the intro: how far the screen reaches along the streaks, and how bright the settled light is so far.
+float gHalfU;
+float gFade;
 
 out vec4 outColor;
 
@@ -77,7 +92,9 @@ float edge(float d, float w) {
 //   bright    light of the layer
 //   drift     pixels a second the layer slides across the streaks
 //   bend      how much the wave field bends this layer
-vec3 layer(int id, float u, float v, float wave, float t, float spacing, float density, vec2 focus, float bright, float drift, float bend, float minSigma, int reach) {
+//   arrive    intro seconds before this layer's light starts to shoot in
+//   travel    intro seconds its light takes to cross and settle
+vec3 layer(int id, float u, float v, float wave, float t, float spacing, float density, vec2 focus, float bright, float drift, float bend, float minSigma, int reach, float arrive, float travel) {
   vec3 acc = vec3(0.0);
   float vv = v + wave * bend + t * drift;
   float cell = floor(vv / spacing);
@@ -101,10 +118,18 @@ vec3 layer(int id, float u, float v, float wave, float t, float spacing, float d
     float run = 0.62 * sin((u - t * pace) * 0.0024 * (0.65 + 0.7 * b.w) + phase) + 0.38 * sin((u - t * pace * 0.7) * 0.0063 + phase * 2.3);
     float light = smoothstep(-0.7, 1.0, run);
     light *= light;
+    if (uIntro < INTRO_END) {
+      // The light shoots in from off screen and eases to a stop past the far edge. Behind the front the streak shows its own light, brightening with the field; at the front a bright head trails off behind and fades as it settles.
+      float x = clamp((uIntro - arrive - b.y * 0.35) / travel, 0.0, 1.0);
+      float e = 1.0 - (1.0 - x) * (1.0 - x) * (1.0 - x);
+      float behind = mix(-gHalfU - 60.0, gHalfU + 700.0, e) - u;
+      float head = exp(-max(behind, 0.0) / 170.0) * smoothstep(-24.0, 0.0, behind) * (1.0 - x);
+      light = light * gFade * smoothstep(0.0, 160.0, behind) + 1.6 * head;
+    }
     float energy = bright * mix(0.3, 1.3, b.w) * light;
     if (energy < 0.002) continue;
     // The streak swells where its light runs and thins to a point where it fades, like a long spindle.
-    float sigma = max(mix(1.3, 11.0, blur * blur) * mix(0.6, 1.15, light), minSigma);
+    float sigma = max(mix(1.3, 11.0, blur * blur) * mix(0.6, 1.15, min(light, 1.0)), minSigma);
     // Wider streaks spread the same light thinner (sigma to the power of minus a quarter).
     energy *= inversesqrt(sqrt(sigma));
     // One side of a streak is crisper than the other, like the lit edge of a ribbon.
@@ -150,12 +175,17 @@ void main() {
              + 3.5 * sin(u * 0.0061 + t * 0.41 - v * 0.0024 + 4.1);
   float minSigma = 0.62 / (uDpr * uScale);
   float dens = uDensity;
-  vec3 col = bands(u, v, wave, t);
+  vec2 extent = 0.5 * uRes / (uDpr * uScale);
+  gHalfU = extent.x * abs(uDir.x) + extent.y * abs(uDir.y);
+  float f = clamp(uIntro / 1.8, 0.0, 1.0);
+  gFade = 1.0 - (1.0 - f) * (1.0 - f);
+  vec3 col = bands(u, v, wave, t) * gFade;
+  // The nearest layer (the widest strips, sliding fastest) arrives first and crosses quickest; the far ones follow.
 #ifndef PHONE
-  col += layer(1, u, v, wave, t, 30.0, 0.5 * dens, vec2(0.15, 0.55), 0.8, 5.0, 0.7, minSigma, 1);
+  col += layer(1, u, v, wave, t, 30.0, 0.5 * dens, vec2(0.15, 0.55), 0.8, 5.0, 0.7, minSigma, 1, 0.3, 1.4);
 #endif
-  col += layer(2, u, v, wave, t, 56.0, 0.58 * dens, vec2(0.0, 0.38), 6.0, 9.0, 1.0, minSigma, 1);
-  col += layer(3, u, v, wave, t, 130.0, 0.6 * dens, vec2(0.2, 1.0), 6.0, 15.0, 1.25, minSigma, 2);
+  col += layer(2, u, v, wave, t, 56.0, 0.58 * dens, vec2(0.0, 0.38), 6.0, 9.0, 1.0, minSigma, 1, 0.15, 1.25);
+  col += layer(3, u, v, wave, t, 130.0, 0.6 * dens, vec2(0.2, 1.0), 6.0, 15.0, 1.25, minSigma, 2, 0.0, 1.1);
 
   vec3 lit = 1.0 - exp(-col * uExposure);
   vec3 linear = uBg + lit * (1.0 - uBg);
