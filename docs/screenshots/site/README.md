@@ -27,7 +27,7 @@ The whole page: [home.webp](home.webp).
 
 | | |
 |---|---|
-| <img src="product-connect.webp" alt="The Coere Connect page from its hero down: features by tab, the same chat with 97.7% fewer tokens, everything in Coere Connect, why people choose it and the other products" /><br /><sub>Coere Connect</sub> | <img src="product-solutions.webp" alt="The Coere Solutions page from its hero down" /><br /><sub>Coere Solutions</sub> |
+| <img src="product-connect.webp" alt="The Coere Connect page from its hero down: features by tab, the same chat with 97.7% fewer tokens, everything in Coere Connect, why people choose it and the other products" /><br /><sub>Coere Connect</sub> | <img src="product-solutions.webp" alt="The Coere Solutions page from its hero down: the hero on a dark LED wall of AI logos drawn in small square pixels round the dashboard, how a team shares one memory, the AIs it works with, everything in Coere Solutions and the other products" /><br /><sub>Coere Solutions</sub> |
 | <img src="product-forge.webp" alt="The Coere Forge page from its hero down" /><br /><sub>Coere Forge</sub> | <img src="product-agents.webp" alt="The Coere Agents page from its hero down" /><br /><sub>Coere Agents</sub> |
 | <img src="phone-product-connect.webp" width="195" alt="The Coere Connect page's first screen at phone width" /><br /><sub>Coere Connect at 390 wide</sub> | |
 
