@@ -52,7 +52,7 @@ export function Capabilities() {
         <div className={`${SOFT_FIELD} px-5 py-14 sm:px-8 md:px-12 md:py-20`}>
           <div className="max-w-3xl">
             <h2 className={SECTION_TITLE}>Everything one worker can do</h2>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">Pick a capability to watch it run.</p>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-white/65">Pick a capability to watch it run.</p>
           </div>
 
           <div className="mt-16 grid gap-10 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)] lg:gap-14">
@@ -70,19 +70,19 @@ export function Capabilities() {
               {features.map((feature, i) => {
                 const on = feature.slug === active.slug;
                 return (
-                  <li key={feature.slug} className="shrink-0 lg:border-t lg:border-neutral-950/10 lg:last:border-b">
+                  <li key={feature.slug} className="shrink-0 lg:border-t lg:border-neutral-950/10 lg:last:border-b dark:lg:border-white/15">
                     <button
                       type="button"
                       role="tab"
                       aria-selected={on}
                       tabIndex={on ? 0 : -1}
                       onClick={() => pick(feature)}
-                      className={`relative block w-full rounded-full px-4 py-2 text-left transition-colors lg:rounded-none lg:px-0 lg:py-4 ${on ? "bg-neutral-950 text-white lg:bg-transparent lg:text-neutral-950" : "bg-white text-neutral-500 ring-1 ring-neutral-950/[0.06] hover:text-neutral-950 lg:bg-transparent lg:ring-0"}`}
+                      className={`relative block w-full rounded-full px-4 py-2 text-left transition-colors lg:rounded-none lg:px-0 lg:py-4 ${on ? "bg-neutral-950 text-white lg:bg-transparent lg:text-neutral-950 dark:bg-white dark:text-neutral-950 dark:lg:bg-transparent dark:lg:text-white" : "bg-white text-neutral-500 ring-1 ring-neutral-950/[0.06] hover:text-neutral-950 lg:bg-transparent lg:ring-0 dark:bg-white/[0.06] dark:text-white/60 dark:ring-white/10 dark:hover:text-white dark:lg:bg-transparent"}`}
                     >
                       {/* The picked one carries a rule of light along its top. */}
                       <span aria-hidden="true" className={`absolute -top-px left-0 hidden h-px bg-gradient-to-r from-brand-400 to-brand-500 transition-all duration-500 lg:block ${on ? "w-full" : "w-0"}`} />
                       <span className="flex items-baseline gap-4">
-                        <span className="hidden w-6 text-[12px] text-neutral-400 tabular-nums lg:inline">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="hidden w-6 text-[12px] text-neutral-400 tabular-nums lg:inline dark:text-white/50">{String(i + 1).padStart(2, "0")}</span>
                         <span className="text-[15px] font-medium lg:text-[20px] lg:tracking-[-0.02em]">{feature.name}</span>
                       </span>
                       {/* Every feature's words are in the page; the picked one opens, the others fold shut. */}
@@ -90,8 +90,8 @@ export function Capabilities() {
                         className={`hidden pl-10 transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:grid ${on ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
                       >
                         <span className="min-h-0 overflow-hidden">
-                          <span className="block pt-2 text-[15px] font-medium text-neutral-800">{feature.title}</span>
-                          <span className="block pt-1.5 text-[14px] leading-relaxed text-neutral-600">{feature.description}</span>
+                          <span className="block pt-2 text-[15px] font-medium text-neutral-800 dark:text-white/85">{feature.title}</span>
+                          <span className="block pt-1.5 text-[14px] leading-relaxed text-neutral-600 dark:text-white/65">{feature.description}</span>
                         </span>
                       </span>
                     </button>
@@ -101,7 +101,7 @@ export function Capabilities() {
             </ul>
 
             <div className="lg:sticky lg:top-24 lg:self-start">
-              <Stage background={backgrounds.prism} className="aspect-[16/11] shadow-[0_40px_100px_-40px_rgba(23,27,77,0.45)]">
+              <Stage background={backgrounds.prism} className="aspect-[16/11] shadow-[0_40px_100px_-40px_rgba(23,27,77,0.45)] dark:shadow-none">
                 <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/25" />
                 <AnimatePresence initial={false}>
                   <motion.div
@@ -116,7 +116,7 @@ export function Capabilities() {
                   </motion.div>
                 </AnimatePresence>
               </Stage>
-              <p className="mt-4 text-[14px] text-neutral-600 lg:hidden">{active.description}</p>
+              <p className="mt-4 text-[14px] text-neutral-600 lg:hidden dark:text-white/65">{active.description}</p>
             </div>
           </div>
         </div>
