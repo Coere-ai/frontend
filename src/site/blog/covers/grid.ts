@@ -17,7 +17,10 @@ export const PITCH = 10;
 export const GAP_COLOR = "#04050b";
 /** The color of a cell nothing lights: the gap color with a little light of its own, so the wall reads as LEDs. */
 export const OFF_COLOR = "#16171c";
-const GAP_RGB = hexToRgb(GAP_COLOR);
+
+/** The two dark colors of a wall: the gap between cells and a cell nothing lights. The covers use the default; a picture on another dark gives its own. */
+export type Wall = { gap: string; off: string };
+export const COVER_WALL: Wall = { gap: GAP_COLOR, off: OFF_COLOR };
 
 /** The lit square inside each cell, in canvas units, so every gap is the same. */
 const SQUARE = { inset: 1.2, size: 7.6, round: 1.6 };
@@ -46,7 +49,7 @@ export function rgbToHex([r, g, b]: Rgb): string {
  * color (a light on the wall) and once from the gap color (a light under
  * the dark edges). Duplicates are dropped, so the list holds each color once.
  */
-export function buildPalette(bases: readonly string[]): Rgb[] {
+export function buildPalette(bases: readonly string[], wall: Wall = COVER_WALL): Rgb[] {
   const seen = new Set<string>();
   const out: Rgb[] = [];
   const add = (c: Rgb) => {
@@ -60,7 +63,7 @@ export function buildPalette(bases: readonly string[]): Rgb[] {
   // Each base also comes paler, a third and two thirds of the way to white, for the white to blue gradients.
   const white: Rgb = [255, 255, 255];
   const tones = bases.map(hexToRgb).flatMap((c) => [c, mix(c, white, 1 / 3), mix(c, white, 2 / 3)]);
-  for (const from of [OFF_COLOR, GAP_COLOR].map(hexToRgb)) {
+  for (const from of [wall.off, wall.gap].map(hexToRgb)) {
     add(from);
     for (const c of tones) for (const t of LEVELS) add(mix(from, c, t));
   }
@@ -79,8 +82,9 @@ export function colorsIn(svg: string): string[] {
  * cell half covered by a shape comes out half way between the shape and
  * what is behind it, never split between the two.
  */
-export function averageCells(rgba: Uint8ClampedArray, cols: number, rows: number, ss: number): Float32Array {
+export function averageCells(rgba: Uint8ClampedArray, cols: number, rows: number, ss: number, gap = GAP_COLOR): Float32Array {
   const width = cols * ss;
+  const gapRgb = hexToRgb(gap);
   if (rgba.length !== width * rows * ss * 4) throw new Error(`picture is not ${cols * ss} by ${rows * ss}`);
   const out = new Float32Array(cols * rows * 3);
   const n = ss * ss;
@@ -94,9 +98,9 @@ export function averageCells(rgba: Uint8ClampedArray, cols: number, rows: number
         for (let sx = 0; sx < ss; sx++, p += 4) {
           // The scene is opaque; any alpha left is read as the gap color behind it.
           const a = rgba[p + 3] / 255;
-          r += rgba[p] * a + GAP_RGB[0] * (1 - a);
-          g += rgba[p + 1] * a + GAP_RGB[1] * (1 - a);
-          b += rgba[p + 2] * a + GAP_RGB[2] * (1 - a);
+          r += rgba[p] * a + gapRgb[0] * (1 - a);
+          g += rgba[p + 1] * a + gapRgb[1] * (1 - a);
+          b += rgba[p + 2] * a + gapRgb[2] * (1 - a);
         }
       }
       const c = (cy * cols + cx) * 3;
@@ -202,7 +206,7 @@ export function blocksOf(cells: Uint16Array, cols: number, rows: number): Block[
  * one per cell, then cuts the same gap round every cell; since every block
  * starts and ends on a cell's edge, each square shows exactly one color.
  */
-export function gridSvg(cells: Uint16Array, palette: readonly Rgb[], cols: number, rows: number, title: string): string {
+export function gridSvg(cells: Uint16Array, palette: readonly Rgb[], cols: number, rows: number, title: string, gap = GAP_COLOR): string {
   const counts = new Map<number, number>();
   for (const c of cells) counts.set(c, (counts.get(c) ?? 0) + 1);
   const common = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
@@ -233,7 +237,7 @@ export function gridSvg(cells: Uint16Array, palette: readonly Rgb[], cols: numbe
 <pattern id="cells" width="${PITCH}" height="${PITCH}" patternUnits="userSpaceOnUse"><rect x="${SQUARE.inset}" y="${SQUARE.inset}" width="${SQUARE.size}" height="${SQUARE.size}" rx="${SQUARE.round}" fill="#fff"/></pattern>
 <mask id="grid" maskUnits="userSpaceOnUse" x="0" y="0" width="${width}" height="${height}"><rect width="${width}" height="${height}" fill="url(#cells)"/></mask>
 </defs>
-<rect width="${width}" height="${height}" fill="${GAP_COLOR}"/>
+<rect width="${width}" height="${height}" fill="${gap}"/>
 <g mask="url(#grid)"><g transform="scale(${PITCH})"><rect width="${cols}" height="${rows}" fill="${rgbToHex(palette[common])}"/>
 ${paths}
 </g></g>

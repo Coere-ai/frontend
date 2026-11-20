@@ -167,4 +167,16 @@ describe("pixelate", () => {
     assert.ok(cells.some((c) => light(c) > 600));
     assert.ok(cells.some((c) => light(c) < 80));
   });
+
+  it("draws a wall of another size on its own dark", async () => {
+    const wall = { gap: "#0b0a12", off: "#1b1a26" };
+    const scene = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" width="60" height="30"><rect width="60" height="30" fill="${wall.gap}"/><rect x="30" width="30" height="30" fill="${wall.off}"/><rect x="40" y="10" width="10" height="10" fill="#5267f7"/></svg>`;
+    const svg = await pixelate(scene, "Share", { cols: 12, rows: 6, wall });
+    const cells = cellsOfSvg(svg, 12, 6);
+    assert.match(svg, /<rect width="120" height="60" fill="#0b0a12"\/>/);
+    assert.equal(cells[0], wall.gap);
+    assert.equal(cells[2 * 12 + 8], "#5267f7");
+    const allowed = new Set(buildPalette(colorsIn(scene), wall).map(rgbToHex));
+    for (const c of new Set(cells)) assert.ok(allowed.has(c), `${c} is in the palette`);
+  });
 });
