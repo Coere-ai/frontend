@@ -1,16 +1,18 @@
-import { SizedPhoto } from "@/site/ui/sized-photo";
+import { PixelPicture } from "@/site/art/pixel-picture";
 
 /**
- * An industry page's opening backdrop: the field's own photo, full bleed,
- * as the pages had it before the redesign, under the same dark shade from
- * the left that keeps white words readable. A phone stacks the words over
- * the photo, so there the shade runs from the top.
+ * An industry page's opening backdrop: the field's photo redrawn as an LED
+ * wall of small square cells in the Coere palette, the Solutions hero's
+ * style, which colors in once as the page opens. A plain dark shade sits
+ * behind the words only, from the left on a wide screen and from the top
+ * where a phone stacks the words above the app (there the picture sits
+ * round the app, see PixelPicture).
  */
-export function IndustryBackdrop({ photo, alt }: { photo: string; alt: string }) {
+export function IndustryBackdrop({ photo, focus }: { photo: string; focus?: readonly [number, number] }) {
   return (
-    <div className="absolute inset-0 bg-neutral-950">
-      <SizedPhoto src={photo} alt={alt} fill preload sizes="100vw" className="object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/80 via-neutral-950/55 to-neutral-950/35 lg:bg-gradient-to-r lg:from-neutral-950/75 lg:via-neutral-950/35 lg:to-neutral-950/10" />
+    <div className="absolute inset-0 bg-[#0b0a12]">
+      <PixelPicture photo={photo} focus={focus} intro />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,10,18,0.8),rgba(11,10,18,0.6)_42%,rgba(11,10,18,0.15)_62%,transparent_78%)] lg:bg-[linear-gradient(90deg,rgba(11,10,18,0.88),rgba(11,10,18,0.74)_30%,rgba(11,10,18,0.45)_42%,rgba(11,10,18,0.12)_52%,transparent_60%)]" />
     </div>
   );
 }

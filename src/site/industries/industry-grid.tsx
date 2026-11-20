@@ -1,14 +1,14 @@
 import Link from "next/link";
+import { PixelPicture } from "@/site/art/pixel-picture";
 import { standardNames } from "@/site/content/compliance";
 import { industries } from "@/site/content/industries";
 import { Underlined } from "@/site/ui/underlined";
 import { IndustryIcon } from "@/site/ui/icons/industry-icons";
 import { Reveal } from "@/site/ui/reveal";
-import { SizedPhoto } from "@/site/ui/sized-photo";
 
 /**
- * Every industry as a photo card that opens its page. The photos are 4K,
- * saved at smaller widths too, so each screen loads the size it needs.
+ * Every industry as a card that opens its page, its photo drawn as the
+ * same pixel picture the page opens on, still and small.
  */
 export function IndustryGrid() {
   return (
@@ -16,14 +16,8 @@ export function IndustryGrid() {
       {industries.map((industry, index) => (
         <Reveal key={industry.slug} delay={(index % 3) * 0.05}>
           <Link id={industry.slug} href={`/industries/${industry.slug}`} className="group block scroll-mt-28">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-neutral-100 shadow-[0_28px_70px_-34px_rgba(23,27,77,0.35)] dark:bg-white/5 dark:shadow-none dark:ring-1 dark:ring-white/10">
-              <SizedPhoto
-                src={industry.photo.src}
-                alt={industry.photo.alt}
-                fill
-                sizes="(min-width: 1280px) 30vw, (min-width: 640px) 50vw, 100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-              />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[28px] bg-[#0b0a12] shadow-[0_28px_70px_-34px_rgba(23,27,77,0.35)] dark:shadow-none dark:ring-1 dark:ring-white/10">
+              <PixelPicture photo={industry.photo.src} focus={industry.photo.focus} label={industry.photo.alt} cell={3} source={960} className="transition-[filter] duration-500 group-hover:brightness-125" />
             </div>
             <div className="mt-6 flex items-center gap-3 text-neutral-950 dark:text-white">
               <IndustryIcon name={industry.icon} size={28} />

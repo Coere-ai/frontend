@@ -44,7 +44,7 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
   return (
     <DarkPage>
       <SplitHero
-        backdrop={<IndustryBackdrop photo={industry.photo.src} alt={industry.photo.alt} />}
+        backdrop={<IndustryBackdrop photo={industry.photo.src} focus={industry.photo.focus} />}
         tone="dark"
         title={`Coere for ${industry.name.toLowerCase()}`}
         line={content.line}
