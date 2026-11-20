@@ -80,6 +80,8 @@ export function LiveDemo({
 
   return (
     <div ref={box} role="img" aria-label={label} className={`relative aspect-[1440/900] w-full overflow-hidden bg-neutral-100 ${className ?? ""}`}>
+      {/* Not aria-hidden: that hides the page from the accessibility tree its Coere code reads (Workers finds no rows),
+          and the box's img role already keeps a screen reader out of it. */}
       {near ? (
         <iframe
           key={src}
@@ -87,7 +89,6 @@ export function LiveDemo({
           src={src}
           title={label}
           tabIndex={-1}
-          aria-hidden={true}
           className="pointer-events-none absolute inset-0 h-full w-full border-0 bg-white"
         />
       ) : null}

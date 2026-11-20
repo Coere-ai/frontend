@@ -9,6 +9,8 @@ import { LiveDemo, posterOf, type DemoState } from "@/site/ui/live-demo";
 /** How long a part's last frame holds before the next one fades in, and the fade, in ms. */
 const HOLD = 900;
 const FADE = 0.45;
+/** The longest a part plays before the next comes in, in ms, should its film stall on a slow machine. */
+const CAP = 150_000;
 /** How long a chapter is taken to run when its film does not say, in seconds, for the line under the tab. */
 const GUESS = 14;
 
@@ -51,6 +53,11 @@ export function AgentsReel() {
     setIncoming(next);
   }, []);
   useEffect(() => () => clearTimeout(hold.current), []);
+  useEffect(() => {
+    if (!auto) return;
+    const cap = window.setTimeout(() => go((shown + 1) % parts.length), CAP);
+    return () => clearTimeout(cap);
+  }, [auto, go, shown]);
 
   const onState = useCallback(
     (next: DemoState) => {
