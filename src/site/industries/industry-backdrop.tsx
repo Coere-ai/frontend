@@ -1,4 +1,5 @@
 import { PixelPicture } from "@/site/art/pixel-picture";
+import type { Focus } from "@/site/art/pixel-picture/frame";
 
 /**
  * An industry page's opening backdrop: the field's photo redrawn as an LED
@@ -8,7 +9,7 @@ import { PixelPicture } from "@/site/art/pixel-picture";
  * where a phone stacks the words above the app (there the picture sits
  * round the app, see PixelPicture).
  */
-export function IndustryBackdrop({ photo, focus }: { photo: string; focus?: readonly [number, number] }) {
+export function IndustryBackdrop({ photo, focus }: { photo: string; focus?: Focus }) {
   return (
     <div className="absolute inset-0 bg-[#0b0a12]">
       <PixelPicture photo={photo} focus={focus} intro />

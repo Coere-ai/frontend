@@ -1,3 +1,4 @@
+import type { Focus } from "@/site/art/pixel-picture/frame";
 import type { IndustryIconName } from "@/site/ui/icons/industry-icons";
 import type { Product } from "./products";
 
@@ -15,13 +16,13 @@ export type Industry = {
    * A photo from Unsplash, free to use under the Unsplash License, saved at
    * 960, 1920 and 3840 wide. The pages draw it as a pixel picture; `focus`
    * is the point to keep in frame, 0 to 1 each way, where a tall or narrow
-   * frame crops the photo.
+   * frame crops the photo, and how far to zoom in on it.
    */
-  photo: { src: string; alt: string; by: string; focus?: readonly [number, number] };
+  photo: { src: string; alt: string; by: string; focus?: Focus };
 };
 
 /** Industry photos are private like the rest of the new site. */
-const photo = (slug: string, alt: string, by: string, focus?: readonly [number, number]) => ({ src: `/preview/images/industries/${slug}.webp`, alt, by, focus });
+const photo = (slug: string, alt: string, by: string, focus?: Focus) => ({ src: `/preview/images/industries/${slug}.webp`, alt, by, focus });
 
 /** Who Coere is for, each tied to the product that serves them. */
 export type Application = {
@@ -67,7 +68,7 @@ export const industries: Industry[] = [
     icon: "cpu",
     summary: "Engineering context, from tool to tool.",
     uses: ["Project memory", "Agent context"],
-    photo: photo("technology", "San Francisco at night with the Salesforce Tower", "Chris Briggs", [0.3, 0.5]),
+    photo: photo("technology", "San Francisco at night with the Salesforce Tower", "Chris Briggs", [0.5, 0.4, 1.25]),
   },
   {
     slug: "commerce",

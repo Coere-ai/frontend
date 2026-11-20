@@ -63,6 +63,10 @@ describe("coverCrop", () => {
     assert.equal(crop.x, 0);
     assert.equal(coverCrop(1920, 1280, 0.5, [0.9, 0.5]).x, 1280);
   });
+
+  it("zooms in on the focus", () => {
+    assert.deepEqual(coverCrop(1920, 1280, 1.5, [0.5, 0.5, 2]), { x: 480, y: 320, w: 960, h: 640 });
+  });
 });
 
 describe("extendRows", () => {

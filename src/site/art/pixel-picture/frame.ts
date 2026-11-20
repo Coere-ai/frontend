@@ -36,13 +36,16 @@ export function extendRows(picture: CellPicture, rows: number, fade = 0.3): Cell
   return { cols, rows, data: out };
 }
 
+/** The point of a photo to keep in frame, 0 to 1 each way, and optionally how far to zoom in on it (1 is a plain cover crop). */
+export type Focus = readonly [x: number, y: number, zoom?: number];
+
 /**
  * The part of a photo `width` by `height` that covers a frame of the given
  * aspect, as CSS object-fit cover would, centered on `focus` (0 to 1 each
- * way) as far as the photo allows.
+ * way) as far as the photo allows, and closer in by `focus[2]` when given.
  */
-export function coverCrop(width: number, height: number, aspect: number, focus: readonly [number, number] = [0.5, 0.5]) {
-  const w = Math.min(width, height * aspect);
+export function coverCrop(width: number, height: number, aspect: number, focus: Focus = [0.5, 0.5]) {
+  const w = Math.min(width, height * aspect) / Math.max(focus[2] ?? 1, 1);
   const h = w / aspect;
   const x = Math.min(Math.max(focus[0] * width - w / 2, 0), width - w);
   const y = Math.min(Math.max(focus[1] * height - h / 2, 0), height - h);

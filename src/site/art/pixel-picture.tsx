@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { hexToRgb, NEON_PALETTE } from "./pixel-matrix/palette";
 import { type CellPicture, pictureCells } from "./pixel-picture/cells";
-import { coverCrop, extendRows } from "./pixel-picture/frame";
+import { coverCrop, extendRows, type Focus } from "./pixel-picture/frame";
 import { paintPicture } from "./pixel-picture/paint";
 import { createPictureRenderer, INTRO_END, type PictureRenderer } from "./pixel-picture/renderer";
 import { sizedSrc } from "@/site/ui/sized-src";
@@ -21,8 +21,8 @@ const MAX_DPR = 2;
 export type PixelPictureProps = {
   /** A private photo's path without its width, such as /preview/images/industries/finance.webp. */
   photo: string;
-  /** The point of the photo to keep in frame, 0 to 1 each way. */
-  focus?: readonly [number, number];
+  /** The point of the photo to keep in frame, 0 to 1 each way, and how far to zoom in on it. */
+  focus?: Focus;
   /** Plays the cells coloring in, once per page load, when the picture first shows. Without it the picture appears finished. */
   intro?: boolean;
   /** CSS pixels from one cell to the next. */
@@ -49,7 +49,7 @@ export type PixelPictureProps = {
  */
 export function PixelPicture({ photo, focus = [0.5, 0.5], intro = false, cell = 3.5, source = 1920, label, className = "" }: PixelPictureProps) {
   const host = useRef<HTMLDivElement>(null);
-  const [fx, fy] = focus;
+  const [fx, fy, zoom = 1] = focus;
 
   useEffect(() => {
     const el = host.current;
@@ -112,7 +112,7 @@ export function PixelPicture({ photo, focus = [0.5, 0.5], intro = false, cell = 
       sample.height = rows * SAMPLE;
       const ctx = sample.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
-      const crop = coverCrop(image.naturalWidth, image.naturalHeight, grid.cols / rows, [fx, fy]);
+      const crop = coverCrop(image.naturalWidth, image.naturalHeight, grid.cols / rows, [fx, fy, zoom]);
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(image, crop.x, crop.y, crop.w, crop.h, 0, 0, sample.width, sample.height);
       const pixels = ctx.getImageData(0, 0, sample.width, sample.height);
@@ -204,7 +204,7 @@ export function PixelPicture({ photo, focus = [0.5, 0.5], intro = false, cell = 
       if (image) image.src = "";
       canvas.remove();
     };
-  }, [photo, fx, fy, intro, cell, source]);
+  }, [photo, fx, fy, zoom, intro, cell, source]);
 
   return (
     <div

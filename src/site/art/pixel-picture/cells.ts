@@ -35,13 +35,15 @@ export const LOOK = {
   /** How far a photo's own warm or cool color moves a cell along the ramp. */
   byHue: 0.22,
   /** How much the brightest cells run toward white, like an LED at full drive. */
-  hot: 0.3,
+  hot: 0.12,
   /** The glow the bright cells spill onto their neighbors, as a share of their light. */
   bloom: 0.45,
   /** Where the ramp starts for the brightest cell. */
   offset: 0.04,
+  /** The mean light a dim picture is lifted toward, so dark and bright photos glow alike. */
+  exposure: 0.24,
   /** Lifts every cell, since the gaps take about half the screen. */
-  gain: 1.4,
+  gain: 1.3,
 };
 
 /** How soon the shoulder bends: higher lifts the mid tones more. */
@@ -137,19 +139,30 @@ export function pictureCells(pixels: Pixels, cols: number, rows: number, stops: 
   // The ramp in 256 steps, so no cell builds a color of its own.
   const ramp = new Float32Array(256 * 3);
   for (let k = 0; k < 256; k++) ramp.set(rampAt(stops, k / 255), k * 3);
+  // Each cell's light: its own, pushed by local contrast, dimmed where the photo is plain, lifted on edges.
+  const local = new Float32Array(n);
+  const value = new Float32Array(n);
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    const l = light[i];
+    local[i] = clamp01(l + LOOK.detail * (l - soft[i]));
+    const edge = clamp01(edges[i] / edgeTop);
+    const texture = clamp01(busy[i] / busyTop);
+    value[i] = Math.pow(local[i], LOOK.gamma) * (LOOK.plain + (1 - LOOK.plain) * texture) + LOOK.edge * edge * edge * (0.25 + 0.75 * l);
+    total += value[i];
+  }
+  // A dim picture is lifted toward the same overall light as the rest, so a night skyline glows like a sunlit facade.
+  const exposure = Math.min(Math.max(LOOK.exposure / Math.max(total / n, 1e-3), 1), 1.6);
+
   const color = new Float32Array(n * 3);
   const place = new Float32Array(n);
   const glow = new Float32Array(n * 3);
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const i = y * cols + x;
-      const l = light[i];
-      const local = clamp01(l + LOOK.detail * (l - soft[i]));
-      const edge = clamp01(edges[i] / edgeTop);
-      const texture = clamp01(busy[i] / busyTop);
-      const v = clamp01(Math.pow(local, LOOK.gamma) * (LOOK.plain + (1 - LOOK.plain) * texture) + LOOK.edge * edge * edge * (0.25 + 0.75 * l));
+      const v = clamp01(value[i] * exposure);
       const sweep = (x / cols) * 0.62 + (y / rows) * 0.38;
-      const t = clamp01((1 - local) * LOOK.byLight + sweep * LOOK.bySweep + LOOK.offset - warmth[i] * LOOK.byHue);
+      const t = clamp01((1 - local[i]) * LOOK.byLight + sweep * LOOK.bySweep + LOOK.offset - warmth[i] * LOOK.byHue);
       const hot = smooth(0.7, 1, v) * LOOK.hot;
       const spill = smooth(0.45, 0.95, v);
       const lut = Math.round(t * 255) * 3;
