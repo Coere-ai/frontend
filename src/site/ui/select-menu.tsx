@@ -36,7 +36,7 @@ export function SelectMenu({ label, value, options, onChange }: { label: string;
 
   return (
     <div ref={root} className="relative">
-      <span id={`${id}-label`} className="text-[13px] font-medium text-neutral-500">
+      <span id={`${id}-label`} className="text-[13px] font-medium text-neutral-500 dark:text-white/60">
         {label}
       </span>
       <button
@@ -57,15 +57,15 @@ export function SelectMenu({ label, value, options, onChange }: { label: string;
             setOpen(false);
           }
         }}
-        className={`relative mt-2 flex h-11 w-full items-center rounded-xl border bg-white pr-11 pl-4 text-left text-[15px] text-neutral-950 outline-none ${open ? "border-neutral-950" : "border-neutral-200 focus-visible:border-neutral-950"}`}
+        className={`relative mt-2 flex h-11 w-full items-center rounded-xl border bg-white pr-11 pl-4 text-left text-[15px] text-neutral-950 outline-none transition-[border-color,box-shadow] dark:bg-white/[0.05] dark:text-white dark:focus-visible:ring-4 dark:focus-visible:ring-brand-500/25 ${open ? "border-neutral-950 dark:border-brand-400" : "border-neutral-200 focus-visible:border-neutral-950 dark:border-white/15 dark:focus-visible:border-brand-400"}`}
       >
         <span id={`${id}-value`} className="truncate">
           {value}
         </span>
-        <ChevronDownIcon size={18} className={`absolute top-1/2 right-4 -translate-y-1/2 text-neutral-500 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDownIcon size={18} className={`absolute top-1/2 right-4 -translate-y-1/2 text-neutral-500 transition-transform dark:text-white/55 ${open ? "rotate-180" : ""}`} />
       </button>
       {open ? (
-        <ul role="listbox" aria-labelledby={`${id}-label`} className="absolute inset-x-0 top-full z-20 mt-2 rounded-xl border border-neutral-200 bg-white p-1.5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)]">
+        <ul role="listbox" aria-labelledby={`${id}-label`} className="absolute inset-x-0 top-full z-20 mt-2 rounded-xl border border-neutral-200 bg-white p-1.5 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.3)] dark:border-white/10 dark:bg-[#16151f] dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,0.8)]">
           {options.map((option, index) => (
             <li
               key={option}
@@ -73,10 +73,10 @@ export function SelectMenu({ label, value, options, onChange }: { label: string;
               aria-selected={option === value}
               onPointerEnter={() => setActive(index)}
               onClick={() => pick(option)}
-              className="group flex cursor-pointer items-center justify-between px-3 py-2 text-[15px] text-neutral-800"
+              className="group flex cursor-pointer items-center justify-between px-3 py-2 text-[15px] text-neutral-800 dark:text-white/85"
             >
               <Underlined on={index === active}>{option}</Underlined>
-              {option === value ? <CheckIcon size={16} className="text-neutral-950" /> : null}
+              {option === value ? <CheckIcon size={16} className="text-neutral-950 dark:text-brand-300" /> : null}
             </li>
           ))}
         </ul>

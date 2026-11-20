@@ -7,10 +7,12 @@ type Variant = "primary" | "secondary" | "ghost";
 const base =
   "inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-[15px] font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-950";
 
+/** Each look on a dark page (see DarkPage): Coere blue for the main step, dark glass with a fine light edge for the second. */
 const variants: Record<Variant, string> = {
-  primary: "bg-neutral-950 text-white hover:bg-neutral-800",
-  secondary: "border border-neutral-200 bg-white text-neutral-950 hover:border-neutral-950",
-  ghost: "text-neutral-950 hover:bg-neutral-100",
+  primary: "bg-neutral-950 text-white hover:bg-neutral-800 dark:bg-brand-500 dark:shadow-[0_12px_30px_-12px_rgba(82,103,247,0.9)] dark:hover:bg-brand-600 dark:focus-visible:outline-white",
+  secondary:
+    "border border-neutral-200 bg-white text-neutral-950 hover:border-neutral-950 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/40 dark:hover:bg-white/10 dark:focus-visible:outline-white",
+  ghost: "text-neutral-950 hover:bg-neutral-100 dark:text-white dark:hover:bg-white/10 dark:focus-visible:outline-white",
 };
 
 /** Class names for a button look, for the few places that need a real <button>. */
@@ -52,7 +54,10 @@ type PillTone = "dark" | "light";
 type PillSize = "md" | "lg";
 
 const pillTones: Record<PillTone, { pill: string; circle: string }> = {
-  dark: { pill: "bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-neutral-950", circle: "bg-white text-neutral-950" },
+  dark: {
+    pill: "bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-neutral-950 dark:bg-brand-500 dark:hover:bg-brand-600 dark:focus-visible:outline-white",
+    circle: "bg-white text-neutral-950 dark:text-brand-600",
+  },
   light: { pill: "bg-white text-neutral-950 hover:bg-neutral-100 focus-visible:outline-white", circle: "bg-neutral-950 text-white" },
 };
 
@@ -86,7 +91,7 @@ function circleArrowParts({ tone, size, icon, wide, className, children }: { ton
 /**
  * A pill with its label and, inside on the right, a round circle holding an
  * arrow that nudges right on hover. Dark is a black pill with a white
- * circle; light is the reverse, for dark artwork. An optional mark sits
+ * circle (Coere blue on a dark page); light is the reverse, for dark artwork. An optional mark sits
  * before the label. Wide fills its row with the label centered, the way
  * full width buttons sit in the mobile menu.
  */
