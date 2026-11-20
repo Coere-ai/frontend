@@ -37,17 +37,34 @@ html {
   scroll-behavior: smooth;
   /* Offset anchor targets so the sticky nav never covers a heading. */
   scroll-padding-top: 6rem;
-  /* The colour a browser shows past the ends of the page when it bounces. */
+  /* The colour a browser shows past the top of the page when it bounces: the page top's own. */
   --overscroll-top: #ffffff;
   background-color: var(--overscroll-top);
 }
 
-/* A page that opens on a dark hero bounces into the hero's near black, not a white strip. */
-html:has(main > section:first-of-type[data-nav-tone="dark"]) {
-  --overscroll-top: #07080f;
+/*
+ * A page whose first part is dark (a section or wrapper marked
+ * data-nav-tone="dark" with nothing but scripts before it) bounces into its
+ * near black, not a white strip. Pure CSS, so it is right from the first
+ * paint and on every route.
+ */
+html:has(main > [data-nav-tone="dark"]:not(:not(script) ~ *)) {
+  --overscroll-top: #0b0a12;
 }
 
-/* Past half way down the page the colour turns back to white, so the bounce under the white footer stays white. */
+/*
+ * With a mouse or trackpad, the page does not bounce past its ends at all
+ * (Chrome on a Mac pulls it down and shows the canvas). Touch screens keep
+ * their bounce and pull to refresh; the colour above covers them.
+ */
+@media (pointer: fine) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+}
+
+/* Past half way down the page the colour turns back to white, so a bounce under the white footer stays white. */
 @supports (animation-timeline: scroll()) {
   html {
     animation: coere-overscroll linear both;
