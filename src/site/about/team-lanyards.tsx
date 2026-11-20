@@ -51,17 +51,6 @@ const STRAP_FADE = {
   WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 5.3%, #000 14.7%)",
 } as const;
 
-function FlipIcon() {
-  return (
-    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3.5 8.5a6.5 6.5 0 0 1 11.6-3.2L16.5 7" />
-      <path d="M16.5 3v4h-4" />
-      <path d="M16.5 11.5a6.5 6.5 0 0 1-11.6 3.2L3.5 13" />
-      <path d="M3.5 17v-4h4" />
-    </svg>
-  );
-}
-
 /**
  * One founder's lanyard, free to roam: its canvas is much wider than the
  * card's place and takes no clicks but the card's, so the card swings over
@@ -69,9 +58,8 @@ function FlipIcon() {
  * so the card drops in while the person can see it, and a phone never builds
  * a scene for a card it has not scrolled to.
  */
-function LanyardSlot({ member, faces }: { member: TeamMember; faces: LanyardFaces | null }) {
+function LanyardSlot({ faces }: { faces: LanyardFaces | null }) {
   const [ref, seen] = useSeen<HTMLDivElement>({ threshold: 0.5 });
-  const [flips, setFlips] = useState(0);
   return (
     <figure className="flex flex-col items-center">
       <div ref={ref} className="relative h-[440px] w-full sm:h-[540px] lg:h-[620px]">
@@ -91,24 +79,12 @@ function LanyardSlot({ member, faces }: { member: TeamMember; faces: LanyardFace
               breeze={0.25}
               metal="silver"
               introFrom="top"
-              flipSignal={flips}
               roam
               style={STRAP_FADE}
             />
           </div>
         ) : null}
       </div>
-      <figcaption className="mt-2">
-        <button
-          type="button"
-          onClick={() => setFlips((n) => n + 1)}
-          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[14px] font-medium text-white ring-1 ring-white/20 backdrop-blur-md transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          aria-label={`Flip ${member.name}'s card`}
-        >
-          <FlipIcon />
-          Flip card
-        </button>
-      </figcaption>
     </figure>
   );
 }
@@ -139,7 +115,7 @@ export function TeamLanyards({ members }: { members: readonly TeamMember[] }) {
   return (
     <div ref={ref} className="grid gap-2 sm:grid-cols-2 sm:gap-0">
       {members.map((member, i) => (
-        <LanyardSlot key={member.name} member={member} faces={faces?.[i] ?? null} />
+        <LanyardSlot key={member.name} faces={faces?.[i] ?? null} />
       ))}
     </div>
   );

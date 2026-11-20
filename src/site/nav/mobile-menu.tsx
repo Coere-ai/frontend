@@ -24,12 +24,12 @@ const items: Record<NavTabId, Item[]> = {
     { href: "/resources/sdks", label: "SDKs" },
     { href: "/resources/mcp", label: "MCP" },
     { href: "/#demo", label: "Product demo" },
-    { href: "/blog", label: "Blog" },
   ],
   blog: [{ href: "/blog", label: "All posts" }, ...posts.slice(0, 3).map((p) => ({ href: `/blog/${p.slug}`, label: p.title }))],
   about: [
     { href: "/about", label: "Our story" },
-    { href: "/about#team", label: "Team" },
+    { href: "/about#team", label: "About us" },
+    { href: "/blog", label: "Blog" },
   ],
   careers: [{ href: "/careers", label: "Open roles" }],
 };

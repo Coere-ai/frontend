@@ -18,7 +18,7 @@ ctx = coere.context.for_draft(
 print(ctx.block, end="")`;
 
 /**
- * Resources menu: five docs pages, All docs and the blog in a grid, and the
+ * Resources menu: five docs pages and All docs in a grid, and the
  * quickstart as an article card: a cover with the code on artwork, then
  * its title and what it covers.
  */
@@ -36,9 +36,6 @@ export function ResourcesPanel() {
           ))}
           <li>
             <PanelLink href="/resources" title="All docs" summary="Conventions, schemas, limits, errors and examples too." />
-          </li>
-          <li>
-            <PanelLink href="/blog" title="Blog" summary="News and launches from Coere." />
           </li>
         </ul>
       </div>

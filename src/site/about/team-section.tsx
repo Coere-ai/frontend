@@ -18,7 +18,6 @@ export function TeamSection() {
         </div>
         <div className="mx-auto mt-4 max-w-6xl">
           <TeamLanyards members={founders} />
-          <p className="mt-4 hidden text-center text-[14px] text-white/50 sm:block">Drag a card to swing it, or click it to turn it over.</p>
         </div>
         <div className="mx-auto mt-16 grid max-w-5xl gap-6 md:grid-cols-2">
           {founders.map((member, index) => (

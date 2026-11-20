@@ -2,7 +2,7 @@ import Link from "next/link";
 import { guides } from "@/site/content/guides";
 import { emailHref } from "@/site/content/navigation";
 import { products } from "@/site/content/products";
-import { Brand } from "@/site/ui/brand";
+import { BrandLockup } from "@/site/nav/brand-lockup";
 import { Container } from "@/site/ui/container";
 
 const columns = [
@@ -11,7 +11,7 @@ const columns = [
   {
     title: "Company",
     links: [
-      { href: "/about", label: "About Us" },
+      { href: "/about", label: "About us" },
       { href: "/blog", label: "Blog" },
       { href: emailHref, label: "Contact" },
     ],
@@ -39,7 +39,7 @@ export function Footer() {
     <footer className="border-t border-neutral-200 bg-white">
       <Container className="grid gap-12 py-16 sm:grid-cols-2 md:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,1fr))]">
         <div>
-          <Brand />
+          <BrandLockup />
           <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-neutral-500">
             The memory layer you own, across every AI.
           </p>
