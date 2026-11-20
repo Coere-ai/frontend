@@ -83,8 +83,9 @@ export function PixelMatrixLogos({ logos = DEFAULT_LOGOS, density = 1, palette =
       ready = false;
       const small = tall || state.width < 900;
       const placed = placeLogos(ids, layout, Boolean(tall), small ? 7 : 10);
-      const cellPx = (tall ? 4.6 : 5.6) / Math.max(density, 0.4);
-      const grids = placed.map((p) => Math.round(Math.min(Math.max((p.size * state.scale) / cellPx, 20), 64)));
+      // About 3 pixels a cell on a laptop, so a logo is 40 to 60 cells across: an LED panel, not 8 bit blocks.
+      const cellPx = (tall ? 3.4 : 3.1) / Math.max(density, 0.4);
+      const grids = placed.map((p) => Math.round(Math.min(Math.max((p.size * state.scale) / cellPx, 24), 72)));
       try {
         const pixels = await Promise.all(placed.map((p, i) => rasterizeLogo(MATRIX_LOGOS[p.id], grids[i])));
         if (disposed || mine !== build) return;
@@ -108,7 +109,7 @@ export function PixelMatrixLogos({ logos = DEFAULT_LOGOS, density = 1, palette =
       canvas.height = Math.round(h * dpr);
       const nowTall = isTall(w, h);
       state.scale = wallScale(w, nowTall);
-      state.wallCell = (nowTall ? 5 : 6) / Math.max(density, 0.4);
+      state.wallCell = (nowTall ? 3.4 : 3.1) / Math.max(density, 0.4);
       if (nowTall !== tall) {
         tall = nowTall;
         void rebuild();

@@ -8,7 +8,7 @@ export type CellSet = { data: Float32Array; count: number };
 
 /** A cell is lit when at least this share of it is covered by the mark. */
 const MIN_COVER = 0.28;
-/** How steep the bevel reads under the light; higher makes the edges catch more. */
+/** How steep the bevel reads under the light at 32 cells a side; finer grids scale it so the bevel keeps its look. */
 const BEVEL = 1.7;
 
 /**
@@ -45,7 +45,10 @@ export function cellsFromPixels(rgba: Uint8ClampedArray, grid: number, ss: numbe
     }
   }
 
-  const height = blur(blur(cover, grid), grid);
+  // A finer grid blurs once more, so the bevel stays about as wide on the logo.
+  let height = blur(blur(cover, grid), grid);
+  if (grid > 40) height = blur(height, grid);
+  const bevel = BEVEL * Math.max(1, grid / 32);
   const at = (x: number, y: number) => (x < 0 || y < 0 || x >= grid || y >= grid ? 0 : height[y * grid + x]);
   const out: number[] = [];
   let seed = 0x9e3779b9 ^ Math.round(logo.tone * 1e4);
@@ -57,7 +60,7 @@ export function cellsFromPixels(rgba: Uint8ClampedArray, grid: number, ss: numbe
       const cell: Rgb = [color[c * 3], color[c * 3 + 1], color[c * 3 + 2]];
       const [r, g, b] = rampAt(stops, rampPosition(cell, logo, across));
       seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-      out.push((x + 0.5) / grid - 0.5, (y + 0.5) / grid - 0.5, r, g, b, -(at(x + 1, y) - at(x - 1, y)) * BEVEL, -(at(x, y + 1) - at(x, y - 1)) * BEVEL, Math.min(1, cover[c] * 1.15), seed / 2 ** 32);
+      out.push((x + 0.5) / grid - 0.5, (y + 0.5) / grid - 0.5, r, g, b, -(at(x + 1, y) - at(x - 1, y)) * bevel, -(at(x, y + 1) - at(x, y - 1)) * bevel, Math.min(1, cover[c] * 1.15), seed / 2 ** 32);
     }
   }
   return { data: new Float32Array(out), count: out.length / CELL_FLOATS };

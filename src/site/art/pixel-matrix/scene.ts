@@ -55,7 +55,8 @@ export function frameFor(s: SceneState): Frame {
     const screenSize = placed.size * s.scale;
     const center = placed.id === "coere";
     const delay = center ? 0.7 : 0.1 + placed.index * 0.08;
-    const dim = (center ? 1.25 : 1) * (1 + Math.min(Math.max(z / 900, -0.3), 0.12));
+    // The gaps take a third of a fine cell, so each lit square runs a little brighter to keep the wall luminous.
+    const dim = (center ? 1.45 : 1.15) * (1 + Math.min(Math.max(z / 900, -0.3), 0.12));
     const arrived = Math.min(Math.max((s.intro - delay) / 2, 0), 1);
     return {
       slot,
@@ -84,8 +85,8 @@ export function frameFor(s: SceneState): Frame {
     pointer: [px, py, pin * Math.min(s.motion, 1)],
     focal,
     wallCell: s.wallCell,
-    gap: 0.24,
-    glow: 0.8,
+    gap: 0.26,
+    glow: 1,
     light: LIGHT,
     shadow: [0.12, 0.2],
     haze: [0.06, 0.1, 0.26],

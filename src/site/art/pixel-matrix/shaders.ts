@@ -86,12 +86,14 @@ void main() {
   vec2 f = px / uCell - id - 0.5;
   vec3 col = texelFetch(uCells, ivec2(id), 0).rgb * 2.0;
   vec2 q = ((id + 0.5) * uCell - uView * vec2(0.5, 0.46)) / max(uView.x, uView.y);
-  float aa = 0.75 / (uCell * uDpr);
-  float core = 1.0 - smoothstep(-aa, aa, max(abs(f.x), abs(f.y)) - (0.5 - uGap * 0.5));
-  vec3 gap = vec3(0.004, 0.006, 0.014);
+  float aa = 0.5 / (uCell * uDpr);
+  // The gap never closes below one device pixel, so the grid stays visible on a plain screen.
+  float gap = max(uGap, 1.0 / (uCell * uDpr));
+  float core = 1.0 - smoothstep(-aa, aa, max(abs(f.x), abs(f.y)) - (0.5 - gap * 0.5));
+  vec3 dark = vec3(0.004, 0.006, 0.014);
   vec3 glow = uHaze * 0.05 * exp(-dot(q, q) * 3.0);
   float vignette = 1.0 - 0.45 * smoothstep(0.15, 0.6, length(q));
-  frag = vec4((mix(gap, col, core) + glow) * vignette, 1.0);
+  frag = vec4((mix(dark, col, core) + glow) * vignette, 1.0);
 }
 `;
 
@@ -119,10 +121,12 @@ uniform float uMotion;
 uniform vec3 uPointer;
 uniform vec3 uLight;
 uniform float uGlow;
+uniform float uGap;
 out vec2 vLocal;
 out vec3 vColor;
 out float vHalo;
 out float vSoft;
+out float vGap;
 
 // The same kind of sine free hash, three values from one seed.
 vec3 hash3(float p) {
@@ -181,7 +185,8 @@ void main() {
   vec2 quad = aCorner * (0.5 + halo);
   vLocal = quad;
   vHalo = halo;
-  vSoft = uBlur + 0.7 / max(cellPx * uDpr, 1.0);
+  vSoft = uBlur + 0.5 / max(cellPx * uDpr, 1.0);
+  vGap = max(uGap, 1.0 / max(cellPx * uDpr, 1.0));
   vColor = col;
   vec2 pos = screen + quad * cellPx;
   gl_Position = vec4(pos.x / uView.x * 2.0 - 1.0, 1.0 - pos.y / uView.y * 2.0, 0.0, 1.0);
@@ -190,18 +195,18 @@ void main() {
 
 export const CELL_FRAG = `#version 300 es
 precision highp float;
-uniform float uGap;
 in vec2 vLocal;
 in vec3 vColor;
 in float vHalo;
 in float vSoft;
+in float vGap;
 out vec4 frag;
 
 void main() {
-  float box = max(abs(vLocal.x), abs(vLocal.y)) - (0.5 - uGap * 0.5);
+  float box = max(abs(vLocal.x), abs(vLocal.y)) - (0.5 - vGap * 0.5);
   float core = 1.0 - smoothstep(-vSoft, vSoft, box);
   float out_ = max(box, 0.0);
-  float glow = vHalo > 0.0 ? exp(-out_ / (0.12 + vHalo * 0.25)) * (1.0 - smoothstep(vHalo * 0.6, vHalo + uGap * 0.5, out_)) : 0.0;
+  float glow = vHalo > 0.0 ? exp(-out_ / (0.12 + vHalo * 0.25)) * (1.0 - smoothstep(vHalo * 0.6, vHalo + vGap * 0.5, out_)) : 0.0;
   // Premultiplied: the square covers the wall, the glow around it only adds light.
   frag = vec4(vColor * core + vColor * glow * 0.3 * (1.0 - core), core);
 }
