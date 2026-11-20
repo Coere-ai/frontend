@@ -25,9 +25,9 @@ export function ForgePage() {
         <Container>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className={SECTION_TITLE}>From a key to context, end to end</h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">A developer makes a token, adds Coere to their app&apos;s AI call and runs it, then points it at any AI.</p>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-white/65">A developer makes a token, adds Coere to their app&apos;s AI call and runs it, then points it at any AI.</p>
           </div>
-          <Stage background={backgrounds.prism} className="mt-14 shadow-[0_40px_100px_-40px_rgba(23,27,77,0.45)] md:mt-16">
+          <Stage background={backgrounds.prism} className="mt-14 shadow-[0_40px_100px_-40px_rgba(23,27,77,0.45)] md:mt-16 dark:shadow-none">
             <div aria-hidden="true" className="absolute inset-0 bg-neutral-950/45" />
             <div className="relative p-6 md:p-12">
               <FilmFrame film={films.forgeDev} />
@@ -40,7 +40,7 @@ export function ForgePage() {
           <div className={`${SOFT_FIELD} grid items-center gap-12 px-6 py-14 md:px-12 md:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-16`}>
             <div>
               <h2 className={SECTION_TITLE}>Give your agent a memory over MCP</h2>
-              <p className="mt-5 text-lg leading-relaxed text-neutral-600">The same memory and the same token, as MCP tools. Connect over HTTP at /mcp, or run coere-server mcp over stdio.</p>
+              <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-white/65">The same memory and the same token, as MCP tools. Connect over HTTP at /mcp, or run coere-server mcp over stdio.</p>
               <ArrowLink href="/resources/mcp" className="mt-7 text-neutral-950">See every MCP tool</ArrowLink>
             </div>
             <CodeTabs samples={mcpSamples} />

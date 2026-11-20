@@ -29,7 +29,7 @@ export function SolutionsPage() {
         <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">
           <div>
             <h2 className={SECTION_TITLE}>Works with the AIs your team already uses</h2>
-            <p className="mt-5 text-lg leading-relaxed text-neutral-600">Nobody switches tools. Coere saves the chats from each AI your team picks and keeps the memory in step with them.</p>
+            <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-white/65">Nobody switches tools. Coere saves the chats from each AI your team picks and keeps the memory in step with them.</p>
             <CheckList className="mt-7" items={["Pick the AIs at setup, and Save", "Extract all saves every chat from each one", "New chats come in by themselves"]} />
           </div>
           <div className={`${SOFT_FIELD} p-8 md:p-12`}>

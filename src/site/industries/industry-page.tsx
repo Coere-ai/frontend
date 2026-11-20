@@ -8,6 +8,7 @@ import { productBySlug } from "@/site/content/products";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { ProductSection } from "@/site/products/product-section";
 import { LiveDemo } from "@/site/ui/live-demo";
+import { DarkPage } from "@/site/ui/page-theme";
 import { IndustryBackdrop } from "./industry-backdrop";
 import { MoreIndustries } from "./more-industries";
 
@@ -19,6 +20,7 @@ const ORDER: DemoKey[] = ["context", "graph", "confidential", "app"];
  * words, then each Coere product told through an example from that field,
  * played live on Coere's real code with the field's own people and work,
  * then a few other fields. The photo carries the showcase below too.
+ * The photo hero reads dark, so the whole page is dark.
  */
 export function IndustryPage({ industry, content }: { industry: Industry; content: Content }) {
   const demo = (key: DemoKey, label: string) => <LiveDemo film={`industry-${industry.slug}`} from={key} to={ORDER[ORDER.indexOf(key) + 1]} label={label} />;
@@ -36,7 +38,7 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
   });
 
   return (
-    <>
+    <DarkPage>
       <SplitHero
         backdrop={<IndustryBackdrop photo={industry.photo.src} alt={industry.photo.alt} />}
         tone="dark"
@@ -52,6 +54,6 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
       </ProductSection>
       <MoreIndustries current={industry.slug} all={industries} />
       <ClosingCta title={`Bring memory to ${industry.name.toLowerCase()}.`} text="Tell us what your people repeat to AI every day." />
-    </>
+    </DarkPage>
   );
 }

@@ -19,10 +19,10 @@ export function PostGrid({ posts }: { posts: Post[] }) {
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-6">
-        <h2 id="more-posts" className="text-3xl font-semibold tracking-[-0.035em] text-neutral-950 md:text-4xl">
+        <h2 id="more-posts" className="text-3xl font-semibold tracking-[-0.035em] text-neutral-950 md:text-4xl dark:text-white">
           More posts
         </h2>
-        <div role="group" aria-label="Filter posts by category" className="-mx-1 flex max-w-full gap-1 overflow-x-auto rounded-[14px] bg-neutral-100 p-1">
+        <div role="group" aria-label="Filter posts by category" className="-mx-1 flex max-w-full gap-1 overflow-x-auto rounded-[14px] bg-neutral-100 p-1 dark:bg-white/[0.06] dark:ring-1 dark:ring-white/10">
           {offered.map((name) => {
             const on = name === filter;
             return (
@@ -31,7 +31,7 @@ export function PostGrid({ posts }: { posts: Post[] }) {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setFilter(name)}
-                className={`h-9 shrink-0 rounded-[10px] px-4 text-[14px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${on ? "bg-white text-neutral-950 shadow-[0_1px_2px_rgba(20,17,15,0.08),0_2px_8px_-2px_rgba(20,17,15,0.08)]" : "text-neutral-600 hover:text-neutral-950"}`}
+                className={`h-9 shrink-0 rounded-[10px] px-4 text-[14px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${on ? "bg-white text-neutral-950 shadow-[0_1px_2px_rgba(20,17,15,0.08),0_2px_8px_-2px_rgba(20,17,15,0.08)] dark:bg-white/[0.14] dark:text-white dark:shadow-none" : "text-neutral-600 hover:text-neutral-950 dark:text-white/65 dark:hover:text-white"}`}
               >
                 {name}
               </button>
