@@ -62,4 +62,12 @@ export const chrome: Messages["chrome"] = {
     copy: "Copier",
     copied: "Copié",
   },
+  notFound: {
+    title: "Page introuvable",
+    description: "Cette page n’existe pas sur le site de Coere. Coere est la couche de mémoire d’IA qui vous appartient, dans toutes les IA.",
+    heading: "Cette page n’est pas ici.",
+    line: "Elle a peut-être été déplacée, ou l’adresse contient une faute de frappe.",
+    home: "Retour à l’accueil",
+    docs: "Documentation développeurs",
+  },
 };

@@ -62,4 +62,12 @@ export const chrome = {
     copy: "Copy",
     copied: "Copied",
   },
+  notFound: {
+    title: "Page not found",
+    description: "This page isn't on the Coere site. Coere is the AI memory layer you own, across every AI.",
+    heading: "This page isn't here.",
+    line: "It may have moved, or the address may be off by a letter.",
+    home: "Go home",
+    docs: "Developer docs",
+  },
 } as const;

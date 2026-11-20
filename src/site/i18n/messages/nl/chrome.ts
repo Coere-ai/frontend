@@ -62,4 +62,12 @@ export const chrome: Messages["chrome"] = {
     copy: "Kopiëren",
     copied: "Gekopieerd",
   },
+  notFound: {
+    title: "Pagina niet gevonden",
+    description: "Deze pagina staat niet op de site van Coere. Coere is de AI-geheugenlaag die van jou is, in elke AI.",
+    heading: "Deze pagina is er niet.",
+    line: "Misschien is ze verplaatst, of zit er een tikfout in het adres.",
+    home: "Naar de startpagina",
+    docs: "Documentatie voor ontwikkelaars",
+  },
 };

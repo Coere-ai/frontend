@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Fragment } from "react";
 
 import { digitsOf, type TimeLeft } from "@/lib/launch/countdown";
+import { format } from "@/site/i18n/types";
 
 export type CountdownSize = "lg" | "sm";
 
@@ -56,13 +57,22 @@ function RollingDigit({ digit }: { digit: string }) {
  * visitor's motion setting, and nothing moves when the numbers arrive. It takes its colour
  * from the page around it.
  */
-export function Countdown({ left, size = "lg" }: { left: TimeLeft | null; size?: CountdownSize }) {
+/** The words round the digits; English unless a page in another language passes its own (the admin panel shows the English). */
+export type CountdownWords = { units: Record<(typeof UNITS)[number]["key"], string>; timer: string; counting: string };
+
+const ENGLISH: CountdownWords = {
+  units: { days: "days", hours: "hours", minutes: "minutes", seconds: "seconds" },
+  timer: "{days} days, {hours} hours, {minutes} minutes and {seconds} seconds left",
+  counting: "Counting down",
+};
+
+export function Countdown({ left, size = "lg", words = ENGLISH }: { left: TimeLeft | null; size?: CountdownSize; words?: CountdownWords }) {
   const look = looks[size];
   return (
     <div
       role="timer"
       aria-live="off"
-      aria-label={left ? `${left.days} days, ${left.hours} hours, ${left.minutes} minutes and ${left.seconds} seconds left` : "Counting down"}
+      aria-label={left ? format(words.timer, { days: left.days, hours: left.hours, minutes: left.minutes, seconds: left.seconds }) : words.counting}
       className={`inline-flex items-start leading-none font-medium tracking-[-0.04em] tabular-nums ${left ? "" : "invisible"}`}
     >
       {UNITS.map((unit, i) => (
@@ -82,7 +92,7 @@ export function Countdown({ left, size = "lg" }: { left: TimeLeft | null; size?:
                     </span>
                   ))}
             </span>
-            <span className={`font-normal tracking-normal opacity-50 ${look.label}`}>{unit.label}</span>
+            <span className={`font-normal tracking-normal opacity-50 ${look.label}`}>{words.units[unit.key]}</span>
           </span>
         </Fragment>
       ))}

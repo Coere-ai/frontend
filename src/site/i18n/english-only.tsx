@@ -13,7 +13,8 @@ import type { Messages } from "./messages/types";
  */
 export function EnglishOnly({ parts = [], children }: { parts?: (keyof Messages)[]; children: ReactNode }) {
   const en = messagesFor("en");
-  const messages = Object.fromEntries(parts.map((part) => [part, en[part]])) as Partial<Messages>;
+  // The shared controls' labels (Copy, Play, Next) in English too; the navbar and footer sit outside and keep theirs.
+  const messages = Object.fromEntries(["chrome" as const, ...parts].map((part) => [part, en[part]])) as Partial<Messages>;
   return (
     <I18nProvider messages={messages}>
       <div lang="en" className="contents">

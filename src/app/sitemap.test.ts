@@ -14,3 +14,19 @@ test("the privacy policy's last change is the date the policy says it took effec
 test("the pricing page is listed, since the Product menu and the footer link to it", () => {
   assert.ok(sitemap().some((e) => e.url.endsWith("/pricing")));
 });
+
+test("a translated page is listed in every language, each naming the others", () => {
+  const pricing = sitemap().filter((e) => new URL(e.url).pathname.replace(/^\/(es|fr|nl|ja)(?=\/)/, "") === "/pricing");
+  const paths = pricing.map((e) => new URL(e.url).pathname).sort();
+  assert.deepEqual(paths, ["/es/pricing", "/fr/pricing", "/ja/pricing", "/nl/pricing", "/pricing"]);
+  for (const entry of pricing) {
+    assert.equal(entry.alternates?.languages?.["x-default"], "https://www.coere.ai/pricing");
+    assert.equal(entry.alternates?.languages?.ja, "https://www.coere.ai/ja/pricing");
+  }
+});
+
+test("a page still in English is listed once, at its English address", () => {
+  const privacy = sitemap().filter((e) => e.url.includes("privacy"));
+  assert.equal(privacy.length, 1);
+  assert.equal(new URL(privacy[0].url).pathname, "/privacy");
+});

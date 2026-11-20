@@ -13,6 +13,7 @@ import { CompareSection } from "@/site/products/compare-section";
 import { guideGraph, JsonLd } from "@/site/seo/json-ld";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { DarkPage } from "@/site/ui/page-theme";
+import { EnglishOnly } from "@/site/i18n/english-only";
 
 const guide = guideBySlug("chatgpt-to-claude-memory");
 const path = `/${guide.slug}`;
@@ -26,35 +27,37 @@ export const metadata: Metadata = pageMetadata({ ...guide.seo, path });
  */
 export default function ChatgptToClaudeMemoryPage() {
   return (
-    <DarkPage>
-      <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Moving ChatGPT memory to Claude", "Importing AI chat history"], faqs: switching.faqs })} />
-      <SplitHero
-        tone="dark"
-        {...switching.hero}
-        primary={{ href: contactHref, label: contactLabel }}
-        secondary={{ href: "#how", label: "How it works" }}
-        app={<FilmFrame film={films.extraction} preview />}
-      />
-      <WaysSection title={switching.answer.title} line={switching.answer.line} ways={switching.ways} />
-      <WordsTable caption="What moves with each way" columns={switching.table.columns} rows={switching.table.rows} note={switching.table.note} />
-      <WorkflowSection
-        title="How to bring ChatGPT context into Claude with Coere"
-        line="Four steps, once. After that every new chat on every AI starts from the same memory. The film below plays Extract all live, on Coere's own code."
-        steps={switching.steps}
-        film={films.extraction}
-        background={backgrounds.prism}
-        link={{ href: "/products/connect#import", label: "See Import chats" }}
-      />
-      <CompareSection words={en.productPages.connect.compare} />
-      <FaqSection faqs={switching.faqs} title="Moving from ChatGPT to Claude, answered" />
-      <RelatedSection
-        links={[
-          { href: "/portable-ai-memory", kind: "What it is", name: "Portable AI memory" },
-          { href: "/products/connect", kind: "Memory for people", name: "Coere Connect" },
-          { href: "/industries/technology", kind: "Industries", name: "Coere for technology" },
-        ]}
-      />
-      <ClosingCta title="Start every chat from what you already said." />
-    </DarkPage>
+    <EnglishOnly>
+      <DarkPage>
+        <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Moving ChatGPT memory to Claude", "Importing AI chat history"], faqs: switching.faqs })} />
+        <SplitHero
+          tone="dark"
+          {...switching.hero}
+          primary={{ href: contactHref, label: contactLabel }}
+          secondary={{ href: "#how", label: "How it works" }}
+          app={<FilmFrame film={films.extraction} preview />}
+        />
+        <WaysSection title={switching.answer.title} line={switching.answer.line} ways={switching.ways} />
+        <WordsTable caption="What moves with each way" columns={switching.table.columns} rows={switching.table.rows} note={switching.table.note} />
+        <WorkflowSection
+          title="How to bring ChatGPT context into Claude with Coere"
+          line="Four steps, once. After that every new chat on every AI starts from the same memory. The film below plays Extract all live, on Coere's own code."
+          steps={switching.steps}
+          film={films.extraction}
+          background={backgrounds.prism}
+          link={{ href: "/products/connect#import", label: "See Import chats" }}
+        />
+        <CompareSection words={en.productPages.connect.compare} />
+        <FaqSection faqs={switching.faqs} title="Moving from ChatGPT to Claude, answered" />
+        <RelatedSection
+          links={[
+            { href: "/portable-ai-memory", kind: "What it is", name: "Portable AI memory" },
+            { href: "/products/connect", kind: "Memory for people", name: "Coere Connect" },
+            { href: "/industries/technology", kind: "Industries", name: "Coere for technology" },
+          ]}
+        />
+        <ClosingCta title="Start every chat from what you already said." locale="en" />
+      </DarkPage>
+    </EnglishOnly>
   );
 }

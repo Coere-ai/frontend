@@ -12,6 +12,7 @@ import { AiTiles } from "@/site/products/ai-tiles";
 import { guideGraph, JsonLd } from "@/site/seo/json-ld";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { DarkPage } from "@/site/ui/page-theme";
+import { EnglishOnly } from "@/site/i18n/english-only";
 
 const guide = guideBySlug("portable-ai-memory");
 const path = `/${guide.slug}`;
@@ -24,43 +25,45 @@ export const metadata: Metadata = pageMetadata({ ...guide.seo, path });
  */
 export default function PortableAiMemoryPage() {
   return (
-    <DarkPage>
-      <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Portable AI memory", "AI memory layer"], faqs: portable.faqs })} />
-      <SplitHero
-        tone="dark"
-        {...portable.hero}
-        primary={{ href: contactHref, label: contactLabel }}
-        secondary={{ href: "#how", label: "How it works" }}
-        app={<FilmFrame film={films.smartContext} preview />}
-      />
-      <AnswerSection
-        title={portable.answer.title}
-        paragraphs={portable.answer.paragraphs}
-        aside={
-          <>
-            <p className="mb-8 text-[15px] font-medium text-neutral-500 dark:text-white/60">One memory, fed by every AI you use</p>
-            <AiTiles />
-          </>
-        }
-      />
-      <WorkflowSection
-        title="How Coere makes your memory portable"
-        line="Four steps in your browser. The film below plays them live, on Coere's own code."
-        steps={portable.steps}
-        film={films.v2}
-        background={backgrounds.ribbons}
-        link={{ href: "/products/connect", label: "Explore Coere Connect" }}
-      />
-      <TodaySection title="What Coere supports today" items={portable.today} status="Coere is in pre-launch, and the waitlist is open. Here is what Coere Connect does now, as the films on this site show it." />
-      <FaqSection faqs={portable.faqs} title="Portable AI memory, answered" />
-      <RelatedSection
-        links={[
-          { href: "/chatgpt-to-claude-memory", kind: "Switching AIs", name: "ChatGPT to Claude memory" },
-          { href: "/ai-agent-memory", kind: "For developers", name: "AI agent memory" },
-          { href: "/products/solutions", kind: "Memory for teams", name: "Coere Solutions" },
-        ]}
-      />
-      <ClosingCta title="Your memory, across every AI." />
-    </DarkPage>
+    <EnglishOnly>
+      <DarkPage>
+        <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Portable AI memory", "AI memory layer"], faqs: portable.faqs })} />
+        <SplitHero
+          tone="dark"
+          {...portable.hero}
+          primary={{ href: contactHref, label: contactLabel }}
+          secondary={{ href: "#how", label: "How it works" }}
+          app={<FilmFrame film={films.smartContext} preview />}
+        />
+        <AnswerSection
+          title={portable.answer.title}
+          paragraphs={portable.answer.paragraphs}
+          aside={
+            <>
+              <p className="mb-8 text-[15px] font-medium text-neutral-500 dark:text-white/60">One memory, fed by every AI you use</p>
+              <AiTiles />
+            </>
+          }
+        />
+        <WorkflowSection
+          title="How Coere makes your memory portable"
+          line="Four steps in your browser. The film below plays them live, on Coere's own code."
+          steps={portable.steps}
+          film={films.v2}
+          background={backgrounds.ribbons}
+          link={{ href: "/products/connect", label: "Explore Coere Connect" }}
+        />
+        <TodaySection title="What Coere supports today" items={portable.today} status="Coere is in pre-launch, and the waitlist is open. Here is what Coere Connect does now, as the films on this site show it." />
+        <FaqSection faqs={portable.faqs} title="Portable AI memory, answered" />
+        <RelatedSection
+          links={[
+            { href: "/chatgpt-to-claude-memory", kind: "Switching AIs", name: "ChatGPT to Claude memory" },
+            { href: "/ai-agent-memory", kind: "For developers", name: "AI agent memory" },
+            { href: "/products/solutions", kind: "Memory for teams", name: "Coere Solutions" },
+          ]}
+        />
+        <ClosingCta title="Your memory, across every AI." locale="en" />
+      </DarkPage>
+    </EnglishOnly>
   );
 }

@@ -62,4 +62,12 @@ export const chrome: Messages["chrome"] = {
     copy: "コピー",
     copied: "コピーしました",
   },
+  notFound: {
+    title: "ページが見つかりません",
+    description: "このページはCoereのサイトにありません。Coereは、すべてのAIで使える、あなた自身の記憶レイヤーです。",
+    heading: "このページは見つかりません。",
+    line: "移動したか、アドレスが一文字違っているのかもしれません。",
+    home: "ホームへ",
+    docs: "開発者向けドキュメント",
+  },
 };

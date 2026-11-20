@@ -62,4 +62,12 @@ export const chrome: Messages["chrome"] = {
     copy: "Copiar",
     copied: "Copiado",
   },
+  notFound: {
+    title: "Página no encontrada",
+    description: "Esta página no está en el sitio de Coere. Coere es la capa de memoria de IA que es tuya, en todas las IA.",
+    heading: "Esta página no está aquí.",
+    line: "Puede que se haya movido, o que a la dirección le sobre o le falte una letra.",
+    home: "Ir al inicio",
+    docs: "Documentación para desarrolladores",
+  },
 };

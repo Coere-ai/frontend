@@ -8,6 +8,8 @@ import { buttonClass } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 import { ChromeMark } from "@/site/ui/icons/chrome-mark";
 import { DarkPage } from "@/site/ui/page-theme";
+import { I18nProvider } from "@/site/i18n/client";
+import { getMessages } from "@/site/i18n/server";
 
 /**
  * Where Add to Chrome leads once Coere Connect is out: COERE_STORE_URL, the
@@ -25,32 +27,34 @@ const storeUrl = () => process.env.COERE_STORE_URL || "https://chromewebstore.go
  * soft backdrop the other page openings use, in the dark page theme.
  */
 export async function ComingSoon({ product }: { product: LaunchProduct }) {
-  const setting = (await launchSettings())[product];
+  const [setting, { launch }] = await Promise.all([launchSettings().then((all) => all[product]), getMessages()]);
   return (
-    <DarkPage>
-      <section className={`relative isolate overflow-hidden pt-[152px] pb-28 md:pt-[184px] md:pb-40 ${UNDER_NAV}`}>
-        <div aria-hidden="true" className="absolute inset-0 -z-10">
-          <SoftBackdrop />
-        </div>
-        <Container>
-          <LaunchStage
-            product={product}
-            setting={setting}
-            here={
-              product === "connect" ? (
-                <div className="mt-12 flex justify-center">
-                  <a href={storeUrl()} className={buttonClass("primary", "h-14 px-6 text-[16px]")}>
-                    <ChromeMark size={22} />
-                    Add to Chrome
-                  </a>
-                </div>
-              ) : undefined
-            }
-          >
-            <InterestForm product={product} />
-          </LaunchStage>
-        </Container>
-      </section>
-    </DarkPage>
+    <I18nProvider messages={{ launch }}>
+      <DarkPage>
+        <section className={`relative isolate overflow-hidden pt-[152px] pb-28 md:pt-[184px] md:pb-40 ${UNDER_NAV}`}>
+          <div aria-hidden="true" className="absolute inset-0 -z-10">
+            <SoftBackdrop />
+          </div>
+          <Container>
+            <LaunchStage
+              product={product}
+              setting={setting}
+              here={
+                product === "connect" ? (
+                  <div className="mt-12 flex justify-center">
+                    <a href={storeUrl()} className={buttonClass("primary", "h-14 px-6 text-[16px]")}>
+                      <ChromeMark size={22} />
+                      {launch.addToChrome}
+                    </a>
+                  </div>
+                ) : undefined
+              }
+            >
+              <InterestForm product={product} />
+            </LaunchStage>
+          </Container>
+        </section>
+      </DarkPage>
+    </I18nProvider>
   );
 }

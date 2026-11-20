@@ -6,6 +6,7 @@ import { industries } from "@/site/content/industries";
 import { posts } from "@/site/content/posts";
 import { PRIVACY_EFFECTIVE } from "@/site/content/privacy";
 import { products } from "@/site/content/products";
+import { localizePath, locales } from "@/site/i18n/locales";
 
 /**
  * When each group of pages last changed in what it says. A date that moved
@@ -23,6 +24,10 @@ const UPDATED = {
  * Every page the menus and footer link to, each at its canonical address.
  * The careers pages are hidden for now, so they are left out here and marked
  * noindex on the pages. So are the blog's placeholder posts.
+ *
+ * A page translated into every language is listed once per language, each
+ * entry naming the others (hreflang), as the pages' own alternates do. A
+ * page still in English lists its English address alone.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const page = (path: string, priority: number, lastModified: string = UPDATED.site, changeFrequency: "weekly" | "monthly" = "weekly") => ({
@@ -31,19 +36,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency,
     priority,
   });
+  const languages = (path: string) => ({
+    languages: { ...Object.fromEntries(locales.map((l) => [l, `${siteConfig.url}${localizePath(path, l)}`])), "x-default": `${siteConfig.url}${path}` },
+  });
+  const translated = (path: string, priority: number, lastModified: string = UPDATED.site) =>
+    locales.map((l) => ({ ...page(localizePath(path, l), priority, lastModified), alternates: languages(path) }));
   return [
-    page("/", 1),
-    ...products.map((p) => page(`/products/${p.slug}`, 0.9)),
-    page("/pricing", 0.8),
-    page("/demo", 0.7),
+    ...translated("/", 1),
+    ...products.flatMap((p) => translated(`/products/${p.slug}`, 0.9)),
+    ...translated("/pricing", 0.8),
+    ...translated("/demo", 0.7),
     ...guides.map((g) => page(`/${g.slug}`, 0.8)),
-    page("/industries", 0.7),
-    ...industries.map((i) => page(`/industries/${i.slug}`, 0.7)),
+    ...translated("/industries", 0.7),
+    ...industries.flatMap((i) => translated(`/industries/${i.slug}`, 0.7)),
     page("/resources", 0.8, UPDATED.docs),
     ...docPages.filter((d) => d.slug !== "overview").map((d) => page(`/resources/${d.slug}`, 0.6, UPDATED.docs, "monthly")),
     page("/developers/waitlist", 0.7),
-    page("/about", 0.6, UPDATED.site, "monthly"),
-    page("/blog", 0.6, posts[0].date),
+    ...translated("/about", 0.6).map((e) => ({ ...e, changeFrequency: "monthly" as const })),
+    ...translated("/blog", 0.6, posts[0].date),
     ...posts.filter((p) => !p.placeholder).map((p) => page(`/blog/${p.slug}`, 0.5, p.date, "monthly")),
     page("/privacy", 0.3, UPDATED.privacy, "monthly"),
   ];

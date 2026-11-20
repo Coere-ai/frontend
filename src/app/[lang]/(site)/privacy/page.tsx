@@ -12,6 +12,7 @@ import { privacySeo } from "@/site/content/seo";
 import { Container } from "@/site/ui/container";
 import { DarkPage } from "@/site/ui/page-theme";
 import { SectionHeading } from "@/site/ui/section-heading";
+import { EnglishOnly } from "@/site/i18n/english-only";
 
 export const metadata: Metadata = pageMetadata({ ...privacySeo, path: "/privacy" });
 
@@ -44,65 +45,67 @@ function Paragraphs({ lines }: { lines: string[] }) {
 /** The privacy policy: the short version, a list of parts, then each part in full, in the dark page theme. */
 export default function PrivacyPage() {
   return (
-    <DarkPage>
-      <section className="pt-20 pb-16 md:pt-28">
-        <Container>
-          <SectionHeading
-            as="h1"
-            eyebrow="Privacy policy"
-            title="What Coere reads, keeps and sends"
-            description="Coere is built so your chats stay with you. This page says exactly what the extension and coere.ai do with your data."
-          />
-          <p className="mt-6 text-[15px] text-neutral-500 dark:text-white/60">
-            Effective <time dateTime={PRIVACY_EFFECTIVE}>{PRIVACY_EFFECTIVE_LABEL}</time>
-          </p>
-        </Container>
-      </section>
-      <section className="pb-28 md:pb-32">
-        <Container className="grid gap-12 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-20">
-          <nav aria-label="On this page" className="hidden lg:sticky lg:top-28 lg:block lg:max-h-[calc(100vh-8rem)] lg:self-start lg:overflow-y-auto">
-            <p className="text-[13px] font-medium text-neutral-500 dark:text-white/60">On this page</p>
-            <ol className="mt-4 space-y-2.5">
-              {privacySections.map((s) => (
-                <li key={s.id}>
-                  <a href={`#${s.id}`} className="text-[15px] text-neutral-950 hover:text-neutral-500 dark:text-white/80 dark:hover:text-white">
-                    {s.title}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-          <article className="max-w-3xl">
-            <div className="rounded-[28px] bg-neutral-50 p-8 md:p-10 dark:bg-white/[0.045] dark:ring-1 dark:ring-white/10">
-              <h2 className="text-[22px] font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">The short version</h2>
-              <ul className="mt-5 space-y-3">
-                {privacySummary.map((line) => (
-                  <li key={line} className="flex gap-3 text-[17px] leading-relaxed text-neutral-600 dark:text-white/70">
-                    <span aria-hidden="true" className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-950 dark:bg-brand-400" />
-                    {line}
+    <EnglishOnly>
+      <DarkPage>
+        <section className="pt-20 pb-16 md:pt-28">
+          <Container>
+            <SectionHeading
+              as="h1"
+              eyebrow="Privacy policy"
+              title="What Coere reads, keeps and sends"
+              description="Coere is built so your chats stay with you. This page says exactly what the extension and coere.ai do with your data."
+            />
+            <p className="mt-6 text-[15px] text-neutral-500 dark:text-white/60">
+              Effective <time dateTime={PRIVACY_EFFECTIVE}>{PRIVACY_EFFECTIVE_LABEL}</time>
+            </p>
+          </Container>
+        </section>
+        <section className="pb-28 md:pb-32">
+          <Container className="grid gap-12 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-20">
+            <nav aria-label="On this page" className="hidden lg:sticky lg:top-28 lg:block lg:max-h-[calc(100vh-8rem)] lg:self-start lg:overflow-y-auto">
+              <p className="text-[13px] font-medium text-neutral-500 dark:text-white/60">On this page</p>
+              <ol className="mt-4 space-y-2.5">
+                {privacySections.map((s) => (
+                  <li key={s.id}>
+                    <a href={`#${s.id}`} className="text-[15px] text-neutral-950 hover:text-neutral-500 dark:text-white/80 dark:hover:text-white">
+                      {s.title}
+                    </a>
                   </li>
                 ))}
-              </ul>
-            </div>
-            {privacySections.map((s) => (
-              <section key={s.id} id={s.id} className="mt-16 scroll-mt-28">
-                <h2 className="text-2xl font-medium tracking-[-0.03em] text-neutral-950 text-balance dark:text-white md:text-[28px]">{s.title}</h2>
-                <Paragraphs lines={s.paragraphs} />
-                {s.list ? (
-                  <ul className="mt-4 list-disc space-y-2 pl-5 text-[17px] leading-relaxed text-neutral-600 marker:text-neutral-400 dark:text-white/70 dark:marker:text-white/40">
-                    {s.list.map((item) => (
-                      <li key={item}>
-                        <Line text={item} />
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                {s.after ? <Paragraphs lines={s.after} /> : null}
-              </section>
-            ))}
-          </article>
-        </Container>
-      </section>
-    </DarkPage>
+              </ol>
+            </nav>
+            <article className="max-w-3xl">
+              <div className="rounded-[28px] bg-neutral-50 p-8 md:p-10 dark:bg-white/[0.045] dark:ring-1 dark:ring-white/10">
+                <h2 className="text-[22px] font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">The short version</h2>
+                <ul className="mt-5 space-y-3">
+                  {privacySummary.map((line) => (
+                    <li key={line} className="flex gap-3 text-[17px] leading-relaxed text-neutral-600 dark:text-white/70">
+                      <span aria-hidden="true" className="mt-[11px] h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-950 dark:bg-brand-400" />
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {privacySections.map((s) => (
+                <section key={s.id} id={s.id} className="mt-16 scroll-mt-28">
+                  <h2 className="text-2xl font-medium tracking-[-0.03em] text-neutral-950 text-balance dark:text-white md:text-[28px]">{s.title}</h2>
+                  <Paragraphs lines={s.paragraphs} />
+                  {s.list ? (
+                    <ul className="mt-4 list-disc space-y-2 pl-5 text-[17px] leading-relaxed text-neutral-600 marker:text-neutral-400 dark:text-white/70 dark:marker:text-white/40">
+                      {s.list.map((item) => (
+                        <li key={item}>
+                          <Line text={item} />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {s.after ? <Paragraphs lines={s.after} /> : null}
+                </section>
+              ))}
+            </article>
+          </Container>
+        </section>
+      </DarkPage>
+    </EnglishOnly>
   );
 }
