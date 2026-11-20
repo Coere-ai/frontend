@@ -51,8 +51,16 @@ The whole page: [home.webp](home.webp).
 | | |
 |---|---|
 | <img src="resources.webp" alt="The developer docs' first page, with the list of pages on the left" /><br /><sub>The developer docs</sub> | <img src="resources-endpoints.webp" alt="The docs' Endpoints page, with each route and its parameters" /><br /><sub>One docs page: Endpoints</sub> |
-| <img src="about.webp" alt="The about page down to its team: four steps from AI is fragmented to the memory is yours" /><br /><sub>About, down to where the team starts</sub> | <img src="portable-ai-memory.webp" alt="The Portable AI memory guide" /><br /><sub>A guide: Portable AI memory</sub> |
+| <img src="about.webp" alt="The about page down to its team: the Coere mark in liquid chrome over About us, then four steps from AI is fragmented to the memory is yours" /><br /><sub>About, down to where the team starts</sub> | <img src="portable-ai-memory.webp" alt="The Portable AI memory guide" /><br /><sub>A guide: Portable AI memory</sub> |
 | <img src="privacy-top.webp" alt="The privacy policy: What Coere reads, keeps and sends, with the short version beside the list of its parts" /><br /><sub>The privacy policy, the short version first. <a href="privacy.webp">The whole policy</a></sub> | <img src="developer-waitlist.webp" alt="Give your app's users memory from day one, with a work email field, Join the waitlist and a TypeScript sample beside it" /><br /><sub>The developer waitlist</sub> |
+
+## Blog and careers
+
+| | |
+|---|---|
+| <img src="blog.webp" alt="The blog: The latest news, launches, and insights, with Coere is now venture backed featured on top and four more posts as cards" /><br /><sub>The blog, the newest post featured</sub> | <img src="blog-post.webp" alt="The post Coere is now venture backed, with its cover, its words and Get Coere Connect" /><br /><sub>A post: Coere is now venture backed</sub> |
+| <img src="careers.webp" alt="Careers: Build the memory layer with us, the job board with its filters and an open role, and How we work" /><br /><sub>Careers, with the job board</sub> | <img src="phone-blog.webp" width="195" alt="The blog's first screen at phone width" /><br /><sub>The blog at 390 wide</sub> |
+| <img src="phone-about.webp" width="195" alt="The about page's first screen at phone width: the chrome Coere mark over About us" /><br /><sub>About at 390 wide</sub> | |
 
 ## Coming soon
 

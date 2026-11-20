@@ -56,6 +56,11 @@ export async function shootSite(browser, base, shooter, { scale }) {
   await open(page, base, "/about");
   const team = await page.locator("section#team").evaluate((el) => Math.round(el.getBoundingClientRect().top + window.scrollY));
   await s("about", { full: true, clip: { x: 0, y: 0, width: 1440, height: team } });
+  // The blog with its featured post, the funding post, and careers.
+  for (const [name, path] of [["blog", "/blog"], ["blog-post", "/blog/coere-is-venture-backed"], ["careers", "/careers"]]) {
+    await open(page, base, path);
+    await s(name, { full: true });
+  }
   for (const [name, path] of [["resources", "/resources"], ["developer-waitlist", "/developers/waitlist"], ["install", "/install"], ["try-teams", "/try-teams"], ["privacy", "/privacy"], ["portable-ai-memory", "/portable-ai-memory"]]) {
     await open(page, base, path);
     await s(name, { full: true });
@@ -107,7 +112,7 @@ export async function shootSite(browser, base, shooter, { scale }) {
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: scale, isMobile: true, hasTouch: true });
   const p = await phone.newPage();
   await shooter.prepare(p, { allNear: true });
-  for (const [name, path] of [["phone-home", "/"], ["phone-product-connect", "/products/connect"], ["phone-install", "/install"], ["phone-sign-in", "/sign-in"]]) {
+  for (const [name, path] of [["phone-home", "/"], ["phone-product-connect", "/products/connect"], ["phone-install", "/install"], ["phone-sign-in", "/sign-in"], ["phone-about", "/about"], ["phone-blog", "/blog"]]) {
     await open(p, base, path);
     await shooter.shot(p, "site", name, { full: name === "phone-home", still: name === "phone-install" || name === "phone-home", settle: 3000 });
   }
