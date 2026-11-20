@@ -40,9 +40,9 @@ The whole page, dark from the hero to the footer: [home.webp](home.webp).
 ## Industries
 
 <p align="center">
-  <img src="industries.webp" width="100%" alt="The industries page on near black: Memory for every industry, who it is for as dark glass cards with Consumer, Developer and Business, then each industry with its photo and its uses" />
+  <img src="industries.webp" width="100%" alt="The industries page on near black: Memory for every industry, who it is for as dark glass cards with Consumer, Developer and Business, then each industry with its photo drawn as a pixel picture and its uses" />
   <br />
-  <sub>Every industry, each with the product it fits, dark to the footer. Each industry page opens on its photo and stays dark too.</sub>
+  <sub>Every industry, each with the product it fits, dark to the footer. Each industry page opens on its photo drawn as a pixel picture, which colors in as the page opens, and stays dark too.</sub>
 </p>
 
 | | |
