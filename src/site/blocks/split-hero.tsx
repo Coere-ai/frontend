@@ -11,14 +11,13 @@ export type HeroLink = { href: string; label: string };
  * A page's opening, in the light and airy style the redesign set: a big
  * bold heading, one line and the buttons on the left, the product on the
  * right, over a backdrop that fills the section. `laser` drops LaserFlow's
- * beam onto the app, for the heroes that show the dashboard. `framed` sets
+ * beam onto the app, kept for the dark heroes (Solutions and Forge). `framed` sets
  * the app in a white rounded frame; `contained` shows it as it is, for a
  * code window or cards that carry their own frame. `dark` is for a backdrop
  * on near black, with light words and buttons. It runs up under the
  * floating glass navbar, so the glass bends the backdrop from the start.
  */
 export function SplitHero({
-  eyebrow,
   title,
   line,
   checks,
@@ -30,7 +29,6 @@ export function SplitHero({
   laser = false,
   tone = "light",
 }: {
-  eyebrow?: string;
   title: string;
   line: string;
   checks?: string[];
@@ -52,13 +50,7 @@ export function SplitHero({
       </div>
       <div className="mx-auto grid min-h-[min(100svh,992px)] max-w-[1440px] items-center gap-14 px-6 pt-[128px] pb-20 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:pt-[152px] lg:pb-20">
         <div className="max-w-[640px]">
-          {eyebrow ? (
-            <p className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 backdrop-blur-md ${dark ? "bg-white/10 text-white ring-white/15" : "bg-white/70 text-brand-700 ring-brand-500/15"}`}>
-              <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${dark ? "bg-brand-300" : "bg-brand-500"}`} />
-              {eyebrow}
-            </p>
-          ) : null}
-          <h1 className="mt-6 text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.045em] text-balance sm:text-6xl xl:text-[4.5rem]">{title}</h1>
+          <h1 className="text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.045em] text-balance sm:text-6xl xl:text-[4.5rem]">{title}</h1>
           <p className={`mt-6 max-w-xl text-lg leading-relaxed text-pretty md:text-[19px] ${dark ? "text-white/75" : "text-neutral-600"}`}>{line}</p>
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <HeroButton link={primary} kind="primary" dark={dark} />

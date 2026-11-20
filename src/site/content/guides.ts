@@ -75,7 +75,6 @@ export type Way = { name: string; text: string; link?: { href: string; label: st
 
 export const portable = {
   hero: {
-    eyebrow: "Portable AI memory",
     title: "Portable AI memory that follows you to every AI",
     line: "Coere is a portable AI memory layer that helps your context follow you across AI assistants. It saves your chats from every AI you use, builds one memory you own, and brings the right part into each new chat.",
     checks: [
@@ -137,7 +136,6 @@ export const portable = {
 
 export const switching = {
   hero: {
-    eyebrow: "ChatGPT to Claude",
     title: "Bring your ChatGPT memory to Claude",
     line: "Bring your existing AI context into a new assistant without starting from scratch. Coere saves your ChatGPT chats on your computer and adds the right context to each new Claude chat as you type.",
     checks: [
@@ -217,7 +215,6 @@ export const switching = {
 
 export const agentMemory = {
   hero: {
-    eyebrow: "AI agent memory",
     title: "Give your AI agent the user's memory",
     line: "Long-term memory for AI agents, from the person they work for. Coere Forge lets your agent read the memory a person already built across ChatGPT, Claude, Gemini and more, over MCP, REST or the SDKs, with a token they allow.",
     checks: [

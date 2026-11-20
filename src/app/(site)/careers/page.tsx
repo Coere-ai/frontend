@@ -21,7 +21,7 @@ export default async function CareersPage({ searchParams }: PageProps<"/careers"
   const team = teams.find((t) => t === asked) as Team | undefined;
   return (
     <>
-      <SoftHero eyebrow="Careers" title="Build the memory layer with us" description={description}>
+      <SoftHero title="Build the memory layer with us" description={description}>
         <div className="mt-12 md:mt-16">
           <JobBoard key={team ?? "all"} team={team} />
         </div>

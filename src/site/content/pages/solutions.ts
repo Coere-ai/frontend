@@ -3,7 +3,6 @@ import type { FilmCase, GridItem, HeroCopy } from "./types";
 
 /** Coere Solutions' page, from what the Teams film shows. */
 export const solutionsHero: HeroCopy = {
-  eyebrow: "Coere Solutions",
   title: "One memory for the whole company",
   line: "Coere Solutions gives your team shared AI memory: one memory of the company, its people and its clients, built from the chats your team already has.",
   checks: [

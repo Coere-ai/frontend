@@ -3,7 +3,8 @@ import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "./container";
 
 /**
- * A page's opening: a label, a big bold title and a line, over a soft wash of
+ * A page's opening: a big bold title and a line (a label above them only
+ * where a page still passes one), over a soft wash of
  * Coere blue that fades to white, in the light look of the redesign. The
  * blog and careers open with it.
  */
@@ -14,7 +15,7 @@ export function SoftHero({
   align = "left",
   children,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: ReactNode;
   description?: ReactNode;
   align?: "left" | "center";
@@ -29,8 +30,8 @@ export function SoftHero({
       />
       <Container>
         <div className={`max-w-4xl ${centered}`}>
-          <p className="inline-flex rounded-full bg-white/80 px-3.5 py-1.5 text-[13px] font-semibold text-brand-700 shadow-[0_1px_2px_rgba(20,17,15,0.05)] ring-1 ring-brand-100">{eyebrow}</p>
-          <h1 className="mt-5 text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.05em] text-neutral-950 text-balance md:text-[4.5rem] md:leading-[0.98]">{title}</h1>
+          {eyebrow ? <p className="mb-5 inline-flex rounded-full bg-white/80 px-3.5 py-1.5 text-[13px] font-semibold text-brand-700 shadow-[0_1px_2px_rgba(20,17,15,0.05)] ring-1 ring-brand-100">{eyebrow}</p> : null}
+          <h1 className="text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.05em] text-neutral-950 text-balance md:text-[4.5rem] md:leading-[0.98]">{title}</h1>
           {description ? <p className={`mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600 text-pretty md:text-xl ${align === "center" ? "mx-auto" : ""}`}>{description}</p> : null}
         </div>
         {children}

@@ -7,6 +7,7 @@ import { RoleDetails } from "@/site/careers/role-details";
 import { roleBySlug, roles } from "@/site/content/roles";
 import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "@/site/ui/container";
+import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 
 export const dynamicParams = false;
 
@@ -26,7 +27,8 @@ export default async function RolePage({ params }: PageProps<"/careers/[slug]">)
     <section className={`relative isolate pt-[136px] pb-28 md:pt-[168px] ${UNDER_NAV}`}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(55%_80%_at_12%_0%,#e3e8ff_0%,rgba(238,241,255,0.55)_45%,rgba(255,255,255,0)_75%)]" />
       <Container>
-        <Link href="/careers" className="inline-flex rounded-full bg-white/80 px-3.5 py-1.5 text-[13px] font-semibold text-brand-700 ring-1 ring-brand-100 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">
+        <Link href="/careers" className="group inline-flex items-center gap-1.5 rounded-md text-[14px] font-medium text-neutral-500 transition-colors hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">
+          <ArrowRightIcon size={14} className="rotate-180 transition-transform group-hover:-translate-x-0.5" />
           Careers
         </Link>
         <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-neutral-950 text-balance md:text-6xl md:leading-[1.02]">{role.title}</h1>

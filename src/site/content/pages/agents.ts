@@ -2,7 +2,6 @@ import type { HeroCopy } from "./types";
 
 /** Coere Agents' page. What the agents do is what Cori does in the films. */
 export const agentsHero: HeroCopy = {
-  eyebrow: "Coere Agents",
   title: "One worker, infinite possibilities",
   line: "Coere Agents is Cori, an AI agent that works from your memory. Give it one task, and when the job is big it becomes as many workers as the job needs, each in a tab of its own.",
   checks: [

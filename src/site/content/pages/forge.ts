@@ -5,7 +5,6 @@ import type { GridItem, HeroCopy } from "./types";
  * apps read memory with a token the person allowed, and nothing else.
  */
 export const forgeHero: HeroCopy = {
-  eyebrow: "Coere Forge",
   title: "The memory API for your apps and agents",
   line: "Build personalized AI experiences with a user-permissioned memory API. A REST API, an MCP server and TypeScript and Python SDKs let your apps and agents read the memory a person already built across their AIs.",
   checks: [

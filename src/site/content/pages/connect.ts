@@ -4,7 +4,6 @@ import type { FilmCase, GridItem, HeroCopy } from "./types";
 
 /** Coere Connect's page. Every claim here is shown in one of the films. */
 export const connectHero: HeroCopy = {
-  eyebrow: "Coere Connect",
   title: "Your memory, across every AI",
   line: "A Chrome extension that saves your chats from ChatGPT, Claude, Gemini and six more AIs, builds a memory you own from them, and brings it into each new chat.",
   checks: [

@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMetadata({ ...pricingSeo, path: "/pricing"
 export default function PricingPage() {
   return (
     <>
-      <CenterHero eyebrow="Pricing" title="A plan for you, your team or your app" line="Coere is free for one person. Teams and developers talk to us." />
+      <CenterHero title="A plan for you, your team or your app" line="Coere is free for one person. Teams and developers talk to us." />
       <PricingSection bare />
       <ClosingCta title="Not sure which plan fits?" text="Talk to the founders about Coere for you, your team or your app." />
     </>

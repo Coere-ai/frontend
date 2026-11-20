@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMetadata({ ...industriesSeo, path: "/indus
 export default function IndustriesPage() {
   return (
     <>
-      <CenterHero eyebrow="Industries" title="Memory for every industry" line="Coere gives people, teams and apps a memory they control. Start with who it is for, then open your field." />
+      <CenterHero plain title="Memory for every industry" line="Coere gives people, teams and apps a memory they control. Start with who it is for, then open your field." />
       <section className="pb-8">
         <Container>
           <div className={`${SOFT_FIELD} px-5 py-12 sm:px-8 md:px-12 md:py-16`}>

@@ -27,11 +27,7 @@ export default function DeveloperWaitlistPage() {
       </div>
       <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-[13px] font-medium text-brand-700 ring-1 ring-brand-500/15 backdrop-blur-md">
-            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-500" />
-            Coere Forge for developers
-          </p>
-          <h1 className="mt-6 text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.045em] text-neutral-950 text-balance sm:text-6xl">
+          <h1 className="text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.045em] text-neutral-950 text-balance sm:text-6xl">
             Give your app&apos;s users memory from day one
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-neutral-600 text-pretty">
