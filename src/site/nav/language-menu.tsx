@@ -95,7 +95,7 @@ export function LanguageMenu({ current = languages[0] }: { current?: Language })
               initial={{ opacity: 0, y: -4, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.16 }}
-              className="fixed z-[60] w-48 origin-top-right rounded-2xl border border-neutral-200/80 bg-white p-1.5 shadow-[0_20px_50px_-20px_rgba(20,17,15,0.3)]"
+              className="fixed z-[60] w-48 origin-top-right rounded-2xl border border-white/10 bg-[#12111b]/95 p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_20px_50px_-20px_rgba(0,0,0,0.8)] backdrop-blur-xl"
             >
               {languages.map((language) => (
                 <a
@@ -109,10 +109,10 @@ export function LanguageMenu({ current = languages[0] }: { current?: Language })
                     if (language.code === current.code) event.preventDefault();
                     close();
                   }}
-                  className="flex items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-neutral-900 outline-none hover:bg-neutral-100 focus-visible:bg-neutral-100"
+                  className="flex items-center justify-between rounded-xl px-3 py-2.5 text-[14px] text-white/85 outline-none transition-colors hover:bg-white/[0.07] hover:text-white focus-visible:bg-white/10 focus-visible:text-white aria-checked:text-brand-400"
                 >
                   {language.label}
-                  {language.code === current.code ? <CheckIcon size={16} className="text-brand-500" /> : null}
+                  {language.code === current.code ? <CheckIcon size={16} className="text-brand-400" /> : null}
                 </a>
               ))}
             </motion.div>,
