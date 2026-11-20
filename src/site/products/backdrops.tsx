@@ -1,25 +1,23 @@
 "use client";
 
 import GradientASCII from "@/site/bits/GradientAscii";
-import Iridescence from "@/site/bits/Iridescence";
+import { DitherWave } from "@/site/art/dither-wave";
 
 /**
- * Coere Connect's backdrop: React Bits Iridescence with every setting at
- * the demo's own default, only its tint moved to Coere blue, so the folds
- * run from deep Coere blue to white. A soft white glow sits only behind the
- * words, so the copy reads without washing out the rest.
+ * Coere Connect's backdrop: Dither Wave full bleed behind the whole hero,
+ * its bands of square pixels in Coere blue and white on near black. A soft
+ * dark shade sits only behind the words, from the left on a laptop and
+ * from the top on a phone, which stacks them, so the copy reads while the
+ * bands stay bright round it.
  */
 export function ConnectBackdrop() {
   return (
-    <div className="absolute inset-0 bg-white">
-      <Iridescence color={CONNECT_TINT} />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_95%_55%_at_50%_42%,rgba(255,255,255,0.78),rgba(255,255,255,0.45)_60%,transparent_85%)] lg:bg-[radial-gradient(ellipse_42%_55%_at_22%_52%,rgba(255,255,255,0.8),rgba(255,255,255,0.45)_55%,transparent_82%)]" />
+    <div className="absolute inset-0 bg-[#0b0a12]">
+      <DitherWave />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,10,18,0.5),rgba(11,10,18,0.8)_20%,rgba(11,10,18,0.76)_68%,rgba(11,10,18,0.3)_86%,transparent)] lg:bg-[radial-gradient(ellipse_42%_56%_at_20%_52%,rgba(11,10,18,0.94),rgba(11,10,18,0.8)_45%,rgba(11,10,18,0.5)_65%,transparent_88%)]" />
     </div>
   );
 }
-
-/** The tint Iridescence multiplies over its colours: almost no red, so the folds run through deep and bright Coere blues with no pink or violet. */
-const CONNECT_TINT: [number, number, number] = [0.08, 0.34, 1];
 
 /**
  * Coere Forge's backdrop: React Bits GradientASCII as the demo draws it,

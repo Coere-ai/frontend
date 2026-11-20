@@ -33,7 +33,7 @@ export function CompareSection() {
       <Container>
         <div className="mx-auto max-w-3xl text-center">
           <h2 className={SECTION_TITLE}>The same chat, 97.7% fewer tokens</h2>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-white/65">
             Without Coere, you paste files and notes into every new chat. With Coere, you name the project and the right context goes in for you.
           </p>
         </div>
