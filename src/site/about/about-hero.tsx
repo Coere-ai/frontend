@@ -17,7 +17,7 @@ export function AboutHero({ line, story }: { line: string; story: string }) {
       <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-white" />
       <div className="mx-auto w-full max-w-[1440px] px-6 text-center md:px-10">
         <div aria-hidden="true" className="mx-auto aspect-square w-[min(72vw,380px)] md:w-[440px]">
-          <MetallicPaint imageSrc={MARK} scale={0.78} color="#e6eaff" density={0.9} softness={0.4} dispersion={0.15} distortion={0.05} speed={0.6} mouseTilt={0.6} />
+          <MetallicPaint imageSrc={MARK} scale={0.78} color="#e6eaff" density={0.9} softness={0.4} dispersion={0} distortion={0.05} speed={0.6} mouseTilt={0.6} />
         </div>
         <h1 className="mt-4 text-5xl font-semibold tracking-[-0.05em] text-neutral-950 md:mt-6 md:text-[5.5rem] md:leading-[0.98]">About us</h1>
         <p className="mx-auto mt-6 max-w-2xl text-2xl font-medium tracking-[-0.025em] text-neutral-800 text-balance md:text-[1.75rem] md:leading-snug">{line}</p>
