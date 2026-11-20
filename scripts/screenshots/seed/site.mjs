@@ -24,7 +24,7 @@ const AGENTS = [
   ["desktop", "Edge", "Windows", 5], ["desktop", "Chrome", "Linux", 4], ["mobile", "Safari", "iOS", 14], ["mobile", "Chrome", "Android", 8], ["tablet", "Safari", "iPadOS", 1],
 ];
 const BOTS = ["Googlebot", "bingbot", "GPTBot", "ClaudeBot", "PerplexityBot", "Applebot"];
-const HOME_SECTIONS = [["hero", "Hero", 0], ["demo", "Demo", 1], ["connect", "Coere Connect", 2], ["solutions", "Coere Solutions", 3], ["forge", "Coere Forge", 4], ["compare", "How Coere compares", 5]];
+const HOME_SECTIONS = [["hero", "Hero", 0], ["demo", "Demo", 1], ["connect", "Coere Connect", 2], ["solutions", "Coere Solutions", 3], ["forge", "Coere Forge", 4]];
 /** Each other page's sections in page order, so its most read section is recorded too. */
 const PAGE_SECTIONS = {
   "/products/connect": [["hero", "Hero", 0], ["use-cases", "Put your memory to work", 1], ["compare", "The same chat, fewer tokens", 2], ["features", "Everything in Coere Connect", 3]],

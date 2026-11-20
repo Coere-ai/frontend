@@ -12,8 +12,8 @@ const DARK = ["#7f8bfa", "#5267f7", "#c6cfff"];
 /**
  * One plan on a PixelCard. The pixels light up from the edges on hover,
  * and fade toward the middle, so the words stay readable over them. The
- * featured plan sits on near black with its pixels always on, so it stands
- * out from the two beside it. The card itself takes no focus; its button
+ * featured plan sits on near black, so it stands out from the two beside
+ * it, and its pixels light on hover like the others. The card itself takes no focus; its button
  * does, and lights the pixels too.
  */
 export function PlanCard({ plan }: { plan: Plan }) {
@@ -30,7 +30,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
       speed={featured ? 30 : 25}
       fade={0.85}
       opacity={featured ? 0.75 : 0.9}
-      trigger={featured ? "always" : "hover"}
+      trigger="hover"
       glowColor="#5267f7"
       radius={28}
       noFocus

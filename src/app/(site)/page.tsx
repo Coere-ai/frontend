@@ -5,7 +5,6 @@ import { homeFaqs } from "@/site/content/faqs";
 import { homeSeo } from "@/site/content/seo";
 import { BlogSection } from "@/site/home/blog-section";
 import { ClosingCta } from "@/site/home/closing-cta";
-import { CompareTable } from "@/site/home/compare-table";
 import { ConnectSection } from "@/site/home/connect-section";
 import { DemoSection } from "@/site/home/demo-section";
 import { ForgeSection } from "@/site/home/forge-section";
@@ -21,7 +20,7 @@ export const metadata: Metadata = pageMetadata({ ...homeSeo, path: "/" });
 /**
  * The home page: the hero with its three pictures, every AI Coere works
  * with, the full demo, what Coere solves, one part per product, each with
- * its own layout and a way to its page, how Coere compares, the plans,
+ * its own layout and a way to its page, the plans,
  * the questions people ask first, the newest posts and the last word.
  */
 export default function HomePage() {
@@ -36,7 +35,6 @@ export default function HomePage() {
       <ConnectSection />
       <SolutionsSection />
       <ForgeSection />
-      <CompareTable />
       <PricingSection />
       <FaqSection faqs={homeFaqs} title="What people ask about Coere" look="soft" />
       <BlogSection />

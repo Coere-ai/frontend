@@ -8,7 +8,6 @@ import { guideBySlug, portable } from "@/site/content/guides";
 import { contactHref, contactLabel } from "@/site/content/navigation";
 import { AnswerSection, RelatedSection, TodaySection, WorkflowSection } from "@/site/guides/guide-blocks";
 import { ClosingCta } from "@/site/home/closing-cta";
-import { CompareTable } from "@/site/home/compare-table";
 import { AiTiles } from "@/site/products/ai-tiles";
 import { guideGraph, JsonLd } from "@/site/seo/json-ld";
 import { FilmFrame } from "@/site/ui/film-frame";
@@ -50,7 +49,6 @@ export default function PortableAiMemoryPage() {
         background={backgrounds.ribbons}
         link={{ href: "/products/connect", label: "Explore Coere Connect" }}
       />
-      <CompareTable />
       <TodaySection title="What Coere supports today" items={portable.today} status="Coere is in pre-launch, and the waitlist is open. Here is what Coere Connect does now, as the films on this site show it." />
       <FaqSection faqs={portable.faqs} title="Portable AI memory, answered" />
       <RelatedSection

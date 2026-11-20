@@ -60,9 +60,9 @@ pictures: [the site](docs/screenshots/site/README.md),
       <sub>Each product has its part of the home page, Coere Connect first.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/home-compare.webp" alt="A table of Coere Connect against the memory ChatGPT, Claude, Gemini and OpenMemory keep" />
+      <img src="docs/screenshots/site/home-ais.webp" alt="Transfer memory across every AI: the AI logos moving past in a line that fades at both edges" />
       <br />
-      <sub>How Coere compares with the memory each AI keeps.</sub>
+      <sub>Every AI Coere works with, under the hero.</sub>
     </td>
   </tr>
   <tr>

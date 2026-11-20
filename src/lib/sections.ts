@@ -27,7 +27,6 @@ export const SECTIONS: readonly SectionMeta[] = [
   { id: "connect", label: "Coere Connect", blurb: "One memory across every AI." },
   { id: "solutions", label: "Coere Solutions", blurb: "One memory for the whole company." },
   { id: "forge", label: "Coere Forge", blurb: "Memory for the apps developers build." },
-  { id: "compare", label: "How Coere compares", blurb: "Coere against the memory each AI keeps." },
 ] as const;
 
 /**
