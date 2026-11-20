@@ -9,13 +9,14 @@ export const storySteps = [
 /**
  * The AIs in the diagram, with the logos already in /public, and the piece
  * of you each one happens to hold. `allowed` is how the last step shows
- * the person choosing who may read their memory.
+ * the person choosing who may read their memory. `mono` marks a logo drawn
+ * in one dark colour, which turns white on the dark page.
  */
 export const storyApps = [
-  { name: "ChatGPT", logo: "/openai.svg", piece: "Your code", allowed: true },
+  { name: "ChatGPT", logo: "/openai.svg", mono: true, piece: "Your code", allowed: true },
   { name: "Claude", logo: "/claude-color.svg", piece: "Your classes", allowed: true },
   { name: "Gemini", logo: "/gemini-color.svg", piece: "Your trip", allowed: true },
   { name: "Perplexity", logo: "/perplexity-color.svg", piece: "Your research", allowed: false },
   { name: "Copilot", logo: "/copilot-color.svg", piece: "Your work", allowed: true },
-  { name: "Grok", logo: "/grok.svg", piece: "Your taste", allowed: false },
+  { name: "Grok", logo: "/grok.svg", mono: true, piece: "Your taste", allowed: false },
 ];
