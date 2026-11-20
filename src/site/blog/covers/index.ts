@@ -1,4 +1,4 @@
-import { frame, type Motif } from "./frame";
+import { type Motif, sceneSvg } from "./frame";
 import { markMotif, ventureMotif, yearMotif } from "./motifs-company";
 import { CONNECT_LOGOS, connectMotif, forgeMotif, solutionsMotif } from "./motifs-product";
 
@@ -15,10 +15,11 @@ export function logosFor(kind: CoverKind): readonly string[] {
 }
 
 /**
- * One post's cover as an SVG document. `logos` maps a file name in /public
- * to its text; `year` is the year a "year" cover shows.
+ * One post's cover scene as an SVG document, before it goes through the
+ * wall's grid (pixelate.ts). `logos` maps a file name in /public to its
+ * text; `year` is the year a "year" cover shows.
  */
-export function coverSvg(kind: CoverKind, title: string, logos: Record<string, string> = {}, year = "26"): string {
+export function coverScene(kind: CoverKind, logos: Record<string, string> = {}, year = "26"): string {
   const motifs: Record<CoverKind, () => Motif> = {
     venture: ventureMotif,
     connect: () => connectMotif(logos),
@@ -27,5 +28,5 @@ export function coverSvg(kind: CoverKind, title: string, logos: Record<string, s
     year: () => yearMotif(year),
     mark: markMotif,
   };
-  return frame(motifs[kind](), title);
+  return sceneSvg(motifs[kind]());
 }

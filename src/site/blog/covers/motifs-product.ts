@@ -1,4 +1,4 @@
-import type { Motif } from "./frame";
+import { type Motif, snap } from "./frame";
 import { mark, markGradient, placeLogo, r1, seeded } from "./shapes";
 
 /**
@@ -18,7 +18,7 @@ const MARK_FILL = markGradient("m-mark", [[0, "#ffffff"], [0.45, "#c6cfff"], [1,
 export function connectMotif(logos: Record<string, string>): Motif {
   const placed = CONNECT_LOGOS.map((file, i) => {
     const angle = (i / CONNECT_LOGOS.length) * Math.PI * 2 - Math.PI / 2 + Math.PI / CONNECT_LOGOS.length;
-    return placeLogo(logos[file] ?? "", 800 + Math.cos(angle) * 560, 450 + Math.sin(angle) * 300, 128, `m-l${i}-`);
+    return placeLogo(logos[file] ?? "", 800 + Math.cos(angle) * 560, 450 + Math.sin(angle) * 300, 150, `m-l${i}-`);
   }).join("");
   return {
     defs: MARK_FILL,
@@ -78,10 +78,16 @@ const CODE: [number, number, string][] = [
   [0, 180, "#c86bff"],
 ];
 
-/** Code between two large braces, with a cursor at the end. */
+/** Code between two large braces, with a cursor at the end. Each line starts, ends and steps on whole cells of the wall. */
 export function forgeMotif(): Motif {
-  const bars = CODE.map(([indent, length, color], i) => `<rect x="${560 + indent * 70}" y="${222 + i * 82}" width="${length}" height="40" rx="20" fill="${color}" opacity="${color === "#ffffff" ? 0.9 : 0.8}"/>`).join("");
-  const cursor = `<rect x="${560 + 180 + 30}" y="${222 + 5 * 82 - 6}" width="40" height="56" rx="6" fill="#ffffff"/>`;
+  const line = (indent: number, i: number) => ({ x: snap(560 + indent * 70), y: snap(222 + i * 82) });
+  const height = snap(40);
+  const bars = CODE.map(([indent, length, color], i) => {
+    const { x, y } = line(indent, i);
+    return `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(snap(length))}" height="${r1(height)}" rx="${r1(height / 2)}" fill="${color}" opacity="${color === "#ffffff" ? 0.9 : 0.8}"/>`;
+  }).join("");
+  const last = line(0, CODE.length - 1);
+  const cursor = `<rect x="${r1(last.x + snap(CODE[CODE.length - 1][1] + 30))}" y="${r1(last.y - snap(8))}" width="${r1(snap(40))}" height="${r1(height + 2 * snap(8))}" fill="#ffffff"/>`;
   const braces = `<g fill="none" stroke="url(#m-brace)" stroke-width="46" stroke-linecap="round" stroke-linejoin="round">${brace(300, 450, 560, 150, false)}${brace(1150, 450, 560, 150, true)}</g>`;
   return {
     defs: `<linearGradient id="m-brace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#7f8bfa"/><stop offset="1" stop-color="#3f4ceb"/></linearGradient>`,

@@ -1,4 +1,4 @@
-import type { Motif } from "./frame";
+import { type Motif, SCENE_CELL, snap } from "./frame";
 import { mark, markGradient, r1 } from "./shapes";
 
 /**
@@ -14,12 +14,13 @@ const MARK_FILL = markGradient("m-mark", [[0, "#ffffff"], [0.45, "#c6cfff"], [1,
 export function ventureMotif(): Motif {
   const bars: string[] = [];
   const count = 12;
+  // Each bar starts, ends and rises on whole cells of the wall.
   for (let i = 0; i < count; i++) {
-    const x = 120 + i * 118;
+    const x = snap(120 + i * 118);
     // Leave the middle to the mark, so the bars frame it.
     if (x > 560 && x < 1000) continue;
-    const h = 90 + Math.pow(i / (count - 1), 1.6) * 430;
-    bars.push(`<rect x="${x}" y="${r1(900 - h)}" width="76" height="${r1(h)}" rx="8" fill="url(#m-bar)"/>`);
+    const h = snap(90 + Math.pow(i / (count - 1), 1.6) * 430);
+    bars.push(`<rect x="${r1(x)}" y="${r1(900 - h)}" width="${r1(snap(76))}" height="${r1(h)}" fill="url(#m-bar)"/>`);
   }
   return {
     defs: `${MARK_FILL}
@@ -41,22 +42,29 @@ const DIGITS: Record<string, string[]> = {
   "6": ["00110", "01000", "10000", "11110", "10001", "10001", "01110"],
 };
 
-/** Large LED digits for the year, standing on the rim of a rising sun. */
+/**
+ * Large LED digits for the year, standing on the rim of a rising sun. Each
+ * dot of the digits is a block of 6 by 6 wall cells with one dark cell
+ * between dots, so every block lights whole cells.
+ */
 export function yearMotif(year: string): Motif {
-  const px = 64;
-  const gap = px;
-  const width = year.length * 5 * px + (year.length - 1) * gap;
-  const left = 800 - width / 2;
-  const top = 110;
+  const dot = 7;
+  const lit = 6;
+  const cols = year.length * 5 * dot + (year.length - 1) * dot - (dot - lit);
+  const left = Math.round((1600 / SCENE_CELL - cols) / 2);
+  const top = 13;
   const blocks: string[] = [];
   [...year].forEach((digit, d) => {
     (DIGITS[digit] ?? DIGITS["2"]).forEach((row, y) => {
       [...row].forEach((on, x) => {
-        if (on === "1") blocks.push(`<rect x="${left + d * (5 * px + gap) + x * px + 4}" y="${top + y * px + 4}" width="${px - 8}" height="${px - 8}" rx="6"/>`);
+        if (on !== "1") return;
+        const cx = left + d * 6 * dot + x * dot;
+        const cy = top + y * dot;
+        blocks.push(`<rect x="${r1(cx * SCENE_CELL)}" y="${r1(cy * SCENE_CELL)}" width="${r1(lit * SCENE_CELL)}" height="${r1(lit * SCENE_CELL)}"/>`);
       });
     });
   });
-  const rings = [620, 700, 780, 860].map((r, i) => `<circle cx="800" cy="1290" r="${r}" fill="none" stroke="#7f8bfa" stroke-width="10" opacity="${0.5 - i * 0.1}"/>`).join("");
+  const rings = [620, 700, 780, 860].map((r, i) => `<circle cx="800" cy="1290" r="${r}" fill="none" stroke="#7f8bfa" stroke-width="16" opacity="${0.5 - i * 0.1}"/>`).join("");
   return {
     defs: `<linearGradient id="m-year" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#a3b0fd"/><stop offset="1" stop-color="#5267f7"/></linearGradient>
 <radialGradient id="m-sun" cx="0.5" cy="0.5" r="0.5"><stop offset="0.6" stop-color="#3f4ceb" stop-opacity="0.9"/><stop offset="0.92" stop-color="#c86bff" stop-opacity="0.75"/><stop offset="1" stop-color="#c86bff" stop-opacity="0"/></radialGradient>`,
