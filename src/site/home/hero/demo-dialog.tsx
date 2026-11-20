@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { backgrounds } from "@/site/content/backgrounds";
 import { films } from "@/site/content/films";
 import { FilmPlayer } from "@/site/ui/film-player";
-import { CloseIcon, PlayIcon } from "@/site/ui/icons/interface-icons";
+import GlassSurface from "@/site/bits/GlassSurface";
+import { CloseIcon } from "@/site/ui/icons/interface-icons";
 import { SizedPhoto } from "@/site/ui/sized-photo";
-import { SoftButton } from "@/site/ui/soft-button";
 
 /**
  * Watch demo: opens the home page's product film (the same one the demo
@@ -46,12 +46,33 @@ export function DemoDialog() {
 
   return (
     <>
-      <SoftButton tone="glass" size="lg" onClick={show} aria-haspopup="dialog">
-        <span className="grid h-6 w-6 place-items-center rounded-full bg-white text-neutral-950">
-          <PlayIcon size={12} className="translate-x-[1px]" />
+      {/* The navbar's own glass, tinted as it is over a dark hero, at the size and corners of Start for free. */}
+      <button
+        type="button"
+        onClick={show}
+        aria-haspopup="dialog"
+        className="group relative isolate inline-flex h-[52px] cursor-pointer items-center justify-center rounded-[14px] px-6 text-[16px] font-medium whitespace-nowrap text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+      >
+        <span aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          <GlassSurface
+            width="100%"
+            height="100%"
+            borderRadius={14}
+            backgroundOpacity={0.62}
+            saturation={1.5}
+            brightness={52}
+            opacity={0.9}
+            blur={10}
+            displace={0.5}
+            distortionScale={-80}
+            redOffset={0}
+            greenOffset={2}
+            blueOffset={4}
+            className="bg-[rgba(14,14,28,0.5)]! shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14),inset_0_1px_0_rgba(255,255,255,0.18),0_12px_32px_-14px_rgba(0,0,0,0.6)]! transition-[background-color] duration-300 group-hover:bg-[rgba(30,30,52,0.55)]!"
+          />
         </span>
         Watch demo
-      </SoftButton>
+      </button>
       <dialog
         ref={dialog}
         aria-label={films.v2.title}
