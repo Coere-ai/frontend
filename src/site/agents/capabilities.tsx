@@ -6,7 +6,7 @@ import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
 import { features, type Feature } from "@/site/content/features";
 import { films } from "@/site/content/films";
-import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "@/site/home/look";
+import { SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "@/site/home/look";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 
@@ -51,8 +51,7 @@ export function Capabilities() {
       <Container>
         <div className={`${SOFT_FIELD} px-5 py-14 sm:px-8 md:px-12 md:py-20`}>
           <div className="max-w-3xl">
-            <p className={EYEBROW}>Capabilities</p>
-            <h2 className={`mt-5 ${SECTION_TITLE}`}>Everything one worker can do</h2>
+            <h2 className={SECTION_TITLE}>Everything one worker can do</h2>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">Pick a capability to watch it run.</p>
           </div>
 

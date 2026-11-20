@@ -5,7 +5,7 @@ import { solves, type Side, type SideWords } from "@/site/content/solves";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 import { PillTabs, tabId } from "@/site/ui/pill-tabs";
-import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "./look";
+import { SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "./look";
 import { SceneRow } from "./solves/scene-row";
 import { Swap } from "./solves/swap";
 
@@ -32,8 +32,7 @@ export function SolvesSection() {
           With Coere's does.
         */}
         <div className="mx-auto max-w-3xl text-center">
-          <p className={EYEBROW}>{solves.eyebrow}</p>
-          <Swap block coere={coere} className="mt-5" today={<Intro words={today} narrow />} withCoere={<Intro words={withCoere} />} />
+          <Swap block coere={coere} today={<Intro words={today} narrow />} withCoere={<Intro words={withCoere} />} />
         </div>
 
         <PillTabs

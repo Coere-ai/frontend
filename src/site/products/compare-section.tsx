@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_CARD } from "@/site/home/look";
+import { SECTION_TITLE, SECTION_Y, SOFT_CARD } from "@/site/home/look";
 import { Container } from "@/site/ui/container";
 
 const PAGE = "/preview/live/compare/index.html";
@@ -32,8 +32,7 @@ export function CompareSection() {
     <section id="compare" className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <p className={EYEBROW}>Without Coere vs with Coere</p>
-          <h2 className={`mt-5 ${SECTION_TITLE}`}>The same chat, 97.7% fewer tokens</h2>
+          <h2 className={SECTION_TITLE}>The same chat, 97.7% fewer tokens</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">
             Without Coere, you paste files and notes into every new chat. With Coere, you name the project and the right context goes in for you.
           </p>

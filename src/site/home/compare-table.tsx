@@ -6,7 +6,7 @@ import { compareTables, type CompareTable as Table, type Mark } from "@/site/con
 import { Container } from "@/site/ui/container";
 import { CheckIcon, CloseIcon } from "@/site/ui/icons/interface-icons";
 import { PillTabs, tabId } from "@/site/ui/pill-tabs";
-import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_CARD } from "./look";
+import { SECTION_TITLE, SECTION_Y, SOFT_CARD } from "./look";
 
 /** A half filled circle, for "partly". */
 const Half = () => (
@@ -92,8 +92,7 @@ export function CompareTable({ id = "compare" }: { id?: string }) {
     <section id={id} className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <p className={EYEBROW}>How Coere compares</p>
-          <h2 className={`mt-5 ${SECTION_TITLE}`}>One memory that knows you everywhere</h2>
+          <h2 className={SECTION_TITLE}>One memory that knows you everywhere</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">Each AI remembers only what you told it. Coere knows you on day one, in every AI, and acts on it.</p>
         </div>
 

@@ -1,5 +1,5 @@
 import { plans } from "@/site/content/pricing";
-import { EYEBROW, SECTION_TITLE, SECTION_Y } from "@/site/home/look";
+import { SECTION_TITLE, SECTION_Y } from "@/site/home/look";
 import { Container } from "@/site/ui/container";
 import { PlanCard } from "./plan-card";
 
@@ -14,8 +14,7 @@ export function PricingSection({ bare = false, id = "pricing" }: { bare?: boolea
       <Container>
         {bare ? null : (
           <div className="mx-auto max-w-3xl text-center">
-            <p className={EYEBROW}>Pricing</p>
-            <h2 className={`mt-5 ${SECTION_TITLE}`}>A plan for you, your team or your app</h2>
+            <h2 className={SECTION_TITLE}>A plan for you, your team or your app</h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">Coere is free for one person. Teams and developers talk to us.</p>
           </div>
         )}

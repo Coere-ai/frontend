@@ -4,7 +4,7 @@ import { formatPostDate, posts } from "@/site/content/posts";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 import { Underlined } from "@/site/ui/underlined";
-import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_CARD } from "./look";
+import { SECTION_TITLE, SECTION_Y, SOFT_CARD } from "./look";
 
 /** The three newest posts, by date, whatever order the list is kept in. */
 const newest = [...posts].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
@@ -20,8 +20,7 @@ export function BlogSection() {
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className={EYEBROW}>From the blog</p>
-            <h2 id="blog-title" className={`mt-4 ${SECTION_TITLE}`}>
+            <h2 id="blog-title" className={SECTION_TITLE}>
               News from the team
             </h2>
           </div>

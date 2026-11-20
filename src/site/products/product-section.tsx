@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "@/site/home/look";
+import { SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "@/site/home/look";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 
@@ -10,7 +10,6 @@ import { Container } from "@/site/ui/container";
  */
 export function ProductSection({
   title,
-  eyebrow,
   line,
   link,
   children,
@@ -18,7 +17,6 @@ export function ProductSection({
   id,
 }: {
   title: string;
-  eyebrow?: string;
   line?: string;
   link?: { href: string; linkLabel: string };
   children: ReactNode;
@@ -28,7 +26,6 @@ export function ProductSection({
   const body = (
     <>
       <div className="mx-auto max-w-3xl text-center">
-        {eyebrow ? <p className={`mb-5 ${EYEBROW}`}>{eyebrow}</p> : null}
         <h2 className={SECTION_TITLE}>{title}</h2>
         {line ? <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{line}</p> : null}
         {link ? <ArrowLink href={link.href} className="mt-6 text-neutral-950">{link.linkLabel}</ArrowLink> : null}

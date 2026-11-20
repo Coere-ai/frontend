@@ -54,7 +54,6 @@ export function ConnectSection() {
     <section id="connect" className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <SectionIntro
-          eyebrow="Coere Connect"
           title="One memory across every AI"
           line="A Chrome extension that saves your chats from every AI, builds them into a memory you own, and brings it into each new chat."
           href="/products/connect"

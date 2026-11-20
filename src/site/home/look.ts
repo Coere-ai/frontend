@@ -14,8 +14,5 @@ export const SOFT_CARD =
 /** The pale field some parts sit on, a shade off white with the same radius. */
 export const SOFT_FIELD = "rounded-[28px] bg-[#f5f6fb] ring-1 ring-neutral-950/[0.04]";
 
-/** The small label over a part's title. */
-export const EYEBROW = "inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-[13px] font-medium text-brand-600 ring-1 ring-brand-100";
-
 /** A part's title, in the hero heading's heavy, tight weight but smaller. */
 export const SECTION_TITLE = "text-4xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.25rem] md:leading-[1.04]";

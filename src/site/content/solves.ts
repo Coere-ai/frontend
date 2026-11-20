@@ -22,7 +22,6 @@ export type SideWords = {
 };
 
 export const solves = {
-  eyebrow: "What Coere solves",
   switchLabel: "Show AI without or with Coere",
   sides: {
     today: {
