@@ -13,12 +13,11 @@ const RIM_MASK = {
 /**
  * The app in a hero, with a beam of Coere blue falling onto its top edge.
  * The beam's canvas sits behind the frame and reaches up past it, so the
- * beam lands in the middle of the frame at every width. Its light is kept
- * to about the frame's width: a wide spread and a strong spill send it
- * along the top edge and down round both top corners, a low flare keeps
- * the wisps close, and the canvas stops a little past the frame's sides.
- * A rim of light on the frame's top edge, bending down round its corners,
- * finishes the wash. On a phone the beam only reaches into the gap above
+ * beam lands in the middle of the frame at every width. The beam keeps
+ * its own full brightness; only its light along the top edge is faded out
+ * just past the frame's corners, so it does not fray out to the sides. A
+ * rim of light on the frame's top edge, bending down round its corners,
+ * makes the light curl in round the frame. On a phone the beam only reaches into the gap above
  * the frame, so it never runs through the words. The hero clips whatever
  * reaches past its top.
  */
@@ -32,8 +31,8 @@ export function LaserShowcase({ children, framed = true, tone = "light" }: { chi
     : "rounded-2xl";
   return (
     <div className="relative">
-      <div aria-hidden="true" className="pointer-events-none absolute -inset-x-[9%] -bottom-[24%] -top-20 z-20 [mask-image:linear-gradient(to_right,transparent,black_9%,black_91%,transparent),linear-gradient(to_bottom,transparent,black_18%,black_72%,transparent)] [mask-composite:intersect] lg:-top-[min(70vh,640px)]">
-        <LaserFlow surfaceRef={surface} beamPosition={0.5} color="#5267f7" theme={tone} intensity={dark ? 1.6 : 1.4} flare={1.0} spread={2.0} spill={1.5} fog={0.15} dust={1.1} mouseInteraction={false} />
+      <div aria-hidden="true" className="pointer-events-none absolute -inset-x-[34%] -bottom-[30%] -top-20 z-20 [mask-image:linear-gradient(to_right,transparent_14%,black_21%,black_79%,transparent_86%),linear-gradient(to_bottom,transparent,black_18%,black_70%,transparent)] [mask-composite:intersect] lg:-top-[min(70vh,640px)]">
+        <LaserFlow surfaceRef={surface} beamPosition={0.5} color="#5267f7" theme={tone} intensity={dark ? 1.6 : 1.4} fog={0.15} dust={1.1} mouseInteraction={false} />
       </div>
       <div ref={surface} className={`relative z-10 ${frame}`}>
         {children}
