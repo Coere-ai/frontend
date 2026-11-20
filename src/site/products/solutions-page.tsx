@@ -23,7 +23,7 @@ export function SolutionsPage() {
     <>
       <ProductHero copy={solutionsHero} backdrop={<SolutionsBackdrop />} tone="dark" laser app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
       <ProductSection id="how" title="How your team shares one memory" line="Built from the chats your team already has, sorted into the company and each client.">
-        <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.curl} />
+        <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.tangle} />
       </ProductSection>
       <section className={SECTION_Y}>
         <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">

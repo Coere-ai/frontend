@@ -50,7 +50,7 @@ export default function AiAgentMemoryPage() {
         line="A developer makes a token, adds Coere to their app's AI call and runs it, then points it at any AI. The film below plays it live."
         steps={agentMemory.steps}
         film={films.forgeDev}
-        background={backgrounds.light}
+        background={backgrounds.blocks}
         link={{ href: "/resources/authentication", label: "Tokens and scopes" }}
       />
       <section className="bg-neutral-50 py-28 md:py-32">

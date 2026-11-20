@@ -30,7 +30,7 @@ export function ConnectPage() {
       </ProductSection>
       <section className={SECTION_Y}>
         <Container>
-          <SlantCard heading="Why people choose Coere Connect" slides={connectSlides} background={backgrounds.flow} />
+          <SlantCard heading="Why people choose Coere Connect" slides={connectSlides} background={backgrounds.dune} />
         </Container>
       </section>
       <OtherProducts current="connect" />
