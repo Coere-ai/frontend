@@ -52,7 +52,7 @@ function stillBackground(p: AsciiTilesPalette): string {
  *
  * It shows a still CSS version on the server and until WebGL starts,
  * holds one frame under reduced motion, pauses off screen and in a hidden
- * tab, draws at a capped pixel ratio with larger cells on a phone, and
+ * tab, draws at a capped pixel ratio (lower on a phone), and
  * frees its context when it unmounts.
  */
 export function AsciiTiles({ palette = "coere", glyphs = DEFAULT_GLYPHS, cell = 7, tile, rotation = 21, tilt = 20, speed = 1, brightness = 1, className = "" }: AsciiTilesProps) {
@@ -73,7 +73,7 @@ export function AsciiTiles({ palette = "coere", glyphs = DEFAULT_GLYPHS, cell = 
       floor: 1,
       speed,
       stillTime: 24,
-      create(gl, phone) {
+      create(gl) {
         const atlas = buildGlyphAtlas(glyphs);
         const scene = link(gl, FULL_VERT, INK_FRAG);
         const glyph = link(gl, FULL_VERT, GLYPH_FRAG);
@@ -128,11 +128,11 @@ export function AsciiTiles({ palette = "coere", glyphs = DEFAULT_GLYPHS, cell = 
           draw(g, f) {
             const W = g.drawingBufferWidth;
             const H = g.drawingBufferHeight;
-            // A phone gets slightly larger cells, so the glyphs still read and there are fewer to draw.
-            const cellPx = Math.max(Math.round(Math.max(cell, 3) * (phone ? 1.15 : 1) * f.dpr), 3);
+            const cellPx = Math.max(Math.round(Math.max(cell, 3) * f.dpr), 3);
             const { cols, rows } = cellGrid(W, H, cellPx);
             sizeScene(cols, rows);
-            const tilePx = tile ?? Math.min(Math.max(Math.min(f.width, f.height * 1.7) * 0.185, 120), 260);
+            // A narrow screen keeps tiles large enough to show their bevels in glyphs.
+            const tilePx = tile ?? Math.min(Math.max(Math.min(f.width, f.height * 1.7) * 0.185, f.width < 640 ? 160 : 120), 260);
             // World width of a tile so that, near the middle of the screen, it spans tilePx.
             const tileWorld = (tilePx / f.height) / (FOCAL * Math.cos(pitch));
 
