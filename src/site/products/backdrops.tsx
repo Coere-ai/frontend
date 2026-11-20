@@ -20,17 +20,19 @@ export function ConnectBackdrop() {
 }
 
 /**
- * Coere Forge's backdrop: GradientASCII in white, Coere blue and near
- * black, on its rising shape, as a horizon along the foot of the hero.
- * The hero leaves room for it (`footRoom`), so the words stay on white.
+ * Coere Forge's backdrop: GradientASCII in near black, Coere blue and
+ * white, on its rising shape, so a horizon of glyphs glows up from the
+ * foot of the hero behind the code. A dark wash on the left keeps the
+ * words readable.
  */
 export function ForgeBackdrop() {
   return (
-    <div className="absolute inset-0 bg-white">
-      {/* A horizon along the foot of the hero, under the code and below the words, fading in from white. */}
-      <div className="absolute inset-x-0 bottom-0 h-[50%] [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_80%,transparent)]">
-        <GradientASCII colors={["#14110f", "#3f4ceb", "#5267f7", "#ffffff"]} shape="rise" lightMode scale={1.45} cellSize={14} flow={0.35} speed={0.7} grain={0.04} scrambleRadius={0.08} clickEffect="none" />
+    <div className="absolute inset-0 bg-[#14110f]">
+      {/* Wider than the hero and shifted right on wide screens, so the dome of glyphs rises under the code. */}
+      <div className="absolute inset-y-0 -right-[20%] -left-[20%] lg:-right-[25%] lg:left-[18%]">
+        <GradientASCII colors={["#14110f", "#3f4ceb", "#5267f7", "#ffffff"]} shape="rise" scale={0.5} cellSize={14} glyphOpacity={0.9} glow={0.35} flow={0.35} speed={0.7} grain={0.05} scrambleRadius={0.08} clickEffect="none" intro={false} />
       </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#14110f]/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-[#14110f]/80 lg:via-[#14110f]/30 lg:to-transparent" />
     </div>
   );
 }

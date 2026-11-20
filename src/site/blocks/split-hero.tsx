@@ -13,8 +13,7 @@ export type HeroLink = { href: string; label: string };
  * beam onto the app, for the heroes that show the dashboard. `framed` sets
  * the app in a white rounded frame; `contained` shows it as it is, for a
  * code window or cards that carry their own frame. `dark` is for a backdrop
- * on near black, with light words and buttons. `footRoom` leaves a band
- * free at the foot for a backdrop that rises from the bottom.
+ * on near black, with light words and buttons.
  */
 export function SplitHero({
   eyebrow,
@@ -28,7 +27,6 @@ export function SplitHero({
   backdrop,
   laser = false,
   tone = "light",
-  footRoom = false,
 }: {
   eyebrow?: string;
   title: string;
@@ -41,7 +39,6 @@ export function SplitHero({
   backdrop?: ReactNode;
   laser?: boolean;
   tone?: "light" | "dark";
-  footRoom?: boolean;
 }) {
   const dark = tone === "dark";
   const framed = appFit === "framed";
@@ -51,7 +48,7 @@ export function SplitHero({
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         {backdrop}
       </div>
-      <div className={`mx-auto grid min-h-[min(calc(100svh-73px),920px)] max-w-[1440px] items-center gap-14 px-6 pt-14 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:pt-20 ${footRoom ? "pb-44 lg:pb-52" : "pb-20 lg:pb-20"}`}>
+      <div className="mx-auto grid min-h-[min(calc(100svh-73px),920px)] max-w-[1440px] items-center gap-14 px-6 pt-14 pb-20 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:py-20">
         <div className="max-w-[640px]">
           {eyebrow ? (
             <p className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 backdrop-blur-md ${dark ? "bg-white/10 text-white ring-white/15" : "bg-white/70 text-brand-700 ring-brand-500/15"}`}>

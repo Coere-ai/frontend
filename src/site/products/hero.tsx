@@ -8,6 +8,6 @@ import type { HeroCopy } from "@/site/content/pages/types";
  * over the product's own backdrop. The main button is the waitlist unless
  * the page names its own. `laser` is for the heroes that show the dashboard.
  */
-export function ProductHero({ copy, backdrop, app, appFit, laser, tone, footRoom, primary, secondary }: { copy: HeroCopy; backdrop: ReactNode; app: ReactNode; appFit?: "framed" | "contained"; laser?: boolean; tone?: "light" | "dark"; footRoom?: boolean; primary?: HeroLink; secondary?: HeroLink }) {
-  return <SplitHero {...copy} primary={primary ?? { href: contactHref, label: contactLabel }} secondary={secondary} app={app} appFit={appFit} backdrop={backdrop} laser={laser} tone={tone} footRoom={footRoom} />;
+export function ProductHero({ copy, backdrop, app, appFit, laser, tone, primary, secondary }: { copy: HeroCopy; backdrop: ReactNode; app: ReactNode; appFit?: "framed" | "contained"; laser?: boolean; tone?: "light" | "dark"; primary?: HeroLink; secondary?: HeroLink }) {
+  return <SplitHero {...copy} primary={primary ?? { href: contactHref, label: contactLabel }} secondary={secondary} app={app} appFit={appFit} backdrop={backdrop} laser={laser} tone={tone} />;
 }
