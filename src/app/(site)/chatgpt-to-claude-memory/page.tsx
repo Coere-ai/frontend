@@ -11,6 +11,7 @@ import { ClosingCta } from "@/site/home/closing-cta";
 import { CompareSection } from "@/site/products/compare-section";
 import { guideGraph, JsonLd } from "@/site/seo/json-ld";
 import { FilmFrame } from "@/site/ui/film-frame";
+import { DarkPage } from "@/site/ui/page-theme";
 
 const guide = guideBySlug("chatgpt-to-claude-memory");
 const path = `/${guide.slug}`;
@@ -24,9 +25,10 @@ export const metadata: Metadata = pageMetadata({ ...guide.seo, path });
  */
 export default function ChatgptToClaudeMemoryPage() {
   return (
-    <>
+    <DarkPage>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Moving ChatGPT memory to Claude", "Importing AI chat history"], faqs: switching.faqs })} />
       <SplitHero
+        tone="dark"
         {...switching.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "How it works" }}
@@ -52,6 +54,6 @@ export default function ChatgptToClaudeMemoryPage() {
         ]}
       />
       <ClosingCta title="Start every chat from what you already said." />
-    </>
+    </DarkPage>
   );
 }

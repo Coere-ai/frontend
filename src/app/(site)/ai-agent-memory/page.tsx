@@ -14,6 +14,7 @@ import { ClosingCta } from "@/site/home/closing-cta";
 import { guideGraph, JsonLd } from "@/site/seo/json-ld";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
+import { DarkPage } from "@/site/ui/page-theme";
 
 const guide = guideBySlug("ai-agent-memory");
 const path = `/${guide.slug}`;
@@ -26,9 +27,10 @@ export const metadata: Metadata = pageMetadata({ ...guide.seo, path });
  */
 export default function AiAgentMemoryPage() {
   return (
-    <>
+    <DarkPage>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["AI agent memory", "Model Context Protocol", "Memory API"], faqs: agentMemory.faqs })} />
       <SplitHero
+        tone="dark"
         {...agentMemory.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "/resources/mcp", label: "Read the MCP docs" }}
@@ -40,7 +42,7 @@ export default function AiAgentMemoryPage() {
         paragraphs={agentMemory.answer.paragraphs}
         aside={
           <>
-            <p className="mb-6 text-[15px] font-medium text-neutral-500">What your agent can read</p>
+            <p className="mb-6 text-[15px] font-medium text-neutral-500 dark:text-white/60">What your agent can read</p>
             <CheckList items={agentMemory.answer.reads} />
           </>
         }
@@ -53,11 +55,11 @@ export default function AiAgentMemoryPage() {
         background={backgrounds.blocks}
         link={{ href: "/resources/authentication", label: "Tokens and scopes" }}
       />
-      <section className="bg-neutral-50 py-28 md:py-32">
+      <section className="bg-neutral-50 py-28 md:py-32 dark:bg-white/[0.02]">
         <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-20">
           <div>
-            <h2 className="text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">The context for a message, in a few lines</h2>
-            <p className="mt-5 text-lg leading-relaxed text-neutral-600">
+            <h2 className="text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance dark:text-white md:text-5xl md:leading-[1.05]">The context for a message, in a few lines</h2>
+            <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-white/65">
               context.forDraft answers with a block to put in front of your prompt and each memory with why it goes. With a chat id, the next message gets only what changed.
             </p>
             <ArrowLink href="/resources/sdks" className="mt-7 text-neutral-950">
@@ -77,6 +79,6 @@ export default function AiAgentMemoryPage() {
         ]}
       />
       <ClosingCta title="Your agent knows its user from day one." text="Talk to the founders about building on Coere Forge." />
-    </>
+    </DarkPage>
   );
 }

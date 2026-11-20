@@ -11,6 +11,7 @@ import { ClosingCta } from "@/site/home/closing-cta";
 import { AiTiles } from "@/site/products/ai-tiles";
 import { guideGraph, JsonLd } from "@/site/seo/json-ld";
 import { FilmFrame } from "@/site/ui/film-frame";
+import { DarkPage } from "@/site/ui/page-theme";
 
 const guide = guideBySlug("portable-ai-memory");
 const path = `/${guide.slug}`;
@@ -23,9 +24,10 @@ export const metadata: Metadata = pageMetadata({ ...guide.seo, path });
  */
 export default function PortableAiMemoryPage() {
   return (
-    <>
+    <DarkPage>
       <JsonLd data={guideGraph({ path, title: guide.seo.title, description: guide.seo.description, about: ["Portable AI memory", "AI memory layer"], faqs: portable.faqs })} />
       <SplitHero
+        tone="dark"
         {...portable.hero}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "How it works" }}
@@ -36,7 +38,7 @@ export default function PortableAiMemoryPage() {
         paragraphs={portable.answer.paragraphs}
         aside={
           <>
-            <p className="mb-8 text-[15px] font-medium text-neutral-500">One memory, fed by every AI you use</p>
+            <p className="mb-8 text-[15px] font-medium text-neutral-500 dark:text-white/60">One memory, fed by every AI you use</p>
             <AiTiles />
           </>
         }
@@ -59,6 +61,6 @@ export default function PortableAiMemoryPage() {
         ]}
       />
       <ClosingCta title="Your memory, across every AI." />
-    </>
+    </DarkPage>
   );
 }
