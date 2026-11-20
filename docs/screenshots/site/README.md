@@ -64,8 +64,8 @@ The whole page: [home.webp](home.webp).
 
 | | |
 |---|---|
-| <img src="blog.webp" alt="The blog: The latest news, launches, and insights, with Coere is now venture backed featured on top and four more posts as cards" /><br /><sub>The blog, the newest post featured</sub> | <img src="blog-post.webp" alt="The post Coere is now venture backed, with its cover, its words and Get Coere Connect" /><br /><sub>A post: Coere is now venture backed</sub> |
-| <img src="careers.webp" alt="Careers: Build the memory layer with us, the job board with its filters and an open role, and How we work" /><br /><sub>Careers, with the job board</sub> | <img src="phone-blog.webp" width="195" alt="The blog's first screen at phone width" /><br /><sub>The blog at 390 wide</sub> |
+| <img src="blog.webp" alt="The blog: The Coere blog on a dark band, with Coere is now venture backed featured beside its cover of the Coere mark lit on an LED wall, then four more posts as large cards with their own covers and category filters" /><br /><sub>The blog, the newest post featured on a dark band</sub> | <img src="blog-post.webp" alt="The post Coere is now venture backed: its title, dek and byline, a wide cover, the reading column with its contents on the left and share links on the right, Get Coere Connect, and Read next" /><br /><sub>A post: Coere is now venture backed</sub> |
+| <img src="careers.webp" alt="Careers: Build the memory layer with us, the job board with its filters and an open role, and How we work" /><br /><sub>Careers, with the job board</sub> | <img src="phone-blog.webp" width="195" alt="The blog's first screen at phone width: the title and the featured post on the dark band" /><br /><sub>The blog at 390 wide</sub> |
 | <img src="phone-about.webp" width="195" alt="The dark about page's first screen at phone width: the chrome Coere mark over About us" /><br /><sub>About at 390 wide</sub> | |
 
 ## Coming soon
