@@ -30,19 +30,24 @@ const WIDE_CENTER: Spot[] = [
   { x: -0.42, y: 0.0, z: -500, size: 130 },
 ];
 
-/** Bands above and below a hero's copy and app, with the Coere mark over the gap between them. */
+/**
+ * Round a hero whose copy fills the left half from top to foot and whose
+ * app sits on the right under a beam: most logos float above and below the
+ * app, clear of the beam's column, and the copy's side only gets a few far
+ * marks at the very edge.
+ */
 const WIDE_FRAME: Spot[] = [
-  { x: -0.06, y: -0.8, z: 150, size: 185 },
-  { x: -0.84, y: -0.78, z: 60, size: 170 },
+  { x: -0.2, y: -0.84, z: 150, size: 150 },
+  { x: 0.24, y: -0.84, z: -60, size: 140 },
   { x: 0.86, y: -0.8, z: 160, size: 175 },
-  { x: -0.5, y: -0.9, z: -200, size: 140 },
-  { x: 0.06, y: 0.84, z: 170, size: 175 },
-  { x: -0.88, y: 0.8, z: 80, size: 165 },
-  { x: -0.42, y: 0.88, z: -120, size: 150 },
-  { x: 0.26, y: -0.92, z: -320, size: 125 },
-  { x: 0.52, y: 0.9, z: -60, size: 160 },
-  { x: 0.92, y: 0.78, z: 110, size: 170 },
-  { x: -0.98, y: 0.02, z: -380, size: 130 },
+  { x: -0.97, y: -0.62, z: -200, size: 120 },
+  { x: 0.06, y: 0.86, z: 170, size: 165 },
+  { x: -0.96, y: 0.64, z: 60, size: 130 },
+  { x: 0.33, y: 0.9, z: -120, size: 140 },
+  { x: 0.68, y: -0.92, z: -320, size: 105 },
+  { x: 0.6, y: 0.88, z: -60, size: 160 },
+  { x: 0.94, y: 0.78, z: 110, size: 165 },
+  { x: -0.5, y: -0.96, z: -400, size: 100 },
 ];
 
 /** A phone held upright: fewer, smaller logos stacked around the copy. */
@@ -61,8 +66,8 @@ const TALL_CENTER: Spot[] = [
 /** Upright, with the copy on top and the app below: the logos keep to the corners, the edges and the foot. */
 const TALL_FRAME: Spot[] = [
   { x: 0.76, y: -0.9, z: 120, size: 96 },
-  { x: -0.92, y: 0.16, z: 40, size: 86 },
-  { x: 0.9, y: 0.1, z: 120, size: 92 },
+  { x: -0.86, y: 0.16, z: 40, size: 86 },
+  { x: 0.84, y: 0.1, z: 120, size: 92 },
   { x: -0.6, y: 0.93, z: -80, size: 84 },
   { x: 0.62, y: 0.94, z: 60, size: 88 },
   { x: 0.02, y: 0.97, z: -200, size: 72 },

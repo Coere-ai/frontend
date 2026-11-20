@@ -124,7 +124,8 @@ export function PixelMatrixLogos({ logos = DEFAULT_LOGOS, density = 1, palette =
     function frame(now: number) {
       raf = 0;
       if (disposed || !ready) return;
-      const dt = last ? Math.min((now - last) / 1000, 0.05) : 0;
+      // Capped so a long stall does not jump the drift, yet loose enough that a slow device still assembles in a few seconds.
+      const dt = last ? Math.min((now - last) / 1000, 0.25) : 0;
       last = now;
       if (!reduce) {
         state.time += dt;
