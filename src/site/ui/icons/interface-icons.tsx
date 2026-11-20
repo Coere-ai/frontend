@@ -77,13 +77,6 @@ export const SearchIcon = (p: IconProps) => (
   </Icon>
 );
 
-export const CheckCircleIcon = (p: IconProps) => (
-  <Icon {...p}>
-    <circle cx="12" cy="12" r="8.5" />
-    <path d="m8.5 12.2 2.3 2.3 4.7-4.8" />
-  </Icon>
-);
-
 export const PlayIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M8 5.5v13l10-6.5z" fill="currentColor" stroke="none" />

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import PixelCard from "@/site/bits/PixelCard";
 import type { Plan } from "@/site/content/pricing";
-import { CheckCircleIcon } from "@/site/ui/icons/interface-icons";
+import { CheckIcon } from "@/site/ui/icons/interface-icons";
 import { usePageTone } from "@/site/ui/page-theme";
 
 /** Coere blue pixels: pale to full on white, full to white on near black. */
@@ -48,7 +48,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
       <div className={`flex h-full flex-col p-8 md:p-9 ${featured ? "text-white lg:py-14" : dark ? "text-white" : "text-neutral-950"}`}>
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-[22px] font-semibold tracking-[-0.03em]">{plan.name}</h3>
-          <span className={`rounded-full px-3 py-1 text-[12px] font-medium ring-1 ${dark ? "bg-white/10 text-white ring-white/15" : "bg-brand-50 text-brand-700 ring-brand-100"}`}>{plan.kind}</span>
+          <span className={`text-[13px] font-medium ${dark ? "text-brand-300" : "text-brand-600"}`}>{plan.kind}</span>
         </div>
         <p className="mt-8 text-[44px] leading-none font-semibold tracking-[-0.045em]">{plan.price}</p>
         <p className={`mt-3 text-[14px] ${dark ? "text-white/65" : "text-neutral-500"}`}>{plan.priceNote}</p>
@@ -56,7 +56,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
         <ul className="mt-7 flex-1 space-y-3">
           {plan.features.map((feature) => (
             <li key={feature} className={`flex gap-3 text-[15px] leading-snug ${dark ? "text-white/90" : "text-neutral-700"}`}>
-              <CheckCircleIcon size={18} className={`mt-px shrink-0 ${dark ? "text-brand-300" : "text-brand-500"}`} />
+              <CheckIcon size={18} strokeWidth={2} className={`mt-px shrink-0 ${dark ? "text-brand-300" : "text-brand-500"}`} />
               {feature}
             </li>
           ))}
