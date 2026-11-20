@@ -1,8 +1,11 @@
 import { siteConfig } from "@/lib/site";
 
+/** One blade of the Coere mark on a 512 square; the mark is it and its copy turned half way round. */
+export const LOGO_BLADE = "M 42 460 L 88 190 L 220 58 L 332 170 L 168 334 Z";
+
 /** The Coere mark: one blade, mirrored through the center. Inherits currentColor. */
 export function LogoMark({ className }: { className?: string }) {
-  const blade = "M 42 460 L 88 190 L 220 58 L 332 170 L 168 334 Z";
+  const blade = LOGO_BLADE;
 
   return (
     <svg
