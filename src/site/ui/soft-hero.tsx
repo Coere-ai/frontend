@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "./container";
 
 /**
@@ -21,7 +22,7 @@ export function SoftHero({
 }) {
   const centered = align === "center" ? "mx-auto text-center" : "";
   return (
-    <section className="relative isolate overflow-hidden pt-16 pb-12 md:pt-24 md:pb-16">
+    <section className={`relative isolate overflow-hidden pt-[136px] pb-12 md:pt-[168px] md:pb-16 ${UNDER_NAV}`}>
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-10 bg-[radial-gradient(55%_70%_at_12%_0%,#e3e8ff_0%,rgba(238,241,255,0.6)_40%,rgba(255,255,255,0)_72%),radial-gradient(40%_60%_at_92%_10%,#eef0ff_0%,rgba(255,255,255,0)_70%)]"

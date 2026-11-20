@@ -4,11 +4,12 @@ import { formatPostDate, type Post } from "@/site/content/posts";
 import { ButtonLink } from "@/site/ui/button";
 import { Container } from "@/site/ui/container";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 
 /** A post in full: a bold title over a soft wash, a wide image, then a narrow reading column. */
 export function PostArticle({ post }: { post: Post }) {
   return (
-    <article className="relative isolate pt-14 pb-24 md:pt-20">
+    <article className={`relative isolate pt-[128px] pb-24 md:pt-[152px] ${UNDER_NAV}`}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[560px] bg-[radial-gradient(50%_80%_at_50%_0%,#e3e8ff_0%,rgba(238,241,255,0.55)_45%,rgba(255,255,255,0)_75%)]" />
       <Container>
         <div className="mx-auto max-w-3xl text-center">

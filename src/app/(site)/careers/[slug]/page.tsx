@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ApplicationForm } from "@/site/careers/application-form";
 import { RoleDetails } from "@/site/careers/role-details";
 import { roleBySlug, roles } from "@/site/content/roles";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "@/site/ui/container";
 
 export const dynamicParams = false;
@@ -22,7 +23,7 @@ export default async function RolePage({ params }: PageProps<"/careers/[slug]">)
   const role = roleBySlug((await params).slug);
   if (!role) notFound();
   return (
-    <section className="relative isolate pt-16 pb-28 md:pt-24">
+    <section className={`relative isolate pt-[136px] pb-28 md:pt-[168px] ${UNDER_NAV}`}>
       <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(55%_80%_at_12%_0%,#e3e8ff_0%,rgba(238,241,255,0.55)_45%,rgba(255,255,255,0)_75%)]" />
       <Container>
         <Link href="/careers" className="inline-flex rounded-full bg-white/80 px-3.5 py-1.5 text-[13px] font-semibold text-brand-700 ring-1 ring-brand-100 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">
