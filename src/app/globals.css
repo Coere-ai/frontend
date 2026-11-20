@@ -73,6 +73,17 @@ body {
   }
 }
 
+/* The home hero's floating cards: a slow rise and fall of a few pixels. */
+@keyframes coere-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

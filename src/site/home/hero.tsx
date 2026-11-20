@@ -1,66 +1,60 @@
 "use client";
 
 import { motion } from "motion/react";
-import Link from "next/link";
-import { buttonClass, CircleArrowLink } from "@/site/ui/button";
+import { startHref, startLabel } from "@/site/content/navigation";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "@/site/ui/container";
-import { ChromeMark } from "@/site/ui/icons/chrome-mark";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
+import { SoftLink } from "@/site/ui/soft-button";
+import { DemoDialog } from "./hero/demo-dialog";
+import { HeroBackdrop } from "./hero/hero-backdrop";
+import { HeroStack } from "./hero/hero-stack";
 
 const ease = [0.22, 1, 0.36, 1] as const;
-const words = ["Own", "your", "Memory"];
 
-/** The two ways further down the page, to the team and developer products. On a phone the short words keep them on one row. */
-const paths = [
-  { href: "#solutions", label: "Coere for Teams", short: "For Teams" },
-  { href: "#forge", label: "Coere for Developers", short: "For Developers" },
-];
+/** The owner's paragraph, as he wrote it. */
+const PARAGRAPH =
+  "Coere accelerates enterprise AI productivity by unifying context and memory across the AI tools employees already use. As enterprises increasingly rely on multiple browser-based AI assistants like ChatGPT, Claude, and Gemini, valuable knowledge becomes fragmented across platforms. Coere solves this by providing a secure, centralized memory layer that preserves and shares relevant context across AI conversations, eliminating repetitive work, improving collaboration, and making every AI interaction more effective.";
+
+/** Fades a piece of the hero up into place, each a beat after the last. */
+function Rise({ delay, className, children }: { delay: number; className?: string; children: React.ReactNode }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay, ease }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
 
 /**
- * The home page's opening: a very large, centered line, each word rising out
- * of a soft blur in turn, the reason under it, then the install button
- * with a way down to Coere for Teams and Coere for Developers.
+ * The home page's opening, laid out as Gamma's was: the heading, the
+ * paragraph and the two buttons on the left, and three stacked pictures of
+ * Coere on the right (Extract all, the dashboard, the memory graph). It runs
+ * up under the glass navbar over a calm field of slats in Coere's colours.
+ * On a phone the text comes first with the dashboard under it.
  */
 export function Hero() {
   return (
-    <section className="pt-20 pb-16 md:pt-28 md:pb-20">
-      <Container className="text-center">
-        <h1 className="text-[clamp(3.25rem,9vw,7.5rem)] leading-[0.9] font-medium tracking-[-0.055em] text-neutral-950">
-          {words.map((word, index) => (
-            <motion.span
-              key={word}
-              className="inline-block"
-              initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.9, delay: 0.1 + index * 0.12, ease }}
-            >
-              {word}
-              {index < words.length - 1 ? " " : null}
-            </motion.span>
-          ))}
-        </h1>
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.55, ease }}
-          className="mx-auto mt-8 max-w-2xl text-xl leading-relaxed text-neutral-600 text-balance md:text-[22px]"
-        >
-          Coere is a portable AI memory layer that you, your team and your app own. Your context follows you across ChatGPT, Claude, Gemini and more, so every AI knows you on day one.
-        </motion.p>
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7, ease }} className="mt-10 flex flex-col items-center gap-4">
-          <CircleArrowLink href="/install" size="lg" icon={<ChromeMark size={22} />}>
-            Install Coere
-          </CircleArrowLink>
-          <div className="flex flex-wrap justify-center gap-2.5 sm:gap-3">
-            {paths.map((path) => (
-              <Link key={path.href} href={path.href} className={buttonClass("secondary", "group")}>
-                <span className="sm:hidden">{path.short}</span>
-                <span className="hidden sm:inline">{path.label}</span>
-                <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            ))}
-          </div>
-        </motion.div>
+    <section className={`relative isolate overflow-hidden ${UNDER_NAV} pt-[120px] pb-16 md:pt-[136px] lg:pb-24`}>
+      <HeroBackdrop />
+      <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-10 xl:gap-16">
+        <div className="max-w-[600px]">
+          <Rise delay={0.05}>
+            <h1 className="text-[clamp(2.6rem,6.2vw,3.4rem)] leading-[1.02] font-bold tracking-[-0.045em] text-neutral-950 text-balance lg:text-[clamp(3.1rem,4.4vw,4.35rem)] lg:leading-[0.98]">
+              Accelerating Enterprise AI with Unified Context
+            </h1>
+          </Rise>
+          <Rise delay={0.18}>
+            <p className="mt-6 text-[16px] leading-[1.65] text-neutral-600 text-pretty md:text-[17px]">{PARAGRAPH}</p>
+          </Rise>
+          <Rise delay={0.3} className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <SoftLink href={startHref} size="lg" className="group">
+              {startLabel}
+              <ArrowRightIcon size={17} strokeWidth={2} className="transition-transform group-hover:translate-x-0.5" />
+            </SoftLink>
+            <DemoDialog />
+          </Rise>
+        </div>
+        <HeroStack />
       </Container>
     </section>
   );
