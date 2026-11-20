@@ -306,6 +306,12 @@ cells in once, as a wave, then stays still. The quiet pages (docs, guides,
 pricing and the account pages) are plain and calm: flat near black, with no
 artwork, gradient or tint behind a form, and no box or circle a part does
 not need.
+Across the site, labels and tags are plain text, never pill shaped
+capsules; ticks, step numbers and done icons stand bare, never inside a
+circle; items on one line are set apart by space, never a middle dot or a
+pipe; and the brand is the text logo alone (`BrandLockup`, or the outlines
+in `src/components/logo.tsx` where its font cannot load). Pills stay only
+for real controls: buttons, tabs and filters.
 The photos load through `SizedPhoto` instead of the image optimizer, which
 fetches without the visitor's pass and would be turned away by the gate.
 
