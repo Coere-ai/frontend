@@ -10,8 +10,6 @@ export type Background = { src: string; by: string };
 const at = (name: string, by: string): Background => ({ src: `/preview/images/backgrounds/${name}.webp`, by });
 
 export const backgrounds = {
-  /** Coere's own: wide blue dunes with a violet edge of light. */
-  dune: at("dune", "Coere"),
   /** Coere's own: glass ribbons looping over faceted blue. */
   ribbons: at("ribbons", "Coere"),
   /** Coere's own: a dense knot of glass bands, darker in the middle. */

@@ -34,7 +34,7 @@ export function AuthShell({ eyebrow, title, lede, children }: { eyebrow: string;
 function BrandPanel() {
   return (
     <div className="relative isolate overflow-hidden bg-brand-900 text-white">
-      <SizedPhoto src={backgrounds.dune.src} alt="" fill loading="eager" fetchPriority="high" sizes="(min-width: 1024px) 50vw, 100vw" className="-z-20 object-cover" />
+      <SizedPhoto src={backgrounds.prism.src} alt="" fill loading="eager" fetchPriority="high" sizes="(min-width: 1024px) 50vw, 100vw" className="-z-20 object-cover" />
       {/* Deepens the top and bottom, so the white words hold on the bright parts. */}
       <div className="absolute inset-0 -z-10 bg-linear-to-b from-brand-950/45 via-brand-950/5 to-brand-950/50" />
 

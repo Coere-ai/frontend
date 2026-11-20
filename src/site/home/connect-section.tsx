@@ -60,7 +60,7 @@ export function ConnectSection() {
           linkLabel="Explore Coere Connect"
         />
         <div className={`mt-14 p-3 sm:p-5 md:mt-16 md:p-8 lg:p-10 ${SOFT_FIELD}`}>
-          <AccordionShowcase items={items} background={backgrounds.dune} />
+          <AccordionShowcase items={items} background={backgrounds.tangle} />
         </div>
       </Container>
     </section>
