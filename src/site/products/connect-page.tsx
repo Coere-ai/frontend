@@ -9,6 +9,7 @@ import { ClosingCta } from "@/site/home/closing-cta";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { CompareSection } from "./compare-section";
+import { ConnectBackdrop } from "./backdrops";
 import { asGrid, asUseCases } from "./film-cases";
 import { ProductHero } from "./hero";
 import { OtherProducts } from "./other-products";
@@ -18,7 +19,7 @@ import { ProductSection } from "./product-section";
 export function ConnectPage() {
   return (
     <>
-      <ProductHero copy={connectHero} background={backgrounds.tangle} app={<FilmFrame film={films.v2} preview />} secondary={{ href: "#use-cases", label: "See what it does" }} />
+      <ProductHero copy={connectHero} backdrop={<ConnectBackdrop />} laser app={<FilmFrame film={films.v2} preview />} secondary={{ href: "#use-cases", label: "See what it does" }} />
       <ProductSection id="use-cases" title="Put your memory to work" line="Bring every chat in, build one memory from them, and let Cori act on it." link={{ href: "/portable-ai-memory", linkLabel: "What portable AI memory means" }} tint>
         <UseCaseTabs cases={asUseCases(connectCases)} />
       </ProductSection>

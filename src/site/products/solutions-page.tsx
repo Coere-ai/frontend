@@ -14,12 +14,13 @@ import { asGrid, asShowcase } from "./film-cases";
 import { ProductHero } from "./hero";
 import { OtherProducts } from "./other-products";
 import { ProductSection } from "./product-section";
+import { SolutionsBackdrop } from "./solutions-backdrop";
 
 /** Coere Solutions: how a team shares one memory, the AIs it works with, and everything it does. */
 export function SolutionsPage() {
   return (
     <>
-      <ProductHero copy={solutionsHero} background={backgrounds.glass} app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
+      <ProductHero copy={solutionsHero} backdrop={<SolutionsBackdrop />} tone="dark" laser app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
       <ProductSection id="how" title="How your team shares one memory" line="Built from the chats your team already has, sorted into the company and each client.">
         <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.curl} />
       </ProductSection>

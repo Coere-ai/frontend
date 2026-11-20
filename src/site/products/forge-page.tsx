@@ -7,6 +7,7 @@ import { forgeGrid, forgeHero } from "@/site/content/pages/forge";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
+import { ForgeBackdrop } from "./backdrops";
 import { asGrid } from "./film-cases";
 import { films } from "@/site/content/films";
 import { FilmFrame } from "@/site/ui/film-frame";
@@ -18,7 +19,7 @@ import { ProductSection } from "./product-section";
 export function ForgePage() {
   return (
     <>
-      <ProductHero copy={forgeHero} background={backgrounds.ribbons} app={<CodeTabs samples={contextSamples} />} appFit="contained" secondary={{ href: "/resources", label: "Read the docs" }} />
+      <ProductHero copy={forgeHero} backdrop={<ForgeBackdrop />} footRoom app={<CodeTabs samples={contextSamples} />} appFit="contained" secondary={{ href: "/resources", label: "Read the docs" }} />
       <section className="py-28 md:py-32">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
