@@ -8,14 +8,30 @@ import { LaserShowcase } from "./laser-showcase";
 export type HeroLink = { href: string; label: string };
 
 /**
+ * The opt in intro, timed as the home hero's: the heading, the line, the
+ * buttons and the checks rise out of a soft blur a beat apart, then the
+ * app rises in as the home tiles do. Plain CSS, so it plays from the first
+ * paint; `backwards` holds the start through each delay and leaves no
+ * filter behind once done, and under reduced motion nothing moves.
+ */
+const INTRO = {
+  title: "motion-safe:animate-[coere-rise_0.8s_cubic-bezier(0.22,1,0.36,1)_50ms_backwards]",
+  line: "motion-safe:animate-[coere-rise_0.8s_cubic-bezier(0.22,1,0.36,1)_180ms_backwards]",
+  buttons: "motion-safe:animate-[coere-rise_0.8s_cubic-bezier(0.22,1,0.36,1)_300ms_backwards]",
+  checks: "motion-safe:animate-[coere-rise_0.8s_cubic-bezier(0.22,1,0.36,1)_420ms_backwards]",
+  app: "motion-safe:animate-[coere-tile-in_1.1s_cubic-bezier(0.22,1,0.36,1)_520ms_backwards]",
+};
+
+/**
  * A page's opening, in the light and airy style the redesign set: a big
  * bold heading, one line and the buttons on the left, the product on the
  * right, over a backdrop that fills the section. `laser` drops LaserFlow's
  * beam onto the app, kept for the dark heroes (Solutions and Forge). `framed` sets
  * the app in a white rounded frame; `contained` shows it as it is, for a
  * code window or cards that carry their own frame. `dark` is for a backdrop
- * on near black, with light words and buttons. It runs up under the
- * floating glass navbar, so the glass bends the backdrop from the start.
+ * on near black, with light words and buttons. `intro` plays the home
+ * hero's entrance (see INTRO); other pages open still. It runs up under
+ * the floating glass navbar, so the glass bends the backdrop from the start.
  */
 export function SplitHero({
   title,
@@ -28,6 +44,7 @@ export function SplitHero({
   backdrop,
   laser = false,
   tone = "light",
+  intro = false,
 }: {
   title: string;
   line: string;
@@ -39,7 +56,9 @@ export function SplitHero({
   backdrop?: ReactNode;
   laser?: boolean;
   tone?: "light" | "dark";
+  intro?: boolean;
 }) {
+  const enter = (part: keyof typeof INTRO) => (intro ? ` ${INTRO[part]}` : "");
   const dark = tone === "dark";
   const framed = appFit === "framed";
   const plainFrame = framed ? (dark ? "overflow-hidden rounded-2xl bg-white ring-1 ring-white/15 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)]" : "overflow-hidden rounded-2xl bg-white shadow-[0_40px_100px_-40px_rgba(20,17,15,0.45),0_0_0_1px_rgba(20,17,15,0.06)]") : "";
@@ -52,16 +71,16 @@ export function SplitHero({
       </div>
       <div className="mx-auto grid min-h-[min(100svh,992px)] max-w-[1440px] items-center gap-14 px-6 pt-[128px] pb-20 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:pt-[152px] lg:pb-20">
         <div className="max-w-[640px]">
-          <h1 className="text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.045em] text-balance sm:text-6xl xl:text-[4.5rem]">{title}</h1>
-          <p className={`mt-6 max-w-xl text-lg leading-relaxed text-pretty md:text-[19px] ${dark ? "text-white/75" : "text-neutral-600"}`}>{line}</p>
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          <h1 className={`text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.045em] text-balance sm:text-6xl xl:text-[4.5rem]${enter("title")}`}>{title}</h1>
+          <p className={`mt-6 max-w-xl text-lg leading-relaxed text-pretty md:text-[19px] ${dark ? "text-white/75" : "text-neutral-600"}${enter("line")}`}>{line}</p>
+          <div className={`mt-9 flex flex-wrap items-center gap-3${enter("buttons")}`}>
             <HeroButton link={primary} kind="primary" dark={dark} />
             {secondary ? <HeroButton link={secondary} kind="secondary" dark={dark} /> : null}
           </div>
-          {checks?.length ? <CheckList items={checks} tone={dark ? "light" : "dark"} className="mt-10 max-w-xl" /> : null}
+          {checks?.length ? <CheckList items={checks} tone={dark ? "light" : "dark"} className={`mt-10 max-w-xl${enter("checks")}`} /> : null}
         </div>
         {/* The app keeps its own look on a dark page: it is product, not page. */}
-        <div data-theme="light" className={`min-w-0 ${laser ? "max-lg:pt-8" : ""}`}>{laser ? <LaserShowcase framed={framed} tone={tone}>{app}</LaserShowcase> : <div className={plainFrame}>{app}</div>}</div>
+        <div data-theme="light" className={`min-w-0 ${laser ? "max-lg:pt-8" : ""}${enter("app")}`}>{laser ? <LaserShowcase framed={framed} tone={tone}>{app}</LaserShowcase> : <div className={plainFrame}>{app}</div>}</div>
       </div>
     </section>
   );

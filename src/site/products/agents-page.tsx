@@ -20,6 +20,7 @@ export function AgentsPage() {
         copy={agentsHero}
         backdrop={<AgentsBackdrop />}
         tone="dark"
+        intro
         app={<AgentsReel />}
         secondary={{ href: "#capabilities", label: "See all features" }}
       />
