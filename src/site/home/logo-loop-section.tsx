@@ -23,7 +23,7 @@ const logos: LogoItem[] = agents.map((agent) => ({
  */
 export function LogoLoopSection() {
   return (
-    <section aria-labelledby="ais-title" className="pt-6 pb-20 md:pb-28">
+    <section id="ais" aria-labelledby="ais-title" className="scroll-mt-24 pt-6 pb-20 md:pb-28">
       <Container>
         <h2 id="ais-title" className="text-center text-[26px] font-semibold tracking-[-0.03em] text-neutral-950 text-balance md:text-[32px]">
           Transfer memory across every AI
