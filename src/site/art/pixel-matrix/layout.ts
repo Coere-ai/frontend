@@ -32,9 +32,9 @@ const WIDE_CENTER: Spot[] = [
 
 /** Bands above and below a hero's copy and app, with the Coere mark over the gap between them. */
 const WIDE_FRAME: Spot[] = [
-  { x: -0.06, y: -0.8, z: 150, size: 190 },
-  { x: -0.84, y: -0.78, z: 60, size: 175 },
-  { x: 0.86, y: -0.74, z: 160, size: 190 },
+  { x: -0.06, y: -0.8, z: 150, size: 185 },
+  { x: -0.84, y: -0.78, z: 60, size: 170 },
+  { x: 0.86, y: -0.8, z: 160, size: 175 },
   { x: -0.5, y: -0.9, z: -200, size: 140 },
   { x: 0.06, y: 0.84, z: 170, size: 175 },
   { x: -0.88, y: 0.8, z: 80, size: 165 },
@@ -58,17 +58,17 @@ const TALL_CENTER: Spot[] = [
   { x: 0.04, y: -0.9, z: -340, size: 86 },
 ];
 
-/** Upright, with the copy filling the middle: the logos keep to the sides and the ends. */
+/** Upright, with the copy on top and the app below: the logos keep to the corners, the edges and the foot. */
 const TALL_FRAME: Spot[] = [
-  { x: 0.62, y: -0.86, z: 120, size: 120 },
-  { x: -0.7, y: -0.9, z: 40, size: 100 },
-  { x: 0.84, y: -0.3, z: -120, size: 84 },
-  { x: -0.86, y: 0.2, z: -80, size: 88 },
-  { x: 0.82, y: 0.46, z: 60, size: 96 },
-  { x: -0.66, y: 0.9, z: 80, size: 104 },
-  { x: 0.4, y: 0.94, z: -200, size: 86 },
-  { x: -0.9, y: -0.4, z: -260, size: 80 },
-  { x: 0.0, y: -0.96, z: -300, size: 78 },
+  { x: 0.76, y: -0.9, z: 120, size: 96 },
+  { x: -0.92, y: 0.16, z: 40, size: 86 },
+  { x: 0.9, y: 0.1, z: 120, size: 92 },
+  { x: -0.6, y: 0.93, z: -80, size: 84 },
+  { x: 0.62, y: 0.94, z: 60, size: 88 },
+  { x: 0.02, y: 0.97, z: -200, size: 72 },
+  { x: -0.96, y: -0.5, z: -260, size: 72 },
+  { x: 0.97, y: -0.38, z: -300, size: 68 },
+  { x: -0.2, y: -0.97, z: -340, size: 64 },
 ];
 
 const SPOTS: Record<MatrixLayout, { wide: Spot[]; tall: Spot[] }> = {
