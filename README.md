@@ -224,7 +224,9 @@ src/site/memory/      the memory explorer the admin panel shows
 src/site/graph/       the memory graph, ported from coere-v2's graph2d
 src/site/bridge/      coere.hello, the one message the site sends the extension
 src/site/about/, blog/, careers/
-                      each page's own sections
+                      each page's own sections; About's lanyard faces are
+                      drawn in the browser from the founder data
+src/site/bits/        the React Bits parts the redesign uses
 src/site/ui/          shared pieces: container, buttons, icons, film frames,
                       slanted tiles, photos saved at several widths
 src/admin/            the admin panels; src/stats the analytics panel and charts
@@ -267,8 +269,10 @@ to, linked from the footer. Its words are in `src/site/content/privacy.ts`,
 each taken from `docs/accounts.md` and the code. When one of those facts
 changes, change the policy and its effective date with it.
 
-The blog and careers pages are hidden from the menus for now. They still
-answer at their addresses but are `noindex` and left out of the sitemap.
+The blog is in the Resources menu and the footer, and its index and real
+posts are in the sitemap. Its placeholder posts, and the careers pages,
+still answer at their addresses but are `noindex` and left out of the
+sitemap; careers is hidden from the menus for now.
 
 `/install` and `/try-teams` say Coere Connect and Coere for Teams are coming
 soon, with a countdown and an I'm interested button that takes an email.
@@ -305,8 +309,8 @@ source. Endpoint and schema tables come from `packages/api/openapi.json`, and
 every fact keeps a `<!-- src: path:line -->` comment, stripped when the page is
 drawn, so it can be checked again when the API changes.
 
-The blog posts and roles are placeholder content for now; each content file
-says so at the top. The industry stories illustrate what each product does;
+The roles and every blog post but the funding news are placeholder content
+for now; each content file says so at the top. The industry stories illustrate what each product does;
 they are not customers.
 
 ## Accounts
