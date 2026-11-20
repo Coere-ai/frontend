@@ -39,9 +39,9 @@ const serverHint = () => false;
 const NAV_LOOK =
   "inline-flex h-10 items-center justify-center rounded-[10px] px-3 text-[14px] font-medium whitespace-nowrap text-neutral-800 transition-colors hover:bg-neutral-950/[0.05] group-data-[tone=dark]/nav:text-white/85 group-data-[tone=dark]/nav:hover:bg-white/10 group-data-[tone=dark]/nav:hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
 
-/** The same, full width and taller, under Start for free in the phone menu. */
+/** The same, full width and taller, under Start for free in the phone menu: dark glass with a light line. */
 const PANEL_LOOK =
-  "inline-flex h-[52px] w-full items-center justify-center rounded-[14px] bg-white text-[16px] font-medium text-neutral-950 ring-1 ring-neutral-950/15 transition-colors hover:ring-neutral-950/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
+  "inline-flex h-[52px] w-full items-center justify-center rounded-[14px] bg-white/[0.06] text-[16px] font-medium text-white ring-1 ring-white/20 transition-colors hover:bg-white/10 hover:ring-white/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
 
 const LOOKS = { nav: NAV_LOOK, panel: PANEL_LOOK };
 

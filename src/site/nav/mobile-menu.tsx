@@ -35,7 +35,7 @@ const items: Record<NavTabId, Item[]> = {
 };
 
 /**
- * The menu below lg: a white card under the glass bar, filling the rest of
+ * The menu below lg: a dark glass card under the glass bar, filling the rest of
  * the screen. Each tab folds open to its links, then come Start for free,
  * Log in and the language. While it is open the page behind it doesn't
  * scroll.
@@ -57,29 +57,31 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
       {open ? (
         <motion.div
           id="mobile-menu"
+          // Marks the card dark for the language button inside it, whatever the bar's tone.
+          data-tone="dark"
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-x-3 top-[80px] bottom-3 overflow-y-auto rounded-[20px] border border-neutral-200/80 bg-white shadow-[0_30px_80px_-30px_rgba(20,17,15,0.35)] sm:inset-x-4 md:inset-x-6 lg:hidden"
+          className="group/nav fixed inset-x-3 top-[80px] bottom-3 overflow-y-auto rounded-[20px] border border-white/10 bg-[#12111b]/95 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-30px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:inset-x-4 md:inset-x-6 lg:hidden"
         >
           <nav aria-label="Mobile" className="px-5 pt-1 pb-8">
             {navTabs.map((tab) => (
-              <div key={tab.id} className="border-b border-neutral-100">
+              <div key={tab.id} className="border-b border-white/10">
                 <button
                   type="button"
                   aria-expanded={expanded === tab.id}
                   onClick={() => setExpanded(expanded === tab.id ? null : tab.id)}
-                  className="flex w-full items-center justify-between py-4 text-left text-lg text-neutral-950"
+                  className="flex w-full items-center justify-between py-4 text-left text-lg text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
                 >
                   {tab.label}
-                  <ChevronDownIcon size={18} className={`transition-transform ${expanded === tab.id ? "rotate-180" : ""}`} />
+                  <ChevronDownIcon size={18} className={`text-white/60 transition-transform ${expanded === tab.id ? "rotate-180" : ""}`} />
                 </button>
                 {expanded === tab.id ? (
                   <ul className="pb-4">
                     {items[tab.id].map((item) => (
                       <li key={item.href}>
-                        <Link href={item.href} onClick={onClose} className="block py-2 text-[15px] text-neutral-600">
+                        <Link href={item.href} onClick={onClose} className="block py-2 text-[15px] text-white/65 transition-colors hover:text-white">
                           {item.label}
                         </Link>
                       </li>
