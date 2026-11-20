@@ -9,8 +9,8 @@ import { PanelFor } from "./panels";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 /**
- * The white card that drops under the glass bar, the bar's width with the
- * same soft corners. It wipes open from the top, glides to each menu's
+ * The dark glass card that drops under the glass bar, the bar's width with
+ * the same soft corners. It wipes open from the top, glides to each menu's
  * height, and crossfades between menus. Its top padding is a clear bridge
  * from the tabs, so the pointer never falls into a gap. Following any link
  * inside closes it.
@@ -45,7 +45,8 @@ export function MegaPanel({
           onClick={closeOnLink}
           className="absolute inset-x-0 top-full hidden pt-2 lg:block"
         >
-          <div className="overflow-hidden rounded-[20px] border border-neutral-200/80 bg-white shadow-[0_30px_80px_-30px_rgba(20,17,15,0.3)]">
+          {/* --u-color turns the hover lines white; the header sits outside the dark page theme. */}
+          <div className="overflow-hidden rounded-[20px] border border-white/10 bg-[#12111b]/95 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-30px_rgba(0,0,0,0.8)] backdrop-blur-xl [--u-color:#fff]">
             <MeasuredHeight>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
@@ -67,7 +68,7 @@ export function MegaPanel({
   );
 }
 
-/** A light veil over the page while a menu is open; clicking it closes the menu. */
+/** A dim dark veil over the page while a menu is open; clicking it closes the menu. */
 export function MenuBackdrop({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   return (
     <AnimatePresence>
@@ -79,7 +80,7 @@ export function MenuBackdrop({ visible, onClose }: { visible: boolean; onClose: 
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           onClick={onClose}
-          className="fixed inset-0 -z-10 hidden bg-neutral-950/10 backdrop-blur-[2px] lg:block"
+          className="fixed inset-0 -z-10 hidden bg-[#0b0a12]/50 backdrop-blur-[2px] lg:block"
         />
       ) : null}
     </AnimatePresence>

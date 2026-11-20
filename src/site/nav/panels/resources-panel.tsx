@@ -40,15 +40,15 @@ export function ResourcesPanel() {
         </ul>
       </div>
 
-      <Link href="/resources#quickstart" className="group grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-6 rounded-2xl bg-neutral-50 p-4">
+      <Link href="/resources#quickstart" className="group grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-6 rounded-2xl bg-white/[0.04] p-4 ring-1 ring-white/10 transition-colors hover:bg-white/[0.07]">
         <div className="relative isolate overflow-hidden rounded-xl p-4">
           <SizedPhoto src={backgrounds.prism.src} alt="" fill sizes="400px" className="-z-10 object-cover" />
           <CodeWindow file="context.py" code={firstCall} language="python" />
         </div>
         <div>
-          <p className="text-[13px] font-medium text-neutral-500">Quickstart</p>
-          <p className="mt-1 text-xl leading-snug font-medium tracking-[-0.02em] text-neutral-950"><Underlined big>From a server to your first context</Underlined></p>
-          <p className="mt-2 text-[14px] leading-snug text-neutral-500">Run coere-server, make a token, and ask for the context of a draft in Python, TypeScript or curl.</p>
+          <p className="text-[13px] font-medium text-white/60">Quickstart</p>
+          <p className="mt-1 text-xl leading-snug font-medium tracking-[-0.02em] text-white"><Underlined big>From a server to your first context</Underlined></p>
+          <p className="mt-2 text-[14px] leading-snug text-white/60">Run coere-server, make a token, and ask for the context of a draft in Python, TypeScript or curl.</p>
         </div>
       </Link>
     </div>

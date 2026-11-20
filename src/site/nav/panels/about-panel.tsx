@@ -17,10 +17,10 @@ export function AboutPanel() {
         {items.map((item) => (
           <li key={item.title}>
             <Link href={item.href} className="group block py-2">
-              <span className="block text-[28px] font-medium tracking-[-0.03em] text-neutral-950">
+              <span className="block text-[28px] font-medium tracking-[-0.03em] text-white">
                 <Underlined big>{item.title}</Underlined>
               </span>
-              <span className="mt-1.5 block text-[15px] text-neutral-500">{item.summary}</span>
+              <span className="mt-1.5 block text-[15px] text-white/60">{item.summary}</span>
             </Link>
           </li>
         ))}

@@ -21,15 +21,15 @@ function TitleWithArrow({ title }: { title: string }) {
 
 /**
  * Blog menu: the title and a Read more link on the left, and the three newest
- * posts as image cards on a soft grey field to the right.
+ * posts as image cards to the right.
  */
 export function BlogPanel() {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,3fr)] gap-10">
       <div className="flex flex-col justify-between py-1">
         <div>
-          <p className="text-[28px] font-medium tracking-[-0.03em] text-neutral-950">Blog</p>
-          <p className="mt-2 text-[15px] text-neutral-500">The latest news, launches, and insights</p>
+          <p className="text-[28px] font-medium tracking-[-0.03em] text-white">Blog</p>
+          <p className="mt-2 text-[15px] text-white/60">The latest news, launches, and insights</p>
         </div>
         <PanelMore href="/blog">Read more</PanelMore>
       </div>
@@ -48,7 +48,7 @@ export function BlogPanel() {
                   className="aspect-[754/421] w-full object-cover"
                 />
               </div>
-              <p className="mt-4 text-[15px] leading-snug text-neutral-950">
+              <p className="mt-4 text-[15px] leading-snug text-white">
                 <Underlined><TitleWithArrow title={post.title} /></Underlined>
               </p>
             </Link>

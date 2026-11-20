@@ -3,9 +3,9 @@ import type { ReactNode } from "react";
 import { Underlined } from "@/site/ui/underlined";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 
-/** The small grey label that names a column in a menu. */
+/** The small quiet label that names a column in a menu. */
 export function PanelLabel({ children }: { children: ReactNode }) {
-  return <p className="text-[13px] font-medium text-neutral-500">{children}</p>;
+  return <p className="text-[13px] font-medium text-white/60">{children}</p>;
 }
 
 /** A menu row: a title and an optional line under it. Hover underlines the title. */
@@ -26,13 +26,13 @@ export function PanelLink({
       className="group flex items-start gap-3 py-2.5 focus-visible:outline-none"
     >
       {icon ? (
-        <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center text-neutral-950">
+        <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center text-white/85">
           {icon}
         </span>
       ) : null}
       <span>
-        <span className="block text-[15px] font-medium text-neutral-950"><Underlined>{title}</Underlined></span>
-        {summary ? <span className="mt-0.5 block text-[13px] leading-snug text-neutral-500">{summary}</span> : null}
+        <span className="block text-[15px] font-medium text-white"><Underlined>{title}</Underlined></span>
+        {summary ? <span className="mt-0.5 block text-[13px] leading-snug text-white/60">{summary}</span> : null}
       </span>
     </Link>
   );
@@ -43,7 +43,7 @@ export function PanelMore({ href, children }: { href: string; children: ReactNod
   return (
     <Link
       href={href}
-      className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-neutral-950"
+      className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-white"
     >
       {children}
       <ArrowRightIcon size={16} className="transition-transform group-hover:translate-x-0.5" />
