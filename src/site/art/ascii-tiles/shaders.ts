@@ -126,18 +126,18 @@ vec4 shade(vec2 frag) {
   float tileTone = hash(cellId + 3.1);
 
   // Tile tops: dark glass with drifting pools of light.
-  float pools = smoothstep(0.32, 0.9, fbm(q * 0.45 + vec2(t * 0.035, -t * 0.022))) * (0.55 + 0.45 * noise(q * 1.3 - t * 0.05));
+  float pools = smoothstep(0.34, 0.8, fbm(q * 0.32 + vec2(t * 0.03, -t * 0.02))) * (0.55 + 0.45 * noise(q * 1.3 - t * 0.05));
   float inner = smoothstep(BEVEL + GROOVE, BEVEL + GROOVE + 0.12, e);
   // Light falls across each tile from the side facing it, so every top has its own soft gradient.
   float across = 0.5 + 0.5 * dot(l * 2.0, normalize(light.xy));
-  float topLight = 0.14 + 0.08 * tileTone + 0.1 * across + pools * (0.62 + 0.25 * tileTone) * mix(0.6, 1.0, inner) + 0.15 * pow(max(dot(reflect(-v, n), light), 0.0), 6.0) + 0.4 * sweep;
+  float topLight = 0.14 + 0.08 * tileTone + 0.1 * across + pools * (0.7 + 0.25 * tileTone) * mix(0.6, 1.0, inner) + 0.15 * pow(max(dot(reflect(-v, n), light), 0.0), 6.0) + 0.4 * sweep;
   vec3 top = mix(uShade, uLit, clamp(topLight, 0.0, 1.0)) * (0.3 + 0.75 * topLight);
 
   // Bevels: an iridescent film.
   float along = (alongX ? l.y * sign(l.x) : -l.x * sign(l.y));
   float hue = 1.6 * dot(n, v) + 1.1 * along + 0.55 * fbm(q * 1.7 + t * 0.05) + 0.22 * sin(along * 70.0 + x * 31.0 - t * 0.6) + 0.12 * hash(frag) + t * 0.035 + tileTone * 0.3;
   float glow = 0.32 + 1.1 * pow(facing, 2.0) + 0.35 * fres + 0.5 * sweep + 0.2 * pools;
-  vec3 film = iridescent(hue) * glow * 0.8;
+  vec3 film = iridescent(hue) * glow * 0.7;
   // The rim where bevel meets top catches a thin white line.
   float rim = exp(-pow((x - 1.0) * 9.0, 2.0)) * 0.35 * (0.4 + facing);
 
