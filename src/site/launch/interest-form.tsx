@@ -64,16 +64,16 @@ export function InterestForm({ product }: { product: LaunchProduct }) {
                   </button>
                 </div>
               </FormField>
-              <p className="mt-3 text-[13px] text-neutral-500">One email when it opens. Nothing else.</p>
+              <p className="mt-3 text-[13px] text-neutral-500 dark:text-white/60">One email when it opens. Nothing else.</p>
             </motion.form>
           ) : (
             <motion.div key="saved" {...swap} role="status" className="flex items-center gap-3 text-left">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-950 text-white">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-950 text-white dark:bg-brand-500">
                 <CheckIcon size={18} />
               </span>
-              <p className="text-[16px] leading-snug text-neutral-950">
+              <p className="text-[16px] leading-snug text-neutral-950 dark:text-white">
                 <span className="font-medium">Thanks, you&apos;re in.</span>{" "}
-                <span className="text-neutral-600">
+                <span className="text-neutral-600 dark:text-white/65">
                   We&apos;ll email {state.email} when {copy.name} opens.
                 </span>
               </p>

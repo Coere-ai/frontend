@@ -54,14 +54,14 @@ export function LaunchStage({ product, setting, children, here: after }: { produ
   return (
     <MotionConfig reducedMotion="user">
       <div className="text-center">
-        <h1 className="mx-auto max-w-4xl text-[2.125rem] leading-[1.08] font-semibold tracking-[-0.045em] text-neutral-950 text-balance sm:text-5xl md:text-[4.25rem] md:leading-[1.02]">
+        <h1 className="mx-auto max-w-4xl text-[2.125rem] leading-[1.08] font-semibold tracking-[-0.045em] text-neutral-950 text-balance dark:text-white sm:text-5xl md:text-[4.25rem] md:leading-[1.02]">
           <Title text={here ? copy.here : copy.title} markBefore={copy.markBefore} />
         </h1>
-        <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-neutral-600 text-pretty">{here ? copy.hereLine : copy.line}</p>
+        <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-neutral-600 text-pretty dark:text-white/65">{here ? copy.hereLine : copy.line}</p>
         {setting.show && !here ? (
-          <div className="mt-14 text-neutral-950 md:mt-16">
+          <div className="mt-14 text-neutral-950 md:mt-16 dark:text-white">
             <Countdown left={left} />
-            <p className="mx-auto mt-5 min-h-[1.5em] max-w-md text-[14px] text-neutral-500 text-balance md:text-[15px]">
+            <p className="mx-auto mt-5 min-h-[1.5em] max-w-md text-[14px] text-neutral-500 text-balance md:text-[15px] dark:text-white/60">
               {now === null ? null : <>Opens <time dateTime={setting.at}>{localMoment(target, now)}</time></>}
             </p>
           </div>

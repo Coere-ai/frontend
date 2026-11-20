@@ -18,12 +18,12 @@ export function WaitlistForm() {
 
   if (state.joined) {
     return (
-      <div role="status" className="rounded-3xl bg-neutral-50 p-10 text-center">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-neutral-950 text-white">
+      <div role="status" className="rounded-3xl bg-neutral-50 p-10 text-center dark:bg-white/[0.045] dark:ring-1 dark:ring-white/10">
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-neutral-950 text-white dark:bg-brand-500">
           <CheckIcon size={22} />
         </span>
-        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950">You&apos;re on the list.</p>
-        <p className="mx-auto mt-2 max-w-sm text-[15px] text-neutral-500">
+        <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">You&apos;re on the list.</p>
+        <p className="mx-auto mt-2 max-w-sm text-[15px] text-neutral-500 dark:text-white/65">
           We&apos;ll email {state.email} when Coere Forge opens. Your 1,000 free credits will be waiting.
         </p>
       </div>
@@ -31,7 +31,7 @@ export function WaitlistForm() {
   }
 
   return (
-    <form action={action} noValidate className="space-y-5 rounded-3xl border border-neutral-200 p-7 md:p-9">
+    <form action={action} noValidate className="space-y-5 rounded-3xl border border-neutral-200 p-7 md:p-9 dark:border-white/10 dark:bg-white/[0.045]">
       <FormField id="email" label="Work email" error={state.error ?? undefined}>
         <input
           id="email"
@@ -50,8 +50,8 @@ export function WaitlistForm() {
       <button type="submit" disabled={pending} className={buttonClass("primary", "w-full disabled:opacity-60")}>
         {pending ? "Joining" : "Join the waitlist"}
       </button>
-      <p className="flex items-center justify-center gap-2 text-[14px] text-neutral-600">
-        <CheckIcon size={16} className="shrink-0 text-brand-500" />
+      <p className="flex items-center justify-center gap-2 text-[14px] text-neutral-600 dark:text-white/70">
+        <CheckIcon size={16} className="shrink-0 text-brand-500 dark:text-brand-300" />
         Join now and get 1,000 free credits at launch.
       </p>
     </form>
