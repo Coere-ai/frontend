@@ -1,4 +1,6 @@
-import { COERE_LIQUID_PALETTE, LiquidLines } from "@/site/art/liquid-lines";
+import { LiquidLines } from "@/site/art/liquid-lines";
+// The palette comes from its own module: a value exported through the client component would reach this server file only as a reference.
+import { COERE_PALETTE as COERE_LIQUID_PALETTE } from "@/site/art/liquid-lines/palette";
 
 /** Liquid Lines on the dark heroes' own near black, so the hero meets the page with no seam. */
 const LINES = { ...COERE_LIQUID_PALETTE, background: "#0b0a12" };

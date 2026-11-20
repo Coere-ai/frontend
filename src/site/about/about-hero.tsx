@@ -1,7 +1,8 @@
 "use client";
 
 import { logoMarkSvg } from "@/components/logo";
-import { AsciiTiles, COERE_TILES_PALETTE } from "@/site/art/ascii-tiles";
+import { AsciiTiles } from "@/site/art/ascii-tiles";
+import { COERE_TILES_PALETTE } from "@/site/art/ascii-tiles/palette";
 import MetallicPaint from "@/site/bits/MetallicPaint";
 
 /** The mark as an image the paint can read its shape from. */

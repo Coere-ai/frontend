@@ -9,7 +9,6 @@ import { cellGrid, hexToRgb } from "./stage/math";
 import { FULL_VERT, fullTriangle, mountStage } from "./stage/stage";
 
 export type { AsciiTilesPalette } from "./ascii-tiles/palette";
-export { COERE_TILES_PALETTE, SPECTRUM_PALETTE } from "./ascii-tiles/palette";
 
 export type AsciiTilesProps = {
   /** "coere" (Coere blue, white and violet), "spectrum" (gray glass, rainbow bevels), or colors of your own. */

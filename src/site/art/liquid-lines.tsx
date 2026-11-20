@@ -7,7 +7,6 @@ import { LIQUID_FRAG } from "./liquid-lines/shader";
 import { FULL_VERT, fullTriangle, mountStage } from "./stage/stage";
 
 export type { LiquidLinesPalette } from "./liquid-lines/palette";
-export { COERE_PALETTE as COERE_LIQUID_PALETTE, PRISM_PALETTE } from "./liquid-lines/palette";
 
 export type LiquidLinesProps = {
   /** "coere" (white, Coere blue, a touch of cyan), "prism" (white with a blue and amber edge), or colors of your own. */
