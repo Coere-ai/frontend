@@ -46,8 +46,8 @@ export function DemoDialog() {
 
   return (
     <>
-      <SoftButton tone="outline" size="lg" onClick={show} aria-haspopup="dialog">
-        <span className="grid h-6 w-6 place-items-center rounded-full bg-neutral-950 text-white">
+      <SoftButton tone="glass" size="lg" onClick={show} aria-haspopup="dialog">
+        <span className="grid h-6 w-6 place-items-center rounded-full bg-white text-neutral-950">
           <PlayIcon size={12} className="translate-x-[1px]" />
         </span>
         Watch demo

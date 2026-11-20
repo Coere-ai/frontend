@@ -2,35 +2,22 @@
 
 import MicroSlats from "@/site/bits/MicroSlats";
 
+/** The hero's near black, which the page's overscroll colour matches too. */
+export const HERO_INK = "#05060d";
+
 /**
- * The hero's moving field: React Bits MicroSlats in Coere's colours, blue
- * slats on white with near black where the light catches. It is slowed and
- * softened so it stays calm. A soft white glow just behind the text keeps
- * the heading and paragraph readable, and a fade at the bottom lets the
- * hero run into the page. It starts drawn, with no intro, so the field is
- * there from the first frame.
+ * The hero's moving field: React Bits MicroSlats exactly as its demo sets
+ * it up (the swell preset, 10 by 25 px slats, a 3 px gap, the cursor
+ * stirring the water and the slats rolling in from the horizon on load),
+ * with only its colours changed: Coere blue slats with white glints on
+ * near black instead of violet on black. A soft dark shade behind the
+ * words keeps the heading and paragraph readable.
  */
 export function HeroBackdrop() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-      <MicroSlats
-        preset="swell"
-        color="#5267f7"
-        glintColor="#14110f"
-        backgroundColor="#ffffff"
-        slatWidth={5}
-        slatHeight={16}
-        gap={3}
-        speed={0.3}
-        contrast={1.05}
-        glint={1.1}
-        fog={0.35}
-        perspective={0.6}
-        interactive={false}
-        intro={false}
-      />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_38%_50%_at_21%_54%,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.72)_55%,rgba(255,255,255,0)_100%)] max-lg:bg-[radial-gradient(ellipse_80%_38%_at_50%_30%,rgba(255,255,255,0.88)_0%,rgba(255,255,255,0.7)_55%,rgba(255,255,255,0)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-white/0 to-white" />
+    <div aria-hidden="true" className="absolute inset-0 -z-10" style={{ background: HERO_INK }}>
+      <MicroSlats color="#5267f7" glintColor="#ffffff" backgroundColor={HERO_INK} />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(5,6,13,0.3),rgba(5,6,13,0.66)_22%,rgba(5,6,13,0.58)_62%,rgba(5,6,13,0.2))] lg:bg-[radial-gradient(ellipse_52%_72%_at_22%_56%,rgba(5,6,13,0.74),rgba(5,6,13,0.36)_55%,rgba(5,6,13,0)_85%)]" />
     </div>
   );
 }

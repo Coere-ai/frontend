@@ -3,15 +3,17 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 /**
  * The squarer buttons of the glass navbar and the home hero: solid Coere
- * blue for the main step, white with a line for the second. Their corners
- * match the bar's soft square rather than the site's pills.
+ * blue for the main step, white with a line for the second, and clear glass
+ * for the second on a dark hero. Their corners match the bar's soft square
+ * rather than the site's pills.
  */
-type Tone = "blue" | "outline";
+type Tone = "blue" | "outline" | "glass";
 type Size = "md" | "lg";
 
 const tones: Record<Tone, string> = {
   blue: "bg-brand-500 text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_8px_20px_-8px_rgba(82,103,247,0.7)] hover:bg-brand-600",
   outline: "bg-white/90 text-neutral-950 ring-1 ring-neutral-950/15 hover:bg-white hover:ring-neutral-950/40",
+  glass: "bg-white/[0.08] text-white ring-1 ring-white/20 backdrop-blur-md hover:bg-white/[0.14] hover:ring-white/35",
 };
 
 const sizes: Record<Size, string> = {
