@@ -14,7 +14,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 /** The owner's paragraph, as he wrote it. */
 const PARAGRAPH =
-  "Coere accelerates enterprise AI productivity by unifying context and memory across the AI tools employees already use. As enterprises increasingly rely on multiple browser-based AI assistants like ChatGPT, Claude, and Gemini, valuable knowledge becomes fragmented across platforms. Coere solves this by providing a secure, centralized memory layer that preserves and shares relevant context across AI conversations, eliminating repetitive work, improving collaboration, and making every AI interaction more effective.";
+  "Coere accelerates enterprise AI productivity by unifying context and memory across the AI tools employees already use. Coere eliminates repetitive work, improves collaboration, and makes every AI interaction more effective.";
 
 /** Fades a piece of the hero up into place, each a beat after the last. */
 function Rise({ delay, className, children }: { delay: number; className?: string; children: React.ReactNode }) {
@@ -42,7 +42,7 @@ export function Hero() {
         <div className="max-w-[600px] self-center pt-[120px] md:pt-[136px] lg:py-[128px]">
           <Rise delay={0.05}>
             <h1 className="text-[clamp(2.6rem,6.2vw,3.4rem)] leading-[1.02] font-bold tracking-[-0.045em] text-balance lg:text-[clamp(3.1rem,4.4vw,4.35rem)] lg:leading-[0.98]">
-              Accelerating Enterprise AI with Unified Context
+              <span className="coere-shimmer">Accelerating</span> Enterprise AI with Unified Context
             </h1>
           </Rise>
           <Rise delay={0.18}>
