@@ -35,10 +35,6 @@ Coere is in pre-launch. The developer waitlist is open: https://www.coere.ai/dev
 - Edison Law, Co-founder and CTO (UC Berkeley, EECS and Bioengineering)
 - [About Coere](https://www.coere.ai/about)
 
-## News
-
-- [Coere is now venture backed](https://www.coere.ai/blog/coere-is-venture-backed): Coere is backed by venture capital at a $2 million valuation, to ship Coere Connect and Coere for Teams, build a hosted API for Coere Forge and hire a founding team.
-
 ## Contact
 
 - Email: coereagent@gmail.com

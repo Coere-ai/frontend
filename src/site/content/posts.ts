@@ -2,7 +2,7 @@ import type { CoverKind } from "@/site/blog/covers";
 import { founders } from "@/lib/site";
 
 /**
- * Blog posts. The funding post is the owner's news. The others are
+ * Blog posts. The funding post is the owner's news, hidden for now. The others are
  * placeholder posts written to fill the blog while the real ones are
  * drafted, marked `placeholder` so search engines skip them.
  *
@@ -37,6 +37,8 @@ type PostInput = {
   cta?: { href: string; label: string };
   /** Written to fill the blog until a real post replaces it, so kept out of search. */
   placeholder?: boolean;
+  /** Kept in the source but off the site: not listed, not linked, and its page is not built. */
+  hidden?: boolean;
 };
 
 export type Post = PostInput & {
@@ -48,6 +50,8 @@ export type Post = PostInput & {
 const input: PostInput[] = [
   {
     slug: "coere-is-venture-backed",
+    // Hidden for now, at the owner's request; set to false to publish it.
+    hidden: true,
     title: "Coere is now venture backed",
     excerpt: "We raised venture funding at a $2 million valuation. Here is what the money is for, and what stays the same.",
     date: "2026-11-20",
@@ -150,7 +154,7 @@ export function readingMinutes(body: Block[]): number {
 }
 
 /** Newest first. The first is the blog's featured post, and the blog menu shows the first three. */
-export const posts: Post[] = input.map((post) => ({ ...post, image: `/blog/${post.slug}/cover.svg`, readMinutes: readingMinutes(post.body) }));
+export const posts: Post[] = input.filter((post) => !post.hidden).map((post) => ({ ...post, image: `/blog/${post.slug}/cover.svg`, readMinutes: readingMinutes(post.body) }));
 
 export function postBySlug(slug: string): Post | undefined {
   return posts.find((p) => p.slug === slug);

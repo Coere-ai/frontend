@@ -1,5 +1,3 @@
-import { LogoMark } from "@/components/logo";
-
 /**
  * The ink of public/coere-wordmark.svg sits inside a wide padded canvas
  * (1284 by 512, the letters from about 141,136 to 1144,372). This box crops
@@ -8,12 +6,11 @@ import { LogoMark } from "@/components/logo";
  */
 const CROP = { x: 133, y: 124, width: 1020, height: 260 };
 
-/** The Coere mark in blue beside the text logo, 26px tall. */
+/** The text logo alone, 26px tall: the owner wants no mark beside it. */
 export function BrandLockup({ height = 26 }: { height?: number }) {
   const width = Math.round((height * CROP.width) / CROP.height);
   return (
-    <span className="flex items-center gap-2">
-      <LogoMark className="h-6 w-6 shrink-0 text-brand-500" />
+    <span className="flex items-center">
       {/* The white copy shows when the navbar sits over a dark hero. */}
       <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="block shrink-0 group-data-[tone=dark]/nav:hidden">
         <image href="/coere-wordmark.svg" width="1284" height="512" />
