@@ -11,24 +11,19 @@ export const CONNECT_LOGOS = ["openai.svg", "claude-color.svg", "gemini-color.sv
 
 const MARK_FILL = markGradient("m-mark", [[0, "#ffffff"], [0.45, "#c6cfff"], [1, "#5267f7"]]);
 
-/** The mark in the middle, the AIs on a ring round it, a line from each to the mark. */
+/**
+ * The mark in the middle and the AIs floating round it, on an oval but
+ * with nothing drawn between them: no lines, no ring, no disc behind a logo.
+ */
 export function connectMotif(logos: Record<string, string>): Motif {
-  const placed: string[] = [];
-  const lines: string[] = [];
-  CONNECT_LOGOS.forEach((file, i) => {
+  const placed = CONNECT_LOGOS.map((file, i) => {
     const angle = (i / CONNECT_LOGOS.length) * Math.PI * 2 - Math.PI / 2 + Math.PI / CONNECT_LOGOS.length;
-    const x = 800 + Math.cos(angle) * 560;
-    const y = 450 + Math.sin(angle) * 300;
-    lines.push(`<line x1="800" y1="450" x2="${r1(x)}" y2="${r1(y)}"/>`);
-    placed.push(`<circle cx="${r1(x)}" cy="${r1(y)}" r="104" fill="#0b0f2a"/>`);
-    placed.push(placeLogo(logos[file] ?? "", x, y, 128, `m-l${i}-`));
-  });
-  const ring = `<ellipse cx="800" cy="450" rx="560" ry="300" fill="none" stroke="#5267f7" stroke-width="6" opacity="0.5"/>`;
+    return placeLogo(logos[file] ?? "", 800 + Math.cos(angle) * 560, 450 + Math.sin(angle) * 300, 128, `m-l${i}-`);
+  }).join("");
   return {
-    defs: `${MARK_FILL}
-<radialGradient id="m-line" gradientUnits="userSpaceOnUse" cx="800" cy="450" r="640"><stop offset="0" stop-color="#a3b0fd"/><stop offset="1" stop-color="#5267f7" stop-opacity="0.2"/></radialGradient>`,
-    lit: `${ring}<g stroke="url(#m-line)" stroke-width="6" opacity="0.7">${lines.join("")}</g><circle cx="800" cy="450" r="170" fill="#0b0f2a"/><circle cx="800" cy="450" r="170" fill="none" stroke="#7f8bfa" stroke-width="8"/>${mark(800, 450, 210, "url(#m-mark)")}${placed.join("")}`,
-    glow: `${ring}${mark(800, 450, 210, "#5267f7")}<circle cx="800" cy="450" r="170" fill="none" stroke="#5267f7" stroke-width="30"/>`,
+    defs: MARK_FILL,
+    lit: `${mark(800, 450, 230, "url(#m-mark)")}${placed}`,
+    glow: `${mark(800, 450, 230, "#5267f7")}${placed}`,
   };
 }
 
