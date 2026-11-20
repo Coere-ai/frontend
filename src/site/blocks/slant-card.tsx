@@ -82,12 +82,12 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
   return (
     <div>
       <div className="flex items-end justify-between gap-6">
-        <h2 className="max-w-xl text-3xl font-medium tracking-[-0.035em] text-neutral-950 text-balance md:text-[2.5rem] md:leading-[1.1]">{heading}</h2>
+        <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[2.75rem] md:leading-[1.06]">{heading}</h2>
         <div className="flex gap-2">
-          <button type="button" onClick={() => step(-1)} aria-label="Previous" className="grid h-11 w-11 place-items-center rounded-full text-neutral-950">
+          <button type="button" onClick={() => step(-1)} aria-label="Previous" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50">
             <ArrowRightIcon size={20} className="rotate-180" />
           </button>
-          <button type="button" onClick={() => step(1)} aria-label="Next" className="grid h-11 w-11 place-items-center rounded-full text-neutral-950">
+          <button type="button" onClick={() => step(1)} aria-label="Next" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50">
             <ArrowRightIcon size={20} />
           </button>
         </div>
@@ -100,7 +100,7 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
               <path d={PANEL} />
             </clipPath>
           </defs>
-          <path d={CARD} className="fill-white stroke-neutral-900" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <path d={CARD} className="fill-white stroke-neutral-200" strokeWidth="1" vectorEffect="non-scaling-stroke" />
         </svg>
         <div className="absolute top-0 left-0 h-full p-[3.2%] pr-[4%]" style={{ width: `${(SPLIT / W) * 100}%` }}>
           {words}
@@ -111,8 +111,8 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
       </div>
 
       <div className="mt-8 space-y-3 lg:hidden">
-        <div className="rounded-3xl border border-neutral-900 p-7">{words}</div>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">{panel}</div>
+        <div className="rounded-[28px] bg-white p-7 ring-1 ring-neutral-950/[0.06] shadow-[0_28px_70px_-34px_rgba(23,27,77,0.28)]">{words}</div>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">{panel}</div>
       </div>
     </div>
   );

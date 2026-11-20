@@ -6,6 +6,7 @@ import { ALL_FEATURES } from "@/site/content/features";
 import { films } from "@/site/content/films";
 import { connectCases, connectGrid, connectHero, connectSlides } from "@/site/content/pages/connect";
 import { ClosingCta } from "@/site/home/closing-cta";
+import { SECTION_Y } from "@/site/home/look";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { CompareSection } from "./compare-section";
@@ -27,7 +28,7 @@ export function ConnectPage() {
       <ProductSection title="Everything in Coere Connect" link={ALL_FEATURES}>
         <FeatureGrid items={asGrid(connectGrid)} />
       </ProductSection>
-      <section className="py-28 md:py-32">
+      <section className={SECTION_Y}>
         <Container>
           <SlantCard heading="Why people choose Coere Connect" slides={connectSlides} background={backgrounds.flow} />
         </Container>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { EYEBROW, SECTION_TITLE, SECTION_Y, SOFT_CARD } from "@/site/home/look";
 import { Container } from "@/site/ui/container";
 
 const PAGE = "/preview/live/compare/index.html";
@@ -28,16 +29,16 @@ export function CompareSection() {
   }, []);
 
   return (
-    <section id="compare" className="scroll-mt-24 py-28 md:py-32">
+    <section id="compare" className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[15px] font-medium text-brand-500">Without Coere vs with Coere</p>
-          <h2 className="mt-3 text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]">The same chat, 97.7% fewer tokens</h2>
+          <p className={EYEBROW}>Without Coere vs with Coere</p>
+          <h2 className={`mt-5 ${SECTION_TITLE}`}>The same chat, 97.7% fewer tokens</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">
             Without Coere, you paste files and notes into every new chat. With Coere, you name the project and the right context goes in for you.
           </p>
         </div>
-        <div ref={box} role="img" aria-label="Without Coere: 10.4k tokens and 4 minutes 12 seconds. With Coere: 240 tokens and 5 seconds." className="relative mt-16 aspect-video w-full overflow-hidden rounded-3xl bg-white shadow-[0_40px_100px_-40px_rgba(0,0,0,0.35)] ring-1 ring-neutral-200">
+        <div ref={box} role="img" aria-label="Without Coere: 10.4k tokens and 4 minutes 12 seconds. With Coere: 240 tokens and 5 seconds." className={`relative mt-14 aspect-video w-full overflow-hidden md:mt-16 ${SOFT_CARD}`}>
           {near ? (
             <iframe
               src={PAGE}

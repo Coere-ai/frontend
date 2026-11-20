@@ -18,5 +18,5 @@ export function asShowcase(cases: FilmCase[]): ShowcaseItem[] {
 
 /** Content grid items with their drawn icons. */
 export function asGrid(items: GridItem[]): GridFeature[] {
-  return items.map((item) => ({ ...item, icon: <FeatureIcon name={item.icon} size={28} /> }));
+  return items.map((item) => ({ ...item, icon: <FeatureIcon name={item.icon} size={22} /> }));
 }
