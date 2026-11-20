@@ -24,9 +24,9 @@ export function IndustryGrid() {
               <h3 className="text-2xl font-semibold tracking-[-0.03em]"><Underlined big>{industry.name}</Underlined></h3>
             </div>
             <p className="mt-3 text-[15px] leading-relaxed text-neutral-600 dark:text-white/65">{industry.summary}</p>
-            <ul className="mt-4 flex flex-wrap gap-2">
+            <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1">
               {industry.uses.map((use) => (
-                <li key={use} className="rounded-full bg-brand-50 px-3 py-1 text-[13px] text-brand-700 ring-1 ring-brand-100 dark:bg-brand-500/10 dark:text-brand-200 dark:ring-brand-400/25">
+                <li key={use} className="text-[13px] font-medium text-brand-600 dark:text-brand-300">
                   {use}
                 </li>
               ))}

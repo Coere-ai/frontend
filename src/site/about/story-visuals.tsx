@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Brand } from "@/site/ui/brand";
+import { BrandLockup } from "@/site/nav/brand-lockup";
 import { SlantTiles } from "@/site/ui/slant-tiles";
 import { storyApps } from "./story-data";
 
@@ -46,7 +46,7 @@ export function AppPieces() {
         content: (
           <span className="flex flex-col items-center gap-2">
             <Logo app={app} size={22} />
-            <span className="rounded-full bg-white/10 px-3 py-1 text-[13px] text-white ring-1 ring-white/15">{app.piece}</span>
+            <span className="text-[13px] text-white/75">{app.piece}</span>
           </span>
         ),
       }))}
@@ -58,11 +58,11 @@ export function AppPieces() {
 export function OneMemory() {
   return (
     <div className={GLASS_CARD}>
-      <Brand />
+      <BrandLockup white height={22} />
       <p className="mt-5 text-[13px] text-white/55">Your memory</p>
-      <ul className="mt-3 flex flex-wrap gap-2">
+      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
         {storyApps.map((app) => (
-          <li key={app.name} className="rounded-full bg-brand-500/20 px-3 py-1 text-[13px] text-brand-100 ring-1 ring-brand-400/25">
+          <li key={app.name} className="text-[14px] font-medium text-brand-200">
             {app.piece}
           </li>
         ))}
