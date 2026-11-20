@@ -35,9 +35,9 @@ pictures: [the site](docs/screenshots/site/README.md),
 ### The site
 
 <p align="center">
-  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The home page's first screen under the glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left, and on the right Extract all, the dashboard with tokens saved, efficiency, time saved and recent chats, and the memory graph, stacked over blue slats with a beam landing on the dashboard" />
+  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The dark home hero under the dark glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left over blue MicroSlats, and on the right three tall tiles: Coere saving chats cut off at the top, the dashboard with tokens saved, efficiency, time saved and recent chats, and the memory graph cut off at the foot" />
   <br />
-  <sub>The home page under the glass navbar: what Coere does, and Extract all, the dashboard and the memory graph stacked beside it. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
+  <sub>The home page: what Coere does, beside Coere saving chats, the dashboard and the memory graph. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
 </p>
 
 <table>

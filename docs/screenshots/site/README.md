@@ -8,9 +8,9 @@ Maya Collins, made up for these pictures.
 ## Home
 
 <p align="center">
-  <img src="home-hero.webp" width="100%" alt="The home page's first screen under the glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left, and Extract all, the dashboard and the memory graph stacked on the right over blue slats, with a beam landing on the dashboard" />
+  <img src="home-hero.webp" width="100%" alt="The dark home hero under the dark glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left over blue MicroSlats, and three tall tiles on the right: Coere saving chats cut off at the top, the dashboard with its rail, tokens saved, efficiency, time saved and recent chats, and the memory graph cut off at the foot" />
   <br />
-  <sub>The first screen under the glass navbar: what Coere does, the way in, and Extract all, the dashboard and the memory graph stacked beside it.</sub>
+  <sub>The first screen: what Coere does and the way in, beside Coere saving chats, the dashboard and the memory graph, running from the top of the hero to its foot.</sub>
 </p>
 
 | | |
@@ -27,8 +27,8 @@ The whole page: [home.webp](home.webp).
 
 | | |
 |---|---|
-| <img src="product-connect.webp" alt="The Coere Connect page from its hero down: Your memory, across every AI on blue and white iridescence, with a beam of Coere blue landing on the live app, then features by tab, the same chat with 97.7% fewer tokens, everything in Coere Connect, why people choose it and the other products" /><br /><sub>Coere Connect</sub> | <img src="product-solutions.webp" alt="The Coere Solutions page from its hero down: the hero on a dark LED wall of AI logos drawn in small square pixels round the dashboard, how a team shares one memory, the AIs it works with, everything in Coere Solutions and the other products" /><br /><sub>Coere Solutions</sub> |
-| <img src="product-forge.webp" alt="The Coere Forge page from its hero down: The memory API for your apps and agents on near black, with a dome of blue and white ASCII glyphs rising under the code, then the demo end to end, MCP, everything in Coere Forge and the other products" /><br /><sub>Coere Forge</sub> | <img src="product-agents.webp" alt="The Coere Agents page from its hero down: One worker, infinite possibilities on a soft blue backdrop beside the four agents on light glass, then the capabilities, the agents as soft cards and the other products" /><br /><sub>Coere Agents</sub> |
+| <img src="product-connect.webp" alt="The Coere Connect page from its hero down: Your memory, across every AI on Iridescence in Coere blue and white beside the live app, then features by tab, the same chat with 97.7% fewer tokens, everything in Coere Connect, why people choose it and the other products" /><br /><sub>Coere Connect</sub> | <img src="product-solutions.webp" alt="The Coere Solutions page from its hero down: the hero on a dark LED wall of AI logos drawn in small square pixels round the dashboard, with the beam washing over its top edge, how a team shares one memory, the AIs it works with, everything in Coere Solutions and the other products" /><br /><sub>Coere Solutions</sub> |
+| <img src="product-forge.webp" alt="The Coere Forge page from its hero down: The memory API for your apps and agents on a full field of blue and white ASCII glyphs over near black, with a beam of Coere blue landing on the code, then the demo end to end, MCP, everything in Coere Forge and the other products" /><br /><sub>Coere Forge</sub> | <img src="product-agents.webp" alt="The Coere Agents page from its hero down: One worker, infinite possibilities on near black beside the four agents on dark glass, then the capabilities, the agents as soft cards and the other products" /><br /><sub>Coere Agents</sub> |
 | <img src="phone-product-connect.webp" width="195" alt="The Coere Connect page's first screen at phone width, on its blue and white iridescence" /><br /><sub>Coere Connect at 390 wide</sub> | |
 
 ## Pricing
@@ -40,24 +40,24 @@ The whole page: [home.webp](home.webp).
 ## Industries
 
 <p align="center">
-  <img src="industries.webp" width="100%" alt="The industries page: Memory for every industry on a soft blue backdrop, who it is for as soft cards, then each industry with its photo" />
+  <img src="industries.webp" width="100%" alt="The industries page: Memory for every industry on white, who it is for as soft cards, then each industry with its photo" />
   <br />
   <sub>Every industry, each with the product it fits.</sub>
 </p>
 
 | | |
 |---|---|
-| <img src="industry-finance.webp" alt="The finance industry page's first screen: Coere for finance on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Finance</sub> | <img src="industry-technology.webp" alt="The technology industry page's first screen: Coere for technology on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Technology</sub> |
-| <img src="industry-commerce.webp" alt="The commerce industry page's first screen: Coere for commerce on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Commerce</sub> | <img src="industry-consumer.webp" alt="The consumer industry page's first screen: Coere for consumer on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Consumer</sub> |
-| <img src="industry-manufacturing.webp" alt="The manufacturing industry page's first screen: Coere for manufacturing on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Manufacturing</sub> | <img src="industry-energy.webp" alt="The energy industry page's first screen: Coere for energy on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Energy</sub> |
-| <img src="industry-education.webp" alt="The education industry page's first screen: Coere for education on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Education</sub> | <img src="industry-legal.webp" alt="The legal industry page's first screen: Coere for legal on a soft blue backdrop, with a beam of Coere blue landing on the app" /><br /><sub>Legal</sub> |
+| <img src="industry-finance.webp" alt="The finance industry page's first screen: Coere for finance on the field's own photo beside the app" /><br /><sub>Finance</sub> | <img src="industry-technology.webp" alt="The technology industry page's first screen: Coere for technology on the field's own photo beside the app" /><br /><sub>Technology</sub> |
+| <img src="industry-commerce.webp" alt="The commerce industry page's first screen: Coere for commerce on the field's own photo beside the app" /><br /><sub>Commerce</sub> | <img src="industry-consumer.webp" alt="The consumer industry page's first screen: Coere for consumer on the field's own photo beside the app" /><br /><sub>Consumer</sub> |
+| <img src="industry-manufacturing.webp" alt="The manufacturing industry page's first screen: Coere for manufacturing on the field's own photo beside the app" /><br /><sub>Manufacturing</sub> | <img src="industry-energy.webp" alt="The energy industry page's first screen: Coere for energy on the field's own photo beside the app" /><br /><sub>Energy</sub> |
+| <img src="industry-education.webp" alt="The education industry page's first screen: Coere for education on the field's own photo beside the app" /><br /><sub>Education</sub> | <img src="industry-legal.webp" alt="The legal industry page's first screen: Coere for legal on the field's own photo beside the app" /><br /><sub>Legal</sub> |
 
 ## Resources, about and guides
 
 | | |
 |---|---|
-| <img src="resources.webp" alt="The developer docs' first page under a band of soft blue, with the list of pages on the left" /><br /><sub>The developer docs</sub> | <img src="resources-endpoints.webp" alt="The docs' Endpoints page, with each route and its parameters" /><br /><sub>One docs page: Endpoints</sub> |
-| <img src="about.webp" alt="The dark about page down to its team: the Coere mark in liquid chrome in a deep blue light over About us, then four steps from AI is fragmented to the memory is yours on glass panels" /><br /><sub>About, down to where the team starts</sub> | <img src="portable-ai-memory.webp" alt="The Portable AI memory guide, opening on a soft blue backdrop with a beam landing on the app" /><br /><sub>A guide: Portable AI memory</sub> |
+| <img src="resources.webp" alt="The developer docs' first page on white, with the list of pages on the left" /><br /><sub>The developer docs</sub> | <img src="resources-endpoints.webp" alt="The docs' Endpoints page, with each route and its parameters" /><br /><sub>One docs page: Endpoints</sub> |
+| <img src="about.webp" alt="The dark about page down to its team: the Coere mark in liquid chrome in a deep blue light over About us, then four steps from AI is fragmented to the memory is yours on glass panels" /><br /><sub>About, down to where the team starts</sub> | <img src="portable-ai-memory.webp" alt="The Portable AI memory guide, opening on white beside the app" /><br /><sub>A guide: Portable AI memory</sub> |
 | <img src="privacy-top.webp" alt="The privacy policy: What Coere reads, keeps and sends, with the short version beside the list of its parts" /><br /><sub>The privacy policy, the short version first. <a href="privacy.webp">The whole policy</a></sub> | <img src="developer-waitlist.webp" alt="Give your app's users memory from day one on a soft blue backdrop, with a work email field, Join the waitlist and a TypeScript sample beside it" /><br /><sub>The developer waitlist</sub> |
 
 ## Blog and careers
