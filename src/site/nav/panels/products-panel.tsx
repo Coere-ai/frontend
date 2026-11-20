@@ -8,7 +8,7 @@ import { PanelLabel } from "./panel-parts";
 /**
  * Products menu: the four products left to right, large, then the features
  * as plain links, each opening that feature in Capabilities on the Agents
- * page, where it plays live.
+ * page, where it plays live, and Pricing under them.
  */
 export function ProductsPanel() {
   return (
@@ -38,6 +38,9 @@ export function ProductsPanel() {
             </li>
           ))}
         </ul>
+        <Link href="/pricing" className="group mt-5 block border-t border-neutral-950/10 pt-4 text-[15px] font-medium text-neutral-950">
+          <Underlined>Pricing</Underlined>
+        </Link>
       </div>
     </div>
   );

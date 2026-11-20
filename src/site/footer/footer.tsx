@@ -6,7 +6,7 @@ import { Brand } from "@/site/ui/brand";
 import { Container } from "@/site/ui/container";
 
 const columns = [
-  { title: "Products", links: products.map((p) => ({ href: `/products/${p.slug}`, label: p.name })) },
+  { title: "Products", links: [...products.map((p) => ({ href: `/products/${p.slug}`, label: p.name })), { href: "/pricing", label: "Pricing" }] },
   { title: "Guides", links: guides.map((g) => ({ href: `/${g.slug}`, label: g.name })) },
   {
     title: "Company",
