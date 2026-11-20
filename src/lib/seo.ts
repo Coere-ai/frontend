@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { siteConfig } from "./site";
 
 /**
@@ -44,3 +44,10 @@ export function pageMetadata({ title, description, path, keywords = [], absolute
 
 /** For pages kept on the site but hidden from its menus: reachable by link, never indexed. */
 export const hiddenPage: Metadata = { robots: { index: false, follow: true } };
+
+/**
+ * The browser's colours for the site's pages, all in the dark page theme:
+ * the near black for the address bar, and a dark canvas from the first
+ * paint, before the stylesheet arrives, so no page flashes white.
+ */
+export const darkViewport: Viewport = { themeColor: "#0b0a12", colorScheme: "dark" };

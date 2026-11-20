@@ -68,9 +68,11 @@ html:has(main > [data-nav-tone="dark"]:not(:not(script) ~ *)) {
 
 /*
  * A page in the dark theme is dark to its end: the body behind it, the
- * footer, and the bounce under the footer.
+ * footer, and the bounce under the footer. The browser's own parts (the
+ * scrollbar, a select's list, autofill) turn dark with it.
  */
 html:has(main > [data-theme="dark"]) {
+  color-scheme: dark;
   --background: #0b0a12;
   --overscroll-bottom: #0b0a12;
 }
