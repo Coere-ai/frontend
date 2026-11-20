@@ -3,9 +3,8 @@ import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "./container";
 
 /**
- * A page's opening: a big bold title and a line, over a soft wash of
- * Coere blue that fades to white, in the light look of the redesign. The
- * blog and careers open with it.
+ * A page's opening: a big bold title and a line on flat white, in the
+ * light look of the redesign. Careers opens with it.
  */
 export function SoftHero({
   title,
@@ -21,10 +20,6 @@ export function SoftHero({
   const centered = align === "center" ? "mx-auto text-center" : "";
   return (
     <section className={`relative isolate overflow-hidden pt-[136px] pb-12 md:pt-[168px] md:pb-16 ${UNDER_NAV}`}>
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[radial-gradient(55%_70%_at_12%_0%,#e3e8ff_0%,rgba(238,241,255,0.6)_40%,rgba(255,255,255,0)_72%),radial-gradient(40%_60%_at_92%_10%,#eef0ff_0%,rgba(255,255,255,0)_70%)]"
-      />
       <Container>
         <div className={`max-w-4xl ${centered}`}>
           <h1 className="text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.05em] text-neutral-950 text-balance md:text-[4.5rem] md:leading-[0.98]">{title}</h1>

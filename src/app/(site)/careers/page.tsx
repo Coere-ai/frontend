@@ -26,7 +26,7 @@ export default async function CareersPage({ searchParams }: PageProps<"/careers"
           <JobBoard key={team ?? "all"} team={team} />
         </div>
       </SoftHero>
-      <section className="bg-[linear-gradient(180deg,#ffffff_0%,#f5f7ff_100%)] py-24">
+      <section className="py-24">
         <Container>
           <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 md:text-3xl">How we work</h2>
           <div className="mt-8">
