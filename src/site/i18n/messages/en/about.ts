@@ -1,4 +1,5 @@
 import { founders, siteConfig } from "@/lib/site";
+import { aboutSeo, demoSeo } from "@/site/content/seo";
 import { storyApps, storySteps } from "@/site/about/story-data";
 
 /**
@@ -8,8 +9,8 @@ import { storyApps, storySteps } from "@/site/about/story-data";
  */
 export const about = {
   seo: {
-    title: "About Coere: the team building the memory layer you own",
-    description: "Why Coere exists and who is building it. Coere is the portable AI memory layer you own. It is not Cohere and is not affiliated with it.",
+    title: aboutSeo.title,
+    description: aboutSeo.description,
   },
   title: "About us",
   line: "We're building the memory layer people own",
@@ -37,8 +38,8 @@ export const about = {
   closing: { title: "Help us put people back together.", text: "We're hiring a founding team, and we'd love to hear from you." },
   demo: {
     seo: {
-      title: "Coere demo: the product, played live",
-      description: "Watch Coere set up, import your chats from every AI, build one memory you own and bring it into each new chat, played live on Coere's own code.",
+      title: demoSeo.title,
+      description: demoSeo.description,
     },
     title: "See Coere in action",
     line: "The whole product, played live on Coere's own code: setup, import, the memory it builds and what you can do with it.",

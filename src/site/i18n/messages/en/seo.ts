@@ -1,3 +1,5 @@
+import { homeSeo, pricingSeo } from "@/site/content/seo";
+
 /**
  * What each translated page says in search results and link previews: a
  * title of about 60 characters at most and a description of about 155.
@@ -5,12 +7,12 @@
  */
 export const seo = {
   home: {
-    title: "Coere | Portable AI memory you own, across every AI",
-    description: "Coere is a portable AI memory layer you own. It saves your chats from ChatGPT, Claude, Gemini and more, and brings the right context into every new chat.",
+    title: homeSeo.title,
+    description: homeSeo.description,
   },
   pricing: {
-    title: "Pricing: free for you, plans for teams and developers",
-    description: "Coere is free for one person, with unlimited transfers and extraction across every AI. Teams get SSO and audit logs, and developers pay per user.",
+    title: pricingSeo.title,
+    description: pricingSeo.description,
   },
   blog: {
     title: "Blog",

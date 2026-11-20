@@ -1,3 +1,5 @@
+import { siteConfig } from "@/lib/site";
+
 /**
  * The questions on the home page, each answered in a few plain sentences
  * that stand on their own. {ais} is every AI Coere saves chats from, as a
@@ -31,7 +33,7 @@ export const faqs = {
     },
     {
       q: "Is Coere the same as Cohere?",
-      a: "No. Coere is not Cohere and is not affiliated with it. The name comes from the Latin cohaerere, to connect. Coere builds a memory layer for people, teams and apps.",
+      a: `No. ${siteConfig.notCohere} Coere builds a memory layer for people, teams and apps.`,
     },
     {
       q: "Can I use Coere today?",

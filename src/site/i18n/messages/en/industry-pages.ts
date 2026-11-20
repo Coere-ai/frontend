@@ -1,6 +1,6 @@
 import { industryCompliance, inPlaceToday } from "@/site/content/compliance";
 import { industryPage } from "@/site/content/industry-stories";
-import { industryAudience } from "@/site/content/seo";
+import { industriesSeo, industryAudience } from "@/site/content/seo";
 import { catalog } from "./catalog";
 
 /**
@@ -37,8 +37,8 @@ function field(slug: Slug) {
 export const industryPages = {
   index: {
     seo: {
-      title: "AI memory for every industry",
-      description: "How a memory you own works in law, finance, technology, commerce, consumer brands, manufacturing, energy and education, with each client's memory kept apart.",
+      title: industriesSeo.title,
+      description: industriesSeo.description,
     },
     title: "Memory for every industry",
     line: "Coere gives people, teams and apps a memory they control. Start with who it is for, then open your field.",

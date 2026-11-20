@@ -1,3 +1,5 @@
+import { productSeo } from "@/site/content/seo";
+
 /**
  * The four product pages. Lists keep the order of their pictures and films
  * in src/site/content/pages, which pairs them by position.
@@ -7,8 +9,8 @@ export const productPages = {
   explore: "Explore",
   connect: {
     seo: {
-      title: "Coere Connect: one AI memory for ChatGPT, Claude and Gemini",
-      description: "A Chrome extension that saves your chats from ChatGPT, Claude, Gemini and six more AIs on your computer and adds the right context to each new chat.",
+      title: productSeo.connect.title,
+      description: productSeo.connect.description,
     },
     hero: {
       title: "Your memory, across every AI",
@@ -80,8 +82,8 @@ export const productPages = {
   },
   solutions: {
     seo: {
-      title: "Coere Solutions: shared AI memory for teams and clients",
-      description: "One memory of your company, its people and its clients, built from the chats your team already has. One client per send, with a source on every answer.",
+      title: productSeo.solutions.title,
+      description: productSeo.solutions.description,
     },
     hero: {
       title: "One memory for the whole company",
@@ -131,8 +133,8 @@ export const productPages = {
   },
   forge: {
     seo: {
-      title: "Coere Forge: AI memory API, MCP server and SDKs",
-      description: "A user-permissioned AI memory API: REST, an MCP server, and TypeScript and Python SDKs that let your apps and agents read a person's Coere memory.",
+      title: productSeo.forge.title,
+      description: productSeo.forge.description,
     },
     hero: {
       title: "The memory API for your apps and agents",
@@ -162,8 +164,8 @@ export const productPages = {
   },
   agents: {
     seo: {
-      title: "Coere Agents: Cori, the AI agent that works from your memory",
-      description: "Cori, the agent in Coere, works from your memory. It drafts email in Gmail, adds calendar events, fixes writing, fills forms and asks before it sends.",
+      title: productSeo.agents.title,
+      description: productSeo.agents.description,
     },
     hero: {
       title: "One worker, infinite possibilities",
