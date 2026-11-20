@@ -176,10 +176,10 @@ export function SceneRow({ coere }: { coere: boolean }) {
                 </Layer>
               </AnimatePresence>
             </div>
-            <h3 className="mt-6 text-[19px] font-medium tracking-[-0.02em] text-neutral-950">
+            <h3 className="mt-6 text-[19px] font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">
               <Swap coere={coere} today={words.today.scenes[i].title} withCoere={words.coere.scenes[i].title} />
             </h3>
-            <p className="mt-2 text-[15px] leading-relaxed text-neutral-500 text-pretty">
+            <p className="mt-2 text-[15px] leading-relaxed text-neutral-500 text-pretty dark:text-white/60">
               <Swap coere={coere} today={words.today.scenes[i].line} withCoere={words.coere.scenes[i].line} />
             </p>
           </li>

@@ -14,6 +14,7 @@ import { PricingSection } from "@/site/pricing/pricing-section";
 import { SolutionsSection } from "@/site/home/solutions-section";
 import { SolvesSection } from "@/site/home/solves-section";
 import { faqGraph, JsonLd, siteGraph } from "@/site/seo/json-ld";
+import { DarkPage } from "@/site/ui/page-theme";
 
 export const metadata: Metadata = pageMetadata({ ...homeSeo, path: "/" });
 
@@ -22,23 +23,26 @@ export const metadata: Metadata = pageMetadata({ ...homeSeo, path: "/" });
  * with, the full demo, what Coere solves, one part per product, each with
  * its own layout and a way to its page, the plans,
  * the questions people ask first, the newest posts and the last word.
+ * The hero is dark, so the whole page is, down to the footer.
  */
 export default function HomePage() {
   return (
     <>
       <JsonLd data={siteGraph} />
       <JsonLd data={faqGraph(homeFaqs)} />
-      <Hero />
-      <LogoLoopSection />
-      <DemoSection />
-      <SolvesSection />
-      <ConnectSection />
-      <SolutionsSection />
-      <ForgeSection />
-      <PricingSection />
-      <FaqSection faqs={homeFaqs} title="What people ask about Coere" look="soft" />
-      <BlogSection />
-      <ClosingCta />
+      <DarkPage>
+        <Hero />
+        <LogoLoopSection />
+        <DemoSection />
+        <SolvesSection />
+        <ConnectSection />
+        <SolutionsSection />
+        <ForgeSection />
+        <PricingSection />
+        <FaqSection faqs={homeFaqs} title="What people ask about Coere" look="soft" />
+        <BlogSection />
+        <ClosingCta />
+      </DarkPage>
     </>
   );
 }

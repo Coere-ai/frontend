@@ -49,7 +49,7 @@ export function SolvesSection() {
 
         <div id={`${SWITCH}-panel`} role="tabpanel" aria-labelledby={tabId(SWITCH, side)} className={`mt-12 px-5 py-10 sm:px-8 md:mt-14 md:px-12 md:py-14 ${SOFT_FIELD}`}>
           <SceneRow coere={coere} />
-          <p className="mx-auto mt-14 max-w-2xl text-center text-[17px] leading-relaxed text-neutral-500 text-balance md:mt-16">
+          <p className="mx-auto mt-14 max-w-2xl text-center text-[17px] leading-relaxed text-neutral-500 text-balance md:mt-16 dark:text-white/60">
             <Swap
               coere={coere}
               today={<DeveloperLine text={today.developers} />}
@@ -75,7 +75,7 @@ function Intro({ words, narrow = false }: { words: SideWords; narrow?: boolean }
   return (
     <div>
       <h2 className={`mx-auto ${SECTION_TITLE} ${narrow ? "md:max-w-md" : ""}`}>{words.title}</h2>
-      <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{words.line}</p>
+      <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance dark:text-white/65">{words.line}</p>
     </div>
   );
 }
@@ -84,7 +84,7 @@ function Intro({ words, narrow = false }: { words: SideWords; narrow?: boolean }
 function DeveloperLine({ text }: { text: { lead: string; rest: string } }) {
   return (
     <>
-      <span className="text-neutral-950">{text.lead}</span> {text.rest}
+      <span className="text-neutral-950 dark:text-white">{text.lead}</span> {text.rest}
     </>
   );
 }

@@ -12,8 +12,8 @@ export function AiTiles({ columns = 3, limit }: { columns?: number; limit?: numb
         key: app.name,
         content: (
           <span className="flex flex-col items-center gap-2">
-            <Image src={app.logo} alt="" width={30} height={30} unoptimized />
-            <span className="text-[13px] text-neutral-700">{app.name}</span>
+            <Image src={app.logo} alt="" width={30} height={30} unoptimized className={app.mono ? "dark:invert" : ""} />
+            <span className="text-[13px] text-neutral-700 dark:text-white/75">{app.name}</span>
           </span>
         ),
       }))}

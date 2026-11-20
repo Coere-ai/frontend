@@ -33,17 +33,17 @@ export const siteConfig = {
   ],
 } as const;
 
-/** The AIs Coere works with, and their logos in /public. */
+/** The AIs Coere works with, and their logos in /public. `mono` marks a logo drawn in black alone, which a dark page shows white. */
 export const agents = [
-  { name: "ChatGPT", logo: "/openai.svg" },
-  { name: "Claude", logo: "/claude-color.svg" },
-  { name: "Gemini", logo: "/gemini-color.svg" },
-  { name: "Perplexity", logo: "/perplexity-color.svg" },
-  { name: "Grok", logo: "/grok.svg" },
-  { name: "Copilot", logo: "/copilot-color.svg" },
-  { name: "Meta AI", logo: "/meta-color.svg" },
-  { name: "Kimi", logo: "/kimi.svg" },
-  { name: "DeepSeek", logo: "/deepseek-color.svg" },
+  { name: "ChatGPT", logo: "/openai.svg", mono: true },
+  { name: "Claude", logo: "/claude-color.svg", mono: false },
+  { name: "Gemini", logo: "/gemini-color.svg", mono: false },
+  { name: "Perplexity", logo: "/perplexity-color.svg", mono: false },
+  { name: "Grok", logo: "/grok.svg", mono: true },
+  { name: "Copilot", logo: "/copilot-color.svg", mono: false },
+  { name: "Meta AI", logo: "/meta-color.svg", mono: false },
+  { name: "Kimi", logo: "/kimi.svg", mono: true },
+  { name: "DeepSeek", logo: "/deepseek-color.svg", mono: false },
 ] as const;
 
 export type TeamMember = {

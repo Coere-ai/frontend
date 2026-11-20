@@ -33,16 +33,16 @@ export function BlogSection() {
         <ul className="mt-12 grid gap-6 md:grid-cols-3">
           {newest.map((post) => (
             <li key={post.slug} className="h-full">
-              <Link href={`/blog/${post.slug}`} className={`group flex h-full flex-col overflow-hidden p-2.5 transition-shadow duration-300 hover:shadow-[0_1px_2px_rgba(20,17,15,0.04),0_36px_80px_-34px_rgba(23,27,77,0.4)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 ${SOFT_CARD}`}>
+              <Link href={`/blog/${post.slug}`} className={`group flex h-full flex-col overflow-hidden p-2.5 transition-shadow duration-300 hover:shadow-[0_1px_2px_rgba(20,17,15,0.04),0_36px_80px_-34px_rgba(23,27,77,0.4)] dark:hover:bg-white/[0.07] dark:hover:shadow-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 ${SOFT_CARD}`}>
                 <div className="overflow-hidden rounded-[20px]">
                   <Image src={post.image} alt="" width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]" />
                 </div>
                 <div className="flex flex-1 flex-col px-3.5 pt-5 pb-4">
                   <PostMeta post={post} className="text-[13px]" />
-                  <h3 className="mt-2 text-[19px] leading-snug font-semibold tracking-[-0.02em] text-neutral-950 text-balance">
+                  <h3 className="mt-2 text-[19px] leading-snug font-semibold tracking-[-0.02em] text-neutral-950 text-balance dark:text-white">
                     <Underlined big>{post.title}</Underlined>
                   </h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-neutral-500">{post.excerpt}</p>
+                  <p className="mt-2 text-[15px] leading-relaxed text-neutral-500 dark:text-white/60">{post.excerpt}</p>
                 </div>
               </Link>
             </li>

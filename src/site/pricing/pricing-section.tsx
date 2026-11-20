@@ -15,7 +15,7 @@ export function PricingSection({ bare = false, id = "pricing" }: { bare?: boolea
         {bare ? null : (
           <div className="mx-auto max-w-3xl text-center">
             <h2 className={SECTION_TITLE}>A plan for you, your team or your app</h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">Coere is free for one person. Teams and developers talk to us.</p>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance dark:text-white/65">Coere is free for one person. Teams and developers talk to us.</p>
           </div>
         )}
         <div className={`mx-auto grid max-w-[1200px] items-stretch gap-5 lg:grid-cols-3 lg:gap-6 ${bare ? "" : "mt-14 md:mt-16"}`}>
