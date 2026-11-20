@@ -34,6 +34,15 @@ function useSeen<T extends Element>(options: IntersectionObserverInit) {
   return [ref, seen] as const;
 }
 
+/**
+ * The strap runs from the top edge of its canvas, so the top of the canvas
+ * fades to clear and the strap seems to hang from the dark above.
+ */
+const STRAP_FADE = {
+  maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 8%, #000 22%)",
+  WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 8%, #000 22%)",
+} as const;
+
 function FlipIcon() {
   return (
     <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -70,6 +79,7 @@ function LanyardSlot({ member, faces }: { member: TeamMember; faces: LanyardFace
             metal="silver"
             introFrom="top"
             flipSignal={flips}
+            style={STRAP_FADE}
           />
         ) : null}
       </div>
@@ -77,7 +87,7 @@ function LanyardSlot({ member, faces }: { member: TeamMember; faces: LanyardFace
         <button
           type="button"
           onClick={() => setFlips((n) => n + 1)}
-          className="inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-[14px] font-medium text-neutral-800 shadow-[0_1px_2px_rgba(20,17,15,0.06)] transition-colors hover:border-neutral-300 hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[14px] font-medium text-white ring-1 ring-white/20 backdrop-blur-md transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           aria-label={`Flip ${member.name}'s card`}
         >
           <FlipIcon />
@@ -90,8 +100,8 @@ function LanyardSlot({ member, faces }: { member: TeamMember; faces: LanyardFace
 
 /**
  * The founders as two lanyard cards that drop in from the top. The front is
- * the photo and the name; flipped, the back is the name, the role and the
- * school. The faces are drawn once the team is a screen away. The same words
+ * the photo, the name and the role; flipped, the back is the name, the role
+ * and the school. The faces are drawn once the team is a screen away. The same words
  * are in the highlights below, for screen readers.
  */
 export function TeamLanyards({ members }: { members: readonly TeamMember[] }) {

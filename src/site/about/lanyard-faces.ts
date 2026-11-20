@@ -95,10 +95,14 @@ function front(member: TeamMember, photo: HTMLImageElement | null, mark: HTMLIma
   if (photo) drawPortrait(ctx, photo, member, box);
   ctx.restore();
 
+  // The name, then the role under it, between the photo and the brand row.
   ctx.fillStyle = INK;
   ctx.textBaseline = "alphabetic";
-  fitText(ctx, member.name, 700, 96, family, WIDTH - 144);
-  ctx.fillText(member.name, 72, 1196);
+  fitText(ctx, member.name, 700, 92, family, WIDTH - 144);
+  ctx.fillText(member.name, 72, 1172);
+  ctx.fillStyle = BLUE;
+  fitText(ctx, member.role, 600, 50, family, WIDTH - 144);
+  ctx.fillText(member.role, 72, 1240);
   drawBrand(ctx, mark, family, 72, 1340, BLUE);
   ctx.fillStyle = "#6b6b6b";
   ctx.font = `500 40px ${family}`;
