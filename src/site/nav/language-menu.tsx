@@ -19,6 +19,9 @@ import { format } from "@/site/i18n/types";
  */
 export const languages = locales.map((code) => ({ code, label: localeLabels[code] }));
 
+/** About how tall the open menu is: a row per language and the padding round them. */
+const MENU_HEIGHT = languages.length * 44 + 16;
+
 function hrefIn(pathname: string, locale: Locale): string {
   const { path } = splitLocale(pathname);
   return localizePath(isEnglishOnly(path) ? "/" : path, locale);
@@ -42,7 +45,7 @@ export function LanguageMenu() {
   const pathname = usePathname() ?? "/";
   const t = useMessages("chrome").language;
   const current = languages.find((language) => language.code === locale) ?? languages[0];
-  const [place, setPlace] = useState<{ top: number; right: number } | null>(null);
+  const [place, setPlace] = useState<{ top?: number; bottom?: number; right: number } | null>(null);
   const open = place !== null;
   const button = useRef<HTMLButtonElement>(null);
   const menu = useRef<HTMLDivElement>(null);
@@ -50,7 +53,11 @@ export function LanguageMenu() {
 
   function toggle() {
     const box = button.current?.getBoundingClientRect();
-    setPlace(open || !box ? null : { top: box.bottom + 8, right: Math.max(12, window.innerWidth - box.right) });
+    if (open || !box) return setPlace(null);
+    const right = Math.max(12, window.innerWidth - box.right);
+    // Five languages make a tall menu: where it would run off the bottom (the phone menu's button), it opens upward.
+    const below = window.innerHeight - box.bottom - 8;
+    setPlace(below >= MENU_HEIGHT ? { top: box.bottom + 8, right } : { bottom: window.innerHeight - box.top + 8, right });
   }
   const close = () => setPlace(null);
 
@@ -102,7 +109,7 @@ export function LanguageMenu() {
             <motion.div
               ref={menu}
               id={menuId}
-              style={{ top: place.top, right: place.right }}
+              style={{ top: place.top, bottom: place.bottom, right: place.right }}
               role="menu"
               aria-label={t.menu}
               initial={{ opacity: 0, y: -4, scale: 0.98 }}
