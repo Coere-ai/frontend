@@ -34,7 +34,7 @@ function Rise({ delay, className, children }: { delay: number; className?: strin
  */
 export function Hero() {
   return (
-    <section className={`relative isolate overflow-hidden ${UNDER_NAV} pt-[120px] pb-16 md:pt-[136px] lg:pb-24`}>
+    <section id="hero" className={`relative isolate overflow-hidden ${UNDER_NAV} pt-[120px] pb-16 md:pt-[136px] lg:pb-24`}>
       <HeroBackdrop />
       <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-10 xl:gap-16">
         <div className="max-w-[600px]">

@@ -13,8 +13,13 @@ const ease = [0.22, 1, 0.36, 1] as const;
 /** The stack's design size; it scales to its column. */
 const W = 720;
 const H = 700;
-/** Where the beam falls, as a share of the column's width: on the dashboard's top edge, clear of the card above it. */
-const BEAM_AT = 0.79;
+/**
+ * Where the beam falls, as a share of the column's width: on the dashboard's
+ * top edge, clear of the card above it. The light theme draws only a
+ * colour's saturation, so the beam uses a purer cousin of Coere blue to
+ * read on white.
+ */
+const BEAM_AT = 0.67;
 
 /** A card rising into place in turn, then drifting a little, as Gamma's pictures do. */
 function Card({ delay, drift, className, children }: { delay: number; drift?: "up" | "down"; className: string; children: React.ReactNode }) {
@@ -42,12 +47,12 @@ export function HeroStack() {
             surfaceRef={dashboard}
             beamPosition={BEAM_AT}
             theme="light"
-            color="#5267f7"
-            intensity={2.2}
-            beamWidth={1.6}
-            flare={1.6}
-            spread={1.1}
-            spill={0.9}
+            color="#2a40ff"
+            intensity={2.4}
+            beamWidth={2.1}
+            flare={2.4}
+            spread={1.6}
+            spill={1.8}
             fog={0.12}
             dust={0.9}
             streaks={1}
@@ -55,6 +60,7 @@ export function HeroStack() {
             pulse={1}
             speed={0.9}
             mouseInteraction={false}
+            intro={false}
           />
         </div>
         <ScaleBox width={W} height={H}>

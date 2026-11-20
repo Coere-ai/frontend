@@ -48,7 +48,8 @@ export function Navbar() {
           redOffset={0}
           greenOffset={2}
           blueOffset={4}
-          className="shadow-[0_10px_30px_-14px_rgba(20,17,15,0.22)]"
+          // A fine light edge and a soft drop shadow in place of the glass's own grey inner rim.
+          className="shadow-[inset_0_0_0_1px_rgba(255,255,255,0.75),inset_0_1px_0_rgba(255,255,255,0.9),0_0_0_1px_rgba(20,17,15,0.06),0_12px_32px_-14px_rgba(20,17,15,0.2)]!"
         >
           <div className="flex w-full items-center justify-between gap-4 pr-1 pl-3">
             <div className="flex items-center gap-6 xl:gap-8">

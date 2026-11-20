@@ -26,7 +26,9 @@ export async function shootSite(browser, base, shooter, { scale }) {
   await s("home", { full: true });
   await s("home-hero");
   // The sticky navbar would sit over the top of each section picture, so it steps aside for them.
-  const bar = await page.addStyleTag({ content: "body > header, header.sticky { visibility: hidden !important; }" });
+  // The hero steps aside too: every part counts as on screen here, so its moving WebGL backgrounds would
+  // keep drawing and starve the frames an element picture waits on.
+  const bar = await page.addStyleTag({ content: "body > header, header.sticky { visibility: hidden !important; } section#hero { display: none !important; }" });
   for (const id of HOME_SECTIONS) {
     const el = page.locator(`section#${id}`);
     await el.scrollIntoViewIfNeeded();
