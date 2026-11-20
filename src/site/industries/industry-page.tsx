@@ -1,5 +1,6 @@
 import { AccordionShowcase } from "@/site/blocks/accordion-showcase";
-import { PhotoHero } from "@/site/blocks/photo-hero";
+import { SoftBackdrop } from "@/site/blocks/soft-backdrop";
+import { SplitHero } from "@/site/blocks/split-hero";
 import { industries, type Industry } from "@/site/content/industries";
 import type { DemoKey } from "@/site/content/industry-stories/types";
 import type { IndustryPage as Content } from "@/site/content/industry-stories";
@@ -14,9 +15,10 @@ import { MoreIndustries } from "./more-industries";
 const ORDER: DemoKey[] = ["context", "graph", "confidential", "app"];
 
 /**
- * One industry: its photo with the app set on it, then each Coere product
- * told through an example from that field, played live on Coere's real code
- * with the field's own people and work, then a few other fields.
+ * One industry: its opening, with the app under LaserFlow's beam, then
+ * each Coere product told through an example from that field, played live
+ * on Coere's real code with the field's own people and work, then a few
+ * other fields. The field's photo carries the showcase below.
  */
 export function IndustryPage({ industry, content }: { industry: Industry; content: Content }) {
   const demo = (key: DemoKey, label: string) => <LiveDemo film={`industry-${industry.slug}`} from={key} to={ORDER[ORDER.indexOf(key) + 1]} label={label} />;
@@ -35,16 +37,15 @@ export function IndustryPage({ industry, content }: { industry: Industry; conten
 
   return (
     <>
-      <PhotoHero
-        photo={industry.photo.src}
-        alt={industry.photo.alt}
+      <SplitHero
+        backdrop={<SoftBackdrop />}
+        laser
         eyebrow="Industries"
         title={`Coere for ${industry.name.toLowerCase()}`}
         line={content.line}
         checks={content.highlights}
         primary={{ href: contactHref, label: contactLabel }}
         secondary={{ href: "#how", label: "See how" }}
-        appFit="centered"
         app={demo("context", `Coere for ${industry.name.toLowerCase()}, shown on the app`)}
       />
       <ProductSection id="how" title={`What ${industry.name.toLowerCase()} teams do with Coere`} line="Each Coere product, through an example from the field.">
