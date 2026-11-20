@@ -47,6 +47,8 @@ export function SplitHero({
     <section data-nav-tone={dark ? "dark" : undefined} className={`relative isolate overflow-hidden ${UNDER_NAV} ${dark ? "bg-[#0b0a12] text-white" : "bg-white text-neutral-950"}`}>
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         {backdrop}
+        {/* A dark hero's backdrop fades into the page's near black at its foot, so the next section follows with no hard edge. */}
+        {dark ? <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(to_bottom,rgba(11,10,18,0),#0b0a12)] md:h-56" /> : null}
       </div>
       <div className="mx-auto grid min-h-[min(100svh,992px)] max-w-[1440px] items-center gap-14 px-6 pt-[128px] pb-20 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:pt-[152px] lg:pb-20">
         <div className="max-w-[640px]">
