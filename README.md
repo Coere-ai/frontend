@@ -298,7 +298,11 @@ from the extension.
 ## Photos and docs
 
 Industry photos are from Unsplash, free to use under the Unsplash License,
-each saved at 960, 1920 and 3840 wide. The quiet pages (docs, guides,
+each saved at 960, 1920 and 3840 wide. The industry pages and cards draw
+them as pixel pictures in the Solutions hero's style
+(`src/site/art/pixel-picture.tsx`): the photo is read once in the browser
+into one Coere palette color per small square cell, and the hero colors the
+cells in once, as a wave, then stays still. The quiet pages (docs, guides,
 pricing and the account pages) are plain and calm: flat near black, with no
 artwork, gradient or tint behind a form, and no box or circle a part does
 not need.
