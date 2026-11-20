@@ -58,7 +58,7 @@ The whole page: [home.webp](home.webp).
 |---|---|
 | <img src="resources.webp" alt="The developer docs' first page on white, with the list of pages on the left" /><br /><sub>The developer docs</sub> | <img src="resources-endpoints.webp" alt="The docs' Endpoints page, with each route and its parameters" /><br /><sub>One docs page: Endpoints</sub> |
 | <img src="about.webp" alt="The dark about page down to its team: the Coere mark in liquid chrome in a deep blue light over About us, then four steps from AI is fragmented to the memory is yours on glass panels" /><br /><sub>About, down to where the team starts</sub> | <img src="portable-ai-memory.webp" alt="The Portable AI memory guide, opening on white beside the app" /><br /><sub>A guide: Portable AI memory</sub> |
-| <img src="privacy-top.webp" alt="The privacy policy: What Coere reads, keeps and sends, with the short version beside the list of its parts" /><br /><sub>The privacy policy, the short version first. <a href="privacy.webp">The whole policy</a></sub> | <img src="developer-waitlist.webp" alt="Give your app's users memory from day one on a soft blue backdrop, with a work email field, Join the waitlist and a TypeScript sample beside it" /><br /><sub>The developer waitlist</sub> |
+| <img src="privacy-top.webp" alt="The privacy policy: What Coere reads, keeps and sends, with the short version beside the list of its parts" /><br /><sub>The privacy policy, the short version first. <a href="privacy.webp">The whole policy</a></sub> | <img src="developer-waitlist.webp" alt="Give your app's users memory from day one on white, with a work email field, Join the waitlist and a TypeScript sample beside it" /><br /><sub>The developer waitlist</sub> |
 
 ## Blog and careers
 
