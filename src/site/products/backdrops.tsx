@@ -19,7 +19,7 @@ export function ConnectBackdrop() {
 }
 
 /** The tint Iridescence multiplies over its colours: the demo's violet and cyan fold into Coere blue, and its whites stay white. */
-const CONNECT_TINT: [number, number, number] = [0.62, 0.7, 1];
+const CONNECT_TINT: [number, number, number] = [0.36, 0.48, 1];
 
 /**
  * Coere Forge's backdrop: React Bits GradientASCII as the demo draws it,
