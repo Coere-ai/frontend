@@ -4,10 +4,13 @@ import { JobBoard } from "@/site/careers/job-board";
 import { Values } from "@/site/careers/values";
 import { teams, type Team } from "@/site/content/roles";
 import { Container } from "@/site/ui/container";
+import { SoftHero } from "@/site/ui/soft-hero";
+
+const description = "Join Coere's founding team in San Francisco, in engineering, business and marketing, or as an intern.";
 
 export const metadata: Metadata = {
   title: "Careers",
-  description: "Join Coere's founding team in San Francisco, in engineering, business and marketing, or as an intern.",
+  description,
   // Hidden from the menus for now, so kept out of search too.
   ...hiddenPage,
 };
@@ -18,20 +21,14 @@ export default async function CareersPage({ searchParams }: PageProps<"/careers"
   const team = teams.find((t) => t === asked) as Team | undefined;
   return (
     <>
-      <section className="pt-16 pb-24 md:pt-24">
+      <SoftHero eyebrow="Careers" title="Build the memory layer with us" description={description}>
+        <div className="mt-12 md:mt-16">
+          <JobBoard key={team ?? "all"} team={team} />
+        </div>
+      </SoftHero>
+      <section className="bg-[linear-gradient(180deg,#ffffff_0%,#f5f7ff_100%)] py-24">
         <Container>
-          <p className="text-sm font-medium text-neutral-500">Careers</p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.25rem] md:leading-[1.05]">
-            Build the memory layer with us
-          </h1>
-          <div className="mt-12">
-            <JobBoard key={team ?? "all"} team={team} />
-          </div>
-        </Container>
-      </section>
-      <section className="border-t border-neutral-100 bg-neutral-50 py-24">
-        <Container>
-          <p className="text-sm font-medium text-neutral-500">How we work</p>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-neutral-950 md:text-3xl">How we work</h2>
           <div className="mt-8">
             <Values />
           </div>

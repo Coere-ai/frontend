@@ -21,7 +21,7 @@ function List({ title, items }: { title: string; items: string[] }) {
 /** The right side of the job board: everything about the picked role, and a way to apply. */
 export function JobDetail({ role }: { role: Role }) {
   return (
-    <article aria-live="polite" className="rounded-3xl border border-neutral-200 p-8 md:p-10">
+    <article aria-live="polite" className="rounded-[28px] bg-white p-8 shadow-[0_1px_2px_rgba(20,17,15,0.04),0_32px_64px_-40px_rgba(40,50,133,0.35)] ring-1 ring-neutral-200/70 md:p-10">
       <p className="text-[13px] font-medium text-neutral-500">{role.team}</p>
       <h2 className="mt-2 text-3xl font-medium tracking-[-0.035em] text-neutral-950 text-balance">{role.title}</h2>
       <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-neutral-600">

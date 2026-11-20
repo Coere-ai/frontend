@@ -22,13 +22,14 @@ export default async function RolePage({ params }: PageProps<"/careers/[slug]">)
   const role = roleBySlug((await params).slug);
   if (!role) notFound();
   return (
-    <section className="pt-16 pb-28 md:pt-24">
+    <section className="relative isolate pt-16 pb-28 md:pt-24">
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-[radial-gradient(55%_80%_at_12%_0%,#e3e8ff_0%,rgba(238,241,255,0.55)_45%,rgba(255,255,255,0)_75%)]" />
       <Container>
-        <Link href="/careers" className="text-[14px] text-neutral-500 hover:text-neutral-950">
+        <Link href="/careers" className="inline-flex rounded-full bg-white/80 px-3.5 py-1.5 text-[13px] font-semibold text-brand-700 ring-1 ring-brand-100 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">
           Careers
         </Link>
-        <h1 className="mt-4 max-w-3xl text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-6xl md:leading-[1.04]">{role.title}</h1>
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-500">{role.summary}</p>
+        <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-neutral-950 text-balance md:text-6xl md:leading-[1.02]">{role.title}</h1>
+        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600">{role.summary}</p>
         <div className="mt-14 grid gap-14 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-20">
           <RoleDetails role={role} />
           <div id="apply" className="scroll-mt-28 lg:sticky lg:top-28 lg:self-start">
