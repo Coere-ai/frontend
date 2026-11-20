@@ -1,7 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
-import { features } from "@/site/content/features";
-import { products } from "@/site/content/products";
+import Link from "@/site/i18n/link";
+import { featuresIn } from "@/site/content/features";
+import { productsIn } from "@/site/content/products";
+import { useMessages } from "@/site/i18n/client";
+import { format } from "@/site/i18n/types";
 import { Underlined } from "@/site/ui/underlined";
 import { PanelLabel } from "./panel-parts";
 
@@ -11,6 +13,10 @@ import { PanelLabel } from "./panel-parts";
  * page, where it plays live, and Pricing under them.
  */
 export function ProductsPanel() {
+  const catalog = useMessages("catalog");
+  const t = useMessages("chrome").nav;
+  const products = productsIn(catalog);
+  const features = featuresIn(catalog);
   return (
     <div className="grid grid-cols-[repeat(4,minmax(0,1fr))_168px] grid-rows-[auto_auto_auto_1fr] gap-x-7 2xl:grid-cols-[repeat(4,minmax(0,1fr))_184px] 2xl:gap-x-9">
       {/* Each card spans the four shared rows, so the images line up whatever the text length. */}
@@ -22,13 +28,13 @@ export function ProductsPanel() {
           </h3>
           <p className="mt-2.5 text-[15px] leading-snug text-white/60">{product.description}</p>
           <div className="mt-6 self-start overflow-hidden rounded-2xl">
-            <Image src={product.image} alt={`${product.name} artwork`} width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover" />
+            <Image src={product.image} alt={format(t.artwork, { name: product.name })} width={754} height={421} unoptimized className="aspect-[754/421] w-full object-cover" />
           </div>
         </Link>
       ))}
 
       <div className="row-span-4 pl-7">
-        <PanelLabel>Features</PanelLabel>
+        <PanelLabel>{t.features}</PanelLabel>
         <ul className="mt-3 space-y-0.5">
           {features.filter((feature) => feature.menu !== false).map((feature) => (
             <li key={feature.slug}>
@@ -39,7 +45,7 @@ export function ProductsPanel() {
           ))}
         </ul>
         <Link href="/pricing" className="group mt-5 block border-t border-white/10 pt-4 text-[15px] font-medium text-white">
-          <Underlined>Pricing</Underlined>
+          <Underlined>{t.pricing}</Underlined>
         </Link>
       </div>
     </div>

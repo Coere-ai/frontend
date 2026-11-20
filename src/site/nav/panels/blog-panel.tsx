@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { posts } from "@/site/content/posts";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { PanelMore } from "./panel-parts";

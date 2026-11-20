@@ -11,7 +11,7 @@ import { DELETE_ON_WEB } from "@/lib/v1/web-only";
 // browser, could read the email from GET /api/v1/account and type it, so
 // the typed email proves nothing. The route checks the token and the body,
 // then refuses with the line that sends the person to coere.ai/account,
-// where deleting needs a fresh sign in (src/app/(site)/account).
+// where deleting needs a fresh sign in (src/app/[lang]/(site)/account).
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { backgrounds } from "@/site/content/backgrounds";
 import { docPages } from "@/site/content/docs";
 import { CodeWindow } from "@/site/code/code-window";

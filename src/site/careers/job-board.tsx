@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { useState } from "react";
 import { roles, teams, type Role, type Team } from "@/site/content/roles";
 import { ANY_LOCATION, filterRoles, type RoleFilters } from "./filter-roles";

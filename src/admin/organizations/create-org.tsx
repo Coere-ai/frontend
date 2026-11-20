@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { createOrganization } from "@/app/admin/organizations/actions";
+import { createOrganization } from "@/app/(app)/admin/organizations/actions";
 import type { PlanRow } from "@/lib/admin/types";
 
 import { Button, Card, fieldClass, fieldStyle, Label, Status } from "../controls";

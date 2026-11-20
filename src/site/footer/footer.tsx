@@ -1,29 +1,34 @@
-import Link from "next/link";
-import { guides } from "@/site/content/guides";
+import Link from "@/site/i18n/link";
+import { guidesIn } from "@/site/content/guides";
 import { emailHref } from "@/site/content/navigation";
-import { products } from "@/site/content/products";
+import { productsIn } from "@/site/content/products";
+import { getMessages } from "@/site/i18n/server";
+import type { Messages } from "@/site/i18n/messages/types";
 import { BrandLockup } from "@/site/nav/brand-lockup";
 import { Container } from "@/site/ui/container";
 
-const columns = [
-  { title: "Products", links: [...products.map((p) => ({ href: `/products/${p.slug}`, label: p.name })), { href: "/pricing", label: "Pricing" }] },
-  { title: "Guides", links: guides.map((g) => ({ href: `/${g.slug}`, label: g.name })) },
-  {
-    title: "Company",
-    links: [
-      { href: "/about", label: "About us" },
-      { href: "/blog", label: "Blog" },
-      { href: emailHref, label: "Contact" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { href: "/demo", label: "Product demo" },
-      { href: "/industries", label: "Industries" },
-    ],
-  },
-];
+/** The footer's columns in a language. */
+function columnsIn({ chrome: { footer: t }, catalog }: Messages) {
+  return [
+    { title: t.products, links: [...productsIn(catalog).map((p) => ({ href: `/products/${p.slug}`, label: p.name })), { href: "/pricing", label: t.pricing }] },
+    { title: t.guides, links: guidesIn(catalog).map((g) => ({ href: `/${g.slug}`, label: g.name })) },
+    {
+      title: t.company,
+      links: [
+        { href: "/about", label: t.about },
+        { href: "/blog", label: t.blog },
+        { href: emailHref, label: t.contact },
+      ],
+    },
+    {
+      title: t.resources,
+      links: [
+        { href: "/demo", label: t.demo },
+        { href: "/industries", label: t.industries },
+      ],
+    },
+  ];
+}
 
 /** The year for the copyright line, read once per render on the server. */
 function currentYear(): number {
@@ -35,14 +40,17 @@ function currentYear(): number {
  * line and the privacy policy. Under a dark page (see DarkPage) it turns
  * near black with light words, so the page stays dark to its end.
  */
-export function Footer() {
+export async function Footer() {
+  const messages = await getMessages();
+  const t = messages.chrome.footer;
+  const columns = columnsIn(messages);
   return (
     <footer className="border-t border-neutral-200 bg-white dark:border-white/10 dark:bg-night">
       <Container className="grid gap-12 py-16 sm:grid-cols-2 md:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,1fr))]">
         <div>
           <BrandLockup />
           <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-neutral-500 dark:text-white/55">
-            The memory layer you own, across every AI.
+            {t.tagline}
           </p>
         </div>
         {columns.map((column) => (
@@ -63,7 +71,7 @@ export function Footer() {
       <Container className="flex flex-col gap-3 border-t border-neutral-100 py-6 text-[13px] text-neutral-500 sm:flex-row dark:border-white/10 dark:text-white/55 sm:items-center sm:justify-between">
         <p>© {currentYear()} Coere AI</p>
         <Link href="/privacy" className="hover:text-neutral-950 dark:hover:text-white">
-          Privacy policy
+          {t.privacy}
         </Link>
       </Container>
     </footer>

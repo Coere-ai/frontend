@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { PixelPicture } from "@/site/art/pixel-picture";
 import type { Industry } from "@/site/content/industries";
 import { Container } from "@/site/ui/container";

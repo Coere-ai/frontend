@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { inviteToOrg, makeAdmin, type FormState } from "@/app/(site)/account/actions";
+import { inviteToOrg, makeAdmin, type FormState } from "@/app/[lang]/(site)/account/actions";
 import { FormStatus } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
 

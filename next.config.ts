@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { localeRedirects, localeRewrites } from "./src/site/i18n/routing";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -51,8 +52,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // English at its own addresses, the other languages under their code (src/site/i18n/routing.ts).
+  async rewrites() {
+    return { beforeFiles: [], afterFiles: localeRewrites, fallback: [] };
+  },
   async redirects() {
     return [
+      ...localeRedirects,
       {
         source: "/:path*",
         has: [{ type: "host", value: "coere.ai" }],

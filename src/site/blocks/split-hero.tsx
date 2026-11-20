@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { UNDER_NAV } from "@/site/nav/nav-space";
 import { CheckList } from "./check-list";

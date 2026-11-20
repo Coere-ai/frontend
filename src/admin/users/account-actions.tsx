@@ -1,6 +1,6 @@
 "use client";
 
-import { revokeAllDevices, setLimits, setPassword, setPlan, setStatus, setUsername } from "@/app/admin/users/actions";
+import { revokeAllDevices, setLimits, setPassword, setPlan, setStatus, setUsername } from "@/app/(app)/admin/users/actions";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/auth/identity";
 import { dollarField } from "@/lib/admin/money";
 import { fieldName, LIMIT_KINDS, type LimitKind } from "@/lib/admin/limit-input";

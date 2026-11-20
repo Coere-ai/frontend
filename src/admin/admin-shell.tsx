@@ -1,4 +1,4 @@
-import { signOut } from "@/app/admin/actions";
+import { signOut } from "@/app/(app)/admin/actions";
 
 import { AdminNav } from "./admin-nav";
 

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { contactHref, contactLabel } from "@/site/content/navigation";
 import { Container } from "@/site/ui/container";
 

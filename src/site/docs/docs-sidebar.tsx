@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { usePathname } from "next/navigation";
 import { docPages } from "@/site/content/docs";
 import { Underlined } from "@/site/ui/underlined";

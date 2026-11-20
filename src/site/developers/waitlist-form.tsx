@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { joinWaitlistAction } from "@/app/(site)/developers/waitlist/actions";
+import { joinWaitlistAction } from "@/app/[lang]/(site)/developers/waitlist/actions";
 import { waitlistStart } from "@/lib/waitlist/form";
 import { buttonClass } from "@/site/ui/button";
 import { FormField, inputClass } from "@/site/ui/form-field";

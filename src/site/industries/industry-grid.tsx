@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { PixelPicture } from "@/site/art/pixel-picture";
 import { standardNames } from "@/site/content/compliance";
 import { industries } from "@/site/content/industries";

@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { useState, type FocusEvent } from "react";
 import GlassSurface from "@/site/bits/GlassSurface";
-import { navTabs, startHref, startLabel } from "@/site/content/navigation";
+import { navTabs, startHref } from "@/site/content/navigation";
+import { useMessages } from "@/site/i18n/client";
 import { CloseIcon, MenuIcon } from "@/site/ui/icons/interface-icons";
 import { SoftLink } from "@/site/ui/soft-button";
 import { AccountLink } from "./account-link";
@@ -29,6 +30,7 @@ export function Navbar() {
   const menu = useMenu();
   const tone = useNavTone();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useMessages("chrome").nav;
 
   // Focus leaving the whole header closes the menu, for keyboard users.
   function onBlur(event: FocusEvent<HTMLElement>) {
@@ -61,12 +63,12 @@ export function Navbar() {
         >
           <div className="flex w-full items-center justify-between gap-4 pr-1 pl-3">
             <div className="flex items-center gap-6 xl:gap-8">
-              <Link href="/" aria-label="Coere home" onMouseEnter={() => menu.hide(0)} className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500">
+              <Link href="/" aria-label={t.home} onMouseEnter={() => menu.hide(0)} className="rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500">
                 <BrandLockup />
               </Link>
-              <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
+              <nav aria-label={t.main} className="hidden items-center gap-0.5 lg:flex">
                 {navTabs.map((tab) => (
-                  <NavTab key={tab.id} label={tab.label} href={tab.href} active={menu.open === tab.id} onOpen={() => menu.show(tab.id)} />
+                  <NavTab key={tab.id} label={t.tabs[tab.id as keyof typeof t.tabs] ?? tab.label} href={tab.href} active={menu.open === tab.id} onOpen={() => menu.show(tab.id)} />
                 ))}
               </nav>
             </div>
@@ -79,7 +81,7 @@ export function Navbar() {
               </span>
               <span className="hidden sm:block">
                 <SoftLink href={startHref} className="ml-1">
-                  {startLabel}
+                  {t.start}
                 </SoftLink>
               </span>
               <button
@@ -87,7 +89,7 @@ export function Navbar() {
                 onClick={() => setMobileOpen((open) => !open)}
                 aria-expanded={mobileOpen}
                 aria-controls="mobile-menu"
-                aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                aria-label={mobileOpen ? t.closeMenu : t.openMenu}
                 className="grid h-10 w-10 place-items-center rounded-[10px] text-neutral-950 transition-colors hover:bg-neutral-950/[0.05] group-data-[tone=dark]/nav:text-white group-data-[tone=dark]/nav:hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-brand-500 lg:hidden"
               >
                 {mobileOpen ? <CloseIcon /> : <MenuIcon />}

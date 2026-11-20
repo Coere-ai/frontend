@@ -1,4 +1,4 @@
-import { setBackupSwitch } from "@/app/(site)/account/actions";
+import { setBackupSwitch } from "@/app/[lang]/(site)/account/actions";
 
 import { Part, Row, rowButtonClass } from "./rows";
 

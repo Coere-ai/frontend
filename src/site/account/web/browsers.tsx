@@ -1,4 +1,4 @@
-import { revokeAllBrowsers, revokeBrowser } from "@/app/(site)/account/actions";
+import { revokeAllBrowsers, revokeBrowser } from "@/app/[lang]/(site)/account/actions";
 import { ago } from "@/lib/dashboard/format";
 import type { DeviceRow } from "@/lib/v1/devices-body";
 import { buttonClass } from "@/site/ui/button";

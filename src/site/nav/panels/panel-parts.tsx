@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import type { ReactNode } from "react";
 import { Underlined } from "@/site/ui/underlined";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";

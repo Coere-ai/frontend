@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Fragment, useState } from "react";
 
-import { removeMember, setMemberAccess, setMemberRole } from "@/app/admin/organizations/member-actions";
+import { removeMember, setMemberAccess, setMemberRole } from "@/app/(app)/admin/organizations/member-actions";
 import type { AdminResult } from "@/lib/admin/action";
 import type { OrgDetailPayload, OrgMemberRow } from "@/lib/admin/types";
 import { compact, day, dollars } from "@/lib/dashboard/format";

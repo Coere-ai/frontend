@@ -1,6 +1,6 @@
 "use client";
 
-import { clearOverrides, setDailyForAllPlans } from "@/app/admin/limits/actions";
+import { clearOverrides, setDailyForAllPlans } from "@/app/(app)/admin/limits/actions";
 import { LIMIT_KINDS, type LimitKind } from "@/lib/admin/limit-input";
 import { dollarField } from "@/lib/admin/money";
 import type { LimitsPayload } from "@/lib/admin/types";

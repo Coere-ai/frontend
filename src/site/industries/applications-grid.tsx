@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { applications } from "@/site/content/industries";
 import { productBySlug } from "@/site/content/products";
 import { SOFT_CARD } from "@/site/home/look";

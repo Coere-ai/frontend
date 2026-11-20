@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { savePlanLimits } from "@/app/admin/limits/actions";
+import { savePlanLimits } from "@/app/(app)/admin/limits/actions";
 import { fieldName, LIMIT_KINDS, type LimitKind } from "@/lib/admin/limit-input";
 import { dollarField } from "@/lib/admin/money";
 import type { PlanRow } from "@/lib/admin/types";

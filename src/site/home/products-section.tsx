@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { productBySlug, type Product } from "@/site/content/products";
 import { Container } from "@/site/ui/container";
 import { Underlined } from "@/site/ui/underlined";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import type { Post } from "@/site/content/posts";
 import { Underlined } from "@/site/ui/underlined";
 import { PostCover } from "./post-cover";

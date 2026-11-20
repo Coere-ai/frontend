@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { docPages, type DocPage } from "@/site/content/docs";
 import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "@/site/ui/container";

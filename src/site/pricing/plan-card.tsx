@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import PixelCard from "@/site/bits/PixelCard";
 import type { Plan } from "@/site/content/pricing";
 import { CheckIcon } from "@/site/ui/icons/interface-icons";

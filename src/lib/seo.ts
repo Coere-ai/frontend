@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { defaultLocale, localizePath, locales, ogLocales, type Locale } from "@/site/i18n/locales";
 import { siteConfig } from "./site";
 
 /**
@@ -20,7 +21,28 @@ type PageSeo = {
   keywords?: string[];
   /** The title as it is, with no "| Coere" after it. */
   absolute?: boolean;
+  /** The language the page is drawn in. */
+  locale?: Locale;
+  /**
+   * True once the page's words are in every language: it then names its
+   * copy in each language (hreflang) and its canonical link is its own
+   * language's address. A page still in English everywhere leaves it off,
+   * so its copies under /es and the rest point their canonical link at the
+   * English page and name no other languages.
+   */
+  translated?: boolean;
 };
+
+/**
+ * The page in every language, for the hreflang links: each language at its
+ * own address, and x-default at the English one, which needs no prefix.
+ */
+export function languageAlternates(path: string): Record<string, string> {
+  return {
+    ...Object.fromEntries(locales.map((locale) => [locale, localizePath(path, locale)])),
+    "x-default": path,
+  };
+}
 
 /** What the site's share picture shows, for people who cannot see it. */
 export const SHARE_ALT = "Coere: Accelerating Enterprise AI with Unified Context. The Coere mark among the AI logos on a pixel wall.";
@@ -33,14 +55,15 @@ export const SHARE_ALT = "Coere: Accelerating Enterprise AI with Unified Context
 const SHARE_IMAGE = { url: "/opengraph-image", width: 1200, height: 630, type: "image/png", alt: SHARE_ALT };
 
 /** A page's title, description, keywords, canonical link and share text, all from one place. */
-export function pageMetadata({ title, description, path, keywords = [], absolute = false }: PageSeo): Metadata {
+export function pageMetadata({ title, description, path, keywords = [], absolute = false, locale = defaultLocale, translated = false }: PageSeo): Metadata {
   const full = absolute ? title : `${title} | ${siteConfig.name}`;
+  const url = translated ? localizePath(path, locale) : path;
   return {
     title: absolute ? { absolute: title } : title,
     description,
     keywords: [...new Set([...keywords, ...KEYWORDS])],
-    alternates: { canonical: path },
-    openGraph: { type: "website", siteName: siteConfig.name, url: path, title: full, description, images: [SHARE_IMAGE] },
+    alternates: translated ? { canonical: url, languages: languageAlternates(path) } : { canonical: path },
+    openGraph: { type: "website", siteName: siteConfig.name, url, title: full, description, locale: ogLocales[translated ? locale : defaultLocale], images: [SHARE_IMAGE] },
     twitter: { card: "summary_large_image", title: full, description, images: [{ ...SHARE_IMAGE, url: "/twitter-image" }] },
   };
 }

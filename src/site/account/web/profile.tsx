@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { saveDisplayName, saveUsername, type FieldState } from "@/app/(site)/account/sign-in-actions";
+import { saveDisplayName, saveUsername, type FieldState } from "@/app/[lang]/(site)/account/sign-in-actions";
 import { DISPLAY_NAME_MAX } from "@/lib/account/display-name";
 import { PASSWORD_MAX } from "@/lib/auth/identity";
 import { buttonClass } from "@/site/ui/button";

@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { deleteOrganization } from "@/app/admin/organizations/actions";
-import { addMember, revokeInvite } from "@/app/admin/organizations/member-actions";
+import { deleteOrganization } from "@/app/(app)/admin/organizations/actions";
+import { addMember, revokeInvite } from "@/app/(app)/admin/organizations/member-actions";
 import type { OrgDetailPayload } from "@/lib/admin/types";
 import { compact, day, dollars, whole } from "@/lib/dashboard/format";
 import { Kpi, Section, Table } from "@/stats/panel/ui";

@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
 import { SIGNED_IN_COOKIE } from "@/lib/supabase/cookie-options";
 import { SignOutForm } from "@/site/account/sign-out-form";
 import { buttonClass } from "@/site/ui/button";
+import { useMessages } from "@/site/i18n/client";
 
 /**
  * The navbar's Log in link, which says Dashboard once this browser is
@@ -49,10 +50,11 @@ export function AccountLink({ variant, className = "", onNavigate }: { variant: 
   // Read for its re-render: a sign in or out ends in a navigation, and each render reads the cookie again.
   usePathname();
   const signedIn = useSyncExternalStore(subscribe, readHint, serverHint);
+  const t = useMessages("chrome").nav;
   const look = variant === "nav" || variant === "panel" ? `${LOOKS[variant]} ${className}` : buttonClass(variant, className);
   const link = (
     <Link href={signedIn ? "/dashboard" : "/sign-in"} onClick={onNavigate} className={look}>
-      {signedIn ? "Dashboard" : "Log in"}
+      {signedIn ? t.dashboard : t.logIn}
     </Link>
   );
   if (!signedIn) return link;
@@ -61,7 +63,7 @@ export function AccountLink({ variant, className = "", onNavigate }: { variant: 
       {link}
       <SignOutForm next="/sign-in">
         <button type="submit" onClick={onNavigate} className={look}>
-          Sign out
+          {t.signOut}
         </button>
       </SignOutForm>
     </>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { ChevronDownIcon } from "@/site/ui/icons/interface-icons";
 
 /**

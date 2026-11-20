@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 
 import { BrandLockup } from "@/site/nav/brand-lockup";
 import { ButtonLink } from "@/site/ui/button";

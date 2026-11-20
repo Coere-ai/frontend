@@ -1,6 +1,6 @@
 "use client";
 
-import { resetFirstBuild } from "@/app/admin/users/actions";
+import { resetFirstBuild } from "@/app/(app)/admin/users/actions";
 import { limitsInForce } from "@/lib/admin/limits-in-force";
 import type { UserDetailPayload } from "@/lib/admin/types";
 import { day, dollars } from "@/lib/dashboard/format";

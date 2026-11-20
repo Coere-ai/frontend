@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import type { ReactNode } from "react";
 import { CheckList } from "@/site/blocks/check-list";
 import { Stage } from "@/site/blocks/stage";

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { products, type Product } from "@/site/content/products";
 import { SOFT_CARD } from "@/site/home/look";
 import { Container } from "@/site/ui/container";

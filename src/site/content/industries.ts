@@ -1,6 +1,10 @@
 import type { Focus } from "@/site/art/pixel-picture/frame";
 import type { IndustryIconName } from "@/site/ui/icons/industry-icons";
+import { catalog as en } from "@/site/i18n/messages/en/catalog";
+import type { Messages } from "@/site/i18n/messages/types";
 import type { Product } from "./products";
+
+type Catalog = Messages["catalog"];
 
 /**
  * Industries Coere serves. The copy is placeholder for now: each line says
@@ -32,90 +36,40 @@ export type Application = {
   product: Product["slug"];
 };
 
-export const applications: Application[] = [
-  {
-    slug: "consumer",
-    name: "Consumer",
-    summary: "One memory across every AI.",
-    product: "connect",
-  },
-  {
-    slug: "developer",
-    name: "Developer",
-    summary: "Apps and agents that read memory.",
-    product: "forge",
-  },
-  {
-    slug: "business",
-    name: "Business",
-    summary: "Company and client memory.",
-    product: "solutions",
-  },
+type AppSlug = keyof Catalog["applications"];
+type IndustrySlug = keyof Catalog["industries"];
+
+const appBase: { slug: AppSlug; product: Product["slug"] }[] = [
+  { slug: "consumer", product: "connect" },
+  { slug: "developer", product: "forge" },
+  { slug: "business", product: "solutions" },
 ];
 
-export const industries: Industry[] = [
-  {
-    slug: "finance",
-    name: "Finance",
-    icon: "chart",
-    summary: "Every advisor starts from the full history.",
-    uses: ["Client memory", "Meeting follow ups"],
-    photo: photo("finance", "The New York Stock Exchange on Wall Street", "David Vives"),
-  },
-  {
-    slug: "technology",
-    name: "Technology",
-    icon: "cpu",
-    summary: "Engineering context, from tool to tool.",
-    uses: ["Project memory", "Agent context"],
-    photo: photo("technology", "San Francisco at night with the Salesforce Tower", "Chris Briggs", [0.5, 0.4, 1.25]),
-  },
-  {
-    slug: "commerce",
-    name: "Commerce",
-    icon: "globe",
-    summary: "Deals and promises across every market.",
-    uses: ["Account memory", "Partner history"],
-    photo: photo("commerce", "The Hong Kong skyline across Victoria Harbour", "I P", [0.7, 0.5]),
-  },
-  {
-    slug: "consumer",
-    name: "Consumer",
-    icon: "cart",
-    summary: "Shoppers known on every channel.",
-    uses: ["Customer memory", "Support context"],
-    photo: photo("consumer", "A grocery store aisle with stocked shelves", "Franki Chamaki"),
-  },
-  {
-    slug: "manufacturing",
-    name: "Manufacturing",
-    icon: "factory",
-    summary: "What the line learned stays with the plant.",
-    uses: ["Line and machine notes", "Handover memory"],
-    photo: photo("manufacturing", "Robot arms on a factory assembly line", "Simon Kadula"),
-  },
-  {
-    slug: "energy",
-    name: "Energy",
-    icon: "bolt",
-    summary: "Field knowledge that stays with the company.",
-    uses: ["Site and asset notes", "Handover memory"],
-    photo: photo("energy", "Wind turbines on the Livermore hills above the fog", "Zetong Li"),
-  },
-  {
-    slug: "education",
-    name: "Education",
-    icon: "cap",
-    summary: "Classes that pick up where they left off.",
-    uses: ["Course memory", "Study context"],
-    photo: photo("education", "Sather Tower at UC Berkeley", "Jeremy Huang", [0.45, 0.5]),
-  },
-  {
-    slug: "legal",
-    name: "Legal",
-    icon: "scale",
-    summary: "Matters and precedents across the firm.",
-    uses: ["Matter memory", "Client history"],
-    photo: photo("legal", "The Supreme Court of the United States", "Joshua Woods", [0.62, 0.5]),
-  },
+/** Who Coere is for in a language. */
+export function applicationsIn(words: Catalog): Application[] {
+  return appBase.map((app) => ({ ...app, ...words.applications[app.slug] }));
+}
+
+export const applications: Application[] = applicationsIn(en);
+
+/** The industries in their order, with their icons and photos; the words come from the messages. */
+const industryBase: { slug: IndustrySlug; icon: IndustryIconName; photo: { by: string; focus?: Focus } }[] = [
+  { slug: "finance", icon: "chart", photo: { by: "David Vives" } },
+  { slug: "technology", icon: "cpu", photo: { by: "Chris Briggs", focus: [0.5, 0.4, 1.25] } },
+  { slug: "commerce", icon: "globe", photo: { by: "I P", focus: [0.7, 0.5] } },
+  { slug: "consumer", icon: "cart", photo: { by: "Franki Chamaki" } },
+  { slug: "manufacturing", icon: "factory", photo: { by: "Simon Kadula" } },
+  { slug: "energy", icon: "bolt", photo: { by: "Zetong Li" } },
+  { slug: "education", icon: "cap", photo: { by: "Jeremy Huang", focus: [0.45, 0.5] } },
+  { slug: "legal", icon: "scale", photo: { by: "Joshua Woods", focus: [0.62, 0.5] } },
 ];
+
+/** The industries in a language, from that language's catalog. */
+export function industriesIn(words: Catalog): Industry[] {
+  return industryBase.map(({ slug, icon, photo: shot }) => {
+    const { alt, ...copy } = words.industries[slug];
+    return { slug, icon, ...copy, uses: [...copy.uses], photo: photo(slug, alt, shot.by, shot.focus) };
+  });
+}
+
+export const industries: Industry[] = industriesIn(en);

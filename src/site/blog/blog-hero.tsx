@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { PixelMatrixLogos, type MatrixLogoId } from "@/site/art/pixel-matrix-logos";
 import { SplitHero } from "@/site/blocks/split-hero";
 import type { Post } from "@/site/content/posts";

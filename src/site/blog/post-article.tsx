@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { siteConfig } from "@/lib/site";
 import type { Post } from "@/site/content/posts";
 import { UNDER_NAV } from "@/site/nav/nav-space";

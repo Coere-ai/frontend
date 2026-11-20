@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { saveOrgSettings } from "@/app/admin/organizations/actions";
+import { saveOrgSettings } from "@/app/(app)/admin/organizations/actions";
 import type { AdminResult } from "@/lib/admin/action";
 import type { OrgDetailPayload } from "@/lib/admin/types";
 

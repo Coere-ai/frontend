@@ -1,4 +1,5 @@
 import { AI_LIST, pending, type Faq } from "./faqs";
+import type { Messages } from "@/site/i18n/messages/types";
 import type { HeroCopy } from "./pages/types";
 
 /**
@@ -58,6 +59,11 @@ export const guides: Guide[] = [
     },
   },
 ];
+
+/** The guides with their names in a language, for the footer and the cards that list them. */
+export function guidesIn(words: Messages["catalog"]): Guide[] {
+  return guides.map((guide) => ({ ...guide, ...words.guides[guide.slug] }));
+}
 
 export function guideBySlug(slug: GuideSlug): Guide {
   const guide = guides.find((g) => g.slug === slug);

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/site/i18n/link";
 import { PostMeta } from "@/site/blog/post-meta";
 import { posts } from "@/site/content/posts";
 import { ArrowLink } from "@/site/ui/arrow-link";

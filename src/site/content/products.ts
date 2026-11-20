@@ -1,3 +1,8 @@
+import { catalog as en } from "@/site/i18n/messages/en/catalog";
+import type { Messages } from "@/site/i18n/messages/types";
+
+type Catalog = Messages["catalog"];
+
 /** One of Coere's three products, with everything its menu card and page show. */
 export type Product = {
   slug: "connect" | "solutions" | "forge" | "agents";
@@ -11,45 +16,22 @@ export type Product = {
 
 const IMAGES = "/preview/images";
 
-export const products: Product[] = [
-  {
-    slug: "connect",
-    name: "Coere Connect",
-    kind: "Memory for people",
-    tagline: "Your memory, across every AI.",
-    description:
-      "A memory layer that belongs to you. It saves your chats from every AI you use and brings the right context into each new one.",
-    image: `${IMAGES}/connect.webp`,
-  },
-  {
-    slug: "solutions",
-    name: "Coere Solutions",
-    kind: "Memory for teams",
-    tagline: "One memory for the whole company.",
-    description:
-      "A shared memory for a company, its people and its clients. Every chat starts from what the team already knows.",
-    image: `${IMAGES}/solutions.webp`,
-  },
-  {
-    slug: "forge",
-    name: "Coere Forge",
-    kind: "Memory for developers",
-    tagline: "Memory infrastructure for your apps.",
-    description:
-      "The API, MCP server and SDKs that let your apps and agents use Coere as their memory layer, with the person's permission.",
-    image: `${IMAGES}/forge.webp`,
-  },
-  {
-    slug: "agents",
-    name: "Coere Agents",
-    kind: "Agents for every field",
-    tagline: "One worker, infinite possibilities, built on your memory.",
-    description:
-      "Cori, the helper in Coere, in a version for each field. Each one works from your memory and splits big tasks across workers.",
-    image: `${IMAGES}/agents.webp`,
-  },
+/** The products in their order, with their names and pictures; the words come from the messages. */
+const base: Pick<Product, "slug" | "name" | "image">[] = [
+  { slug: "connect", name: "Coere Connect", image: `${IMAGES}/connect.webp` },
+  { slug: "solutions", name: "Coere Solutions", image: `${IMAGES}/solutions.webp` },
+  { slug: "forge", name: "Coere Forge", image: `${IMAGES}/forge.webp` },
+  { slug: "agents", name: "Coere Agents", image: `${IMAGES}/agents.webp` },
 ];
 
-export function productBySlug(slug: string): Product | undefined {
-  return products.find((p) => p.slug === slug);
+/** The products in a language, from that language's catalog. Product names never change. */
+export function productsIn(words: Catalog): Product[] {
+  return base.map((product) => ({ ...product, ...words.products[product.slug] }));
+}
+
+/** The products in English, for the pages and data that are English only. */
+export const products: Product[] = productsIn(en);
+
+export function productBySlug(slug: string, list: Product[] = products): Product | undefined {
+  return list.find((p) => p.slug === slug);
 }

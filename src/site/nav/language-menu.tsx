@@ -1,19 +1,28 @@
 "use client";
 
 import { motion } from "motion/react";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Icon, type IconProps } from "@/site/ui/icons/icon";
 import { CheckIcon, ChevronDownIcon } from "@/site/ui/icons/interface-icons";
+import { useLocale, useMessages } from "@/site/i18n/client";
+import { isEnglishOnly, localeLabels, localizePath, locales, splitLocale, type Locale } from "@/site/i18n/locales";
+import { format } from "@/site/i18n/types";
 
 /**
- * The languages the site is written in. Only English exists today, so the
- * menu lists only English. A new language adds a row here with the path its
- * pages live under, and the menu offers it.
+ * The languages the site is written in, from src/site/i18n/locales.ts. Each
+ * row links to the page the reader is on, in that language: /pricing in
+ * Spanish is /es/pricing. A page that exists in English only (the account
+ * pages) offers each language's home page instead. Nothing is remembered
+ * and nothing redirects by the browser's language: the link is the choice.
  */
-export const languages = [{ code: "en", label: "English", href: "/" }] as const;
+export const languages = locales.map((code) => ({ code, label: localeLabels[code] }));
 
-type Language = (typeof languages)[number];
+function hrefIn(pathname: string, locale: Locale): string {
+  const { path } = splitLocale(pathname);
+  return localizePath(isEnglishOnly(path) ? "/" : path, locale);
+}
 
 const GlobeIcon = (p: IconProps) => (
   <Icon {...p}>
@@ -28,7 +37,11 @@ const GlobeIcon = (p: IconProps) => (
  * click outside or a scroll closes it. The menu is drawn on the page's body
  * under the button, since the glass bar clips whatever overflows it.
  */
-export function LanguageMenu({ current = languages[0] }: { current?: Language }) {
+export function LanguageMenu() {
+  const locale = useLocale();
+  const pathname = usePathname() ?? "/";
+  const t = useMessages("chrome").language;
+  const current = languages.find((language) => language.code === locale) ?? languages[0];
   const [place, setPlace] = useState<{ top: number; right: number } | null>(null);
   const open = place !== null;
   const button = useRef<HTMLButtonElement>(null);
@@ -75,7 +88,7 @@ export function LanguageMenu({ current = languages[0] }: { current?: Language })
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
-        aria-label={`Language: ${current.label}`}
+        aria-label={format(t.button, { name: current.label })}
         onClick={toggle}
         className="flex h-10 items-center gap-1.5 rounded-[10px] px-2.5 text-[14px] font-medium text-neutral-800 transition-colors hover:bg-neutral-950/[0.05] group-data-[tone=dark]/nav:text-white/85 group-data-[tone=dark]/nav:hover:bg-white/10 group-data-[tone=dark]/nav:hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
       >
@@ -91,7 +104,7 @@ export function LanguageMenu({ current = languages[0] }: { current?: Language })
               id={menuId}
               style={{ top: place.top, right: place.right }}
               role="menu"
-              aria-label="Language"
+              aria-label={t.menu}
               initial={{ opacity: 0, y: -4, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.16 }}
@@ -100,7 +113,8 @@ export function LanguageMenu({ current = languages[0] }: { current?: Language })
               {languages.map((language) => (
                 <a
                   key={language.code}
-                  href={language.href}
+                  href={hrefIn(pathname, language.code)}
+                  hrefLang={language.code}
                   role="menuitemradio"
                   aria-checked={language.code === current.code}
                   lang={language.code}

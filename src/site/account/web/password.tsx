@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { savePassword, type FieldState } from "@/app/(site)/account/sign-in-actions";
+import { savePassword, type FieldState } from "@/app/[lang]/(site)/account/sign-in-actions";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/auth/identity";
 import { FormStatus } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
