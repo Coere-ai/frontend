@@ -22,12 +22,15 @@ type PageSeo = {
   absolute?: boolean;
 };
 
+/** What the site's share picture shows, for people who cannot see it. */
+export const SHARE_ALT = "Coere: Accelerating Enterprise AI with Unified Context. The Coere mark among the AI logos on a pixel wall.";
+
 /**
- * The share picture (app/opengraph-image.png and twitter-image.png). A page
- * that sets its own share text replaces the root's, picture and all, so
- * every page names it again here.
+ * The share picture, drawn at build time by app/opengraph-image.tsx and
+ * twitter-image.tsx. A page that sets its own share text replaces the
+ * root's, picture and all, so every page names it again here.
  */
-const SHARE_IMAGE = { url: "/opengraph-image.png", width: 1200, height: 630, alt: "Coere: the memory layer you own, across every AI" };
+const SHARE_IMAGE = { url: "/opengraph-image", width: 1200, height: 630, type: "image/png", alt: SHARE_ALT };
 
 /** A page's title, description, keywords, canonical link and share text, all from one place. */
 export function pageMetadata({ title, description, path, keywords = [], absolute = false }: PageSeo): Metadata {
@@ -38,7 +41,7 @@ export function pageMetadata({ title, description, path, keywords = [], absolute
     keywords: [...new Set([...keywords, ...KEYWORDS])],
     alternates: { canonical: path },
     openGraph: { type: "website", siteName: siteConfig.name, url: path, title: full, description, images: [SHARE_IMAGE] },
-    twitter: { card: "summary_large_image", title: full, description, images: [{ ...SHARE_IMAGE, url: "/twitter-image.png" }] },
+    twitter: { card: "summary_large_image", title: full, description, images: [{ ...SHARE_IMAGE, url: "/twitter-image" }] },
   };
 }
 
