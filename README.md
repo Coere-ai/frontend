@@ -320,6 +320,10 @@ drawn, so it can be checked again when the API changes.
 The roles and every blog post but the funding news are placeholder content
 for now; each content file says so at the top. The industry stories illustrate what each product does;
 they are not customers.
+Each industry page also lists the standards Coere will meet before it works
+with that field (`src/site/content/compliance.ts`). Coere is pre launch and
+holds none of them yet, so the copy never says it is certified or compliant,
+and a test keeps it that way.
 
 ## Accounts
 
