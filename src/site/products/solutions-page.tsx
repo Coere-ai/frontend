@@ -21,7 +21,7 @@ import { SolutionsBackdrop } from "./solutions-backdrop";
 export function SolutionsPage() {
   return (
     <>
-      <ProductHero copy={solutionsHero} backdrop={<SolutionsBackdrop />} tone="dark" laser app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
+      <ProductHero copy={solutionsHero} backdrop={<SolutionsBackdrop />} tone="dark" app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
       <ProductSection id="how" title="How your team shares one memory" line="Built from the chats your team already has, sorted into the company and each client.">
         <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.tangle} />
       </ProductSection>
