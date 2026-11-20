@@ -8,7 +8,7 @@ Maya Collins, made up for these pictures.
 ## Home
 
 <p align="center">
-  <img src="home-hero.webp" width="100%" alt="The dark home hero under the dark glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left over blue MicroSlats, and three tall tiles on the right: Coere saving chats cut off at the top, the dashboard with its rail, tokens saved, efficiency, time saved and recent chats, and the memory graph cut off at the foot" />
+  <img src="home-hero.webp" width="100%" alt="The dark home hero under the dark glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Learn more on the left over blue MicroSlats, and three tall tiles on the right: Coere saving chats cut off at the top, the dashboard with its rail, tokens saved, efficiency, time saved and recent chats, and the memory graph cut off at the foot" />
   <br />
   <sub>The first screen: what Coere does and the way in, beside Coere saving chats, the dashboard and the memory graph, running from the top of the hero to its foot.</sub>
 </p>

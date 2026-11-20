@@ -6,7 +6,7 @@ import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "@/site/ui/container";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { SoftLink } from "@/site/ui/soft-button";
-import { DemoDialog } from "./hero/demo-dialog";
+import { LearnMore } from "./hero/learn-more";
 import { HERO_INK, HeroBackdrop } from "./hero/hero-backdrop";
 import { HeroStack } from "./hero/hero-stack";
 
@@ -53,7 +53,7 @@ export function Hero() {
               {startLabel}
               <ArrowRightIcon size={17} strokeWidth={2} className="transition-transform group-hover:translate-x-0.5" />
             </SoftLink>
-            <DemoDialog />
+            <LearnMore />
           </Rise>
         </div>
         <HeroStack />

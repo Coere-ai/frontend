@@ -35,7 +35,7 @@ pictures: [the site](docs/screenshots/site/README.md),
 ### The site
 
 <p align="center">
-  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The dark home hero under the dark glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left over blue MicroSlats, and on the right three tall tiles: Coere saving chats cut off at the top, the dashboard with tokens saved, efficiency, time saved and recent chats, and the memory graph cut off at the foot" />
+  <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The dark home hero under the dark glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Learn more on the left over blue MicroSlats, and on the right three tall tiles: Coere saving chats cut off at the top, the dashboard with tokens saved, efficiency, time saved and recent chats, and the memory graph cut off at the foot" />
   <br />
   <sub>The home page: what Coere does, beside Coere saving chats, the dashboard and the memory graph. The page stays dark to its footer. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
 </p>
