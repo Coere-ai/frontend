@@ -7,9 +7,11 @@ import { industries } from "@/site/content/industries";
 import { navTabs, type NavTabId } from "@/site/content/navigation";
 import { posts } from "@/site/content/posts";
 import { products } from "@/site/content/products";
-import { CircleArrowLink } from "@/site/ui/button";
+import { startHref, startLabel } from "@/site/content/navigation";
 import { ChevronDownIcon } from "@/site/ui/icons/interface-icons";
+import { SoftLink } from "@/site/ui/soft-button";
 import { AccountLink } from "./account-link";
+import { LanguageMenu } from "./language-menu";
 
 type Item = { href: string; label: string };
 
@@ -32,8 +34,10 @@ const items: Record<NavTabId, Item[]> = {
 };
 
 /**
- * The full screen menu below lg. Each tab folds open to its links. While it
- * is open the page behind it doesn't scroll.
+ * The menu below lg: a white card under the glass bar, filling the rest of
+ * the screen. Each tab folds open to its links, then come Start for free,
+ * Log in and the language. While it is open the page behind it doesn't
+ * scroll.
  */
 export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [expanded, setExpanded] = useState<NavTabId | null>("products");
@@ -56,9 +60,9 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-x-0 top-[73px] bottom-0 overflow-y-auto bg-white lg:hidden"
+          className="fixed inset-x-3 top-[80px] bottom-3 overflow-y-auto rounded-[20px] border border-neutral-200/80 bg-white shadow-[0_30px_80px_-30px_rgba(20,17,15,0.35)] sm:inset-x-4 md:inset-x-6 lg:hidden"
         >
-          <nav aria-label="Mobile" className="px-6 pt-2 pb-10">
+          <nav aria-label="Mobile" className="px-5 pt-1 pb-8">
             {navTabs.map((tab) => (
               <div key={tab.id} className="border-b border-neutral-100">
                 <button
@@ -83,11 +87,16 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
                 ) : null}
               </div>
             ))}
-            {/* The same Install as the navbar's; the menu closes as it opens, like the tabs above. */}
-            <CircleArrowLink href="/install" onClick={onClose} wide className="mt-8">
-              Install
-            </CircleArrowLink>
-            <AccountLink variant="secondary" className="mt-3 w-full" onNavigate={onClose} />
+            {/* The same Start for free as the navbar's; the menu closes as it opens, like the tabs above. */}
+            <SoftLink href={startHref} size="lg" onClick={onClose} className="mt-8 w-full">
+              {startLabel}
+            </SoftLink>
+            <div className="mt-3 flex flex-col gap-3">
+              <AccountLink variant="panel" onNavigate={onClose} />
+            </div>
+            <div className="mt-6 flex justify-center">
+              <LanguageMenu />
+            </div>
           </nav>
         </motion.div>
       ) : null}

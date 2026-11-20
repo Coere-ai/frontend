@@ -4,11 +4,19 @@ import { siteConfig } from "@/lib/site";
 export type NavTabId = "products" | "industries" | "resources" | "blog" | "about" | "careers";
 
 export const navTabs: { id: NavTabId; label: string; href: string }[] = [
-  { id: "products", label: "Products", href: "/products/connect" },
-  { id: "industries", label: "Industries", href: "/industries" },
+  { id: "products", label: "Product", href: "/products/connect" },
+  { id: "industries", label: "Industry", href: "/industries" },
   { id: "resources", label: "Resources", href: "/resources" },
-  { id: "about", label: "About Us", href: "/about" },
+  { id: "about", label: "About us", href: "/about" },
 ];
+
+/**
+ * The first step for someone new: install Coere. The extension opens the
+ * connect page, where they make an account or sign in, so a sign up first
+ * would only land them on a page that says to install (docs/launch.md 7.5).
+ */
+export const startHref = "/install";
+export const startLabel = "Start for free";
 
 /** The site's waitlist button: it opens the developer waitlist page. */
 export const contactHref = "/developers/waitlist";

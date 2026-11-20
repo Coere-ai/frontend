@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { ChevronDownIcon } from "@/site/ui/icons/interface-icons";
 
 /**
- * One navbar tab. Hovering draws a black line under the label that grows out
- * from the middle; the line stays while the tab's menu is open.
+ * One navbar tab: its label and a small chevron on a soft square that
+ * lights on hover and stays lit while the tab's menu is open. Clicking goes
+ * to the tab's page; hovering or focusing opens its menu.
  */
 export function NavTab({
   label,
@@ -22,17 +24,12 @@ export function NavTab({
       onFocus={onOpen}
       aria-expanded={active}
       aria-controls="site-menu"
-      className="group flex h-[72px] items-center px-4 text-[15px] text-neutral-950 outline-none"
+      className={`group flex h-10 items-center gap-1 rounded-[10px] px-3 text-[14px] font-medium text-neutral-800 transition-colors hover:bg-neutral-950/[0.05] hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
+        active ? "bg-neutral-950/[0.05] text-neutral-950" : ""
+      }`}
     >
-      <span className="relative py-1">
-        {label}
-        <span
-          aria-hidden="true"
-          className={`absolute inset-x-0 -bottom-0.5 h-[1.5px] origin-center bg-neutral-950 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100"
-          }`}
-        />
-      </span>
+      {label}
+      <ChevronDownIcon size={14} className={`text-neutral-500 transition-transform duration-300 ${active ? "rotate-180" : ""}`} />
     </Link>
   );
 }
