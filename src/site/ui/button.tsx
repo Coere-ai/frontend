@@ -9,7 +9,7 @@ const base =
 
 /** Each look on a dark page (see DarkPage): Coere blue for the main step, dark glass with a fine light edge for the second. */
 const variants: Record<Variant, string> = {
-  primary: "bg-neutral-950 text-white hover:bg-neutral-800 dark:bg-brand-500 dark:shadow-[0_12px_30px_-12px_rgba(82,103,247,0.9)] dark:hover:bg-brand-600 dark:focus-visible:outline-white",
+  primary: "bg-neutral-950 text-white hover:bg-neutral-800 dark:bg-brand-500 dark:shadow-[0_6px_14px_-8px_rgba(82,103,247,0.45)] dark:hover:bg-brand-600 dark:focus-visible:outline-white",
   secondary:
     "border border-neutral-200 bg-white text-neutral-950 hover:border-neutral-950 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/40 dark:hover:bg-white/10 dark:focus-visible:outline-white",
   ghost: "text-neutral-950 hover:bg-neutral-100 dark:text-white dark:hover:bg-white/10 dark:focus-visible:outline-white",

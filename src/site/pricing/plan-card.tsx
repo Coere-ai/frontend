@@ -26,7 +26,7 @@ export function PlanCard({ plan }: { plan: Plan }) {
   const external = !plan.cta.href.startsWith("/");
   const button = `inline-flex h-12 w-full items-center justify-center rounded-full px-6 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${
     featured
-      ? "bg-brand-500 text-white shadow-[0_12px_30px_-12px_rgba(82,103,247,0.9)] hover:bg-brand-400 focus-visible:outline-white"
+      ? "bg-brand-500 text-white shadow-[0_6px_14px_-8px_rgba(82,103,247,0.45)] hover:bg-brand-400 focus-visible:outline-white"
       : dark
         ? "bg-white text-neutral-950 hover:bg-white/85 focus-visible:outline-white"
         : "bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-brand-500"

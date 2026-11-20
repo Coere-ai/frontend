@@ -90,7 +90,7 @@ export function SplitHero({
 function HeroButton({ link, kind, dark }: { link: HeroLink; kind: "primary" | "secondary"; dark: boolean }) {
   const look =
     kind === "primary"
-      ? "bg-brand-500 text-white shadow-[0_12px_30px_-12px_rgba(82,103,247,0.9)] hover:bg-brand-600 focus-visible:outline-brand-500"
+      ? "bg-brand-500 text-white shadow-[0_6px_14px_-8px_rgba(82,103,247,0.45)] hover:bg-brand-600 focus-visible:outline-brand-500"
       : dark
         ? "bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-md hover:bg-white/15 focus-visible:outline-white"
         : "bg-white/75 text-neutral-950 ring-1 ring-neutral-950/10 backdrop-blur-md hover:bg-white focus-visible:outline-neutral-950";

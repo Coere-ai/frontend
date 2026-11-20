@@ -10,7 +10,7 @@ type Tone = "blue" | "outline";
 type Size = "md" | "lg";
 
 const tones: Record<Tone, string> = {
-  blue: "bg-brand-500 text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_8px_20px_-8px_rgba(82,103,247,0.7)] hover:bg-brand-600",
+  blue: "bg-brand-500 text-white shadow-[0_1px_0_rgba(255,255,255,0.25)_inset,0_4px_10px_-6px_rgba(82,103,247,0.4)] hover:bg-brand-600",
   outline: "bg-white/90 text-neutral-950 ring-1 ring-neutral-950/15 hover:bg-white hover:ring-neutral-950/40",
 };
 

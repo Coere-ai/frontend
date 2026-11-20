@@ -25,7 +25,7 @@ export function ClosingCta({
           <h2 className="mx-auto max-w-4xl text-5xl font-semibold tracking-[-0.05em] text-neutral-950 text-balance md:text-7xl dark:text-white">{title}</h2>
           <p className="mx-auto mt-6 max-w-xl text-lg text-neutral-600 dark:text-white/65">{text}</p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <ButtonLink href={primary.href} className="dark:bg-brand-500 dark:shadow-[0_12px_30px_-12px_rgba(82,103,247,0.9)] dark:hover:bg-brand-600 dark:focus-visible:outline-white">
+            <ButtonLink href={primary.href} className="dark:bg-brand-500 dark:shadow-[0_6px_14px_-8px_rgba(82,103,247,0.45)] dark:hover:bg-brand-600 dark:focus-visible:outline-white">
               {primary.label}
             </ButtonLink>
             <ButtonLink href="/demo" variant="secondary" className="dark:border-white/20 dark:bg-white/10 dark:text-white dark:backdrop-blur-md dark:hover:border-white/20 dark:hover:bg-white/15 dark:focus-visible:outline-white">
