@@ -1,31 +1,70 @@
-import type { ReactNode } from "react";
-import { UNDER_NAV } from "@/site/nav/nav-space";
-import { Container } from "@/site/ui/container";
+import Link from "next/link";
+import { PixelMatrixLogos, type MatrixLogoId } from "@/site/art/pixel-matrix-logos";
+import { SplitHero } from "@/site/blocks/split-hero";
+import type { Post } from "@/site/content/posts";
+import { Underlined } from "@/site/ui/underlined";
+import { PostCover } from "./post-cover";
+import { PostMeta } from "./post-meta";
+
+/** A few AIs only, so the wall stays quiet round the post. */
+const WALL_LOGOS: readonly MatrixLogoId[] = ["chatgpt", "claude", "gemini", "perplexity", "deepseek"];
 
 /**
- * The blog's opening: a dark band in the look of the Coere Solutions and
- * Forge heroes, with the page title, a line about the blog, and the
- * featured post under them. It marks itself dark, so the glass navbar over
- * it turns dark too.
+ * The wall behind the blog's opening: flat near black with the Coere
+ * Solutions LED wall of AI logos on it, fewer and dimmer. The wall is
+ * lightened onto the flat black, so where it is dark the black shows
+ * through untouched and only the lit cells add to it.
  */
-export function BlogHero({ children }: { children: ReactNode }) {
+function BlogBackdrop() {
   return (
-    <section data-nav-tone="dark" aria-labelledby="blog-title" className={`relative isolate overflow-hidden bg-[#05060d] pt-[136px] pb-20 text-white md:pt-[176px] md:pb-28 ${UNDER_NAV}`}>
-      <div aria-hidden="true" className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(60%_55%_at_18%_0%,rgba(82,103,247,0.32),rgba(82,103,247,0)_70%),radial-gradient(45%_50%_at_95%_35%,rgba(63,76,235,0.18),rgba(63,76,235,0)_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(163,176,253,0.16)_1px,transparent_1.2px)] [background-size:14px_14px] [mask-image:linear-gradient(180deg,#000,transparent_70%)]" />
+    <div className="absolute inset-0 bg-[#0b0a12]">
+      <div className="absolute inset-0 opacity-60 mix-blend-lighten">
+        <PixelMatrixLogos logos={WALL_LOGOS} layout="frame" className="[background:none]!" />
       </div>
-      <Container>
-        <div className="flex flex-wrap items-end justify-between gap-x-16 gap-y-6">
-          <h1 id="blog-title" className="text-[3.25rem] leading-[0.98] font-semibold tracking-[-0.055em] md:text-[5.5rem]">
-            The Coere blog
-          </h1>
-          <p className="max-w-md text-[17px] leading-relaxed text-white/65 text-pretty md:pb-2 md:text-lg">
-            News, launches and notes from the team building the memory layer you own.
-          </p>
-        </div>
-        <div className="mt-14 border-t border-white/10 pt-14 md:mt-20 md:pt-16">{children}</div>
-      </Container>
-    </section>
+    </div>
+  );
+}
+
+/** The newest post as the hero's picture: its cover in a white card, its meta and title under it. */
+function NewestPost({ post }: { post: Post }) {
+  return (
+    <Link
+      href={`/blog/${post.slug}`}
+      className="group block rounded-[26px] bg-white p-2.5 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)] ring-1 ring-white/15 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
+    >
+      <PostCover
+        post={post}
+        priority
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        className="rounded-[18px]"
+        imageClassName="transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.025]"
+      />
+      <div className="px-3.5 pt-5 pb-4 md:px-5 md:pt-6 md:pb-5">
+        <PostMeta post={post} />
+        <h2 className="mt-2.5 text-[24px] leading-[1.15] font-semibold tracking-[-0.03em] text-neutral-950 text-balance md:text-[30px]">
+          <Underlined big>{post.title}</Underlined>
+        </h2>
+      </div>
+    </Link>
+  );
+}
+
+/**
+ * The blog's opening, on the dark split hero the product pages use: the
+ * title, one line and a way to the newest post on the left, and that post
+ * as a large card on the right. The hero marks itself dark, so the glass
+ * navbar over it turns dark too.
+ */
+export function BlogHero({ post }: { post: Post }) {
+  return (
+    <SplitHero
+      title="The Coere blog"
+      line="News, launches and notes from the team building the memory layer you own."
+      primary={{ href: `/blog/${post.slug}`, label: "Read the newest post" }}
+      app={<NewestPost post={post} />}
+      appFit="contained"
+      backdrop={<BlogBackdrop />}
+      tone="dark"
+    />
   );
 }

@@ -58,8 +58,8 @@ export async function shootSite(browser, base, shooter, { scale }) {
   await open(page, base, "/about");
   const team = await page.locator("section#team").evaluate((el) => Math.round(el.getBoundingClientRect().top + window.scrollY));
   await s("about", { full: true, clip: { x: 0, y: 0, width: 1440, height: team } });
-  // The blog with its featured post, the funding post, and careers.
-  for (const [name, path] of [["blog", "/blog"], ["blog-post", "/blog/coere-is-venture-backed"], ["careers", "/careers"]]) {
+  // The blog with the newest post in its hero, that post, and careers.
+  for (const [name, path] of [["blog", "/blog"], ["blog-post", "/blog/introducing-coere-connect"], ["careers", "/careers"]]) {
     await open(page, base, path);
     await s(name, { full: true });
   }
