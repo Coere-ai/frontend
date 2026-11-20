@@ -10,9 +10,9 @@ import { UNDER_NAV } from "@/site/nav/nav-space";
 export const metadata: Metadata = pageMetadata({ ...aboutSeo, path: "/about" });
 
 /**
- * The About page, dark from the top down to the footer, in the near black
- * and deep blue light of the Forge and Solutions heroes. The whole page is
- * marked dark, so the glass navbar stays dark over every part of it.
+ * The About page, dark from the top down to the footer: flat near black,
+ * with ASCII Tiles behind the hero only. The whole page is marked dark,
+ * so the glass navbar stays dark over every part of it.
  */
 export default function AboutPage() {
   return (

@@ -6,14 +6,13 @@ const BUTTON = "inline-flex h-12 items-center justify-center rounded-full px-6 t
 
 /**
  * The About page's last word, on the dark page: one line and a way to reach
- * the founders, on a glass panel lit with Coere blue from below.
+ * the founders, on a plain glass panel with a fine light border.
  */
 export function AboutClosing({ title, text }: { title: string; text: string }) {
   return (
     <section className="pt-8 pb-24 md:pt-12 md:pb-32">
       <Container>
         <div className="relative isolate overflow-hidden rounded-[28px] bg-white/[0.03] px-6 py-20 text-center ring-1 ring-white/10 md:py-28">
-          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_80%_at_50%_120%,rgba(82,103,247,0.45)_0%,rgba(63,76,235,0.14)_45%,rgba(11,10,18,0)_75%)]" />
           <h2 className="mx-auto max-w-4xl text-5xl font-semibold tracking-[-0.05em] text-white text-balance md:text-7xl">{title}</h2>
           <p className="mx-auto mt-6 max-w-xl text-lg text-white/65">{text}</p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">

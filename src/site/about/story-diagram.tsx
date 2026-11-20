@@ -10,7 +10,7 @@ const visuals: ReactNode[] = [<ScatteredApps key="apps" />, <AppPieces key="piec
  * Why Coere exists, read top to bottom: four steps, each with its words on
  * the left and a picture on the right, and an arrow down to the next. It
  * stays still; nothing moves as the page scrolls. It sits on the dark page,
- * so each picture is a glass panel lit with Coere blue.
+ * so each picture sits on a plain glass panel with a fine light border.
  */
 export function StoryDiagram() {
   return (
@@ -25,7 +25,7 @@ export function StoryDiagram() {
                   <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white text-balance md:text-[2.75rem] md:leading-[1.06]">{step.title}</h2>
                   <p className="mt-4 text-[17px] leading-relaxed text-white/65 text-pretty">{step.text}</p>
                 </div>
-                <div className="rounded-[32px] bg-[linear-gradient(160deg,rgba(82,103,247,0.16)_0%,rgba(255,255,255,0.03)_60%)] p-6 ring-1 ring-white/10 md:p-10">{visuals[index]}</div>
+                <div className="rounded-[32px] bg-white/[0.03] p-6 ring-1 ring-white/10 md:p-10">{visuals[index]}</div>
               </div>
               {index < storySteps.length - 1 ? (
                 <div className="grid py-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] md:gap-14" aria-hidden="true">

@@ -4,11 +4,10 @@ import { Reveal } from "@/site/ui/reveal";
 import { TeamCard } from "./team-card";
 import { TeamLanyards } from "./team-lanyards";
 
-/** The people behind Coere, on the dark page: their lanyards in a soft blue light, then each founder's record in two columns. */
+/** The people behind Coere, on the dark page: their lanyards, then each founder's record in two columns. */
 export function TeamSection() {
   return (
     <section id="team" className="relative isolate scroll-mt-24 overflow-hidden pt-24 pb-28 md:pt-32">
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(55%_38%_at_50%_42%,rgba(63,76,235,0.22)_0%,rgba(63,76,235,0.07)_50%,rgba(11,10,18,0)_80%)]" />
       <Container>
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-semibold text-brand-300">Our team</p>
