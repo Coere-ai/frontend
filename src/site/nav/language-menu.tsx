@@ -77,11 +77,11 @@ export function LanguageMenu({ current = languages[0] }: { current?: Language })
         aria-controls={menuId}
         aria-label={`Language: ${current.label}`}
         onClick={toggle}
-        className="flex h-10 items-center gap-1.5 rounded-[10px] px-2.5 text-[14px] font-medium text-neutral-800 transition-colors hover:bg-neutral-950/[0.05] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+        className="flex h-10 items-center gap-1.5 rounded-[10px] px-2.5 text-[14px] font-medium text-neutral-800 transition-colors hover:bg-neutral-950/[0.05] group-data-[tone=dark]/nav:text-white/85 group-data-[tone=dark]/nav:hover:bg-white/10 group-data-[tone=dark]/nav:hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
       >
         <GlobeIcon size={17} />
         {current.label}
-        <ChevronDownIcon size={14} className={`text-neutral-500 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDownIcon size={14} className={`text-neutral-500 transition-transform group-data-[tone=dark]/nav:text-white/60 ${open ? "rotate-180" : ""}`} />
       </button>
       {/* Only while open, so the server and the first client render agree. */}
       {place

@@ -37,7 +37,7 @@ const serverHint = () => false;
 
 /** The glass navbar's quiet text button, squarer than the site's pills to match the bar. */
 const NAV_LOOK =
-  "inline-flex h-10 items-center justify-center rounded-[10px] px-3 text-[14px] font-medium whitespace-nowrap text-neutral-800 transition-colors hover:bg-neutral-950/[0.05] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
+  "inline-flex h-10 items-center justify-center rounded-[10px] px-3 text-[14px] font-medium whitespace-nowrap text-neutral-800 transition-colors hover:bg-neutral-950/[0.05] group-data-[tone=dark]/nav:text-white/85 group-data-[tone=dark]/nav:hover:bg-white/10 group-data-[tone=dark]/nav:hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500";
 
 /** The same, full width and taller, under Start for free in the phone menu. */
 const PANEL_LOOK =

@@ -14,8 +14,12 @@ export function BrandLockup({ height = 26 }: { height?: number }) {
   return (
     <span className="flex items-center gap-2">
       <LogoMark className="h-6 w-6 shrink-0 text-brand-500" />
-      <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="block shrink-0">
+      {/* The white copy shows when the navbar sits over a dark hero. */}
+      <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="block shrink-0 group-data-[tone=dark]/nav:hidden">
         <image href="/coere-wordmark.svg" width="1284" height="512" />
+      </svg>
+      <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="hidden shrink-0 group-data-[tone=dark]/nav:block">
+        <image href="/coere-wordmark-white.svg" width="1284" height="512" />
       </svg>
     </span>
   );

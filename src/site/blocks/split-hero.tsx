@@ -46,7 +46,7 @@ export function SplitHero({
   const framed = appFit === "framed";
   const plainFrame = framed ? (dark ? "overflow-hidden rounded-2xl bg-white ring-1 ring-white/15 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)]" : "overflow-hidden rounded-2xl bg-white shadow-[0_40px_100px_-40px_rgba(20,17,15,0.45),0_0_0_1px_rgba(20,17,15,0.06)]") : "";
   return (
-    <section className={`relative isolate overflow-hidden ${UNDER_NAV} ${dark ? "bg-[#0b0a12] text-white" : "bg-white text-neutral-950"}`}>
+    <section data-nav-tone={dark ? "dark" : undefined} className={`relative isolate overflow-hidden ${UNDER_NAV} ${dark ? "bg-[#0b0a12] text-white" : "bg-white text-neutral-950"}`}>
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         {backdrop}
       </div>
