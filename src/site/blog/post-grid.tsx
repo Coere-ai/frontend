@@ -42,7 +42,7 @@ export function PostGrid({ posts }: { posts: Post[] }) {
       <p className="sr-only" aria-live="polite">
         {filter === "All" ? `${shown.length} posts` : `${shown.length} ${shown.length === 1 ? "post" : "posts"} in ${filter}`}
       </p>
-      <ul className="mt-10 grid gap-x-10 gap-y-16 md:mt-12 md:grid-cols-2">
+      <ul className="mt-10 grid gap-x-8 gap-y-16 md:mt-12 md:grid-cols-2 lg:grid-cols-3">
         {shown.map((post) => (
           <li key={post.slug}>
             <PostCard post={post} size="lg" />
