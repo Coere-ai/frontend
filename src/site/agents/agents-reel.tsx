@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { films, type Film } from "@/site/content/films";
-import { agentsReel as parts } from "@/site/content/pages/agents";
+import type { ReelPart } from "@/site/content/pages/agents";
 import { LiveDemo, posterOf, type DemoState } from "@/site/ui/live-demo";
 
 /** How long a part's last frame holds before the next one fades in, and the fade, in ms. */
@@ -31,7 +31,7 @@ const watchMotion = (change: () => void) => {
  * the top say which part plays and jump to any of them. With reduced
  * motion the reel stays on one part, looping it, until a tab is picked.
  */
-export function AgentsReel() {
+export function AgentsReel({ parts, label }: { parts: ReelPart[]; label: string }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [shown, setShown] = useState(0);
   // The part whose still is fading in over the one playing, or sits there until its film reports in.
@@ -104,7 +104,7 @@ export function AgentsReel() {
     <div className="bg-white">
       <div
         role="tablist"
-        aria-label="Parts of Coere Agents"
+        aria-label={label}
         className="grid grid-cols-6 border-b border-neutral-950/[0.07]"
         onKeyDown={(e) => {
           if (e.key === "ArrowRight") go((shown + 1) % parts.length);

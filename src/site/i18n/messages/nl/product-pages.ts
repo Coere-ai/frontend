@@ -1,0 +1,215 @@
+import type { Messages } from "../types";
+
+export const productPages: Messages["productPages"] = {
+  more: "Meer van Coere",
+  explore: "Ontdek",
+  connect: {
+    seo: {
+      title: "Coere Connect: één AI-geheugen voor ChatGPT, Claude en Gemini",
+      description: "Een Chrome-extensie die je chats uit ChatGPT, Claude, Gemini en zes andere AI's op je computer bewaart en elke nieuwe chat de juiste context geeft.",
+    },
+    hero: {
+      title: "Jouw geheugen, in elke AI",
+      line: "Een Chrome-extensie die je chats uit ChatGPT, Claude, Gemini en zes andere AI's bewaart, er een geheugen van bouwt dat van jou is en dat meeneemt naar elke nieuwe chat.",
+      checks: [
+        "Elke AI: ChatGPT, Claude, Gemini en zes andere voeden één geheugen",
+        "Terwijl je typt: een regel boven het chatvak zegt wat er met je bericht meegaat",
+        "Van jou: niets gaat naar een AI om geheugen te bouwen voordat je ja zegt",
+      ],
+    },
+    secondary: "Bekijk wat het doet",
+    useCases: { title: "Zet je geheugen aan het werk", line: "Haal al je chats binnen, bouw er één geheugen van en laat Cori ermee aan de slag gaan.", link: "Wat draagbaar AI-geheugen betekent" },
+    cases: [
+      {
+        label: "Chats importeren",
+        title: "Al je chats, op één plek bewaard",
+        text: "Extract all leest elke AI die je gebruikt en bewaart elke chat op je computer. Daarna worden nieuwe chats vanzelf bewaard.",
+        checks: ["Een rij per AI terwijl hij bewaart", "Bewaard op deze computer", "Het geheugen volgt een chat die verandert"],
+        link: "Neem je ChatGPT-geheugen mee naar Claude",
+      },
+      {
+        label: "Geheugen bouwen",
+        title: "Alles wat je chats het leerden, in één graaf",
+        text: "Coere leest je chats en laat sectie voor sectie een graaf van je leven groeien. Elke herinnering staat naast de chats waar ze vandaan komt.",
+        checks: ["De weergaven All, Memories en Chats", "Eén klik opent een sectie van dichtbij", "Zoeken licht de beste treffers op"],
+      },
+      {
+        label: "Quizzen en formulieren",
+        title: "Cori werkt op de pagina die je open hebt",
+        text: "Vraag Cori een quiz te maken of een formulier in te vullen. Hij antwoordt stap voor stap vanuit je geheugen, met Take over en Stop in de balk.",
+        checks: ["Vraagt het eerst bij alles wat niet ongedaan kan", "Typt nooit een wachtwoord of kaartnummer", "Stopt als een pagina hem bevelen probeert te geven"],
+      },
+      {
+        label: "Schrijven",
+        title: "Verbeter je tekst precies waar hij staat",
+        text: "Selecteer tekst in Gmail, Docs of een chatvak en kies Rewrite, Improve of Fix grammar only. Elke wijziging krijgt een blauw kader tot je haar houdt.",
+        checks: ["Fix grammar only houdt je eigen woorden", "Improve houdt elk feit dat je schreef", "Go back zet je tekst precies terug"],
+      },
+      {
+        label: "E-mail",
+        title: "E-mail in je eigen stijl",
+        text: "Vraag Cori om een e-mail en hij schrijft die in zijn eigen Gmail-tabblad met wat je geheugen weet.",
+        checks: ["Geschreven in jouw stijl", "In een eigen tabblad", "Vraagt het eerst voordat hij iemand schrijft die je niet noemde"],
+      },
+    ],
+    compare: {
+      title: "Dezelfde chat, 97,7% minder tokens",
+      line: "Zonder Coere plak je bestanden en notities in elke nieuwe chat. Met Coere noem je het project en gaat de juiste context vanzelf mee.",
+      label: "Zonder Coere: 10.400 tokens en 4 minuten 12 seconden. Met Coere: 240 tokens en 5 seconden.",
+    },
+    everything: "Alles in Coere Connect",
+    grid: [
+      { title: "Geheugengraaf", text: "Je chats geordend in secties en mappen rond jou, elke herinnering naast haar chats." },
+      { title: "Extract all", text: "Elke chat uit je AI's bewaard op je computer, en nieuwe zodra ze er zijn." },
+      { title: "Slimme context", text: "De juiste herinneringen gaan voor je bericht terwijl je typt, met één keer Enter." },
+      { title: "Spraak", text: "Houd de rechter Option-toets ingedrukt en praat. Cori antwoordt hardop zodra je loslaat." },
+      { title: "Cori", text: "Een assistent op elke AI die je oude chats in gewone woorden vindt." },
+      { title: "Gmail", text: "E-mail in jouw stijl, in een eigen tabblad." },
+      { title: "Herschrijven", text: "Verbeter tekst in Gmail, Docs en elk chatvak." },
+      { title: "Werkers", text: "Onderzoek verdeeld over tabbladen en samengevoegd in één tabel, elke waarde met haar pagina." },
+    ],
+    why: "Waarom mensen kiezen voor Coere Connect",
+    slides: [
+      { label: "Elke AI, één geheugen", text: "ChatGPT, Claude, Gemini en zes andere AI's voeden hetzelfde geheugen, dus een nieuwe chat begint overal bij wat je al zei." },
+      { label: "Context terwijl je typt", text: "Een blauwe regel boven het chatvak zegt wat Coere toevoegt en van welke AI het dat leerde. Wat meegaat, pas je altijd aan voordat je verstuurt." },
+      { label: "Van jou", text: "Elke chat wordt op je computer bewaard. Coere vraagt waaruit het geheugen gebouwd mag worden, en niets gaat naar een AI voordat je ja zegt." },
+    ],
+    closing: "Jouw geheugen, in elke AI.",
+  },
+  solutions: {
+    seo: {
+      title: "Coere Solutions: gedeeld AI-geheugen voor teams en klanten",
+      description: "Eén geheugen van je bedrijf, zijn mensen en zijn klanten, gebouwd uit de chats die je team al heeft. Eén klant per verzending, met een bron bij elk antwoord.",
+    },
+    hero: {
+      title: "Eén geheugen voor het hele bedrijf",
+      line: "Coere Solutions geeft je team gedeeld AI-geheugen: één geheugen van het bedrijf, zijn mensen en zijn klanten, gebouwd uit de chats die je team al heeft.",
+      checks: [
+        "Bedrijf: het team, zijn manier van werken en zijn tools",
+        "Klanten: een map per klant, met contacten en afspraken",
+        "Eén klant per verzending: een concept over de ene klant krijgt nooit het geheugen van een andere",
+      ],
+    },
+    secondary: "Zo werkt het",
+    how: { title: "Zo deelt je team één geheugen", line: "Gebouwd uit de chats die je team al heeft, geordend in het bedrijf en elke klant." },
+    cases: [
+      {
+        title: "Bedrijf en klanten",
+        text: "Extract all bewaart elke chat uit de AI's van je team, en de graaf groeit uit tot Company en Clients terwijl Coere ze leest.",
+        checks: ["Contacten, afspraken en beslissingen per klant", "Een klant die de chats vonden, wacht in Review", "Vraag Cori wat het team een klant beloofde"],
+      },
+      {
+        title: "De juiste klant in elke chat",
+        text: "Begin een antwoord over een klant en de blauwe regel noemt de klant waar het concept over gaat. Wat meegaat, staat op de regel voordat je verstuurt.",
+        checks: ["Eén klant gaat mee met elke verzending", "Bij een vervolg gaat alleen mee wat veranderde", "Lange context kan als bestand mee (bèta)"],
+      },
+      {
+        title: "Onderzoek verdeeld over veel tabbladen",
+        text: "Een grote taak gaat naar meerdere werkers tegelijk, elk leest pagina's in een eigen tabblad. Wat ze vinden komt samen in één tabel.",
+        checks: ["Volg elke werker live, met Stop en Take over", "Geen enkele rij dubbel", "Elke waarde noemt de pagina waar ze vandaan komt"],
+      },
+    ],
+    ais: {
+      title: "Werkt met de AI's die je team al gebruikt",
+      line: "Niemand stapt over op andere tools. Coere bewaart de chats uit elke AI die je team kiest en houdt het geheugen daarmee in de pas.",
+      checks: ["Kies de AI's bij de installatie en klik op Save", "Extract all bewaart elke chat uit elk ervan", "Nieuwe chats komen vanzelf binnen"],
+    },
+    everything: "Alles in Coere Solutions",
+    grid: [
+      { title: "Bedrijfsgeheugen", text: "Wie het team is, hoe het werkt en welke tools het gebruikt, op één plek." },
+      { title: "Klantmappen", text: "Elke klant met zijn contacten, afspraken en beslissingen." },
+      { title: "Eén klant per verzending", text: "Elk concept krijgt de klant waar het over gaat, en alleen die." },
+      { title: "Vraag het Cori", text: "Wat hebben we Kestrel Outdoor beloofd? Beantwoord met elke afspraak, de datum en de AI." },
+      { title: "Een klant overdragen", text: "Exporteer één klant naar een bestand dat een collega kan importeren. De regel zegt wat erin zit." },
+      { title: "Wissen als het werk klaar is", text: "Wis alles over een klant, en Coere controleert dat er niets overblijft." },
+      { title: "Werkers", text: "Veel tabbladen onderzoek samengevoegd in één tabel met bronnen." },
+      { title: "Eerst nakijken", text: "Een klant die de chats vonden, wacht in Review tot je hem houdt." },
+    ],
+    closing: { title: "Eén geheugen voor het hele bedrijf.", text: "Zie Coere Solutions aan het werk met het werk van je eigen team. We leiden je graag rond." },
+  },
+  forge: {
+    seo: {
+      title: "Coere Forge: AI-geheugen-API, MCP-server en SDK's",
+      description: "Een AI-geheugen-API met toestemming van de gebruiker: REST, een MCP-server en SDK's voor TypeScript en Python waarmee je apps en agents iemands Coere-geheugen lezen.",
+    },
+    hero: {
+      title: "De geheugen-API voor je apps en agents",
+      line: "Bouw gepersonaliseerde AI-ervaringen met een geheugen-API die werkt met toestemming van de gebruiker. Een REST API, een MCP-server en SDK's voor TypeScript en Python laten je apps en agents het geheugen lezen dat iemand al in zijn AI's opbouwde.",
+      checks: [
+        "Context voor een concept: de herinneringen die een nieuwe chat zou krijgen, klaar om ervoor te zetten",
+        "Eerst toestemming: de persoon klikt op Allow, en het token komt één keer",
+        "Altijd intrekbaar: een token werkt meteen niet meer",
+      ],
+    },
+    secondary: "Lees de documentatie",
+    endToEnd: { title: "Van sleutel tot context, van begin tot eind", line: "Een ontwikkelaar maakt een token, voegt Coere toe aan de AI-aanroep van zijn app en voert die uit, en richt hem daarna op elke AI." },
+    mcp: { title: "Geef je agent een geheugen via MCP", line: "Hetzelfde geheugen en hetzelfde token, als MCP-tools. Verbind via HTTP op /mcp, of draai coere-server mcp via stdio.", link: "Bekijk alle MCP-tools" },
+    everything: "Alles in Coere Forge",
+    everythingLink: "Geheugen voor AI-agents",
+    grid: [
+      { title: "Context voor een concept", text: "POST /v1/context/draft antwoordt met een blok om ervoor te zetten en elke herinnering met de reden waarom ze meegaat." },
+      { title: "De boom lezen", text: "De sectieboom, elke node en zijn kinderen, feiten, entiteiten en hun relaties." },
+      { title: "Zoeken", text: "Zoeken op trefwoord in het hele geheugen, met paden en feiten bij elke treffer." },
+      { title: "Profiel en stijl", text: "Wie de persoon is, wat er binnenkort moet gebeuren en hoe die graag schrijft en antwoord krijgt." },
+      { title: "Een herinnering voorstellen", text: "De enige schrijfactie van een app. Er verandert niets tot de persoon hem accepteert." },
+      { title: "MCP", text: "Tot vijftien tools op /mcp of via stdio, achter hetzelfde token en dezelfde scopes." },
+      { title: "Zes scopes", text: "memory:read staat standaard aan. Evidence, sensitive, suggest, export en identity worden apart gevraagd." },
+      { title: "Wijzigingsfeed", text: "Vraag GET /v1/changes op om te volgen wat veranderde. Er zijn geen webhooks." },
+    ],
+    closing: "Je app kent zijn gebruikers vanaf dag één.",
+  },
+  agents: {
+    seo: {
+      title: "Coere Agents: Cori, de AI-agent die vanuit je geheugen werkt",
+      description: "Cori, de agent in Coere, werkt vanuit je geheugen. Hij schrijft e-mail in Gmail, zet afspraken in je agenda, verbetert tekst, vult formulieren in en vraagt het eerst voordat hij verstuurt.",
+    },
+    hero: {
+      title: "Eén werker, eindeloze mogelijkheden",
+      line: "Coere Agents is Cori, een AI-agent die vanuit je geheugen werkt. Geef hem één taak, en als het werk groot is, wordt hij zoveel werkers als nodig, elk in een eigen tabblad.",
+      checks: [
+        "Jouw geheugen: elke werker begint bij wat jij en je team weten",
+        "Zoveel als nodig: één taak kan in tien tabbladen tegelijk draaien",
+        "Vraagt het eerst: niets wordt verstuurd of ingediend zonder jou",
+      ],
+    },
+    reelLabel: "Onderdelen van Coere Agents",
+    reel: [
+      { name: "Werkers", line: "Onderzoek verdeeld over veel tabbladen" },
+      { name: "Elke site", line: "Formulieren en quizzen vanuit wat je al weet" },
+      { name: "Gmail", line: "E-mail in je eigen stijl" },
+      { name: "Agenda", line: "Afspraken uit je geheugen, bewaard zodra je ze nakijkt" },
+      { name: "Herschrijven", line: "Verbeter je tekst precies waar hij staat" },
+      { name: "Chat", line: "Eén assistent op elke AI" },
+    ],
+    capabilities: { title: "Alles wat één werker kan", line: "Kies een vaardigheid en zie hem aan het werk.", label: "Vaardigheden" },
+    meet: { title: "Maak kennis met de agents", line: "Dezelfde werker, in de kleuren van zijn sector. Elk kent je geheugen en het werk van die sector." },
+    artAlt: "{name}, in de kleuren van {field}",
+    agents: {
+      general: {
+        name: "Cori",
+        field: "Algemeen",
+        line: "De assistent in Coere voor al het andere: je e-mail, je agenda, je teksten en de formulieren die je ophouden.",
+        tasks: ["Schrijf een e-mail in je eigen stijl", "Zet een afspraak in je agenda", "Vul een formulier in met wat je weet"],
+      },
+      business: {
+        name: "Cori for Business",
+        field: "Zakelijk",
+        line: "Kent je bedrijf en elke klant, en houdt het geheugen van elke klant bij die klant.",
+        tasks: ["Vat samen wat het team een klant beloofde", "Schrijf de opvolging na een vergadering", "Onderzoek een markt in veel tabbladen"],
+      },
+      finance: {
+        name: "Cori for Finance",
+        field: "Financiën",
+        line: "Werkt vanuit de geschiedenis van elke klant en verzint nooit een waarde: elk getal noemt de pagina waar het vandaan komt.",
+        tasks: ["Bereid een klantgesprek voor", "Verzamel cijfers van veel pagina's in één tabel", "Schrijf de samenvatting voor de klant"],
+      },
+      tech: {
+        name: "Cori for Tech",
+        field: "Tech",
+        line: "Kent je projecten en je stack, dus een vraag over een van beide begint bij wat je al besloot.",
+        tasks: ["Vergelijk tools in veel tabbladen", "Schrijf de projectupdate", "Antwoord vanuit je stack, geen gok"],
+      },
+    },
+    closing: "Eén werker. Eindeloze mogelijkheden.",
+  },
+};

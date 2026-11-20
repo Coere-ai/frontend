@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Stage } from "@/site/blocks/stage";
 import { backgrounds } from "@/site/content/backgrounds";
-import { features, type Feature } from "@/site/content/features";
+import { featuresIn, type Feature } from "@/site/content/features";
+import { useMessages } from "@/site/i18n/client";
 import { films } from "@/site/content/films";
 import { SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "@/site/home/look";
 import { Container } from "@/site/ui/container";
@@ -19,7 +20,8 @@ const HASH = "#capability-";
  * its own address (#capability-<slug>), so the products menu opens the
  * page on that feature.
  */
-export function Capabilities() {
+export function Capabilities({ words }: { words: { title: string; line: string; label: string } }) {
+  const features = featuresIn(useMessages("catalog"));
   const section = useRef<HTMLElement>(null);
   const [active, setActive] = useState<Feature>(features[0]);
 
@@ -51,18 +53,18 @@ export function Capabilities() {
       <Container>
         <div className={`${SOFT_FIELD} px-5 py-14 sm:px-8 md:px-12 md:py-20`}>
           <div className="max-w-3xl">
-            <h2 className={SECTION_TITLE}>Everything one worker can do</h2>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-white/65">Pick a capability to watch it run.</p>
+            <h2 className={SECTION_TITLE}>{words.title}</h2>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-white/65">{words.line}</p>
           </div>
 
           <div className="mt-16 grid gap-10 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)] lg:gap-14">
             <ul
               role="tablist"
-              aria-label="Capabilities"
+              aria-label={words.label}
               aria-orientation="vertical"
               className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:gap-0 lg:overflow-visible lg:pb-0"
               onKeyDown={(e) => {
-                const at = features.indexOf(active);
+                const at = features.findIndex((f) => f.slug === active.slug);
                 if (e.key === "ArrowDown" || e.key === "ArrowRight") pick(features[(at + 1) % features.length]);
                 if (e.key === "ArrowUp" || e.key === "ArrowLeft") pick(features[(at - 1 + features.length) % features.length]);
               }}

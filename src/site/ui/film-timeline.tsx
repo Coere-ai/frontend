@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { posterOf } from "./live-demo";
+import { useMessages } from "@/site/i18n/client";
 
 /** One chapter on the line: where it starts and how long it runs, in seconds. */
 export type Span = { id: string; title: string; start: number; seconds: number };
@@ -16,6 +17,7 @@ export const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(
  * from there, as a video's line does.
  */
 export function FilmTimeline({ film, spans, now, onSeek }: { film: string; spans: Span[]; now: number; onSeek: (seconds: number) => void }) {
+  const common = useMessages("chrome").common;
   const track = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -50,7 +52,7 @@ export function FilmTimeline({ film, spans, now, onSeek }: { film: string; spans
         ref={track}
         role="slider"
         tabIndex={0}
-        aria-label="Film position"
+        aria-label={common.filmPosition}
         aria-valuemin={0}
         aria-valuemax={Math.round(total)}
         aria-valuenow={Math.round(now)}

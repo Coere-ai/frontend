@@ -4,10 +4,11 @@ import { FeatureGrid } from "@/site/blocks/feature-grid";
 import { backgrounds } from "@/site/content/backgrounds";
 import { ALL_FEATURES } from "@/site/content/features";
 import { films } from "@/site/content/films";
-import { demoHref, demoLabel } from "@/site/content/navigation";
-import { solutionsCases, solutionsGrid, solutionsHero } from "@/site/content/pages/solutions";
+import { demoHref } from "@/site/content/navigation";
+import { solutionsCasesIn, solutionsGridIn } from "@/site/content/pages/solutions";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { SECTION_TITLE, SECTION_Y, SOFT_FIELD } from "@/site/home/look";
+import { getMessages } from "@/site/i18n/server";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { AiTiles } from "./ai-tiles";
@@ -18,30 +19,33 @@ import { ProductSection } from "./product-section";
 import { SolutionsBackdrop } from "./solutions-backdrop";
 
 /** Coere Solutions: how a team shares one memory, the AIs it works with, and everything it does. */
-export function SolutionsPage() {
+export async function SolutionsPage() {
+  const { productPages, catalog, chrome } = await getMessages();
+  const t = productPages.solutions;
+  const demo = { href: demoHref, label: chrome.common.bookDemo };
   return (
     <>
-      <ProductHero copy={solutionsHero} backdrop={<SolutionsBackdrop />} tone="dark" app={<FilmFrame film={films.teams} preview />} primary={{ href: demoHref, label: demoLabel }} secondary={{ href: "#how", label: "How it works" }} />
-      <ProductSection id="how" title="How your team shares one memory" line="Built from the chats your team already has, sorted into the company and each client.">
-        <AccordionShowcase items={asShowcase(solutionsCases)} background={backgrounds.tangle} />
+      <ProductHero copy={t.hero} backdrop={<SolutionsBackdrop />} tone="dark" app={<FilmFrame film={films.teams} preview />} primary={demo} secondary={{ href: "#how", label: t.secondary }} />
+      <ProductSection id="how" title={t.how.title} line={t.how.line}>
+        <AccordionShowcase items={asShowcase(solutionsCasesIn(t, catalog.seeAllFeatures))} background={backgrounds.tangle} />
       </ProductSection>
       <section className={SECTION_Y}>
         <Container className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">
           <div>
-            <h2 className={SECTION_TITLE}>Works with the AIs your team already uses</h2>
-            <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-white/65">Nobody switches tools. Coere saves the chats from each AI your team picks and keeps the memory in step with them.</p>
-            <CheckList className="mt-7" items={["Pick the AIs at setup, and Save", "Extract all saves every chat from each one", "New chats come in by themselves"]} />
+            <h2 className={SECTION_TITLE}>{t.ais.title}</h2>
+            <p className="mt-5 text-lg leading-relaxed text-neutral-600 dark:text-white/65">{t.ais.line}</p>
+            <CheckList className="mt-7" items={[...t.ais.checks]} />
           </div>
           <div className={`${SOFT_FIELD} p-8 md:p-12`}>
             <AiTiles />
           </div>
         </Container>
       </section>
-      <ProductSection title="Everything in Coere Solutions" link={ALL_FEATURES} tint>
-        <FeatureGrid items={asGrid(solutionsGrid)} />
+      <ProductSection title={t.everything} link={{ href: ALL_FEATURES.href, linkLabel: catalog.seeAllFeatures }} tint>
+        <FeatureGrid items={asGrid(solutionsGridIn(t))} />
       </ProductSection>
       <OtherProducts current="solutions" />
-      <ClosingCta title="One memory for the whole company." text="See Coere Solutions on your own team's work. We will show you around." primary={{ href: demoHref, label: demoLabel }} />
+      <ClosingCta title={t.closing.title} text={t.closing.text} primary={demo} />
     </>
   );
 }

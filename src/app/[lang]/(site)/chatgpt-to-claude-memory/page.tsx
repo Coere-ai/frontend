@@ -8,6 +8,7 @@ import { guideBySlug, switching } from "@/site/content/guides";
 import { contactHref, contactLabel } from "@/site/content/navigation";
 import { RelatedSection, WaysSection, WordsTable, WorkflowSection } from "@/site/guides/guide-blocks";
 import { ClosingCta } from "@/site/home/closing-cta";
+import { en } from "@/site/i18n/messages/en";
 import { CompareSection } from "@/site/products/compare-section";
 import { guideGraph, JsonLd } from "@/site/seo/json-ld";
 import { FilmFrame } from "@/site/ui/film-frame";
@@ -44,7 +45,7 @@ export default function ChatgptToClaudeMemoryPage() {
         background={backgrounds.prism}
         link={{ href: "/products/connect#import", label: "See Import chats" }}
       />
-      <CompareSection />
+      <CompareSection words={en.productPages.connect.compare} />
       <FaqSection faqs={switching.faqs} title="Moving from ChatGPT to Claude, answered" />
       <RelatedSection
         links={[

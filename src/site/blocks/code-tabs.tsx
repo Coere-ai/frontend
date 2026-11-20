@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Highlighted } from "@/site/code/highlighted";
 import { Underlined } from "@/site/ui/underlined";
+import { useMessages } from "@/site/i18n/client";
 
 export type CodeSample = { label: string; language: string; code: string };
 
@@ -11,6 +12,7 @@ export type CodeSample = { label: string; language: string; code: string };
  * takes the code exactly as written.
  */
 export function CodeTabs({ samples }: { samples: CodeSample[] }) {
+  const common = useMessages("chrome").common;
   const [picked, setPicked] = useState(0);
   const [copied, setCopied] = useState(false);
   const sample = samples[picked];
@@ -40,7 +42,7 @@ export function CodeTabs({ samples }: { samples: CodeSample[] }) {
           </button>
         ))}
         <button type="button" onClick={copy} className="ml-auto h-11 px-3 text-[13px] text-white/55 hover:text-white">
-          {copied ? "Copied" : "Copy"}
+          {copied ? common.copied : common.copy}
         </button>
       </div>
       {/* Every sample sits in the same cell and only the picked one shows, so the

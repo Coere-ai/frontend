@@ -1,7 +1,8 @@
 import { AgentCards } from "@/site/agents/agent-cards";
 import { AgentsReel } from "@/site/agents/agents-reel";
 import { Capabilities } from "@/site/agents/capabilities";
-import { agentsHero } from "@/site/content/pages/agents";
+import { agentsReelIn } from "@/site/content/pages/agents";
+import { getMessages } from "@/site/i18n/server";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { AgentsBackdrop } from "./agents-backdrop";
 import { ProductHero } from "./hero";
@@ -13,23 +14,25 @@ import { ProductSection } from "./product-section";
  * part of it live, one after another; Capabilities carries the page, one
  * feature at a time, and the products menu links straight into it.
  */
-export function AgentsPage() {
+export async function AgentsPage() {
+  const { productPages, catalog } = await getMessages();
+  const t = productPages.agents;
   return (
     <>
       <ProductHero
-        copy={agentsHero}
+        copy={t.hero}
         backdrop={<AgentsBackdrop />}
         tone="dark"
         intro
-        app={<AgentsReel />}
-        secondary={{ href: "#capabilities", label: "See all features" }}
+        app={<AgentsReel parts={agentsReelIn(t)} label={t.reelLabel} />}
+        secondary={{ href: "#capabilities", label: catalog.seeAllFeatures }}
       />
-      <Capabilities />
-      <ProductSection id="agents" title="Meet the agents" line="The same worker, in the colors of its field. Each knows your memory and the work that field does." tint>
-        <AgentCards />
+      <Capabilities words={t.capabilities} />
+      <ProductSection id="agents" title={t.meet.title} line={t.meet.line} tint>
+        <AgentCards words={t} />
       </ProductSection>
       <OtherProducts current="agents" />
-      <ClosingCta title="One worker. Infinite possibilities." />
+      <ClosingCta title={t.closing} />
     </>
   );
 }

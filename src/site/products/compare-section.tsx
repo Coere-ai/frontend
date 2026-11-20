@@ -15,7 +15,7 @@ const POSTER = "/preview/live/compare/poster.webp";
  * built on its own; it plays and loops by itself and ignores the pointer.
  * It loads only near the screen, and its last frame shows until it does.
  */
-export function CompareSection() {
+export function CompareSection({ words }: { words: { title: string; line: string; label: string } }) {
   const box = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -32,12 +32,12 @@ export function CompareSection() {
     <section id="compare" className={`scroll-mt-24 ${SECTION_Y}`}>
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className={SECTION_TITLE}>The same chat, 97.7% fewer tokens</h2>
+          <h2 className={SECTION_TITLE}>{words.title}</h2>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 dark:text-white/65">
-            Without Coere, you paste files and notes into every new chat. With Coere, you name the project and the right context goes in for you.
+            {words.line}
           </p>
         </div>
-        <div ref={box} role="img" aria-label="Without Coere: 10.4k tokens and 4 minutes 12 seconds. With Coere: 240 tokens and 5 seconds." className={`relative mt-14 aspect-video w-full overflow-hidden md:mt-16 ${SOFT_CARD}`}>
+        <div ref={box} role="img" aria-label={words.label} className={`relative mt-14 aspect-video w-full overflow-hidden md:mt-16 ${SOFT_CARD}`}>
           {near ? (
             <iframe
               src={PAGE}

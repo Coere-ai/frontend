@@ -6,6 +6,7 @@ import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { LiveDemo } from "@/site/ui/live-demo";
 import { roundedPolygon } from "@/site/ui/slant-shape";
 import { SizedPhoto } from "@/site/ui/sized-photo";
+import { useMessages } from "@/site/i18n/client";
 
 /** One reason, and the part of a live demo (a film and its chapters) that shows it. */
 export type Slide = { label: string; text: string; byline?: string; live: { film: string; from?: string; to?: string } };
@@ -36,6 +37,7 @@ const SLIDE_MS = 26000;
  * themselves until someone does. On narrow screens the two stack.
  */
 export function SlantCard({ heading, slides, background }: { heading: string; slides: Slide[]; background: Background }) {
+  const common = useMessages("chrome").common;
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   const clip = useId().replace(/:/g, "");
@@ -84,10 +86,10 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
       <div className="flex items-end justify-between gap-6">
         <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[2.75rem] md:leading-[1.06] dark:text-white">{heading}</h2>
         <div className="flex gap-2">
-          <button type="button" onClick={() => step(-1)} aria-label="Previous" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 dark:hover:bg-white/10">
+          <button type="button" onClick={() => step(-1)} aria-label={common.previous} className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 dark:hover:bg-white/10">
             <ArrowRightIcon size={20} className="rotate-180" />
           </button>
-          <button type="button" onClick={() => step(1)} aria-label="Next" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 dark:hover:bg-white/10">
+          <button type="button" onClick={() => step(1)} aria-label={common.next} className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 dark:hover:bg-white/10">
             <ArrowRightIcon size={20} />
           </button>
         </div>

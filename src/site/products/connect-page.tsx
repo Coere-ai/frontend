@@ -4,9 +4,10 @@ import { UseCaseTabs } from "@/site/blocks/use-case-tabs";
 import { backgrounds } from "@/site/content/backgrounds";
 import { ALL_FEATURES } from "@/site/content/features";
 import { films } from "@/site/content/films";
-import { connectCases, connectGrid, connectHero, connectSlides } from "@/site/content/pages/connect";
+import { connectCasesIn, connectGridIn, connectSlidesIn } from "@/site/content/pages/connect";
 import { ClosingCta } from "@/site/home/closing-cta";
 import { SECTION_Y } from "@/site/home/look";
+import { getMessages } from "@/site/i18n/server";
 import { Container } from "@/site/ui/container";
 import { FilmFrame } from "@/site/ui/film-frame";
 import { CompareSection } from "./compare-section";
@@ -17,24 +18,26 @@ import { OtherProducts } from "./other-products";
 import { ProductSection } from "./product-section";
 
 /** Coere Connect: what people use it for, what it saves against pasting context by hand, everything it does, then why they choose it. */
-export function ConnectPage() {
+export async function ConnectPage() {
+  const { productPages, catalog } = await getMessages();
+  const t = productPages.connect;
   return (
     <>
-      <ProductHero copy={connectHero} backdrop={<ConnectBackdrop />} tone="dark" app={<FilmFrame film={films.v2} preview />} secondary={{ href: "#use-cases", label: "See what it does" }} />
-      <ProductSection id="use-cases" title="Put your memory to work" line="Bring every chat in, build one memory from them, and let Cori act on it." link={{ href: "/portable-ai-memory", linkLabel: "What portable AI memory means" }} tint>
-        <UseCaseTabs cases={asUseCases(connectCases)} />
+      <ProductHero copy={t.hero} backdrop={<ConnectBackdrop />} tone="dark" app={<FilmFrame film={films.v2} preview />} secondary={{ href: "#use-cases", label: t.secondary }} />
+      <ProductSection id="use-cases" title={t.useCases.title} line={t.useCases.line} link={{ href: "/portable-ai-memory", linkLabel: t.useCases.link }} tint>
+        <UseCaseTabs cases={asUseCases(connectCasesIn(t, catalog.seeAllFeatures))} />
       </ProductSection>
-      <CompareSection />
-      <ProductSection title="Everything in Coere Connect" link={ALL_FEATURES}>
-        <FeatureGrid items={asGrid(connectGrid)} />
+      <CompareSection words={t.compare} />
+      <ProductSection title={t.everything} link={{ href: ALL_FEATURES.href, linkLabel: catalog.seeAllFeatures }}>
+        <FeatureGrid items={asGrid(connectGridIn(t))} />
       </ProductSection>
       <section className={SECTION_Y}>
         <Container>
-          <SlantCard heading="Why people choose Coere Connect" slides={connectSlides} background={backgrounds.ribbons} />
+          <SlantCard heading={t.why} slides={connectSlidesIn(t)} background={backgrounds.ribbons} />
         </Container>
       </section>
       <OtherProducts current="connect" />
-      <ClosingCta title="Your memory, across every AI." />
+      <ClosingCta title={t.closing} />
     </>
   );
 }

@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { pageMetadata } from "@/lib/seo";
-import { productBySlug, products } from "@/site/content/products";
+import { productBySlug, products, productsIn } from "@/site/content/products";
 import { productSeo } from "@/site/content/seo";
+import { localizePath } from "@/site/i18n/locales";
+import { getLocale, getMessages } from "@/site/i18n/server";
 import { ProductPage } from "@/site/products/product-page";
 import { JsonLd, productGraph } from "@/site/seo/json-ld";
 
-/** Only the three products exist; any other slug is a 404. */
+/** Only the four products exist; any other slug is a 404. */
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -15,15 +17,18 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/products/[slug]">): Promise<Metadata> {
   const product = productBySlug((await params).slug);
-  return product ? pageMetadata({ ...productSeo[product.slug], path: `/products/${product.slug}` }) : {};
+  if (!product) return {};
+  const [locale, { productPages }] = await Promise.all([getLocale(), getMessages()]);
+  return pageMetadata({ ...productSeo[product.slug], ...productPages[product.slug].seo, path: `/products/${product.slug}`, locale, translated: true });
 }
 
 export default async function Page({ params }: PageProps<"/[lang]/products/[slug]">) {
-  const product = productBySlug((await params).slug);
+  const [locale, { catalog }] = await Promise.all([getLocale(), getMessages()]);
+  const product = productBySlug((await params).slug, productsIn(catalog));
   if (!product) notFound();
   return (
     <>
-      <JsonLd data={productGraph(product)} />
+      <JsonLd data={productGraph(product, localizePath(`/products/${product.slug}`, locale))} />
       <ProductPage product={product} />
     </>
   );

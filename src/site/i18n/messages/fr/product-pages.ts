@@ -1,0 +1,215 @@
+import type { Messages } from "../types";
+
+export const productPages: Messages["productPages"] = {
+  more: "Plus de Coere",
+  explore: "Découvrir",
+  connect: {
+    seo: {
+      title: "Coere Connect : une mémoire d’IA pour ChatGPT, Claude et Gemini",
+      description: "Une extension Chrome qui enregistre sur votre ordinateur vos conversations avec ChatGPT, Claude, Gemini et six autres IA, et ajoute le bon contexte à chaque nouvelle conversation.",
+    },
+    hero: {
+      title: "Votre mémoire, dans toutes les IA",
+      line: "Une extension Chrome qui enregistre vos conversations avec ChatGPT, Claude, Gemini et six autres IA, en tire une mémoire qui vous appartient et l’apporte à chaque nouvelle conversation.",
+      checks: [
+        "Toutes les IA : ChatGPT, Claude, Gemini et six autres alimentent une seule mémoire",
+        "Pendant la saisie : une ligne au-dessus de la zone de saisie indique ce qui part avec votre message",
+        "À vous : rien ne part vers une IA pour construire la mémoire sans votre accord",
+      ],
+    },
+    secondary: "Voir ce qu’il fait",
+    useCases: { title: "Mettez votre mémoire au travail", line: "Rassemblez toutes vos conversations, construisez-en une seule mémoire et laissez Cori agir à partir d’elle.", link: "Ce que veut dire une mémoire d’IA portable" },
+    cases: [
+      {
+        label: "Importer",
+        title: "Toutes vos conversations, réunies au même endroit",
+        text: "Extract all lit chaque IA que vous utilisez et enregistre chaque conversation sur votre ordinateur. Ensuite, les nouvelles s’enregistrent toutes seules.",
+        checks: ["Une ligne par IA pendant l’enregistrement", "Enregistré sur cet ordinateur", "La mémoire suit une conversation qui change"],
+        link: "Apporter votre mémoire ChatGPT à Claude",
+      },
+      {
+        label: "Mémoire",
+        title: "Tout ce que vos conversations lui ont appris, dans un seul graphe",
+        text: "Coere lit vos conversations et fait grandir un graphe de votre vie, section par section. Chaque souvenir se trouve à côté des conversations dont il vient.",
+        checks: ["Les vues All, Memories et Chats", "Un clic ouvre une section en gros plan", "La recherche met en lumière les meilleurs résultats"],
+      },
+      {
+        label: "Quiz et formulaires",
+        title: "Cori travaille sur la page que vous avez ouverte",
+        text: "Demandez à Cori de faire un quiz ou de remplir un formulaire. Il répond à partir de votre mémoire, étape par étape, avec Take over et Stop dans la barre.",
+        checks: ["Il demande avant tout ce qui ne peut pas être annulé", "Il ne tape jamais de mot de passe ni de numéro de carte", "Il s’arrête si une page tente de lui donner des ordres"],
+      },
+      {
+        label: "Rédaction",
+        title: "Améliorez votre texte là où il se trouve",
+        text: "Sélectionnez du texte dans Gmail, Docs ou une zone de chat et choisissez Rewrite, Improve ou Fix grammar only. Chaque modification est encadrée en bleu jusqu’à ce que vous la gardiez.",
+        checks: ["Fix grammar only garde vos mots", "Improve garde chaque fait que vous avez écrit", "Go back rend votre texte à l’identique"],
+      },
+      {
+        label: "E-mail",
+        title: "Des e-mails écrits dans votre style",
+        text: "Demandez un e-mail à Cori et il le rédige dans son propre onglet Gmail avec ce que sait votre mémoire.",
+        checks: ["Écrit dans votre style", "Dans un onglet à part", "Il demande avant d’écrire à quelqu’un que vous n’avez pas nommé"],
+      },
+    ],
+    compare: {
+      title: "La même conversation, 97,7 % de tokens en moins",
+      line: "Sans Coere, vous collez fichiers et notes dans chaque nouvelle conversation. Avec Coere, vous nommez le projet et le bon contexte s’ajoute pour vous.",
+      label: "Sans Coere : 10 400 tokens et 4 minutes 12 secondes. Avec Coere : 240 tokens et 5 secondes.",
+    },
+    everything: "Tout ce que fait Coere Connect",
+    grid: [
+      { title: "Graphe de mémoire", text: "Vos conversations classées en sections et en dossiers autour de vous, chaque souvenir à côté de ses conversations." },
+      { title: "Extract all", text: "Chaque conversation de vos IA enregistrée sur votre ordinateur, et les nouvelles au fil de l’eau." },
+      { title: "Contexte intelligent", text: "Les bons souvenirs se placent devant votre message pendant que vous tapez, avec une seule touche Entrée." },
+      { title: "Voix", text: "Maintenez la touche Option droite et parlez. Cori répond à voix haute quand vous relâchez." },
+      { title: "Cori", text: "Un assistant sur toutes les IA qui retrouve vos anciennes conversations avec des mots simples." },
+      { title: "Gmail", text: "Des e-mails rédigés dans votre style, dans un onglet à part." },
+      { title: "Réécriture", text: "Corrigez ou améliorez un texte dans Gmail, Docs et toute zone de chat." },
+      { title: "Travail en parallèle", text: "Une recherche répartie sur plusieurs onglets et réunie dans un seul tableau, chaque valeur avec sa page." },
+    ],
+    why: "Pourquoi choisir Coere Connect",
+    slides: [
+      { label: "Toutes les IA, une seule mémoire", text: "ChatGPT, Claude, Gemini et six autres IA alimentent la même mémoire : une nouvelle conversation, où qu’elle soit, part de ce que vous avez déjà dit." },
+      { label: "Le contexte pendant la saisie", text: "Une ligne bleue au-dessus de la zone de saisie indique ce que Coere va ajouter et de quelles IA il l’a appris. Vous pouvez toujours le modifier avant l’envoi." },
+      { label: "Elle vous appartient", text: "Chaque conversation est enregistrée sur votre ordinateur. Coere vous demande à partir de quoi construire la mémoire, et rien ne part vers une IA sans votre accord." },
+    ],
+    closing: "Votre mémoire, dans toutes les IA.",
+  },
+  solutions: {
+    seo: {
+      title: "Coere Solutions : une mémoire d’IA partagée pour vos équipes",
+      description: "Une mémoire de votre entreprise, de ses collaborateurs et de ses clients, construite à partir des conversations de votre équipe. Un client par envoi, une source pour chaque réponse.",
+    },
+    hero: {
+      title: "Une seule mémoire pour toute l’entreprise",
+      line: "Coere Solutions donne à votre équipe une mémoire d’IA partagée : une mémoire de l’entreprise, de ses collaborateurs et de ses clients, construite à partir des conversations que votre équipe a déjà.",
+      checks: [
+        "L’entreprise : l’équipe, sa façon de travailler et ses outils",
+        "Les clients : un dossier pour chacun, avec ses contacts et ses engagements",
+        "Un client par envoi : un brouillon sur un client ne reçoit jamais la mémoire d’un autre",
+      ],
+    },
+    secondary: "Comment ça marche",
+    how: { title: "Comment votre équipe partage une seule mémoire", line: "Construite à partir des conversations de votre équipe, classée entre l’entreprise et chaque client." },
+    cases: [
+      {
+        title: "L’entreprise et ses clients",
+        text: "Extract all enregistre chaque conversation des IA de votre équipe, et le graphe se développe en Company et Clients à mesure que Coere les lit.",
+        checks: ["Les contacts, engagements et décisions de chaque client", "Un client repéré dans les conversations attend dans Review", "Demandez à Cori ce que l’équipe a promis à un client"],
+      },
+      {
+        title: "Le bon client dans chaque conversation",
+        text: "Commencez une réponse au sujet d’un client et la ligne bleue nomme le client dont parle le brouillon. Ce qui part s’affiche sur la ligne avant l’envoi.",
+        checks: ["Un seul client part avec chaque envoi", "Une relance n’envoie que ce qui a changé", "Un long contexte peut partir en fichier (bêta)"],
+      },
+      {
+        title: "Une recherche répartie sur plusieurs onglets",
+        text: "Une grande tâche part vers plusieurs agents à la fois, chacun lisant des pages dans son propre onglet. Leurs résultats se réunissent dans un seul tableau.",
+        checks: ["Suivez chaque agent en direct, avec Stop et Take over", "Aucune ligne en double", "Chaque valeur nomme la page d’où elle vient"],
+      },
+    ],
+    ais: {
+      title: "Fonctionne avec les IA que votre équipe utilise déjà",
+      line: "Personne ne change d’outil. Coere enregistre les conversations de chaque IA choisie par votre équipe et garde la mémoire à jour.",
+      checks: ["Choisissez les IA à l’installation, puis Save", "Extract all enregistre chaque conversation de chacune", "Les nouvelles conversations arrivent toutes seules"],
+    },
+    everything: "Tout ce que fait Coere Solutions",
+    grid: [
+      { title: "Mémoire de l’entreprise", text: "Qui est l’équipe, comment elle travaille et quels outils elle utilise, au même endroit." },
+      { title: "Dossiers clients", text: "Chaque client avec ses contacts, ses engagements et ses décisions." },
+      { title: "Un client par envoi", text: "Chaque brouillon reçoit le client dont il parle, et seulement celui-là." },
+      { title: "Demandez à Cori", text: "Qu’avons-nous promis à Kestrel Outdoor ? La réponse donne chaque engagement, sa date et son IA." },
+      { title: "Transmettre un client", text: "Exportez un client dans un fichier qu’un collègue peut importer. La ligne indique ce qu’il contient." },
+      { title: "Effacer en fin de mission", text: "Effacez tout ce qui concerne un client, puis Coere vérifie qu’il ne reste rien." },
+      { title: "Travail en parallèle", text: "De nombreux onglets de recherche réunis dans un seul tableau, avec leurs sources." },
+      { title: "Validation d’abord", text: "Un client repéré dans les conversations attend dans Review jusqu’à ce que vous le gardiez." },
+    ],
+    closing: { title: "Une seule mémoire pour toute l’entreprise.", text: "Découvrez Coere Solutions sur le travail de votre propre équipe. Nous vous faisons la visite." },
+  },
+  forge: {
+    seo: {
+      title: "Coere Forge : API de mémoire d’IA, serveur MCP et SDK",
+      description: "Une API de mémoire d’IA soumise à l’accord de l’utilisateur : REST, un serveur MCP et des SDK TypeScript et Python pour que vos apps et vos agents lisent la mémoire Coere d’une personne.",
+    },
+    hero: {
+      title: "L’API de mémoire pour vos apps et vos agents",
+      line: "Créez des expériences d’IA personnalisées avec une API de mémoire soumise à l’accord de l’utilisateur. Une API REST, un serveur MCP et des SDK TypeScript et Python permettent à vos apps et à vos agents de lire la mémoire qu’une personne a déjà construite dans ses IA.",
+      checks: [
+        "Du contexte pour un brouillon : les souvenirs qu’obtiendrait une nouvelle conversation, prêts à placer devant",
+        "L’accord d’abord : la personne clique sur Allow, et le jeton n’arrive qu’une fois",
+        "Révocable à tout moment : un jeton cesse de fonctionner aussitôt",
+      ],
+    },
+    secondary: "Lire la documentation",
+    endToEnd: { title: "D’une clé au contexte, de bout en bout", line: "Un développeur crée un jeton, ajoute Coere à l’appel d’IA de son app et le lance, puis le pointe vers n’importe quelle IA." },
+    mcp: { title: "Donnez une mémoire à votre agent via MCP", line: "La même mémoire et le même jeton, sous forme d’outils MCP. Connectez-vous en HTTP sur /mcp, ou lancez coere-server mcp en stdio.", link: "Voir tous les outils MCP" },
+    everything: "Tout ce que fait Coere Forge",
+    everythingLink: "La mémoire des agents d’IA",
+    grid: [
+      { title: "Contexte de brouillon", text: "POST /v1/context/draft renvoie un bloc à placer en tête et chaque souvenir avec la raison de sa présence." },
+      { title: "Lire l’arbre", text: "L’arbre des sections, n’importe quel nœud et ses enfants, les faits, les entités et leurs relations." },
+      { title: "Recherche", text: "Une recherche par mots-clés dans toute la mémoire, avec chemins et faits pour chaque résultat." },
+      { title: "Profil et style", text: "Qui est la personne, ce qui arrive bientôt, et comment elle aime écrire et qu’on lui réponde." },
+      { title: "Suggérer un souvenir", text: "La seule écriture permise à une app. Rien ne change tant que la personne ne l’accepte pas." },
+      { title: "MCP", text: "Jusqu’à quinze outils sur /mcp ou en stdio, derrière le même jeton et les mêmes portées." },
+      { title: "Six portées", text: "memory:read est actif par défaut. Evidence, sensitive, suggest, export et identity se demandent." },
+      { title: "Flux de changements", text: "Interrogez GET /v1/changes pour suivre ce qui a changé. Il n’y a pas de webhooks." },
+    ],
+    closing: "Votre app connaît ses utilisateurs dès le premier jour.",
+  },
+  agents: {
+    seo: {
+      title: "Coere Agents : Cori, l’agent d’IA qui part de votre mémoire",
+      description: "Cori, l’agent de Coere, travaille à partir de votre mémoire. Il rédige vos e-mails dans Gmail, ajoute des événements à l’agenda, corrige vos textes, remplit des formulaires et demande avant d’envoyer.",
+    },
+    hero: {
+      title: "Un seul agent, des possibilités infinies",
+      line: "Coere Agents, c’est Cori, un agent d’IA qui travaille à partir de votre mémoire. Confiez-lui une tâche : quand le travail est grand, il devient autant d’agents qu’il le faut, chacun dans son propre onglet.",
+      checks: [
+        "Votre mémoire : chaque agent part de ce que vous et votre équipe savez",
+        "Autant qu’il en faut : une tâche peut tourner dans dix onglets à la fois",
+        "Il demande d’abord : rien n’est envoyé ni soumis sans vous",
+      ],
+    },
+    reelLabel: "Les volets de Coere Agents",
+    reel: [
+      { name: "En parallèle", line: "Une recherche répartie sur plusieurs onglets" },
+      { name: "Tous les sites", line: "Formulaires et quiz à partir de ce que vous savez déjà" },
+      { name: "Gmail", line: "Des e-mails écrits dans votre style" },
+      { name: "Agenda", line: "Des événements tirés de votre mémoire, enregistrés après relecture" },
+      { name: "Réécriture", line: "Améliorez votre texte là où il se trouve" },
+      { name: "Chat", line: "Un seul assistant sur toutes les IA" },
+    ],
+    capabilities: { title: "Tout ce qu’un seul agent sait faire", line: "Choisissez une capacité pour la voir à l’œuvre.", label: "Capacités" },
+    meet: { title: "Les agents", line: "Le même agent, aux couleurs de son secteur. Chacun connaît votre mémoire et le travail de ce secteur." },
+    artAlt: "{name}, aux couleurs de {field}",
+    agents: {
+      general: {
+        name: "Cori",
+        field: "Général",
+        line: "L’assistant de Coere pour tout le reste : vos e-mails, votre agenda, vos textes et les formulaires qui vous ralentissent.",
+        tasks: ["Rédiger un e-mail dans votre style", "Ajouter un événement à votre agenda", "Remplir un formulaire avec ce que vous savez"],
+      },
+      business: {
+        name: "Cori for Business",
+        field: "Entreprise",
+        line: "Connaît votre entreprise et chaque client, et réserve la mémoire de chaque client à ce client.",
+        tasks: ["Récapituler ce que l’équipe a promis à un client", "Rédiger le suivi après une réunion", "Étudier un marché sur plusieurs onglets"],
+      },
+      finance: {
+        name: "Cori for Finance",
+        field: "Finance",
+        line: "Part de l’historique de chaque client et n’invente jamais une valeur : chaque chiffre nomme la page d’où il vient.",
+        tasks: ["Préparer une revue client", "Réunir des chiffres de nombreuses pages dans un seul tableau", "Rédiger la synthèse pour le client"],
+      },
+      tech: {
+        name: "Cori for Tech",
+        field: "Tech",
+        line: "Connaît vos projets et votre stack : une question sur l’un ou l’autre part de ce que vous avez déjà décidé.",
+        tasks: ["Comparer des outils sur plusieurs onglets", "Rédiger le point d’avancement du projet", "Répondre à partir de votre stack, pas au hasard"],
+      },
+    },
+    closing: "Un seul agent. Des possibilités infinies.",
+  },
+};

@@ -62,12 +62,12 @@ const KIND: Record<Product["slug"], { category: string; system: string }> = {
 };
 
 /** One product as a SoftwareApplication, made by Coere. */
-export function productGraph(product: Product) {
+export function productGraph(product: Product, path = `/products/${product.slug}`) {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: product.name,
-    url: `${siteConfig.url}/products/${product.slug}`,
+    url: `${siteConfig.url}${path}`,
     description: product.description,
     applicationCategory: KIND[product.slug].category,
     operatingSystem: KIND[product.slug].system,

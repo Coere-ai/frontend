@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { CheckList } from "./check-list";
+import { useMessages } from "@/site/i18n/client";
 
 export type UseCase = { key: string; label: string; title: string; text: string; checks?: string[]; href?: string; linkLabel?: string; visual: ReactNode };
 
@@ -15,6 +16,7 @@ export type UseCase = { key: string; label: string; title: string; text: string;
  * opens that case, until a pill is clicked.
  */
 export function UseCaseTabs({ cases }: { cases: UseCase[] }) {
+  const common = useMessages("chrome").common;
   const [picked, setPicked] = useState<string | null>(null);
   const hash = useSyncExternalStore(onHashChange, () => window.location.hash.slice(1), () => "");
   const active = cases.find((c) => c.key === (picked ?? hash)) ?? cases[0];
@@ -24,7 +26,7 @@ export function UseCaseTabs({ cases }: { cases: UseCase[] }) {
       {cases.map((c) => (
         <span key={c.key} id={c.key} aria-hidden="true" className="block scroll-mt-32" />
       ))}
-      <div role="tablist" aria-label="Use cases" className="mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-white p-1.5 shadow-[0_12px_30px_-18px_rgba(23,27,77,0.3)] ring-1 ring-neutral-950/[0.06] dark:bg-white/[0.06] dark:shadow-none dark:ring-white/10">
+      <div role="tablist" aria-label={common.useCases} className="mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-white p-1.5 shadow-[0_12px_30px_-18px_rgba(23,27,77,0.3)] ring-1 ring-neutral-950/[0.06] dark:bg-white/[0.06] dark:shadow-none dark:ring-white/10">
         {cases.map((c) => (
           <button
             key={c.key}

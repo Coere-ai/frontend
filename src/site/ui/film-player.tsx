@@ -6,6 +6,7 @@ import { PauseIcon, PlayIcon } from "./icons/interface-icons";
 import { clock, FilmTimeline, type Span } from "./film-timeline";
 import { LiveDemo, type DemoChapter, type DemoState } from "./live-demo";
 import { Underlined } from "./underlined";
+import { useMessages } from "@/site/i18n/client";
 
 /** How long a chapter is taken to run before the film says, in seconds. */
 const GUESS = 20;
@@ -19,6 +20,7 @@ const GUESS = 20;
  * picked rather than following the skip. Meant for dark artwork.
  */
 export function FilmPlayer({ film, className }: { film: Film; className?: string }) {
+  const common = useMessages("chrome").common;
   const frame = useRef<HTMLIFrameElement>(null);
   const [start, setStart] = useState<{ from?: string; at?: number }>({});
   const [chapters, setChapters] = useState<DemoChapter[]>([]);
@@ -77,7 +79,7 @@ export function FilmPlayer({ film, className }: { film: Film; className?: string
     <div className={className}>
       <LiveDemo key={jumps} film={film.slug} from={start.from} at={start.at} label={film.title} frameRef={frame} onState={onState} className="rounded-2xl shadow-[0_50px_120px_-30px_rgba(0,0,0,0.75)] ring-1 ring-white/10" />
       <div className="mt-5 flex items-center gap-4 text-white">
-        <button type="button" onClick={toggle} aria-label={paused ? "Play" : "Pause"} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-neutral-950">
+        <button type="button" onClick={toggle} aria-label={paused ? common.play : common.pause} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-neutral-950">
           {paused ? <PlayIcon size={18} /> : <PauseIcon size={18} />}
         </button>
         <span className="w-[92px] shrink-0 text-[13px] text-white/80 tabular-nums">
@@ -86,7 +88,7 @@ export function FilmPlayer({ film, className }: { film: Film; className?: string
         <FilmTimeline film={film.slug} spans={spans} now={now} onSeek={seek} />
       </div>
       {/* The parts arrive once the film reports them; the row keeps their height from the start so nothing below it moves. */}
-      <nav aria-label="Parts of the film" className="mt-4 flex min-h-[43px] gap-6 overflow-x-auto pb-1 md:justify-center">
+      <nav aria-label={common.filmParts} className="mt-4 flex min-h-[43px] gap-6 overflow-x-auto pb-1 md:justify-center">
         {spans.map((s) => (
           <button key={s.id} type="button" onClick={() => seek(s.start)} aria-current={s.id === showing?.id} className="group shrink-0 text-left text-[14px] text-white/70 hover:text-white aria-[current=true]:text-white">
             <span className="block text-[12px] text-white/45 tabular-nums">{clock(s.start)}</span>
