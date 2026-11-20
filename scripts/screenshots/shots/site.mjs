@@ -42,6 +42,15 @@ export async function shootSite(browser, base, shooter, { scale }) {
     }
   }
   await bar.evaluate((node) => node.remove());
+  // The home hero in each of the other languages, and the language menu open over the Japanese one.
+  for (const lang of ["es", "fr", "nl", "ja"]) {
+    await open(page, base, `/${lang}`);
+    await s(`home-hero-${lang}`, { still: true });
+  }
+  await page.locator('header button[aria-haspopup="menu"]').first().click();
+  await page.locator('[role="menu"]').waitFor();
+  await s("language-menu", { still: true });
+  await page.keyboard.press("Escape");
   for (const slug of PRODUCTS) {
     await open(page, base, `/products/${slug}`);
     await s(`product-${slug}`, { full: true });

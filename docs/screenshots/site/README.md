@@ -23,6 +23,16 @@ every page is on near black from the navbar to the footer.
 
 The whole page, dark from the hero to the footer: [home.webp](home.webp).
 
+## Languages
+
+English stays at its addresses; Spanish, French, Dutch and Japanese live under /es, /fr, /nl and /ja.
+
+| | |
+|---|---|
+| <img src="home-hero-es.webp" alt="The home hero in Spanish: Aceleramos la IA empresarial con contexto unificado" /><br /><sub>Spanish, /es</sub> | <img src="home-hero-fr.webp" alt="The home hero in French: Accélérer l’IA d’entreprise grâce au contexte unifié" /><br /><sub>French, /fr</sub> |
+| <img src="home-hero-nl.webp" alt="The home hero in Dutch: Versnel zakelijke AI met verenigde context" /><br /><sub>Dutch, /nl</sub> | <img src="home-hero-ja.webp" alt="The home hero in Japanese, its heading broken between phrases" /><br /><sub>Japanese, /ja, in Noto Sans JP after Geist</sub> |
+| <img src="language-menu.webp" alt="The language menu open over the Japanese home page, with 日本語 checked" /><br /><sub>The language menu, which opens the same page in each language</sub> | |
+
 ## Products
 
 | | |

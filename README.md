@@ -67,6 +67,18 @@ pictures: [the site](docs/screenshots/site/README.md),
   </tr>
   <tr>
     <td width="50%">
+      <img src="docs/screenshots/site/language-menu.webp" alt="The Japanese home hero with the language menu open under the navbar: English, Español, Français, Nederlands and 日本語, with 日本語 checked" />
+      <br />
+      <sub>The site in five languages. The menu opens the same page in each: /pricing, /es/pricing, /ja/pricing.</sub>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/site/home-hero-es.webp" alt="The home hero in Spanish: Aceleramos la IA empresarial con contexto unificado, the paragraph, Empieza gratis and Más información" />
+      <br />
+      <sub>The home page in Spanish. French, Dutch and Japanese are in <a href="docs/screenshots/site/README.md#languages">the site pictures</a>.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
       <img src="docs/screenshots/site/install.webp" alt="Coming soon on the Chrome Web Store on near black, a white countdown and I'm interested in Coere blue" />
       <br />
       <sub>Start for free and every Install button lead to the countdown until the extension is in the Chrome Web Store.</sub>
