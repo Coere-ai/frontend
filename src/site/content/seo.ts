@@ -93,6 +93,13 @@ export const waitlistSeo: Seo = {
   keywords: ["Coere Forge waitlist", "AI memory API waitlist", "user memory for apps", "Coere developer access"],
 };
 
+/** The pricing page: the three plans. The site names no prices, so neither does this. */
+export const pricingSeo: Seo = {
+  title: "Pricing: free for you, plans for teams and developers",
+  description: "Coere is free for one person, with unlimited transfers and extraction across every AI. Teams get SSO and audit logs, and developers pay per user.",
+  keywords: ["Coere pricing", "AI memory pricing", "free AI memory", "team AI memory plan", "memory API pricing"],
+};
+
 /** The privacy policy: what the extension and coere.ai read, keep and send. */
 export const privacySeo: Seo = {
   title: "Privacy policy",

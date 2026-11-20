@@ -10,3 +10,7 @@ test("the privacy policy's last change is the date the policy says it took effec
   assert.ok(entry);
   assert.equal(entry.lastModified, PRIVACY_EFFECTIVE);
 });
+
+test("the pricing page is listed, since the Product menu and the footer link to it", () => {
+  assert.ok(sitemap().some((e) => e.url.endsWith("/pricing")));
+});
