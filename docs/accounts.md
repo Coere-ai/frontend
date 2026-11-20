@@ -1420,7 +1420,7 @@ against 5 tries a minute per address, and shows a thank you in place of the
 form. The page is public and indexed; the form's endpoint is not.
 
 **Coming soon and I'm interested.** `/install` (Coere Connect) and
-`/try-teams` (Coere for Teams) share one plain white page. `/install` says
+`/try-teams` (Coere for Teams) share one plain near black page. `/install` says
 "Coming soon on the Chrome Web Store" with the Chrome mark set in the
 heading in front of Chrome, the size of the letters; `/try-teams` says
 "Coere for Teams is coming soon". Under the heading, the countdown is one

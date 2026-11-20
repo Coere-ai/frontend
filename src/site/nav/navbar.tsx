@@ -21,8 +21,9 @@ import { useNavTone } from "./use-nav-tone";
  * the page edges and stuck to the top, so what scrolls under it bends at
  * its rim. The brand and the tabs sit on the left; the language, Log in and
  * Start for free on the right. A light white tint inside the glass keeps
- * the words readable over white pages and over the hero's animation. Over a
- * dark hero the glass turns dark and the words white (see use-nav-tone).
+ * the words readable over white pages and over the hero's animation. On a
+ * dark page, which every page of the site now is, the glass turns dark and
+ * the words white (see use-nav-tone).
  */
 export function Navbar() {
   const menu = useMenu();

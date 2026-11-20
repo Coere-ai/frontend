@@ -67,36 +67,36 @@ pictures: [the site](docs/screenshots/site/README.md),
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/site/install.webp" alt="Coming soon on the Chrome Web Store, a countdown and I'm interested" />
+      <img src="docs/screenshots/site/install.webp" alt="Coming soon on the Chrome Web Store on near black, a white countdown and I'm interested in Coere blue" />
       <br />
       <sub>Start for free and every Install button lead to the countdown until the extension is in the Chrome Web Store.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/sign-in.webp" alt="Sign in to Coere with a username and a password, maya_collins typed, beside Coere's line and Cori on blue" />
+      <img src="docs/screenshots/site/sign-in.webp" alt="Sign in to Coere on near black, with a username and a password in a dark glass card, maya_collins typed, beside Coere's line and Cori on blue" />
       <br />
       <sub>Sign in with a username and a password. No email is asked for.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/site/account-top.webp" alt="Your account, signed in as maya_collins: Open the dashboard and Sign out at the top, then Profile with her name and username, and Dashboard and Sign out in the glass navbar" />
+      <img src="docs/screenshots/site/account-top.webp" alt="Your account on near black, signed in as maya_collins: Open the dashboard and Sign out at the top, then Profile with her name and username, and Dashboard and Sign out in the dark glass navbar" />
       <br />
       <sub>/account, with Sign out at the top and in the navbar. <a href="docs/screenshots/site/account.webp">The whole page</a>.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/sign-out.webp" alt="Sign out of Coere: Sign out of coere.ai in this browser, Coere here signs out too, and one Sign out button" />
+      <img src="docs/screenshots/site/sign-out.webp" alt="Sign out of Coere on near black: Sign out of coere.ai in this browser, Coere here signs out too, and one Coere blue Sign out button" />
       <br />
       <sub>/sign-out, reached from another site, waits for its button. Typed, it signs out at once.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/site/privacy-top.webp" alt="The privacy policy: What Coere reads, keeps and sends, with the short version beside the list of its parts" />
+      <img src="docs/screenshots/site/privacy-top.webp" alt="The privacy policy on near black: What Coere reads, keeps and sends, with the short version on a dark glass card beside the list of its parts" />
       <br />
       <sub>The privacy policy, the short version first. <a href="docs/screenshots/site/privacy.webp">The whole policy</a>.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/connect.webp" alt="Connect Coere to your account, signed in as maya_collins, with Connect Coere" />
+      <img src="docs/screenshots/site/connect.webp" alt="Connect Coere to your account on near black, signed in as maya_collins, with Connect Coere in Coere blue" />
       <br />
       <sub>/connect, where the extension gets its device token.</sub>
     </td>
@@ -299,17 +299,24 @@ from the extension.
 
 Industry photos are from Unsplash, free to use under the Unsplash License,
 each saved at 960, 1920 and 3840 wide. The quiet pages (docs, guides,
-pricing and the account pages) are plain and calm: white, with no artwork,
-gradient or tint behind a form, and no box or circle a part does not need.
+pricing and the account pages) are plain and calm: flat near black, with no
+artwork, gradient or tint behind a form, and no box or circle a part does
+not need.
 The photos load through `SizedPhoto` instead of the image optimizer, which
 fetches without the visitor's pass and would be turned away by the gate.
 
-A page whose hero is dark is dark to its end: the home page, Solutions,
-Forge, Agents, the blog, About and each industry. It wraps itself in
-`DarkPage` (`src/site/ui/page-theme.tsx`), which sets `data-theme="dark"`;
-every shared part carries its own dark look through the `dark:` variant
-defined in `src/app/globals.css`, and the footer, the navbar and the bounce
-past the page's ends follow it. An app window inside a dark page sets
+The site is dark throughout: every page, from the home page and the
+products to the blog posts, the guides, the docs, careers, pricing, the
+countdown pages, privacy, the account pages, the 404 and the page around
+the framed dashboard, wraps itself in `DarkPage`
+(`src/site/ui/page-theme.tsx`), which sets `data-theme="dark"`. Every
+shared part carries its own dark look through the `dark:` variant defined
+in `src/app/globals.css`: flat near black, raised dark glass cards, white
+and softer white words, fine light borders, Coere blue for the main step
+and the focus rings. The footer, the navbar and the bounce past the page's
+ends follow it, and the site's viewport (`darkViewport` in `src/lib/seo.ts`)
+starts the browser dark, so no page flashes white before its stylesheet
+arrives. An app window or a picture of product inside a dark page sets
 `data-theme="light"` and keeps its own look.
 
 The developer docs in `src/site/content/docs` were built from the coere-v2
@@ -371,7 +378,7 @@ this section is what the owner sets up by hand.
   site, where it waits for its button.
 - `/sign-in`, `/sign-up`, `/sign-out` and `/connect` share one frame,
   `src/site/account/auth-shell.tsx`: Coere's name, its line and Cori on
-  blue beside the page's one task on white.
+  blue beside the page's one task on near black.
 
 ### The dashboard
 
