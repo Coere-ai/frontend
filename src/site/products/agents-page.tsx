@@ -1,5 +1,5 @@
 import { AgentCards } from "@/site/agents/agent-cards";
-import { AgentLineup } from "@/site/agents/agent-lineup";
+import { AgentsReel } from "@/site/agents/agents-reel";
 import { Capabilities } from "@/site/agents/capabilities";
 import { agentsHero } from "@/site/content/pages/agents";
 import { ClosingCta } from "@/site/home/closing-cta";
@@ -9,8 +9,9 @@ import { OtherProducts } from "./other-products";
 import { ProductSection } from "./product-section";
 
 /**
- * Coere Agents: one worker and everything it can do. Capabilities carries the
- * page, one feature at a time, live; the products menu links straight into it.
+ * Coere Agents: one worker and everything it can do. The hero plays every
+ * part of it live, one after another; Capabilities carries the page, one
+ * feature at a time, and the products menu links straight into it.
  */
 export function AgentsPage() {
   return (
@@ -19,8 +20,7 @@ export function AgentsPage() {
         copy={agentsHero}
         backdrop={<AgentsBackdrop />}
         tone="dark"
-        app={<AgentLineup />}
-        appFit="contained"
+        app={<AgentsReel />}
         secondary={{ href: "#capabilities", label: "See all features" }}
       />
       <Capabilities />

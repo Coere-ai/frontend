@@ -8,9 +8,9 @@ const LINES = { ...COERE_LIQUID_PALETTE, background: "#0b0a12" };
 /**
  * The Coere Agents hero's backdrop: Liquid Lines in Coere's palette,
  * white streaks edged with Coere blue and now and then cyan, flowing
- * along the diagonal behind the agent lineup. A shade sits behind the
+ * along the diagonal behind the live demo. A shade sits behind the
  * words only, so white type reads: from the left on a wide screen, and
- * over the top where a phone stacks the copy above the lineup.
+ * over the top where a phone stacks the copy above the demo.
  */
 export function AgentsBackdrop() {
   return (
