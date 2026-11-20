@@ -1,6 +1,7 @@
 import { launchSettings } from "@/lib/launch/store";
 import type { LaunchProduct } from "@/site/content/launch";
 import { InterestForm } from "@/site/launch/interest-form";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { SoftBackdrop } from "./soft-backdrop";
 import { LaunchStage } from "@/site/launch/launch-stage";
 import { buttonClass } from "@/site/ui/button";
@@ -25,7 +26,7 @@ const storeUrl = () => process.env.COERE_STORE_URL || "https://chromewebstore.go
 export async function ComingSoon({ product }: { product: LaunchProduct }) {
   const setting = (await launchSettings())[product];
   return (
-    <section className="relative isolate overflow-hidden bg-white pt-20 pb-28 md:pt-28 md:pb-40">
+    <section className={`relative isolate overflow-hidden bg-white pt-[152px] pb-28 md:pt-[184px] md:pb-40 ${UNDER_NAV}`}>
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         <SoftBackdrop />
       </div>

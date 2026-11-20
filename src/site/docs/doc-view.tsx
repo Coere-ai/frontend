@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { docPages, type DocPage } from "@/site/content/docs";
 import { SoftBackdrop } from "@/site/blocks/soft-backdrop";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { Container } from "@/site/ui/container";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { DocsSidebar } from "./docs-sidebar";
@@ -22,11 +23,11 @@ export function DocView({ page }: { page: DocPage }) {
   const index = docPages.findIndex((p) => p.slug === page.slug);
   const next = docPages[index + 1];
   return (
-    <div className="relative isolate">
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[460px] overflow-hidden [mask-image:linear-gradient(to_bottom,black_40%,transparent)]">
+    <div className={`relative isolate ${UNDER_NAV}`}>
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[540px] overflow-hidden [mask-image:linear-gradient(to_bottom,black_40%,transparent)]">
         <SoftBackdrop />
       </div>
-      <Container className="grid gap-12 pt-16 pb-28 md:pt-20 lg:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_220px] xl:gap-16">
+      <Container className="grid gap-12 pt-[136px] pb-28 md:pt-[152px] lg:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_220px] xl:gap-16">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <DocsSidebar />
         </aside>

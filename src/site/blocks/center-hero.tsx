@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { SoftBackdrop } from "./soft-backdrop";
 
 /**
@@ -8,11 +9,11 @@ import { SoftBackdrop } from "./soft-backdrop";
  */
 export function CenterHero({ eyebrow, title, line, children }: { eyebrow?: string; title: string; line: string; children?: ReactNode }) {
   return (
-    <section className="relative isolate overflow-hidden">
+    <section className={`relative isolate overflow-hidden ${UNDER_NAV}`}>
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         <SoftBackdrop />
       </div>
-      <div className="mx-auto max-w-[1440px] px-6 pt-20 pb-16 text-center md:px-10 md:pt-28 md:pb-24">
+      <div className="mx-auto max-w-[1440px] px-6 pt-[152px] pb-16 text-center md:px-10 md:pt-[184px] md:pb-24">
         {eyebrow ? (
           <p className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-[13px] font-medium text-brand-700 ring-1 ring-brand-500/15 backdrop-blur-md">
             <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand-500" />

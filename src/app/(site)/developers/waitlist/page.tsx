@@ -8,6 +8,7 @@ import { backgrounds } from "@/site/content/backgrounds";
 import { contextSamples } from "@/site/content/code/context-api";
 import { waitlistSeo } from "@/site/content/seo";
 import { WaitlistForm } from "@/site/developers/waitlist-form";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 
@@ -20,7 +21,7 @@ export const metadata: Metadata = pageMetadata({ ...waitlistSeo, path: "/develop
  */
 export default function DeveloperWaitlistPage() {
   return (
-    <section className="relative isolate overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32">
+    <section className={`relative isolate overflow-hidden pt-[136px] pb-24 md:pt-[168px] md:pb-32 ${UNDER_NAV}`}>
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         <SoftBackdrop />
       </div>

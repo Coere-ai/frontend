@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
+import { UNDER_NAV } from "@/site/nav/nav-space";
 import { CheckList } from "./check-list";
 import { LaserShowcase } from "./laser-showcase";
 
@@ -13,7 +14,8 @@ export type HeroLink = { href: string; label: string };
  * beam onto the app, for the heroes that show the dashboard. `framed` sets
  * the app in a white rounded frame; `contained` shows it as it is, for a
  * code window or cards that carry their own frame. `dark` is for a backdrop
- * on near black, with light words and buttons.
+ * on near black, with light words and buttons. It runs up under the
+ * floating glass navbar, so the glass bends the backdrop from the start.
  */
 export function SplitHero({
   eyebrow,
@@ -44,11 +46,11 @@ export function SplitHero({
   const framed = appFit === "framed";
   const plainFrame = framed ? (dark ? "overflow-hidden rounded-2xl bg-white ring-1 ring-white/15 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)]" : "overflow-hidden rounded-2xl bg-white shadow-[0_40px_100px_-40px_rgba(20,17,15,0.45),0_0_0_1px_rgba(20,17,15,0.06)]") : "";
   return (
-    <section className={`relative isolate overflow-hidden ${dark ? "bg-[#0b0a12] text-white" : "bg-white text-neutral-950"}`}>
+    <section className={`relative isolate overflow-hidden ${UNDER_NAV} ${dark ? "bg-[#0b0a12] text-white" : "bg-white text-neutral-950"}`}>
       <div aria-hidden="true" className="absolute inset-0 -z-10">
         {backdrop}
       </div>
-      <div className="mx-auto grid min-h-[min(calc(100svh-73px),920px)] max-w-[1440px] items-center gap-14 px-6 pt-14 pb-20 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:py-20">
+      <div className="mx-auto grid min-h-[min(100svh,992px)] max-w-[1440px] items-center gap-14 px-6 pt-[128px] pb-20 md:px-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:pt-[152px] lg:pb-20">
         <div className="max-w-[640px]">
           {eyebrow ? (
             <p className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 backdrop-blur-md ${dark ? "bg-white/10 text-white ring-white/15" : "bg-white/70 text-brand-700 ring-brand-500/15"}`}>
