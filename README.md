@@ -207,14 +207,17 @@ use `npx next dev --webpack` and `npx next build --webpack`.
 ## Where things live
 
 ```
-src/app/(site)/       routes: home, products, industries and each industry,
+src/app/[lang]/(site)/
+                      routes: home, products, industries and each industry,
                       resources (the developer docs), the guides, about,
                       install, try-teams, privacy, sign in, sign up, sign
                       out, connect, account, blog, careers, and a 404 inside
-                      the site's layout
-src/app/dashboard/    the dashboard host: the extension's own Console, framed
-src/app/welcome/      the extension's own onboarding, framed the same way
-src/app/admin/        the admin pages and their server actions
+                      the site's layout, once per language (English at its
+                      own addresses through a rewrite, the rest under /es,
+                      /fr, /nl and /ja)
+src/app/(app)/        the second root layout: the dashboard host (the
+                      extension's own Console, framed), welcome (its
+                      onboarding, framed the same way) and the admin pages
 src/app/api/          v1 (the extension's API), admin (the panels' data),
                       site/track (the analytics beacon)
 src/site/content/     everything the pages say: products, features, films and
@@ -223,6 +226,9 @@ src/site/content/     everything the pages say: products, features, films and
 src/site/content/docs the developer docs as Markdown, one file per page
 src/site/blocks/      layouts the pages share: the accordion showcase, feature
                       grid, use case tabs, slanted card, photo hero, code tabs
+src/site/i18n/        the languages, the routing rules, the language aware
+                      Link, and messages/ with every word in English,
+                      Spanish, French, Dutch and Japanese, checked key for key
 src/site/nav/         the navbar, its hover menus and the mobile menu
 src/site/home/        the home page: one part per product
 src/site/products/    one page design per product
@@ -275,6 +281,15 @@ of them out of the live demos' own pages, `/admin` (and its old address
 `/statistics`), `/api/` and the account pages; it says
 how to stop model training without leaving AI search. `docs/seo-report.md`
 has the research and the remaining manual steps.
+
+A page translated into every language passes `translated: true` and its
+`locale` to `pageMetadata`, which then gives it a canonical link at its own
+language's address and hreflang alternates for all five, with x-default at
+the English one; the sitemap lists it once per language. A page still in
+English (the guides, the policy, careers, the docs, the developer waitlist
+and each blog post) keeps one canonical English address in every language,
+and its body says `lang="en"` (`EnglishOnly` in `src/site/i18n`). Nothing
+redirects by the browser's language; the language menu is the only switch.
 
 `/privacy` is the privacy policy that the Chrome Web Store listing points
 to, linked from the footer. Its words are in `src/site/content/privacy.ts`,
