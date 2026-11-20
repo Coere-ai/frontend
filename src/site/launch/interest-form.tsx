@@ -7,7 +7,7 @@ import { registerInterestAction } from "@/lib/interest/actions";
 import { interestStart } from "@/lib/interest/form";
 import { launchCopy, type LaunchProduct } from "@/site/content/launch";
 import { ArrowLink } from "@/site/ui/arrow-link";
-import { buttonClass, CircleArrowButton } from "@/site/ui/button";
+import { ArrowButton, buttonClass } from "@/site/ui/button";
 import { FormField, inputClass } from "@/site/ui/form-field";
 import { CheckIcon } from "@/site/ui/icons/interface-icons";
 
@@ -36,9 +36,9 @@ export function InterestForm({ product }: { product: LaunchProduct }) {
         <AnimatePresence mode="wait" initial={false}>
           {step === "button" ? (
             <motion.div key="button" {...swap}>
-              <CircleArrowButton size="lg" onClick={() => setOpen(true)} aria-controls={id} aria-expanded={false}>
+              <ArrowButton size="lg" onClick={() => setOpen(true)} aria-controls={id} aria-expanded={false}>
                 I&apos;m interested
-              </CircleArrowButton>
+              </ArrowButton>
             </motion.div>
           ) : step === "form" ? (
             <motion.form key="form" {...swap} id={id} action={submit} noValidate className="w-full text-left">
@@ -68,8 +68,8 @@ export function InterestForm({ product }: { product: LaunchProduct }) {
             </motion.form>
           ) : (
             <motion.div key="saved" {...swap} role="status" className="flex items-center gap-3 text-left">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-neutral-950 text-white dark:bg-brand-500">
-                <CheckIcon size={18} />
+              <span className="grid h-10 w-10 shrink-0 place-items-center text-neutral-950 dark:text-brand-300">
+                <CheckIcon size={30} strokeWidth={2} />
               </span>
               <p className="text-[16px] leading-snug text-neutral-950 dark:text-white">
                 <span className="font-medium">Thanks, you&apos;re in.</span>{" "}

@@ -50,7 +50,7 @@ export function StepList({ steps }: { steps: Step[] }) {
     <ol className="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
       {steps.map((step, i) => (
         <li key={step.title}>
-          <span className="inline-grid h-9 w-9 place-items-center rounded-full bg-neutral-950 text-[15px] font-medium text-white tabular-nums dark:bg-brand-500">{i + 1}</span>
+          <span className="block text-[28px] leading-9 font-semibold tracking-[-0.03em] text-brand-600 tabular-nums dark:text-brand-300">{i + 1}</span>
           <h3 className="mt-5 text-[22px] font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">{step.title}</h3>
           <p className={`mt-2.5 text-[15px] leading-relaxed ${BODY}`}>{step.text}</p>
         </li>

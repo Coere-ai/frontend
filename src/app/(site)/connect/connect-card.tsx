@@ -68,8 +68,8 @@ export function ConnectCard({ username, params }: { username: string | null; par
   if (done) {
     return (
       <div role="status" className={`${authCardClass} text-center`}>
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
-          <CheckIcon size={22} />
+        <span className="mx-auto grid h-12 w-12 place-items-center text-brand-600 dark:text-brand-300">
+          <CheckIcon size={36} strokeWidth={2} />
         </span>
         <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">Connected</p>
         <p className="mt-2 text-[15px] text-neutral-500 dark:text-white/65">Coere is connected. You can close this tab.</p>
@@ -81,8 +81,8 @@ export function ConnectCard({ username, params }: { username: string | null; par
     <div className={`space-y-6 ${authCardClass}`}>
       <div>
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
-            <UserIcon size={20} />
+          <span className="grid h-10 w-10 shrink-0 place-items-center text-brand-600 dark:text-brand-300">
+            <UserIcon size={26} />
           </span>
           <div className="min-w-0">
             <p className="text-[13px] text-neutral-500 dark:text-white/60">Signed in as</p>

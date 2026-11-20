@@ -19,8 +19,8 @@ export function WaitlistForm() {
   if (state.joined) {
     return (
       <div role="status" className="rounded-3xl bg-neutral-50 p-10 text-center dark:bg-white/[0.045] dark:ring-1 dark:ring-white/10">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-neutral-950 text-white dark:bg-brand-500">
-          <CheckIcon size={22} />
+        <span className="mx-auto grid h-12 w-12 place-items-center text-neutral-950 dark:text-brand-300">
+          <CheckIcon size={36} strokeWidth={2} />
         </span>
         <p className="mt-5 text-2xl font-medium tracking-[-0.02em] text-neutral-950 dark:text-white">You&apos;re on the list.</p>
         <p className="mx-auto mt-2 max-w-sm text-[15px] text-neutral-500 dark:text-white/65">
