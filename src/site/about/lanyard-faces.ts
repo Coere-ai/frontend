@@ -1,4 +1,4 @@
-import { logoMarkSvg } from "@/components/logo";
+import { logoMarkSvg, WORDMARK_CROP, wordmarkSvg } from "@/components/logo";
 import type { TeamMember } from "@/lib/site";
 
 /**
@@ -74,15 +74,12 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, weight: number, si
   }
 }
 
-function drawBrand(ctx: CanvasRenderingContext2D, mark: HTMLImageElement, family: string, x: number, y: number, color: string, size = 56) {
-  ctx.drawImage(mark, x, y - size * 0.8, size, size);
-  ctx.fillStyle = color;
-  ctx.font = `600 ${size * 0.82}px ${family}`;
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText("Coere", x + size * 1.22, y);
+/** The text logo (cropped to its letters), `height` tall, its letters' foot near the baseline `y`. */
+function drawBrand(ctx: CanvasRenderingContext2D, wordmark: HTMLImageElement, x: number, y: number, height = 60) {
+  ctx.drawImage(wordmark, x, y - height * 0.93, (height * WORDMARK_CROP.width) / WORDMARK_CROP.height, height);
 }
 
-function front(member: TeamMember, photo: HTMLImageElement | null, mark: HTMLImageElement, family: string): string {
+function front(member: TeamMember, photo: HTMLImageElement | null, wordmark: HTMLImageElement, family: string): string {
   const [c, ctx] = canvas(WIDTH, HEIGHT);
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -103,7 +100,7 @@ function front(member: TeamMember, photo: HTMLImageElement | null, mark: HTMLIma
   ctx.fillStyle = BLUE;
   fitText(ctx, member.role, 600, 56, family, WIDTH - 144);
   ctx.fillText(member.role, 72, 1246);
-  drawBrand(ctx, mark, family, 72, 1340, BLUE);
+  drawBrand(ctx, wordmark, 72, 1340);
   ctx.fillStyle = "#6b6b6b";
   ctx.font = `500 40px ${family}`;
   ctx.textAlign = "right";
@@ -111,12 +108,9 @@ function front(member: TeamMember, photo: HTMLImageElement | null, mark: HTMLIma
   return c.toDataURL("image/jpeg", 0.92);
 }
 
-function back(member: TeamMember, whiteMark: HTMLImageElement, family: string): string {
+function back(member: TeamMember, whiteMark: HTMLImageElement, whiteWordmark: HTMLImageElement, family: string): string {
   const [c, ctx] = canvas(WIDTH, HEIGHT);
-  const fill = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-  fill.addColorStop(0, "#6a7cff");
-  fill.addColorStop(1, "#3f4ceb");
-  ctx.fillStyle = fill;
+  ctx.fillStyle = BLUE;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
   // A large, faint mark in the corner, cut off by the card's edge.
   ctx.globalAlpha = 0.12;
@@ -137,22 +131,16 @@ function back(member: TeamMember, whiteMark: HTMLImageElement, family: string): 
   ctx.fillStyle = "rgba(255,255,255,0.8)";
   ctx.font = `400 42px ${family}`;
   ctx.fillText(member.majors.join(" and "), 72, 776);
-  drawBrand(ctx, whiteMark, family, 72, 1340, "#ffffff");
+  drawBrand(ctx, whiteWordmark, 72, 1340);
   return c.toDataURL("image/jpeg", 0.92);
 }
 
-/** The strap: Coere blue with the mark and the name, repeated along it. */
-function strap(whiteMark: HTMLImageElement, family: string): string {
+/** The strap: Coere blue with the text logo in white, repeated along it. */
+function strap(whiteWordmark: HTMLImageElement): string {
   const [c, ctx] = canvas(1280, 192);
   ctx.fillStyle = BLUE;
   ctx.fillRect(0, 0, 1280, 192);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `600 72px ${family}`;
-  ctx.textBaseline = "middle";
-  for (let x = 40; x < 1280; x += 320) {
-    ctx.drawImage(whiteMark, x, 66, 60, 60);
-    ctx.fillText("coere", x + 76, 100);
-  }
+  for (let x = 40; x < 1280; x += 320) drawBrand(ctx, whiteWordmark, x, 126, 64);
   return c.toDataURL("image/png");
 }
 
@@ -162,12 +150,12 @@ const svgUrl = (svg: string) => `data:image/svg+xml;charset=utf-8,${encodeURICom
 export async function drawLanyardFaces(members: readonly TeamMember[]): Promise<LanyardFaces[]> {
   const family = getComputedStyle(document.body).fontFamily || "system-ui, sans-serif";
   await Promise.all([700, 600, 500, 400].map((w) => document.fonts?.load(`${w} 64px ${family}`).catch(() => [])));
-  const [mark, whiteMark] = await Promise.all([loadImage(svgUrl(logoMarkSvg(BLUE))), loadImage(svgUrl(logoMarkSvg("#ffffff")))]);
+  const [whiteMark, wordmark, whiteWordmark] = await Promise.all([loadImage(svgUrl(logoMarkSvg("#ffffff"))), loadImage(svgUrl(wordmarkSvg())), loadImage(svgUrl(wordmarkSvg("#ffffff")))]);
   const photos = await Promise.all(members.map((m) => (m.photo ? loadImage(m.photo).catch(() => null) : Promise.resolve(null))));
-  const strapUrl = strap(whiteMark, family);
+  const strapUrl = strap(whiteWordmark);
   return members.map((member, i) => ({
-    front: front(member, photos[i], mark, family),
-    back: back(member, whiteMark, family),
+    front: front(member, photos[i], wordmark, family),
+    back: back(member, whiteMark, whiteWordmark, family),
     strap: strapUrl,
   }));
 }

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 
-import { LogoMark } from "@/components/logo";
 import { backgrounds } from "@/site/content/backgrounds";
+import { BrandLockup } from "@/site/nav/brand-lockup";
 import { DarkPage } from "@/site/ui/page-theme";
 import { SizedPhoto } from "@/site/ui/sized-photo";
 
@@ -34,7 +34,7 @@ export function AuthShell({ eyebrow, title, lede, children }: { eyebrow: string;
   );
 }
 
-/** Coere's mark and name in white on blue, the line that says what it is, and Cori. */
+/** Coere's text logo in white on blue, the line that says what it is, and Cori. */
 function BrandPanel() {
   return (
     <div className="relative isolate overflow-hidden bg-brand-900 text-white">
@@ -71,14 +71,9 @@ function BrandPanel() {
   );
 }
 
-/** The Coere mark and name in white. */
+/** The text logo in white, as the navbar and the footer show it. */
 function Mark({ size }: { size: "sm" | "lg" }) {
-  return (
-    <span className="flex items-center gap-3">
-      <LogoMark className={size === "lg" ? "h-11 w-11 shrink-0" : "h-7 w-7 shrink-0"} />
-      <span className={`font-semibold tracking-[-0.03em] ${size === "lg" ? "text-[34px]" : "text-[22px]"}`}>Coere</span>
-    </span>
-  );
+  return <BrandLockup white height={size === "lg" ? 36 : 24} />;
 }
 
 /** The card a form sits in, alone on the page's side: dark glass on the near black. */

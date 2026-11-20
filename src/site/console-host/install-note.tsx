@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Brand } from "@/site/ui/brand";
+import { BrandLockup } from "@/site/nav/brand-lockup";
 import { ButtonLink } from "@/site/ui/button";
 import { ChromeMark } from "@/site/ui/icons/chrome-mark";
 import { DarkPage } from "@/site/ui/page-theme";
@@ -18,7 +18,7 @@ export function InstallNote() {
       <DarkPage className="flex min-h-screen flex-col px-6">
         <div className="pt-8">
           <Link href="/" aria-label="Coere home" className="inline-block">
-            <Brand />
+            <BrandLockup />
           </Link>
         </div>
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center pb-24">

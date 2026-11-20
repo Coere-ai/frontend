@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { LOGO_BLADE } from "@/components/logo";
+import { WORDMARK_CROP, wordmarkSvg } from "@/components/logo";
 import type { Post } from "@/site/content/posts";
 import { formatPostDate } from "@/site/content/posts";
 import { loadCover } from "./covers/load";
@@ -11,7 +11,7 @@ export const SHARE_SIZE = { width: 1200, height: 630 };
 
 /**
  * A post's share picture: its cover art behind, a shade from the left so
- * the words read, and the Coere mark, the title and the date on top. Drawn
+ * the words read, and the text logo, the title and the date on top. Drawn
  * once at build time for each post. The title is set in Geist, the site's
  * own type, from a copy kept beside this file (src/site/blog/fonts, under
  * the SIL Open Font License).
@@ -19,7 +19,8 @@ export const SHARE_SIZE = { width: 1200, height: 630 };
 export async function shareImage(post: Post): Promise<ImageResponse> {
   const [cover, font] = await Promise.all([loadCover(post), readFile(join(process.cwd(), "src/site/blog/fonts/Geist-SemiBold.ttf"))]);
   const art = `data:image/svg+xml;base64,${Buffer.from(cover).toString("base64")}`;
-  const mark = `data:image/svg+xml;base64,${Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="#fff"><path d="${LOGO_BLADE}"/><path d="${LOGO_BLADE}" transform="rotate(180 256 256)"/></svg>`).toString("base64")}`;
+  const logo = `data:image/svg+xml;base64,${Buffer.from(wordmarkSvg("#ffffff")).toString("base64")}`;
+  const logoHeight = 34;
   return new ImageResponse(
     (
       <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", background: "#04050b", fontFamily: "Geist" }}>
@@ -30,8 +31,7 @@ export async function shareImage(post: Post): Promise<ImageResponse> {
         <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "64px 72px", width: 720, height: "100%" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, color: "#fff", fontSize: 30, letterSpacing: "-0.02em" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={mark} width={34} height={34} alt="" />
-            <span>Coere</span>
+            <img src={logo} width={Math.round((logoHeight * WORDMARK_CROP.width) / WORDMARK_CROP.height)} height={logoHeight} alt="" />
             <span style={{ color: "rgba(255,255,255,0.5)", marginLeft: 6 }}>Blog</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
