@@ -25,7 +25,6 @@ export function PostArticle({ post }: { post: Post }) {
   const toc = headings.length >= TOC_FROM;
   return (
     <article className={`relative isolate pt-[128px] pb-20 md:pt-[160px] md:pb-28 ${UNDER_NAV}`}>
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[620px] bg-[linear-gradient(180deg,#f3f5ff_0%,rgba(243,245,255,0)_100%)] dark:hidden" />
       <Container>
         <header className="mx-auto max-w-[860px] text-center">
           <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-1.5 text-[14px] text-neutral-500 dark:text-white/60">
