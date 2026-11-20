@@ -11,6 +11,7 @@ type Finish = 'glossy' | 'matte' | 'holographic' | 'metallic';
 type Metal = 'graphite' | 'silver' | 'gold';
 type Anchor = 'left' | 'center' | 'right';
 type ImageFit = 'cover' | 'contain';
+type IntroFrom = 'side' | 'top';
 type Rgb = [number, number, number];
 type Point = { clientX: number; clientY: number };
 
@@ -41,6 +42,10 @@ export interface LanyardProps {
   breeze?: number;
   interactive?: boolean;
   intro?: boolean;
+  /** Where the intro starts: swung up to the side (the original), or dropped from above the view. */
+  introFrom?: IntroFrom;
+  /** Each change turns the card over, for a button that flips it from the keyboard. */
+  flipSignal?: number;
   className?: string;
   style?: CSSProperties;
 }
@@ -66,6 +71,8 @@ interface Settings {
   breeze: number;
   interactive: boolean;
   intro: boolean;
+  introFrom: IntroFrom;
+  flipSignal: number;
 }
 
 interface Images {
@@ -155,6 +162,7 @@ interface Applied {
   faceKey?: string;
   strapColor?: string;
   strapScale?: number;
+  flipSignal?: number;
 }
 
 interface Press {
@@ -736,19 +744,29 @@ const solvePin = (body: Body, grab: Grab, target: THREE.Vector3) => {
   pushBody(body, r, normal.multiplyScalar(lambda));
 };
 
-const placeHanging = (sim: Simulation, layout: CardLayout, intro: boolean) => {
+const placeHanging = (sim: Simulation, layout: CardLayout, intro: boolean, from: IntroFrom = 'side') => {
   const { nodes, previous, velocities, body, anchor } = sim;
+  const side = intro && from === 'side';
   nodes[0].copy(anchor);
   for (let i = 1; i <= JOINTS; i++) {
     nodes[i].copy(nodes[i - 1]);
-    if (intro) nodes[i].x += sim.rest;
+    if (side) nodes[i].x += sim.rest;
     else nodes[i].y -= sim.rest;
   }
   body.quaternion.identity();
-  if (intro) body.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+  if (side) body.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+  else if (intro) body.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 1), 0.05);
   body.hang.set(0, layout.hangY, 0);
   const offset = scratch.a.copy(body.hang).applyQuaternion(body.quaternion);
   body.position.copy(nodes[JOINTS]).sub(offset);
+  if (intro && from === 'top') {
+    // Lift the card until its bottom edge is just above the anchor, out of
+    // view, with the strap slack. It falls, and the strap catches it.
+    const lift = anchor.y + 0.1 - (body.position.y - layout.height / 2);
+    body.position.y += lift;
+    body.position.x += 0.04;
+    for (let i = 1; i <= JOINTS; i++) nodes[i].y += (lift * i) / JOINTS;
+  }
   body.previous.copy(body.position);
   body.previousQuaternion.copy(body.quaternion);
   body.velocity.set(0, 0, 0);
@@ -890,6 +908,8 @@ const Lanyard = ({
   breeze = 0.5,
   interactive = true,
   intro = true,
+  introFrom = 'side',
+  flipSignal = 0,
   className = '',
   style
 }: LanyardProps) => {
@@ -916,7 +936,9 @@ const Lanyard = ({
     elasticity,
     breeze,
     interactive,
-    intro
+    intro,
+    introFrom: introFrom === 'top' ? 'top' : 'side',
+    flipSignal
   };
   const settingsRef = useRef<Settings | null>(settings);
 
@@ -1128,7 +1150,7 @@ const Lanyard = ({
       if (framingKey !== applied.framingKey) {
         frameView();
         if (!placed) {
-          placeHanging(sim, layout, s.intro && !reducedMotion);
+          placeHanging(sim, layout, s.intro && !reducedMotion, s.introFrom);
           placed = true;
         } else if (layoutKey !== applied.layoutKey) {
           placeHanging(sim, layout, false);
@@ -1180,8 +1202,11 @@ const Lanyard = ({
         clampMesh.geometry = buildClampGeometry(strapScale);
       }
       canvas.style.touchAction = s.interactive ? 'pan-y' : 'auto';
+      if (applied.flipSignal !== undefined && s.flipSignal !== applied.flipSignal) {
+        flip(scratch.d.set(0.3, 0, 0).applyQuaternion(sim.body.quaternion).add(sim.body.position));
+      }
 
-      applied = { layoutKey, framingKey, imageKey, faceKey, strapColor: s.strapColor, strapScale };
+      applied = { layoutKey, framingKey, imageKey, faceKey, strapColor: s.strapColor, strapScale, flipSignal: s.flipSignal };
       start();
     };
 
