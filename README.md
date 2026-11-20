@@ -37,7 +37,7 @@ pictures: [the site](docs/screenshots/site/README.md),
 <p align="center">
   <img src="docs/screenshots/site/home-hero.webp" width="100%" alt="The dark home hero under the dark glass navbar: Accelerating Enterprise AI with Unified Context, the paragraph, Start for free and Watch demo on the left over blue MicroSlats, and on the right three tall tiles: Coere saving chats cut off at the top, the dashboard with tokens saved, efficiency, time saved and recent chats, and the memory graph cut off at the foot" />
   <br />
-  <sub>The home page: what Coere does, beside Coere saving chats, the dashboard and the memory graph. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
+  <sub>The home page: what Coere does, beside Coere saving chats, the dashboard and the memory graph. The page stays dark to its footer. <a href="docs/screenshots/site/home.webp">The whole page</a>.</sub>
 </p>
 
 <table>
@@ -55,12 +55,12 @@ pictures: [the site](docs/screenshots/site/README.md),
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/site/home-connect.webp" alt="One memory across every AI, with a ChatGPT window beside four features" />
+      <img src="docs/screenshots/site/home-connect.webp" alt="One memory across every AI on the dark home page, with a ChatGPT window beside four features" />
       <br />
       <sub>Each product has its part of the home page, Coere Connect first.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/site/home-ais.webp" alt="Transfer memory across every AI: the AI logos moving past in a line that fades at both edges" />
+      <img src="docs/screenshots/site/home-ais.webp" alt="Transfer memory across every AI on near black: the AI logos moving past in a line that fades at both edges, the black ones drawn white" />
       <br />
       <sub>Every AI Coere works with, under the hero.</sub>
     </td>
@@ -298,11 +298,19 @@ from the extension.
 ## Photos and docs
 
 Industry photos are from Unsplash, free to use under the Unsplash License,
-each saved at 960, 1920 and 3840 wide. The site's own pages are plain and
-calm: white, with no artwork, gradient or tint behind a hero, a film or a
-form, and no box or circle a part does not need. They load through
-`SizedPhoto` instead of the image optimizer, which fetches without the
-visitor's pass and would be turned away by the gate.
+each saved at 960, 1920 and 3840 wide. The quiet pages (docs, guides,
+pricing and the account pages) are plain and calm: white, with no artwork,
+gradient or tint behind a form, and no box or circle a part does not need.
+The photos load through `SizedPhoto` instead of the image optimizer, which
+fetches without the visitor's pass and would be turned away by the gate.
+
+A page whose hero is dark is dark to its end: the home page, Solutions,
+Forge, Agents, the blog, About and each industry. It wraps itself in
+`DarkPage` (`src/site/ui/page-theme.tsx`), which sets `data-theme="dark"`;
+every shared part carries its own dark look through the `dark:` variant
+defined in `src/app/globals.css`, and the footer, the navbar and the bounce
+past the page's ends follow it. An app window inside a dark page sets
+`data-theme="light"` and keeps its own look.
 
 The developer docs in `src/site/content/docs` were built from the coere-v2
 source. Endpoint and schema tables come from `packages/api/openapi.json`, and
