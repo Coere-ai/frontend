@@ -28,7 +28,7 @@ const items: Record<NavTabId, Item[]> = {
   blog: [{ href: "/blog", label: "All posts" }, ...posts.slice(0, 3).map((p) => ({ href: `/blog/${p.slug}`, label: p.title }))],
   about: [
     { href: "/about", label: "Our story" },
-    { href: "/about#team", label: "About us" },
+    { href: "/about#team", label: "Our team" },
     { href: "/blog", label: "Blog" },
   ],
   careers: [{ href: "/careers", label: "Open roles" }],

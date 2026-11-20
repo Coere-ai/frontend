@@ -5,11 +5,11 @@ import { Underlined } from "@/site/ui/underlined";
 
 const items = [
   { href: "/about", title: "Our story", summary: "Why memory should belong to you." },
-  { href: "/about#team", title: "About us", summary: "The people building Coere." },
+  { href: "/about#team", title: "Our team", summary: "The people building Coere." },
   { href: "/blog", title: "Blog", summary: "News and launches from Coere." },
 ];
 
-/** About menu: three big links, one above the other (our story, the team and the blog), and the invitation to build Coere with us. */
+/** About menu: three big links, one above the other (our story, our team and the blog), and the invitation to build Coere with us. */
 export function AboutPanel() {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] gap-12">
