@@ -58,7 +58,8 @@ export function SplitHero({
           </div>
           {checks?.length ? <CheckList items={checks} tone={dark ? "light" : "dark"} className="mt-10 max-w-xl" /> : null}
         </div>
-        <div className={`min-w-0 ${laser ? "max-lg:pt-8" : ""}`}>{laser ? <LaserShowcase framed={framed} tone={tone}>{app}</LaserShowcase> : <div className={plainFrame}>{app}</div>}</div>
+        {/* The app keeps its own look on a dark page: it is product, not page. */}
+        <div data-theme="light" className={`min-w-0 ${laser ? "max-lg:pt-8" : ""}`}>{laser ? <LaserShowcase framed={framed} tone={tone}>{app}</LaserShowcase> : <div className={plainFrame}>{app}</div>}</div>
       </div>
     </section>
   );

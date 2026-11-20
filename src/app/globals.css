@@ -25,7 +25,20 @@
   /* The hero's sky. Matches HERO_BACKGROUND in three/hero-scene.ts, which is
      what the 3D scene clears to and fogs into. */
   --color-mist: #f2f5fc;
+
+  /* The dark page theme's ground: the near black of the dark heroes. */
+  --color-night: #0b0a12;
 }
+
+/*
+ * The page theme. A page whose hero is dark wraps itself in DarkPage
+ * (src/site/ui/page-theme.tsx), which sets data-theme="dark", and every
+ * shared part below the hero reads it through the dark: variant. The
+ * footer sits outside the page in the layout, so it follows a dark page
+ * through :has. An app window or a light card inside a dark page sets
+ * data-theme="light" and keeps its own look.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, :has(> main > [data-theme="dark"]) > footer, :has(> main > [data-theme="dark"]) > footer *):not(:where([data-theme="light"], [data-theme="light"] *)));
 
 :root {
   color-scheme: light;
@@ -39,6 +52,7 @@ html {
   scroll-padding-top: 6rem;
   /* The colour a browser shows past the top of the page when it bounces: the page top's own. */
   --overscroll-top: #ffffff;
+  --overscroll-bottom: #ffffff;
   background-color: var(--overscroll-top);
 }
 
@@ -53,6 +67,15 @@ html:has(main > [data-nav-tone="dark"]:not(:not(script) ~ *)) {
 }
 
 /*
+ * A page in the dark theme is dark to its end: the body behind it, the
+ * footer, and the bounce under the footer.
+ */
+html:has(main > [data-theme="dark"]) {
+  --background: #0b0a12;
+  --overscroll-bottom: #0b0a12;
+}
+
+/*
  * With a mouse or trackpad, the page does not bounce past its ends at all
  * (Chrome on a Mac pulls it down and shows the canvas). Touch screens keep
  * their bounce and pull to refresh; the colour above covers them.
@@ -64,7 +87,7 @@ html:has(main > [data-nav-tone="dark"]:not(:not(script) ~ *)) {
   }
 }
 
-/* Past half way down the page the colour turns back to white, so a bounce under the white footer stays white. */
+/* Past half way down the page the colour turns to the page bottom's own, so a bounce under a white footer stays white and under a dark one dark. */
 @supports (animation-timeline: scroll()) {
   html {
     animation: coere-overscroll linear both;
@@ -79,7 +102,7 @@ html:has(main > [data-nav-tone="dark"]:not(:not(script) ~ *)) {
   }
   50.01%,
   100% {
-    background-color: #ffffff;
+    background-color: var(--overscroll-bottom);
   }
 }
 
@@ -178,6 +201,12 @@ body {
   transition: background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+}
+/* On a dark page the line is white, like the words. */
+.u-line {
+  @variant dark {
+    --u-color: #fff;
+  }
 }
 .u-line-big {
   --u-weight: 2px;

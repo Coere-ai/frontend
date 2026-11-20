@@ -13,7 +13,8 @@ const SIZES = {
 };
 
 /**
- * The site's row of pills on light grey, the picked one solid black, as
+ * The site's row of pills on light grey, the picked one solid black (on a
+ * dark page, glass with the picked one white), as
  * tabs: the picked pill is the one in the tab order, and the arrow keys,
  * Home and End move the pick, so a keyboard and a screen reader get the
  * same switch the mouse does. A pill with the keyboard's focus shows a
@@ -37,7 +38,7 @@ export function PillTabs<K extends string>({ label, tabs, picked, onPick, id, si
   }
 
   return (
-    <div ref={row} role="tablist" aria-label={label} onKeyDown={onKeyDown} className={`mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-neutral-100 ${look.row} ${className}`}>
+    <div ref={row} role="tablist" aria-label={label} onKeyDown={onKeyDown} className={`mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-neutral-100 dark:bg-white/[0.06] dark:ring-1 dark:ring-white/10 ${look.row} ${className}`}>
       {tabs.map((t) => {
         const on = t.key === picked;
         return (
@@ -50,7 +51,7 @@ export function PillTabs<K extends string>({ label, tabs, picked, onPick, id, si
             aria-controls={id ? `${id}-panel` : undefined}
             tabIndex={on ? 0 : -1}
             onClick={() => onPick(t.key)}
-            className={`shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 ${look.tab} ${on ? "bg-neutral-950 text-white focus-visible:outline-white" : "text-neutral-700 hover:text-neutral-950 focus-visible:outline-neutral-950"}`}
+            className={`shrink-0 rounded-full transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 ${look.tab} ${on ? "bg-neutral-950 text-white focus-visible:outline-white dark:bg-white dark:text-neutral-950 dark:focus-visible:outline-neutral-950" : "text-neutral-700 hover:text-neutral-950 focus-visible:outline-neutral-950 dark:text-white/70 dark:hover:text-white dark:focus-visible:outline-white"}`}
           >
             {t.label}
           </button>

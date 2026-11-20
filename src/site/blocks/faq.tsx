@@ -2,21 +2,21 @@ import type { Faq } from "@/site/content/faqs";
 import { ArrowLink } from "@/site/ui/arrow-link";
 import { Container } from "@/site/ui/container";
 
-/** The two looks: thin rules between questions, or each question on a soft card (the home page). */
+/** The two looks: thin rules between questions, or each question on a soft card (the home page). Each has its dark look for a dark page. */
 const looks = {
   rules: {
-    section: "border-t border-neutral-100 py-28 md:py-32",
-    title: "text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05]",
+    section: "border-t border-neutral-100 py-28 md:py-32 dark:border-white/10",
+    title: "text-4xl font-medium tracking-[-0.04em] text-neutral-950 text-balance md:text-5xl md:leading-[1.05] dark:text-white",
     list: "",
-    item: "border-t border-neutral-300 py-7 last:border-b",
-    question: "text-[22px] font-medium tracking-[-0.025em] text-neutral-950 text-balance",
+    item: "border-t border-neutral-300 py-7 last:border-b dark:border-white/15",
+    question: "text-[22px] font-medium tracking-[-0.025em] text-neutral-950 text-balance dark:text-white",
   },
   soft: {
     section: "py-24 md:py-32",
-    title: "text-4xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.25rem] md:leading-[1.04]",
+    title: "text-4xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[3.25rem] md:leading-[1.04] dark:text-white",
     list: "space-y-3",
-    item: "rounded-[22px] bg-[#f5f6fb] px-6 py-6 ring-1 ring-neutral-950/[0.04] md:px-8 md:py-7",
-    question: "text-[20px] font-semibold tracking-[-0.025em] text-neutral-950 text-balance",
+    item: "rounded-[22px] bg-[#f5f6fb] px-6 py-6 ring-1 ring-neutral-950/[0.04] md:px-8 md:py-7 dark:bg-white/[0.04] dark:ring-white/10",
+    question: "text-[20px] font-semibold tracking-[-0.025em] text-neutral-950 text-balance dark:text-white",
   },
 };
 
@@ -34,13 +34,13 @@ export function FaqSection({ faqs, title = "Questions, answered", line, id = "fa
       <Container className="grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <h2 className={style.title}>{title}</h2>
-          {line ? <p className="mt-5 max-w-md text-lg leading-relaxed text-neutral-600">{line}</p> : null}
+          {line ? <p className="mt-5 max-w-md text-lg leading-relaxed text-neutral-600 dark:text-white/65">{line}</p> : null}
         </div>
         <ul className={style.list}>
           {faqs.map((faq) => (
             <li key={faq.q} className={style.item}>
               <h3 className={style.question}>{faq.q}</h3>
-              <p className="mt-3 text-[16px] leading-relaxed text-neutral-600">{faq.a}</p>
+              <p className="mt-3 text-[16px] leading-relaxed text-neutral-600 dark:text-white/65">{faq.a}</p>
               {faq.link ? <ArrowLink href={faq.link.href} className="mt-4 text-neutral-950">{faq.link.label}</ArrowLink> : null}
             </li>
           ))}

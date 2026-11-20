@@ -11,11 +11,11 @@ export function BrandLockup({ height = 26 }: { height?: number }) {
   const width = Math.round((height * CROP.width) / CROP.height);
   return (
     <span className="flex items-center">
-      {/* The white copy shows when the navbar sits over a dark hero. */}
-      <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="block shrink-0 group-data-[tone=dark]/nav:hidden">
+      {/* The white copy shows when the navbar sits over a dark hero, and in the footer of a dark page. */}
+      <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="block shrink-0 group-data-[tone=dark]/nav:hidden dark:hidden">
         <image href="/coere-wordmark.svg" width="1284" height="512" />
       </svg>
-      <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="hidden shrink-0 group-data-[tone=dark]/nav:block">
+      <svg width={width} height={height} viewBox={`${CROP.x} ${CROP.y} ${CROP.width} ${CROP.height}`} aria-hidden="true" focusable="false" className="hidden shrink-0 group-data-[tone=dark]/nav:block dark:block">
         <image href="/coere-wordmark-white.svg" width="1284" height="512" />
       </svg>
     </span>

@@ -7,7 +7,7 @@ import { CheckCircleIcon } from "@/site/ui/icons/interface-icons";
  * tablet width up, wrapping only on a phone.
  */
 export function CheckList({ items, tone = "dark", row = false, className }: { items: string[]; tone?: "dark" | "light"; row?: boolean; className?: string }) {
-  const text = tone === "light" ? "text-white/90" : "text-neutral-700";
+  const text = tone === "light" ? "text-white/90" : "text-neutral-700 dark:text-white/80";
   return (
     <ul className={`${row ? "flex flex-wrap justify-center gap-x-7 gap-y-2.5 md:flex-nowrap md:whitespace-nowrap" : "space-y-2.5"} ${className ?? ""}`}>
       {items.map((item) => {

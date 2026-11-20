@@ -9,7 +9,7 @@ import { SizedPhoto } from "@/site/ui/sized-photo";
  */
 export function Stage({ background, children, className }: { background: Background; children: ReactNode; className?: string }) {
   return (
-    <div className={`relative isolate overflow-hidden rounded-[28px] bg-neutral-950 ${className ?? ""}`}>
+    <div className={`relative isolate overflow-hidden rounded-[28px] bg-neutral-950 dark:ring-1 dark:ring-white/10 ${className ?? ""}`}>
       <SizedPhoto src={background.src} alt="" fill sizes="(min-width: 1024px) 60vw, 100vw" className="-z-10 object-cover" />
       {children}
     </div>

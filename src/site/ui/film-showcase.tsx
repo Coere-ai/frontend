@@ -11,7 +11,7 @@ import { SizedPhoto } from "./sized-photo";
  */
 export function FilmShowcase({ film, backdrop }: { film: Film; backdrop: Background }) {
   return (
-    <div className="relative overflow-hidden rounded-[28px] bg-neutral-950 md:rounded-[36px]">
+    <div className="relative overflow-hidden rounded-[28px] bg-neutral-950 md:rounded-[36px] dark:ring-1 dark:ring-white/10">
       <SizedPhoto src={backdrop.src} alt="" fill sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-950/0 to-neutral-950/35" />
       <div className="relative px-3 py-6 sm:px-8 sm:py-10 md:px-[7%] md:py-[5.5%]">

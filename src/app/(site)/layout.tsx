@@ -4,12 +4,13 @@ import { SiteTracker } from "@/site/tracker/site-tracker";
 
 /**
  * Every page of the site inside the navbar and footer, with the analytics
- * beacon beside them. Titles, descriptions and keywords come from the root
+ * beacon beside them. The ground is the page theme's (white, or near black
+ * under a DarkPage), so a short page never shows a strip of the other. Titles, descriptions and keywords come from the root
  * layout and each page.
  */
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex min-h-dvh flex-col bg-white text-neutral-950">
+    <div className="flex min-h-dvh flex-col bg-(--background) text-neutral-950">
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />

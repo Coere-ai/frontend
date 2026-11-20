@@ -10,7 +10,7 @@ export function SectionIntro({ title, line, href, linkLabel, actions }: { title:
   return (
     <div className="mx-auto max-w-3xl text-center">
       <h2 className={SECTION_TITLE}>{title}</h2>
-      <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{line}</p>
+      <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance dark:text-white/65">{line}</p>
       {actions ? <div className="mt-8 flex flex-wrap items-center justify-center gap-3">{actions}</div> : null}
       {href && linkLabel ? (
         <ArrowLink href={href} className={`${actions ? "mt-7" : "mt-6"} text-neutral-950`}>

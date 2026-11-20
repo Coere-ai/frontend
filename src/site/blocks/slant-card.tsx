@@ -57,13 +57,13 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
       {slides.map((s, i) => (
         <div key={s.label} hidden={i !== index}>
           <p className="text-[15px] font-medium text-brand-500">{s.label}</p>
-          <p className="mt-5 text-[24px] leading-snug tracking-[-0.02em] text-neutral-950 text-pretty xl:text-[28px]">{s.text}</p>
-          {s.byline ? <p className="mt-6 text-[15px] text-neutral-600">{s.byline}</p> : null}
+          <p className="mt-5 text-[24px] leading-snug tracking-[-0.02em] text-neutral-950 text-pretty xl:text-[28px] dark:text-white">{s.text}</p>
+          {s.byline ? <p className="mt-6 text-[15px] text-neutral-600 dark:text-white/65">{s.byline}</p> : null}
         </div>
       ))}
       <div className="mt-8 flex gap-2" aria-hidden="true">
         {slides.map((s, i) => (
-          <span key={s.label} className={`h-1 rounded-full transition-all duration-500 ${i === index ? "w-8 bg-neutral-950" : "w-3 bg-neutral-300"}`} />
+          <span key={s.label} className={`h-1 rounded-full transition-all duration-500 ${i === index ? "w-8 bg-neutral-950 dark:bg-white" : "w-3 bg-neutral-300 dark:bg-white/25"}`} />
         ))}
       </div>
     </div>
@@ -82,12 +82,12 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
   return (
     <div>
       <div className="flex items-end justify-between gap-6">
-        <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[2.75rem] md:leading-[1.06]">{heading}</h2>
+        <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.04em] text-neutral-950 text-balance md:text-[2.75rem] md:leading-[1.06] dark:text-white">{heading}</h2>
         <div className="flex gap-2">
-          <button type="button" onClick={() => step(-1)} aria-label="Previous" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50">
+          <button type="button" onClick={() => step(-1)} aria-label="Previous" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 dark:hover:bg-white/10">
             <ArrowRightIcon size={20} className="rotate-180" />
           </button>
-          <button type="button" onClick={() => step(1)} aria-label="Next" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50">
+          <button type="button" onClick={() => step(1)} aria-label="Next" className="grid h-11 w-11 place-items-center rounded-full bg-white text-neutral-950 ring-1 ring-neutral-950/10 transition-colors hover:bg-neutral-50 dark:bg-white/[0.06] dark:text-white dark:ring-white/15 dark:hover:bg-white/10">
             <ArrowRightIcon size={20} />
           </button>
         </div>
@@ -100,7 +100,7 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
               <path d={PANEL} />
             </clipPath>
           </defs>
-          <path d={CARD} className="fill-white stroke-neutral-200" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+          <path d={CARD} className="fill-white stroke-neutral-200 dark:fill-white/[0.045] dark:stroke-white/10" strokeWidth="1" vectorEffect="non-scaling-stroke" />
         </svg>
         <div className="absolute top-0 left-0 h-full p-[3.2%] pr-[4%]" style={{ width: `${(SPLIT / W) * 100}%` }}>
           {words}
@@ -111,7 +111,7 @@ export function SlantCard({ heading, slides, background }: { heading: string; sl
       </div>
 
       <div className="mt-8 space-y-3 lg:hidden">
-        <div className="rounded-[28px] bg-white p-7 ring-1 ring-neutral-950/[0.06] shadow-[0_28px_70px_-34px_rgba(23,27,77,0.28)]">{words}</div>
+        <div className="rounded-[28px] bg-white p-7 ring-1 ring-neutral-950/[0.06] shadow-[0_28px_70px_-34px_rgba(23,27,77,0.28)] dark:bg-white/[0.045] dark:shadow-none dark:ring-white/10">{words}</div>
         <div className="relative aspect-[4/3] overflow-hidden rounded-[28px]">{panel}</div>
       </div>
     </div>

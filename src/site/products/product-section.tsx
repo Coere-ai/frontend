@@ -27,7 +27,7 @@ export function ProductSection({
     <>
       <div className="mx-auto max-w-3xl text-center">
         <h2 className={SECTION_TITLE}>{title}</h2>
-        {line ? <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance">{line}</p> : null}
+        {line ? <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-600 text-balance dark:text-white/65">{line}</p> : null}
         {link ? <ArrowLink href={link.href} className="mt-6 text-neutral-950">{link.linkLabel}</ArrowLink> : null}
       </div>
       <div className="mt-14 md:mt-16">{children}</div>

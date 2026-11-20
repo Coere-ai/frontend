@@ -18,7 +18,7 @@ export function SlantTiles({ items, columns = 2, className }: { items: { key: st
           <svg viewBox={`0 0 100 ${TILE_HEIGHT}`} className="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
             <path
               d={slantPath({ column: index % columns, columns, height: TILE_HEIGHT })}
-              className="fill-neutral-100 stroke-neutral-300"
+              className="fill-neutral-100 stroke-neutral-300 dark:fill-white/[0.04] dark:stroke-white/15"
               strokeWidth="1"
               vectorEffect="non-scaling-stroke"
             />

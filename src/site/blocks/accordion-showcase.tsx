@@ -40,7 +40,7 @@ export function AccordionShowcase({ items, background, flip = false }: { items: 
             transition={{ duration: 0.25 }}
             className="absolute inset-0 flex items-center justify-center p-[6%]"
           >
-            <div className="w-full overflow-hidden rounded-2xl shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] ring-1 ring-white/10">{active.visual}</div>
+            <div data-theme="light" className="w-full overflow-hidden rounded-2xl shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] ring-1 ring-white/10">{active.visual}</div>
           </motion.div>
         </AnimatePresence>
       </Stage>
@@ -49,19 +49,19 @@ export function AccordionShowcase({ items, background, flip = false }: { items: 
         {items.map((item) => {
           const isOpen = item.key === active.key;
           return (
-            <li key={item.key} className="relative border-t border-neutral-300">
+            <li key={item.key} className="relative border-t border-neutral-300 dark:border-white/15">
               {isOpen ? <span aria-hidden="true" className="absolute inset-x-0 -top-px h-0.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-700" /> : null}
               <button
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(item.key)}
-                className="group w-full py-5 text-left text-2xl font-medium tracking-[-0.025em] text-neutral-950"
+                className="group w-full py-5 text-left text-2xl font-medium tracking-[-0.025em] text-neutral-950 dark:text-white"
               >
                 <Underlined big>{item.title}</Underlined>
               </button>
               <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
                 <div className="overflow-hidden" inert={!isOpen}>
-                  <p className="text-[16px] leading-relaxed text-neutral-600">{item.summary}</p>
+                  <p className="text-[16px] leading-relaxed text-neutral-600 dark:text-white/65">{item.summary}</p>
                   <CheckList items={item.checks} className="mt-6" />
                   {item.href ? <ArrowLink href={item.href} className="mt-7 text-neutral-950">{item.linkLabel ?? "Learn more"}</ArrowLink> : null}
                   <div className="h-8" />
