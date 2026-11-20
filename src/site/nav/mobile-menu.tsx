@@ -24,6 +24,7 @@ const items: Record<NavTabId, Item[]> = {
     { href: "/resources/sdks", label: "SDKs" },
     { href: "/resources/mcp", label: "MCP" },
     { href: "/#demo", label: "Product demo" },
+    { href: "/blog", label: "Blog" },
   ],
   blog: [{ href: "/blog", label: "All posts" }, ...posts.slice(0, 3).map((p) => ({ href: `/blog/${p.slug}`, label: p.title }))],
   about: [
