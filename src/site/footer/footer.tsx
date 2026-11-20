@@ -19,9 +19,6 @@ const columns = [
   {
     title: "Resources",
     links: [
-      { href: "/resources", label: "Developer docs" },
-      { href: "/resources/sdks", label: "SDKs" },
-      { href: "/resources/mcp", label: "MCP" },
       { href: "/#demo", label: "Product demo" },
       { href: "/industries", label: "Industries" },
     ],

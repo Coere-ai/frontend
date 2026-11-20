@@ -1,12 +1,11 @@
 import { siteConfig } from "@/lib/site";
 
-/** The tabs in the navbar, in order. Each opens a menu on hover and is a link on click. Blog and Careers are hidden for now; their pages stay, unlinked. */
+/** The tabs in the navbar, in order. Each opens a menu on hover and is a link on click. Resources and Careers are hidden for now; their pages stay, unlinked (the blog sits under About us). */
 export type NavTabId = "products" | "industries" | "resources" | "blog" | "about" | "careers";
 
 export const navTabs: { id: NavTabId; label: string; href: string }[] = [
   { id: "products", label: "Product", href: "/products/connect" },
   { id: "industries", label: "Industry", href: "/industries" },
-  { id: "resources", label: "Resources", href: "/resources" },
   { id: "about", label: "About us", href: "/about" },
 ];
 
