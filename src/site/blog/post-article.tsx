@@ -25,18 +25,18 @@ export function PostArticle({ post }: { post: Post }) {
   const toc = headings.length >= TOC_FROM;
   return (
     <article className={`relative isolate pt-[128px] pb-20 md:pt-[160px] md:pb-28 ${UNDER_NAV}`}>
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[620px] bg-[linear-gradient(180deg,#f3f5ff_0%,rgba(243,245,255,0)_100%)]" />
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[620px] bg-[linear-gradient(180deg,#f3f5ff_0%,rgba(243,245,255,0)_100%)] dark:hidden" />
       <Container>
         <header className="mx-auto max-w-[860px] text-center">
-          <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-1.5 text-[14px] text-neutral-500">
-            <Link href="/blog" className="rounded-sm font-medium text-neutral-700 hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">
+          <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-1.5 text-[14px] text-neutral-500 dark:text-white/60">
+            <Link href="/blog" className="rounded-sm font-medium text-neutral-700 hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 dark:text-white/85 dark:hover:text-white dark:focus-visible:outline-brand-300">
               Blog
             </Link>
-            <ChevronRightIcon size={14} className="text-neutral-400" />
+            <ChevronRightIcon size={14} className="text-neutral-400 dark:text-white/40" />
             <span>{post.category}</span>
           </nav>
-          <h1 className="mx-auto mt-6 max-w-[800px] text-[2.5rem] leading-[1.04] font-semibold tracking-[-0.045em] text-neutral-950 text-balance md:text-[3.75rem] lg:text-[4.25rem]">{post.title}</h1>
-          <p className="mx-auto mt-6 max-w-[680px] text-[19px] leading-relaxed text-neutral-600 text-pretty md:text-[21px]">{post.excerpt}</p>
+          <h1 className="mx-auto mt-6 max-w-[800px] text-[2.5rem] leading-[1.04] font-semibold tracking-[-0.045em] text-neutral-950 text-balance dark:text-white md:text-[3.75rem] lg:text-[4.25rem]">{post.title}</h1>
+          <p className="mx-auto mt-6 max-w-[680px] text-[19px] leading-relaxed text-neutral-600 text-pretty dark:text-white/65 md:text-[21px]">{post.excerpt}</p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <PostAuthor post={post} />
             <PostMeta post={post} category={false} className="text-[14.5px]" />
@@ -47,7 +47,7 @@ export function PostArticle({ post }: { post: Post }) {
           post={post}
           priority
           sizes="(min-width: 1200px) 1120px, 100vw"
-          className="mx-auto mt-12 max-w-[1120px] rounded-[20px] ring-1 ring-neutral-950/[0.06] shadow-[0_40px_90px_-50px_rgba(23,27,77,0.6)] md:mt-16 md:rounded-[28px]"
+          className="mx-auto mt-12 max-w-[1120px] rounded-[20px] ring-1 ring-neutral-950/[0.06] shadow-[0_40px_90px_-50px_rgba(23,27,77,0.6)] md:mt-16 md:rounded-[28px] dark:shadow-none dark:ring-white/10"
         />
 
         <div className="mx-auto mt-14 grid max-w-[1120px] md:mt-20 xl:grid-cols-[minmax(0,1fr)_680px_minmax(0,1fr)] xl:gap-12">
@@ -59,10 +59,10 @@ export function PostArticle({ post }: { post: Post }) {
                 <ButtonLink href={post.cta.href}>{post.cta.label}</ButtonLink>
               </div>
             ) : null}
-            <div className="mt-14 flex flex-wrap items-center justify-between gap-6 border-t border-neutral-200 pt-8">
+            <div className="mt-14 flex flex-wrap items-center justify-between gap-6 border-t border-neutral-200 pt-8 dark:border-white/10">
               <PostAuthor post={post} />
               <div className="flex items-center gap-4">
-                <span className="text-[14px] text-neutral-500">Share this post</span>
+                <span className="text-[14px] text-neutral-500 dark:text-white/60">Share this post</span>
                 <ShareLinks url={url} title={post.title} />
               </div>
             </div>

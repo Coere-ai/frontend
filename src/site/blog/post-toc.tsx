@@ -30,8 +30,8 @@ export function PostToc({ headings }: { headings: { id: string; text: string }[]
 
   return (
     <nav aria-label="On this page">
-      <p className="text-[13px] font-semibold text-neutral-950">On this page</p>
-      <ul className="mt-4 space-y-1 border-l border-neutral-200">
+      <p className="text-[13px] font-semibold text-neutral-950 dark:text-white">On this page</p>
+      <ul className="mt-4 space-y-1 border-l border-neutral-200 dark:border-white/10">
         {headings.map((h) => {
           const on = h.id === active;
           return (
@@ -39,7 +39,7 @@ export function PostToc({ headings }: { headings: { id: string; text: string }[]
               <a
                 href={`#${h.id}`}
                 aria-current={on ? "location" : undefined}
-                className={`-ml-px block border-l py-1.5 pl-4 text-[14px] leading-snug transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${on ? "border-brand-500 font-medium text-neutral-950" : "border-transparent text-neutral-500 hover:text-neutral-950"}`}
+                className={`-ml-px block border-l py-1.5 pl-4 text-[14px] leading-snug transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${on ? "border-brand-500 font-medium text-neutral-950 dark:border-brand-400 dark:text-white" : "border-transparent text-neutral-500 hover:text-neutral-950 dark:text-white/60 dark:hover:text-white"}`}
               >
                 {h.text}
               </a>

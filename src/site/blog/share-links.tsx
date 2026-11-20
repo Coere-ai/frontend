@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { CheckIcon } from "@/site/ui/icons/interface-icons";
 
-/** A bare icon with room round it to tap: no circle, no ring, only the mark darkening on hover. */
-const BUTTON = "grid h-10 w-10 place-items-center rounded-md text-neutral-500 transition-colors hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-brand-500";
+/** A bare icon with room round it to tap: no circle, no ring, only the mark darkening on hover (brightening on a dark page). */
+const BUTTON =
+  "grid h-10 w-10 place-items-center rounded-md text-neutral-500 transition-colors hover:text-neutral-950 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-brand-500 dark:text-white/60 dark:hover:text-white dark:focus-visible:outline-brand-300";
 
 function LinkIcon() {
   return (
@@ -60,7 +61,7 @@ export function ShareLinks({ url, title, layout = "row" }: { url: string; title:
   return (
     <div className={`flex items-center gap-1 ${layout === "column" ? "flex-col" : ""}`}>
       <button type="button" onClick={copy} className={BUTTON} aria-label={copied ? "Link copied" : "Copy link"} title={copied ? "Link copied" : "Copy link"}>
-        {copied ? <CheckIcon size={17} className="text-brand-600" /> : <LinkIcon />}
+        {copied ? <CheckIcon size={17} className="text-brand-600 dark:text-brand-300" /> : <LinkIcon />}
       </button>
       <a href={x} target="_blank" rel="noopener noreferrer" className={BUTTON} aria-label="Share on X" title="Share on X">
         <XIcon />
