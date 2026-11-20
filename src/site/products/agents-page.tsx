@@ -1,9 +1,9 @@
 import { AgentCards } from "@/site/agents/agent-cards";
 import { AgentLineup } from "@/site/agents/agent-lineup";
 import { Capabilities } from "@/site/agents/capabilities";
-import { SoftBackdrop } from "@/site/blocks/soft-backdrop";
 import { agentsHero } from "@/site/content/pages/agents";
 import { ClosingCta } from "@/site/home/closing-cta";
+import { AgentsBackdrop } from "./agents-backdrop";
 import { ProductHero } from "./hero";
 import { OtherProducts } from "./other-products";
 import { ProductSection } from "./product-section";
@@ -17,7 +17,8 @@ export function AgentsPage() {
     <>
       <ProductHero
         copy={agentsHero}
-        backdrop={<SoftBackdrop accent="#22b8cf" />}
+        backdrop={<AgentsBackdrop />}
+        tone="dark"
         app={<AgentLineup />}
         appFit="contained"
         secondary={{ href: "#capabilities", label: "See all features" }}
