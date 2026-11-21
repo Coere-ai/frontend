@@ -1,5 +1,3 @@
-import { siteConfig } from "@/lib/site";
-
 /**
  * The questions on the home page, each answered in a few plain sentences
  * that stand on their own. {ais} is every AI Coere saves chats from, as a

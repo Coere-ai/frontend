@@ -1,4 +1,4 @@
-import { founders, siteConfig } from "@/lib/site";
+import { founders } from "@/lib/site";
 import { aboutSeo, demoSeo } from "@/site/content/seo";
 import { storyApps, storySteps } from "@/site/about/story-data";
 
