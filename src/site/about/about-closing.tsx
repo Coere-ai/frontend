@@ -1,5 +1,5 @@
 import Link from "@/site/i18n/link";
-import { contactHref } from "@/site/content/navigation";
+import { contactHref, emailHref } from "@/site/content/navigation";
 import { getMessages } from "@/site/i18n/server";
 import { Container } from "@/site/ui/container";
 
@@ -7,10 +7,11 @@ const BUTTON = "inline-flex h-12 items-center justify-center rounded-full px-6 t
 
 /**
  * The About page's last word, on the dark page: one line and a way to reach
- * the founders, on a plain glass panel with a fine light border.
+ * the founders, on a plain glass panel with a fine light border. Contact us
+ * opens the contact pop up.
  */
 export async function AboutClosing({ title, text }: { title: string; text: string }) {
-  const { common } = (await getMessages()).chrome;
+  const { common, nav } = (await getMessages()).chrome;
   return (
     <section className="pt-8 pb-24 md:pt-12 md:pb-32">
       <Container>
@@ -21,6 +22,9 @@ export async function AboutClosing({ title, text }: { title: string; text: strin
             <Link href={contactHref} className={`${BUTTON} bg-brand-500 text-white shadow-[0_6px_14px_-8px_rgba(82,103,247,0.45)] hover:bg-brand-600 focus-visible:outline-white`}>
               {common.waitlist}
             </Link>
+            <a href={emailHref} className={`${BUTTON} bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-md hover:bg-white/15 focus-visible:outline-white`}>
+              {nav.contactUs}
+            </a>
             <Link href="/demo" className={`${BUTTON} bg-white/10 text-white ring-1 ring-white/20 backdrop-blur-md hover:bg-white/15 focus-visible:outline-white`}>
               {common.watchDemo}
             </Link>
