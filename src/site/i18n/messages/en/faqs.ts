@@ -32,10 +32,6 @@ export const faqs = {
       link: "Memory for AI agents",
     },
     {
-      q: "Is Coere the same as Cohere?",
-      a: `No. ${siteConfig.notCohere} Coere builds a memory layer for people, teams and apps.`,
-    },
-    {
       q: "Can I use Coere today?",
       a: "Not yet. Coere is in pre-launch and the waitlist is open. Until launch, you can email the founders about Coere for you, your team or your app.",
       link: "Email the founders",

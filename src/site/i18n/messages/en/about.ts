@@ -32,7 +32,6 @@ export const about = {
   team: {
     eyebrow: "Our team",
     title: "The people building Coere",
-    notCohere: siteConfig.notCohere,
     founders: founders.map(({ role, majors, highlights }) => ({ role, majors, highlights })),
   },
   closing: { title: "Help us put people back together.", text: "We're hiring a founding team, and we'd love to hear from you." },

@@ -87,7 +87,7 @@ export const docsSeo: Seo = {
 export const aboutSeo: Seo = {
   title: "About Coere: the team building the memory layer you own",
   description:
-    "Why Coere exists and who is building it. Coere is the portable AI memory layer you own. It is not Cohere and is not affiliated with it.",
+    "Why Coere exists and who is building it. Coere is the portable AI memory layer you own.",
   keywords: ["Coere team", "Coere founders", "about Coere AI", "Coere not Cohere"],
   absolute: true,
 };

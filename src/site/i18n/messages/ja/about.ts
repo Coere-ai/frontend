@@ -3,7 +3,7 @@ import type { Messages } from "../types";
 export const about: Messages["about"] = {
   seo: {
     title: "Coereについて：あなたのものになる記憶レイヤーをつくるチーム",
-    description: "Coereが生まれた理由と、つくっている人たち。Coereは、あなたが所有する持ち運べるAIの記憶レイヤーです。Cohereではなく、提携関係もありません。",
+    description: "Coereが生まれた理由と、つくっている人たち。Coereは、あなたが所有する持ち運べるAIの記憶レイヤーです。",
   },
   title: "私たちについて",
   line: "人が自分で持つ記憶レイヤーを、つくっています",
@@ -30,7 +30,6 @@ export const about: Messages["about"] = {
   team: {
     eyebrow: "チーム",
     title: "Coereをつくる人たち",
-    notCohere: "CoereはCohereではなく、提携関係もありません。名前はラテン語のcohaerere（つながる）に由来します。",
     founders: [
       {
         role: "共同創業者、CEO",

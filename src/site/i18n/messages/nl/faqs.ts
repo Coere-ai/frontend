@@ -26,10 +26,6 @@ export const faqs: Messages["faqs"] = {
       link: "Geheugen voor AI-agents",
     },
     {
-      q: "Is Coere hetzelfde als Cohere?",
-      a: "Nee. Coere is niet Cohere en heeft er geen banden mee. De naam komt van het Latijnse cohaerere, verbinden. Coere bouwt een geheugenlaag voor mensen, teams en apps.",
-    },
-    {
       q: "Kan ik Coere nu al gebruiken?",
       a: "Nog niet. Coere zit in de prelancering en de wachtlijst is open. Tot de lancering kun je de oprichters mailen over Coere voor jou, je team of je app.",
       link: "Mail de oprichters",

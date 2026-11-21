@@ -26,10 +26,6 @@ export const faqs: Messages["faqs"] = {
       link: "Memoria para agentes de IA",
     },
     {
-      q: "¿Coere es lo mismo que Cohere?",
-      a: "No. Coere no es Cohere ni tiene relación con ella. El nombre viene del latín cohaerere, conectar. Coere construye una capa de memoria para personas, equipos y apps.",
-    },
-    {
       q: "¿Puedo usar Coere hoy?",
       a: "Todavía no. Coere está en prelanzamiento y la lista de espera está abierta. Hasta el lanzamiento, puedes escribir a los fundadores sobre Coere para ti, tu equipo o tu app.",
       link: "Escribe a los fundadores",

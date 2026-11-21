@@ -3,7 +3,7 @@ import type { Messages } from "../types";
 export const about: Messages["about"] = {
   seo: {
     title: "Over Coere: het team achter de geheugenlaag die van jou is",
-    description: "Waarom Coere bestaat en wie het bouwt. Coere is de draagbare AI-geheugenlaag die van jou is. Het is niet Cohere en is er niet aan verbonden.",
+    description: "Waarom Coere bestaat en wie het bouwt. Coere is de draagbare AI-geheugenlaag die van jou is.",
   },
   title: "Over ons",
   line: "We bouwen de geheugenlaag die van mensen zelf is",
@@ -30,7 +30,6 @@ export const about: Messages["about"] = {
   team: {
     eyebrow: "Ons team",
     title: "De mensen achter Coere",
-    notCohere: "Coere is niet Cohere en is er niet aan verbonden. De naam komt van het Latijnse cohaerere, verbinden.",
     founders: [
       {
         role: "Medeoprichter, CEO",

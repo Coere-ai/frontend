@@ -3,7 +3,7 @@ import type { Messages } from "../types";
 export const about: Messages["about"] = {
   seo: {
     title: "Sobre Coere: el equipo que construye la capa de memoria que es tuya",
-    description: "Por qué existe Coere y quién lo construye. Coere es la capa de memoria de IA portátil que te pertenece. No es Cohere ni tiene relación con ella.",
+    description: "Por qué existe Coere y quién lo construye. Coere es la capa de memoria de IA portátil que te pertenece.",
   },
   title: "Sobre nosotros",
   line: "Construimos la capa de memoria que pertenece a las personas",
@@ -30,7 +30,6 @@ export const about: Messages["about"] = {
   team: {
     eyebrow: "Nuestro equipo",
     title: "Las personas que construyen Coere",
-    notCohere: "Coere no es Cohere ni tiene relación con ella. El nombre viene del latín cohaerere, conectar.",
     founders: [
       {
         role: "Cofundadora y CEO",

@@ -44,7 +44,6 @@ export async function TeamSection() {
             <h2 className="mt-3 text-4xl font-semibold tracking-[-0.045em] text-white text-balance md:text-[3.5rem] md:leading-[1.04]">
               {t.title}
             </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/65 text-pretty">{t.notCohere}</p>
           </div>
           <div className="mx-auto mt-4 max-w-6xl">
             <TeamLanyards members={members} />
