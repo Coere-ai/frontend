@@ -1,4 +1,5 @@
 import { siteConfig } from "@/lib/site";
+import { BOOKING_URL } from "@/site/contact/links";
 
 /** The tabs in the navbar, in order. Each opens a menu on hover and is a link on click. Resources and Careers are hidden for now; their pages stay, unlinked (the blog sits under About us). */
 export type NavTabId = "products" | "industries" | "resources" | "blog" | "about" | "careers";
@@ -21,9 +22,16 @@ export const startLabel = "Start for free";
 export const contactHref = "/developers/waitlist";
 export const contactLabel = "Join the waitlist";
 
-/** Writing to the team: the footer's Contact, the About menu, the FAQ's email link and the privacy policy. */
+/**
+ * Writing to the team: the footer's Contact, the About menu, the FAQ's email
+ * link and the privacy policy. On the page the contact pop up opens instead
+ * (src/site/contact); the mailto stays for a browser without JavaScript.
+ */
 export const emailHref = `mailto:${siteConfig.email}`;
 
-/** Coere Solutions sells to companies, so its page asks for a demo, which emails the team. */
-export const demoHref = `mailto:${siteConfig.email}?subject=Coere%20Solutions%20demo`;
+/**
+ * Coere Solutions and the Team plan sell to companies, so they ask for a
+ * demo: the founders' Cal.com page, which opens in the booking pop up.
+ */
+export const demoHref = BOOKING_URL;
 export const demoLabel = "Book a demo";

@@ -23,7 +23,9 @@ const nextConfig: NextConfig = {
    */
   /**
    * Frames on the public pages: they may frame only this site (the live
-   * demos under /preview/live) and only this site may frame them. So a
+   * demos under /preview/live) and Cal.com's booking page, which the Book a
+   * demo pop up embeds (src/site/contact/cal-embed.ts; the embed always
+   * frames app.cal.com), and only this site may frame them. So a
    * script slipped into a public page cannot open a frame of Coere's own
    * Console, which the extension lets coere.ai load for /dashboard alone
    * (docs/accounts.md 6.8). The private paths are left out here, since
@@ -46,7 +48,7 @@ const nextConfig: NextConfig = {
       {
         source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|sign-out$|auth(?:/|$)|connect$|account$|welcome$|dashboard(?:/|$)).*)",
         headers: [
-          { key: "Content-Security-Policy", value: "frame-src 'self'; frame-ancestors 'self'" },
+          { key: "Content-Security-Policy", value: "frame-src 'self' https://app.cal.com; frame-ancestors 'self'" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
         ],
       },
