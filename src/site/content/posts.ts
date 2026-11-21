@@ -76,7 +76,7 @@ const input: PostInput[] = [
         ],
       },
       { h2: "We are hiring" },
-      "The funding also lets us grow the team. We are hiring a founding team in San Francisco, in engineering, business and marketing. If you want to help build memory that people own, [email the founders](mailto:edisonlaw@berkeley.edu).",
+      "The funding also lets us grow the team. We are hiring a founding team in San Francisco, in engineering, business and marketing. If you want to help build memory that people own, [email the founders](mailto:coereagent@gmail.com).",
       { h2: "What does not change" },
       "Funding changes how fast we build. It does not change who your memory belongs to.",
       "Your memory stays yours. You can see everything Coere remembers, edit it or forget it, and you decide which AIs and apps may read it.",
