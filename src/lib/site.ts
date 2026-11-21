@@ -25,7 +25,7 @@ export const siteConfig = {
     "Coere (Coere AI) is a user-owned, portable AI memory layer. Coere Connect, a Chrome extension, saves your chats from ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Grok, Copilot, Meta AI and Kimi on your computer, builds a memory graph from them, and adds the right context to each new chat as you type. Coere Solutions shares one memory across a team and its clients, Coere Forge lets apps and AI agents read a person's memory with their permission, and Coere Agents is Cori, who works from that memory.",
   /** Said plainly wherever the name might be misread. */
   notCohere: "Coere is not Cohere and is not affiliated with it. The name comes from the Latin cohaerere, to connect.",
-  email: "coereagent@gmail.com",
+  email: "edisonlaw@berkeley.edu",
   /** Profiles that speak for Coere, for search engines (schema.org sameAs). */
   profiles: [
     "https://www.linkedin.com/company/coere",
