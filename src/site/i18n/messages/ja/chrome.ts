@@ -62,6 +62,28 @@ export const chrome: Messages["chrome"] = {
     copy: "コピー",
     copied: "コピーしました",
   },
+  /** The contact pop up, opened by every link that writes to the team. */
+  contact: {
+    title: "お問い合わせ",
+    line: "ご質問、デモ、提携のご相談は、創業者に直接メールでどうぞ。",
+    address: "メールアドレス",
+    selected: "選択しました。キーボードでコピーしてください。",
+    openIn: "新しいメッセージを作成",
+    gmail: "ブラウザで開きます",
+    outlook: "Web版Outlookを開きます",
+    appleMail: "または既定のメールアプリ",
+    close: "閉じる",
+  },
+  /** The booking pop up, opened by every Book a demo. */
+  booking: {
+    title: "デモを予約",
+    line: "ご都合のよい日時をお選びください。",
+    newTab: "新しいタブで開く",
+    loading: "カレンダーを読み込んでいます",
+    failed: "ここではカレンダーを読み込めませんでした。",
+    openPage: "予約ページを開く",
+    close: "閉じる",
+  },
   notFound: {
     title: "ページが見つかりません",
     description: "このページはCoereのサイトにありません。Coereは、すべてのAIで使える、あなた自身の記憶レイヤーです。",

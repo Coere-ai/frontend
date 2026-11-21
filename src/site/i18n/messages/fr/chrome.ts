@@ -62,6 +62,28 @@ export const chrome: Messages["chrome"] = {
     copy: "Copier",
     copied: "Copié",
   },
+  /** The contact pop up, opened by every link that writes to the team. */
+  contact: {
+    title: "Nous écrire",
+    line: "Questions, démos ou partenariats : écrivez aux fondateurs.",
+    address: "Adresse e-mail",
+    selected: "Sélectionné. Copiez-le avec le clavier.",
+    openIn: "Écrire un nouveau message dans",
+    gmail: "S’ouvre dans votre navigateur",
+    outlook: "Ouvre Outlook sur le web",
+    appleMail: "Ou votre app de messagerie",
+    close: "Fermer",
+  },
+  /** The booking pop up, opened by every Book a demo. */
+  booking: {
+    title: "Réserver une démo",
+    line: "Choisissez le créneau qui vous convient.",
+    newTab: "Ouvrir dans un nouvel onglet",
+    loading: "Chargement du calendrier",
+    failed: "Le calendrier n’a pas pu se charger ici.",
+    openPage: "Ouvrir la page de réservation",
+    close: "Fermer",
+  },
   notFound: {
     title: "Page introuvable",
     description: "Cette page n’existe pas sur le site de Coere. Coere est la couche de mémoire d’IA qui vous appartient, dans toutes les IA.",

@@ -62,6 +62,28 @@ export const chrome = {
     copy: "Copy",
     copied: "Copied",
   },
+  /** The contact pop up, opened by every link that writes to the team. */
+  contact: {
+    title: "Get in touch",
+    line: "Questions, demos or partnerships: write to the founders.",
+    address: "Email address",
+    selected: "Selected. Copy it with your keyboard.",
+    openIn: "Start a new message in",
+    gmail: "Opens in your browser",
+    outlook: "Opens Outlook on the web",
+    appleMail: "Or your default mail app",
+    close: "Close",
+  },
+  /** The booking pop up, opened by every Book a demo. */
+  booking: {
+    title: "Book a demo",
+    line: "Pick a time that works for you.",
+    newTab: "Open in a new tab",
+    loading: "Loading the calendar",
+    failed: "The calendar could not load here.",
+    openPage: "Open the booking page",
+    close: "Close",
+  },
   notFound: {
     title: "Page not found",
     description: "This page isn't on the Coere site. Coere is the AI memory layer you own, across every AI.",

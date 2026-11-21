@@ -62,6 +62,28 @@ export const chrome: Messages["chrome"] = {
     copy: "Kopiëren",
     copied: "Gekopieerd",
   },
+  /** The contact pop up, opened by every link that writes to the team. */
+  contact: {
+    title: "Neem contact op",
+    line: "Vragen, demo’s of samenwerkingen: mail de oprichters.",
+    address: "E-mailadres",
+    selected: "Geselecteerd. Kopieer het met je toetsenbord.",
+    openIn: "Begin een nieuw bericht in",
+    gmail: "Opent in je browser",
+    outlook: "Opent Outlook op het web",
+    appleMail: "Of je standaard mailapp",
+    close: "Sluiten",
+  },
+  /** The booking pop up, opened by every Book a demo. */
+  booking: {
+    title: "Plan een demo",
+    line: "Kies een moment dat jou uitkomt.",
+    newTab: "Openen in een nieuw tabblad",
+    loading: "De agenda laden",
+    failed: "De agenda kon hier niet laden.",
+    openPage: "Open de boekingspagina",
+    close: "Sluiten",
+  },
   notFound: {
     title: "Pagina niet gevonden",
     description: "Deze pagina staat niet op de site van Coere. Coere is de AI-geheugenlaag die van jou is, in elke AI.",

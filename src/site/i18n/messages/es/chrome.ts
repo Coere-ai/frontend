@@ -62,6 +62,28 @@ export const chrome: Messages["chrome"] = {
     copy: "Copiar",
     copied: "Copiado",
   },
+  /** The contact pop up, opened by every link that writes to the team. */
+  contact: {
+    title: "Hablemos",
+    line: "Preguntas, demos o alianzas: escribe a los fundadores.",
+    address: "Correo electrónico",
+    selected: "Seleccionado. Cópialo con el teclado.",
+    openIn: "Escribe un mensaje nuevo en",
+    gmail: "Se abre en tu navegador",
+    outlook: "Abre Outlook en la web",
+    appleMail: "O tu app de correo",
+    close: "Cerrar",
+  },
+  /** The booking pop up, opened by every Book a demo. */
+  booking: {
+    title: "Reserva una demo",
+    line: "Elige el momento que mejor te venga.",
+    newTab: "Abrir en una pestaña nueva",
+    loading: "Cargando el calendario",
+    failed: "El calendario no se pudo cargar aquí.",
+    openPage: "Abrir la página de reservas",
+    close: "Cerrar",
+  },
   notFound: {
     title: "Página no encontrada",
     description: "Esta página no está en el sitio de Coere. Coere es la capa de memoria de IA que es tuya, en todas las IA.",
