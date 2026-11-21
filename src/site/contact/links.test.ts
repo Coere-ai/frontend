@@ -27,7 +27,7 @@ test("a subject cannot slip another field into a compose link", () => {
 
 test("only mail to the team's address opens the pop up, with its subject", () => {
   assert.deepEqual(readMailto(`mailto:${EMAIL}`, EMAIL), { subject: "Coere" });
-  assert.deepEqual(readMailto(`MAILTO:CoereAgent@Gmail.com?subject=Coere%20Solutions%20demo`, EMAIL), { subject: "Coere Solutions demo" });
+  assert.deepEqual(readMailto(`MAILTO:EdisonLaw@Berkeley.EDU?subject=Coere%20Solutions%20demo`, EMAIL), { subject: "Coere Solutions demo" });
   assert.deepEqual(readMailto(`mailto:edisonlaw%40berkeley.edu?subject=`, EMAIL), { subject: "Coere" });
   assert.equal(readMailto("mailto:someone@else.com", EMAIL), null);
   assert.equal(readMailto("/about", EMAIL), null);
