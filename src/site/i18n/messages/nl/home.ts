@@ -2,7 +2,7 @@ import type { Messages } from "../types";
 
 export const home: Messages["home"] = {
   hero: {
-    title: "[Versnel] AI met een geheugen dat van jou is.",
+    title: "[Versnel]|AI met een geheugen|dat van jou is",
     paragraph:
       "Coere versnelt AI door gebruikers eigenaar te maken van hun geheugen en context in de AI-tools die ze al gebruiken. Coere schrapt herhaald werk, verbetert de samenwerking en maakt elke interactie met AI effectiever.",
     extractionAlt: "Coere bewaart Maya's chats: 74 van 570 chats bewaard, nog ongeveer 5 minuten, en ChatGPT op 18 van 240",

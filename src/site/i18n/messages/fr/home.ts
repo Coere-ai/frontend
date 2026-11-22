@@ -2,7 +2,7 @@ import type { Messages } from "../types";
 
 export const home: Messages["home"] = {
   hero: {
-    title: "[Accélérer] l’IA avec une mémoire qui vous appartient.",
+    title: "[Accélérer]|l’IA avec une mémoire|qui vous appartient",
     paragraph:
       "Coere accélère l’IA en rendant à chacun la propriété de sa mémoire et de son contexte dans les outils d’IA qu’il utilise déjà. Coere supprime les tâches répétitives, améliore la collaboration et rend chaque échange avec l’IA plus efficace.",
     extractionAlt: "Coere enregistre les conversations de Maya : 74 sur 570 enregistrées, environ 5 minutes restantes, et ChatGPT à 18 sur 240",

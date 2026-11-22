@@ -1,8 +1,8 @@
 /** The home page, top to bottom. */
 export const home = {
   hero: {
-    /** The owner's heading. The word in [brackets] shimmers. */
-    title: "[Accelerating] AI with memory you own.",
+    /** The owner's heading. The word in [brackets] shimmers and each "|" starts a new line. */
+    title: "[Accelerating]|AI with memory|you own",
     /** The owner's paragraph, as he wrote it. */
     paragraph:
       "Coere accelerates AI by giving users ownership of their memory and context across the AI tools they already use. Coere eliminates repetitive work, improves collaboration, and makes every AI interaction more effective.",

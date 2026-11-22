@@ -16,18 +16,26 @@ const ease = [0.22, 1, 0.36, 1] as const;
 /**
  * The owner's heading in the page's language, split round the word in
  * [brackets], which shimmers: "Accelerating" in English, wherever the verb
- * falls in another language.
+ * falls in another language. A "|" starts a new line, so the heading
+ * breaks where the owner wants it at every width.
  */
 function Heading({ title }: { title: string }) {
-  const [before, shimmer, after] = title.split(/\[|\]/);
-  if (shimmer === undefined) return title;
-  return (
-    <>
-      {before}
-      <span className="coere-shimmer">{shimmer}</span>
-      {after}
-    </>
-  );
+  return title.split("|").map((line, index) => {
+    const [before, shimmer, after] = line.split(/\[|\]/);
+    return (
+      <span key={index} className="block">
+        {shimmer === undefined ? (
+          line
+        ) : (
+          <>
+            {before}
+            <span className="coere-shimmer">{shimmer}</span>
+            {after}
+          </>
+        )}
+      </span>
+    );
+  });
 }
 
 /** Fades a piece of the hero up into place, each a beat after the last. */

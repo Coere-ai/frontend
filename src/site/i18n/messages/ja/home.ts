@@ -2,7 +2,7 @@ import type { Messages } from "../types";
 
 export const home: Messages["home"] = {
   hero: {
-    title: "あなたが所有する記憶で、AIを[加速する]。",
+    title: "あなたが所有する記憶で、|AIを[加速する]",
     paragraph:
       "Coereは、すでに使っているAIツールのあいだで、記憶とコンテキストの所有権をユーザー自身に渡すことで、AIを加速します。繰り返しの作業をなくし、コラボレーションを深め、AIとのあらゆるやりとりをより効果的にします。",
     extractionAlt: "Mayaのチャットを保存するCoere：570件中74件を保存済み、残り約5分、ChatGPTは240件中18件",

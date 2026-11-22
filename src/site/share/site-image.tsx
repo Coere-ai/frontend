@@ -46,7 +46,7 @@ export async function siteShareImage(): Promise<ImageResponse> {
           <div style={{ display: "flex", flexDirection: "column", color: "#fff", fontSize: 66, lineHeight: 1.02, letterSpacing: "-0.045em" }}>
             <span style={{ backgroundImage: "linear-gradient(90deg, #e6f1ff 0%, #b4d0ff 30%, #8fb8ff 58%, #5f78fb 100%)", backgroundClip: "text", color: "transparent", paddingBottom: 4 }}>Accelerating</span>
             <span>AI with memory</span>
-            <span>you own.</span>
+            <span>you own</span>
           </div>
           <div style={{ display: "flex", fontSize: 24, letterSpacing: "-0.01em", color: "rgba(255,255,255,0.55)" }}>coere.ai</div>
         </div>
