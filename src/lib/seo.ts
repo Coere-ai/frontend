@@ -45,7 +45,7 @@ export function languageAlternates(path: string): Record<string, string> {
 }
 
 /** What the site's share picture shows, for people who cannot see it. */
-export const SHARE_ALT = "Coere: Accelerating Enterprise AI with Unified Context. The Coere mark among the AI logos on a pixel wall.";
+export const SHARE_ALT = "Coere: Accelerating AI with memory you own. The Coere mark among the AI logos on a pixel wall.";
 
 /**
  * The share picture, drawn at build time by app/opengraph-image.tsx and

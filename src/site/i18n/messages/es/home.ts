@@ -2,9 +2,9 @@ import type { Messages } from "../types";
 
 export const home: Messages["home"] = {
   hero: {
-    title: "[Aceleramos] la IA empresarial con contexto unificado",
+    title: "[Aceleramos] la IA con una memoria que es tuya.",
     paragraph:
-      "Coere acelera la productividad de la IA en la empresa al unificar el contexto y la memoria en las herramientas de IA que los empleados ya usan. Coere elimina el trabajo repetitivo, mejora la colaboración y hace que cada interacción con la IA sea más eficaz.",
+      "Coere acelera la IA al dar a cada persona la propiedad de su memoria y su contexto en las herramientas de IA que ya usa. Coere elimina el trabajo repetitivo, mejora la colaboración y hace que cada interacción con la IA sea más eficaz.",
     extractionAlt: "Coere guardando los chats de Maya: 74 de 570 chats guardados, quedan unos 5 minutos y ChatGPT va por 18 de 240",
     graphAlt: "El grafo de la página Memoria: Información personal, Personas, Tono y voz, Estilo de escritura y Trabajo, que salen de la persona",
   },

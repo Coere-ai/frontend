@@ -2,10 +2,10 @@
 export const home = {
   hero: {
     /** The owner's heading. The word in [brackets] shimmers. */
-    title: "[Accelerating] Enterprise AI with Unified Context",
+    title: "[Accelerating] AI with memory you own.",
     /** The owner's paragraph, as he wrote it. */
     paragraph:
-      "Coere accelerates enterprise AI productivity by unifying context and memory across the AI tools employees already use. Coere eliminates repetitive work, improves collaboration, and makes every AI interaction more effective.",
+      "Coere accelerates AI by giving users ownership of their memory and context across the AI tools they already use. Coere eliminates repetitive work, improves collaboration, and makes every AI interaction more effective.",
     extractionAlt: "Coere saving Maya's chats: 74 of 570 chats saved, about 5 minutes left, and ChatGPT at 18 of 240",
     graphAlt: "The Memory page's graph: Personal info, People, Tone and voice, Writing style and Work branching from the person",
   },
