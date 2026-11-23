@@ -538,19 +538,45 @@ onboarding started ends with its page closed, the finish screen opens at
 page passes `finish=1` to the framed Console and drops it from its own
 address. Offline it opens the local Console as before.
 
-**The live build.** In v4 the onboarding's growing graph, the Memory page
-(a card at its top) and the processing popup draw one live view
+**One choice, then a background build.** The owner's ask of 2026-11-23
+streamlined it: v4's onboarding asks only which AIs, with every
+recommended setting on and a line that they can be changed later in the
+dashboard. Start writes the choices and runs Extract all as Save did, then
+makes the build step's calls in its order (the stored checklist,
+Automatically save new chats and Add my context to chats on, the finish
+owed, `memory.control` build from onboarding), so memory reads each chat
+as it is saved. The page goes straight to "Coere is saving your chats and
+building your memory." with "You can close this tab or keep browsing.
+We'll let you know when it's ready.", Open the dashboard, and a small live
+card of the chats saved and memory's step that counts from the first
+second. It plays the finish screen if it is still open when the build
+ends. While the finish screen is owed the worker gives chats memory holds
+for a click the same build call, and the finish tab waits for Extract all
+to end, since memory can finish one round before the last chats land
+(`background/account/onboarding-build.ts`). Until it ends, Recall's search
+as you type runs whatever its switch says (`recall/while-building.ts`), so
+typing brings up saved chats before there is a memory to add. Every page
+that shows a build says "Sorting your chats, 0 of N chats" or Preparing
+before the first progress (`console/memory/live/build-line.ts`).
+
+**The live build.** In v4 the Memory page (a card at its top, the one
+place to watch a build) and the processing popup draw one live view
 (`console/memory/live`) from the same status and progress: the steps with
 one count, one bar and one time left, each chat as a dot the moment a job
 takes it, lit while it is read and flying into the section whose memories
 grew, Cori teleporting there with his hammer at most about once a second,
 the chat in work by title and AI, each AI's rows, the memories each AI
-added, the chats that could not be read, a short log, and Pause, Resume,
-Stop and Continue. The runtime's `memory.work` event carries each job's
+added, the chats that could not be read, the activity log, and Pause,
+Resume, Stop and Continue. The runtime's `memory.work` event carries each job's
 start and end with the chat's id, title and AI, and at the end the ids of
 the entities and folders its memories landed in; it goes to the extension's
-own pages only and is never logged, stored or sent to coere.ai. The log
-holds counts and section names, never a chat's title.
+own pages only and is never logged, stored or sent to coere.ai. The
+activity log (the owner's ask of 2026-11-23) names each chat by its title
+as it is saved, sorted, read, linked and connected, newest on top, at most
+50 lines with a small accent mark for each kind, and says the step that
+runs when nothing new came for a few seconds. Its titles come from
+`memory.work` and, for Saved, from `library.changed` with the library's
+own title rows; they live in the page alone.
 `memory.control` takes `stop` (a pause kept as Stopped, every job left in
 the memory file) and `continue` (lifts it, tests a site stop at once,
 releases jobs waiting out a retry and drops the pacer's own wait), so a
@@ -567,7 +593,7 @@ The time left and the bar come from one model
 end, not at the moment of reading, and the time left counts down from that
 end by at most one job's seconds, so a set of calls waiting on its answers
 never makes the time climb. The dashboard's steps card, like the
-onboarding's head, never draws its bar below what it drew before. The
+onboarding's live card, never draws its bar below what it drew before. The
 corner pill of the processing popup takes its percent, and its Linking,
 from the build's own progress, and a set with no chats of its own is never
 read as linking.
