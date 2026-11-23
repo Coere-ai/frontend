@@ -36,7 +36,7 @@ has no Anthropic key, so what it finds comes from the fake's rules.
 
 | | |
 |---|---|
-| <img src="welcome.webp" alt="coere.ai/welcome framing the onboarding: Hi, I'm Cori, Which AI chats do you use, with ChatGPT, Claude and Gemini chosen, the search, Cori and voice switches, and Save" /><br /><sub>The onboarding's first step, framed by coere.ai</sub> | <img src="welcome-building.webp" alt="The memory build live on coere.ai/welcome: Building memories, the graph growing among her chats on the stage, the steps, Pause and Stop, Reading Lisbon trip in January from ChatGPT, the memories each AI added, each AI's row, and the log of what Coere just did" /><br /><sub>Her memory building live: the chat in work, the graph as it grows, the log, and Pause and Stop</sub> |
+| <img src="welcome.webp" alt="coere.ai/welcome framing the onboarding: Hi, I'm Cori, Which AI chats do you use, with ChatGPT, Claude and Gemini chosen, Start, and Recommended settings are on. Change them later in the dashboard." /><br /><sub>The onboarding's one choice, framed by coere.ai</sub> | <img src="welcome-working.webp" alt="coere.ai/welcome after Start: Coere is saving your chats and building your memory, the line that she can leave, a small card with her chats saved and memory's step with its count, and Open the dashboard" /><br /><sub>Then Coere saves her chats and builds her memory on its own</sub> |
 
 For Organization as a member, the tool sets Maya's role to member in the
 local database, as an admin's Make member would, and back after.
