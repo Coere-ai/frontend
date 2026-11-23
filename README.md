@@ -150,14 +150,14 @@ pictures: [the site](docs/screenshots/site/README.md),
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/dashboard/welcome.webp" alt="coere.ai/welcome framing the extension's onboarding: Hi, I'm Cori, Which AI chats do you use, with ChatGPT, Claude and Gemini chosen and Save" />
+      <img src="docs/screenshots/dashboard/welcome.webp" alt="coere.ai/welcome framing the extension's onboarding: Hi, I'm Cori, Which AI chats do you use, with ChatGPT, Claude and Gemini chosen, Start, and the line Recommended settings are on. Change them later in the dashboard." />
       <br />
-      <sub>After Connect Coere, coere.ai/welcome frames the extension's own onboarding.</sub>
+      <sub>After Connect Coere, coere.ai/welcome frames the extension's own onboarding. It asks only which AIs.</sub>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/dashboard/welcome-building.webp" alt="The memory build live on coere.ai/welcome: Building memories, the graph growing among her chats on the stage, the steps, Pause and Stop, Reading Lisbon trip in January from ChatGPT, the memories each AI added, each AI's row, and the log of what Coere just did" />
+      <img src="docs/screenshots/dashboard/welcome-working.webp" alt="coere.ai/welcome after Start: Coere is saving your chats and building your memory. You can close this tab or keep browsing. We'll let you know when it's ready. A small card with her chats saved and memory's step with its count, and Open the dashboard" />
       <br />
-      <sub>Her memory building live on coere.ai: the chat in work, the graph as it grows, and Pause and Stop.</sub>
+      <sub>Then Coere saves her chats and builds her memory on its own, and says she can leave.</sub>
     </td>
   </tr>
 </table>

@@ -1,7 +1,7 @@
 // The welcome pictures: coere.ai/welcome framing the extension's own
-// onboarding (the fake v4 build from coere-v2), first as Connect Coere
-// leaves it, then with Maya's memory building live: each chat drawn on the
-// stage as a job takes it, the chat in work named, and the graph growing.
+// onboarding (the fake v4 build from coere-v2), first its one choice as
+// Connect Coere leaves it, then the working screen while Maya's chats are
+// in and her memory builds in the background, with its small live card.
 // It runs in a browser of its own, after every other area, since a second
 // browser joins Maya's account. The AI behind the build is coere-v2's
 // fake Claude (lib/fake-ai.mjs), so the build reads her made up chats.
@@ -91,24 +91,17 @@ export async function shootWelcome(playwright, shooter, { coereV2, proxy, supaba
     await engineCall(engine, "upsertConversations", { convs: withLines(libraryConversations(now)) });
     await until(() => engineCall(engine, "memory.status"), (s) => (s.held?.chats ?? 0) > 0, 120_000, "chats to build from");
 
-    // As Build my memory does: the finish owed, then the build, so the onboarding opens on the growing graph.
+    // As Start does: the finish owed, then the build, so the onboarding opens on its working screen.
     await engine.evaluate(() => chrome.storage.local.set({ "coere.memory.finish": { v: 1, state: "owed" } }));
     await engineCall(engine, "memory.control", { action: "build", mode: "direct", from: "onboarding" });
-    // Room for the stage, Pause and Stop, the chat in work and the log, one under another.
-    await welcome.setViewportSize({ width: VIEWPORT.width, height: 1500 });
     await welcome.bringToFront();
     await welcome.reload();
-    const stage = ob.getByTestId("coere-live-stage");
-    await until(async () => Number(await stage.getAttribute("data-chats", { timeout: 5000 })), (n) => n > 0, 90_000, "chats on the stage");
-    await ob.getByTestId("coere-live-now").filter({ hasText: /^Now(Sorting|Reading|Checking|Linking) / }).waitFor({ timeout: 90_000 });
-    // Past sorting, with a chat read and others still waiting, so the log says what a read found.
-    await until(() => ob.getByTestId("coere-live-log").innerText({ timeout: 5000 }), (t) => /Read an? .*chat, added \d+ memor/.test(t), 300_000, "a chat read with memories");
-    // The window as tall as the framed page, so the picture ends under the log and cuts nothing.
-    const inner = welcome.frames().find((f) => f !== welcome.mainFrame());
-    const height = await inner.evaluate(() => Math.ceil(document.documentElement.scrollHeight));
-    await welcome.setViewportSize({ width: VIEWPORT.width, height: Math.max(1500, height) });
+    await ob.getByRole("heading", { name: "Coere is saving your chats and building your memory." }).waitFor({ timeout: 60_000 });
+    // The live card past its first second: memory's step with its count, not Preparing.
+    const memoryRow = ob.locator(".ob-live-text").nth(1);
+    await until(() => memoryRow.innerText({ timeout: 5000 }), (t) => /^(Sorting your chats|Choosing what to keep|Building memories|Linking related things)/.test(t), 120_000, "memory's step on the live card");
     await welcome.waitForTimeout(1500);
-    await shooter.shot(welcome, "dashboard", "welcome-building");
+    await shooter.shot(welcome, "dashboard", "welcome-working");
   } finally {
     await browser.close();
     proxy.useAi(null);

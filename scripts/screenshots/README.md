@@ -77,8 +77,9 @@ Set `SHOTS_VERBOSE=1` to see the dev server's log, and
 6. **The welcome pictures**, last, in a second browser with the fake v4
    build, since it joins Maya's account as one more browser. After Connect
    Coere the tab is `www.coere.ai/welcome` framing the extension's own
-   onboarding. Her chats go into the Library and a memory build starts as
-   Build my memory starts one, so the onboarding shows it live. The run has
+   onboarding, whose one choice is the first picture. Her chats then go into
+   the Library and a memory build starts as Start starts one, so the
+   onboarding shows its working screen with the small live card. The run has
    no Anthropic key, so the host proxy hands the Claude proxy's calls to
    coere-v2's fake Claude (`lib/fake-ai.mjs`, under `tsx`), slowed as
    coere-v2's own live build spec slows it. The fake reads a chat with
