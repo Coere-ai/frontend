@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { saveDisplayName, saveUsername, type FieldState } from "@/app/[lang]/(site)/account/sign-in-actions";
 import { DISPLAY_NAME_MAX } from "@/lib/account/display-name";
 import { PASSWORD_MAX } from "@/lib/auth/identity";
+import { PasswordInput } from "@/site/account/auth-fields";
 import { buttonClass } from "@/site/ui/button";
 import { FormField, inputClass } from "@/site/ui/form-field";
 
@@ -104,7 +105,9 @@ function OneField({
       {withPassword ? (
         <FormField id={passwordId} label="Current password">
           <div className="flex flex-wrap items-end gap-3">
-            <input id={passwordId} name="currentPassword" type="password" autoComplete="current-password" maxLength={PASSWORD_MAX} className={`${inputClass(false)} h-11 min-w-48 flex-1`} />
+            <div className="min-w-48 flex-1">
+              <PasswordInput id={passwordId} name="currentPassword" autoComplete="current-password" maxLength={PASSWORD_MAX} className={`${inputClass(false)} h-11`} />
+            </div>
             {submit}
           </div>
         </FormField>

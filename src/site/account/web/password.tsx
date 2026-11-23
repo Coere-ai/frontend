@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import { savePassword, type FieldState } from "@/app/[lang]/(site)/account/sign-in-actions";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/auth/identity";
+import { PasswordInput } from "@/site/account/auth-fields";
 import { FormStatus } from "@/site/account/auth-shell";
 import { buttonClass } from "@/site/ui/button";
 import { FormField, inputClass } from "@/site/ui/form-field";
@@ -20,13 +21,13 @@ export function Password() {
     <Part title="Password" line="You sign in with your username and this password. Type your current one, then a new one twice.">
       <form action={action} noValidate className="max-w-[420px] space-y-4">
         <FormField id="current-password" label="Current password">
-          <input id="current-password" name="currentPassword" type="password" autoComplete="current-password" maxLength={PASSWORD_MAX} className={field} />
+          <PasswordInput id="current-password" name="currentPassword" autoComplete="current-password" maxLength={PASSWORD_MAX} className={field} />
         </FormField>
         <FormField id="password" label="New password" hint={`At least ${PASSWORD_MIN} characters`}>
-          <input id="password" name="password" type="password" autoComplete="new-password" maxLength={PASSWORD_MAX} className={field} />
+          <PasswordInput id="password" name="password" autoComplete="new-password" maxLength={PASSWORD_MAX} className={field} />
         </FormField>
         <FormField id="confirm" label="New password again">
-          <input id="confirm" name="confirm" type="password" autoComplete="new-password" maxLength={PASSWORD_MAX} className={field} />
+          <PasswordInput id="confirm" name="confirm" autoComplete="new-password" maxLength={PASSWORD_MAX} className={field} />
         </FormField>
         <button type="submit" disabled={pending} className={buttonClass("secondary", "disabled:opacity-60")}>
           {pending ? "Saving" : "Change password"}
