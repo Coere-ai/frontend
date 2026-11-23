@@ -21,7 +21,7 @@ export async function signInAndConnect(context) {
   const tab = await tabMatching(context, CONNECT);
   await tab.waitForLoadState("load");
   await tab.getByLabel("Username").fill(MAYA.username);
-  await tab.getByLabel("Password").fill(MAYA.password);
+  await tab.getByLabel("Password", { exact: true }).fill(MAYA.password);
   await tab.getByRole("button", { name: "Sign in", exact: true }).click();
   await tab.waitForURL(/\/connect\?/, { timeout: 60_000 });
   // The connect page loads itself once as a whole document after a sign in (src/lib/connect/loaded-path.ts).

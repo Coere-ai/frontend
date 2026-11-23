@@ -95,7 +95,7 @@ export async function shootSite(browser, base, shooter, { scale }) {
   // The connect page as the extension opens it, signed in as Maya.
   await open(page, base, "/sign-in");
   await page.getByLabel("Username").fill(MAYA.username);
-  await page.getByLabel("Password").fill(MAYA.password);
+  await page.getByLabel("Password", { exact: true }).fill(MAYA.password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await page.waitForURL(/\/dashboard/, { timeout: 60_000 }).catch(() => {});
   const ext = "kfpnhnhmcmhdhlbkdmlnoeiogdgnfoap";
