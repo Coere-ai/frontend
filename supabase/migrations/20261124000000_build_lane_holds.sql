@@ -1,4 +1,4 @@
--- Coere: spend holds that let a memory build run about 100 calls at once.
+-- Coere: spend holds that let a memory build run more calls at once.
 --
 -- Runs after 20261103000000_coere.sql. Paste into the Supabase SQL editor and
 -- run, before the site that calls it deploys. It only adds: one nullable
@@ -24,6 +24,12 @@
 --     or when the account already has p_max_live holds, 128 on the site.
 --     That bounds what calls in flight together can pass a limit by.
 --   * A batch keeps the rules it had: its hold is its worst case.
+--
+-- With Sonnet at 16,000 max_tokens the $5 overrun is what binds: about 57
+-- Sonnet calls fit the $10 first build at once before anything is spent and
+-- about 38 at $5 spent. Near the limit the expected costs bind first, as
+-- `pending`. A larger overrun, a tighter worst case or a lower Sonnet
+-- max_tokens would let more run.
 
 
 -- What the call will most likely cost, which reserve_spend weighs against

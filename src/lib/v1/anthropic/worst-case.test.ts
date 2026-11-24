@@ -99,7 +99,8 @@ describe("expectedCaseMicros", () => {
     const expected = expectedCaseMicros(params, "direct");
     assert.ok(worst > 250_000 && worst < 270_000, String(worst));
     assert.ok(expected > 80_000 && expected < 95_000, String(expected));
-    // So the $10 first build allowance weighs more than 100 of them at once before anything is spent.
+    // By expected cost alone the $10 first build allowance weighs more than 100 of them at once. The $5
+    // overrun bound on their worst cases is what binds, at about 57 (hold-rules.test.ts).
     assert.ok(Math.floor(10_000_000 / expected) >= 100);
   });
 

@@ -1614,8 +1614,8 @@ end;
 $$;
 
 -- The seven argument reserve_spend (migration 20261124000000_build_lane_holds),
--- which the site calls from 2026-11-24 so a memory build can run about 100
--- calls at once. Each hold keeps its expected cost beside its worst case: a
+-- which the site calls from 2026-11-24 so a memory build can run more calls
+-- at once. Each hold keeps its expected cost beside its worst case: a
 -- message waits as `pending` when spend plus every hold's expected cost would
 -- pass a limit, and as `concurrency` when the account has p_max_live holds
 -- or every worst case in flight would pass a limit by more than p_overrun.
