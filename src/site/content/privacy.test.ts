@@ -43,7 +43,7 @@ test("the effective date reads as the date it holds", () => {
 test("the policy says saved chat excerpts may go in front of a message before memory exists", () => {
   // coere-v2 import-context/smart/saved-chats.ts: local, redacted, and never from these chats.
   const said = text("extension");
-  for (const words of ["Until your memory has enough in it", "short excerpts of the closest chats", "API keys, card numbers and passwords taken out", "In Suggest, it only shows them", "temporary chat", "the chat you are in", "Include sensitive memories"]) {
+  for (const words of ["Until your memory has enough in it", "short excerpts of the closest chats", "each with its chat's title, the AI site it came from and its date", "API keys, card numbers and passwords are taken out of the excerpts", "In Suggest, it only shows them", "temporary chat", "the chat you are in", "Include sensitive memories"]) {
     assert.ok(said.includes(words), words);
   }
   // The draft itself still never leaves the browser.

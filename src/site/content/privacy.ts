@@ -42,7 +42,7 @@ export const privacySections: PrivacySection[] = [
     list: [
       "With Search as I type on, it reads the box after each pause to search your saved chats in your browser. With it off, it reads the box only while the search sheet is open.",
       "With Add my context to chats on, it matches what you type against your memory in your browser. When you send, it puts the matching memories in front of your message, so the AI site receives them as part of your message.",
-      "Until your memory has enough in it, Add my context to chats matches what you type against your saved chats instead, also in your browser. In Auto, when you send, it puts short excerpts of the closest chats in front of your message, with API keys, card numbers and passwords taken out, so the AI site receives them as part of your message. In Suggest, it only shows them. It never takes them from a temporary chat, the chat you are in, a chat outside what Coere builds memory from, or a sensitive chat unless Include sensitive memories is on.",
+      "Until your memory has enough in it, Add my context to chats matches what you type against your saved chats instead, also in your browser. In Auto, when you send, it puts short excerpts of the closest chats in front of your message, each with its chat's title, the AI site it came from and its date, so the AI site receives them as part of your message. API keys, card numbers and passwords are taken out of the excerpts. In Suggest, it only shows them. It never takes them from a temporary chat, the chat you are in, a chat outside what Coere builds memory from, or a sensitive chat unless Include sensitive memories is on.",
     ],
     after: [
       "Your draft is never saved, never logged and never sent to coere.ai or to a model.",
