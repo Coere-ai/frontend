@@ -1,10 +1,10 @@
 // npm run db:check
 //
-// Proves supabase/migrations/20261103000000_coere.sql runs on a blank
-// project, runs again without changing anything, and builds what
+// Proves the migrations in supabase/migrations run in order on a blank
+// project, run again without changing anything, and build what
 // docs/accounts.md asks for. It boots PGlite (Postgres compiled to
 // WebAssembly, so no server is needed), adds stand ins for what Supabase
-// provides, runs the migration twice, then exercises every function and
+// provides, runs the migrations twice, then exercises every function and
 // policy. Exits non zero on any failure.
 
 import { readFile } from "node:fs/promises";
@@ -15,13 +15,17 @@ import { checkInterestKept, checkInterestTables } from "./checks-interest.mjs";
 import { checkLimitColumns, checkLimitResolution, checkOwnLimitsLocked, checkSameFingerprint, schemaFingerprint } from "./checks-limits.mjs";
 import { checkOrganizationRows, checkOwnRows, checkServerWrites, checkStorage } from "./checks-rls.mjs";
 import { checkAdminReaders, checkAppEvents, checkInvites, checkMemoryTotals, checkRecordUsage } from "./checks-totals.mjs";
+import { checkHoldColumns, checkLiveHolds, checkUpgradeKeepsHolds } from "./checks-holds.mjs";
 import { bootDatabase, check, equal, failureCount, one, passCount } from "./harness.mjs";
 
-const MIGRATION = fileURLToPath(new URL("../../supabase/migrations/20261103000000_coere.sql", import.meta.url));
+// In the order they run. The first builds the whole database; each later one only adds to it.
+const MIGRATIONS = ["20261103000000_coere.sql", "20261124000000_build_lane_holds.sql"].map((name) =>
+  fileURLToPath(new URL(`../../supabase/migrations/${name}`, import.meta.url)),
+);
 
-async function migrate(db, sql, run) {
+async function migrate(db, files, run) {
   try {
-    await db.exec(sql);
+    for (const sql of files) await db.exec(sql);
     check(`migration run ${run}`, true);
   } catch (error) {
     check(`migration run ${run}`, false, error.message);
@@ -30,7 +34,7 @@ async function migrate(db, sql, run) {
 }
 
 async function main() {
-  const sql = await readFile(MIGRATION, "utf8");
+  const sql = await Promise.all(MIGRATIONS.map((file) => readFile(file, "utf8")));
   const db = await bootDatabase();
   await migrate(db, sql, 1);
   const first = await schemaFingerprint(db);
@@ -50,6 +54,8 @@ async function main() {
   await checkDailyRows(db);
   await checkSpendResolution(db);
   await checkSpendReserve(db);
+  await checkHoldColumns(db);
+  await checkLiveHolds(db);
   await checkCostReaders(db);
   await checkSpendLocked(db);
   await checkAppEvents(db, org);
@@ -72,6 +78,10 @@ async function main() {
   await checkSpendKept(db);
 
   await db.close();
+
+  // The second migration over a database that already runs the first, as on the live site.
+  await checkUpgradeKeepsHolds(bootDatabase, sql, checkSignUp);
+
   const failed = failureCount();
   console.log(`${passCount()} checks passed, ${failed} failed`);
   process.exitCode = failed === 0 ? 0 : 1;
