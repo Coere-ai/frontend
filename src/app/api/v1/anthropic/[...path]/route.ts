@@ -6,9 +6,12 @@ import { proxyAnthropic } from "@/lib/v1/anthropic/proxy";
 // the paths the memory runtime uses pass; see src/lib/v1/anthropic/proxy.ts.
 // A long answer can take minutes. 300 seconds is the most Vercel's Hobby
 // plan allows and Pro's default with Fluid compute, so it deploys on every
-// plan. The extension waits up to 600 seconds for a non streaming call, so a
-// rare answer that takes longer than 300 is cut off, billed by Anthropic and
-// never metered. A Pro team may raise this to 800, Vercel's ceiling there.
+// plan. A rare answer that takes longer is cut off, billed by Anthropic and
+// never metered, and its spend hold runs out HOLD_SECONDS (360) after it
+// started (src/lib/v1/hold-rules.ts). The v4 extension waits 330 seconds for
+// a call, so it gives up just after the cut. A Pro team may raise this to
+// 800, Vercel's ceiling there: then HOLD_SECONDS goes to 860 and the
+// extension's timeout to 830.
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

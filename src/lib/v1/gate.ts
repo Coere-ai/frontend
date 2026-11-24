@@ -66,6 +66,17 @@ export function hitRate(account: DeviceAccount, lane: Lane, headers: Headers): E
   return { ok: false, refusal: "rate_limited", retryAfter: rateRetryAfter(limit.retryAfterSeconds) };
 }
 
+/**
+ * Logs a `rate_limited` event once a minute per device when reserve_spend
+ * refuses a call as `concurrency`. The per minute lanes are now wide, so this
+ * is where a runaway loop on the model calls shows in the security log.
+ */
+export function noteConcurrencyLimited(account: DeviceAccount, headers: Headers): void {
+  if (securityOnce.firstIn(`concurrency:${account.deviceId}`, 60_000)) {
+    logSecurityEventAfter("rate_limited", { userId: account.userId, orgId: account.orgId, headers });
+  }
+}
+
 /** Logs `usage_limited` once an hour per device, for the gate and for a refused spend reservation alike. */
 export function noteUsageLimited(account: DeviceAccount, headers: Headers): void {
   if (securityOnce.firstIn(`usage:${account.deviceId}`, 3_600_000)) {

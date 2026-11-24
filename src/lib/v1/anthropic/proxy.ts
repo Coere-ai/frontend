@@ -1,8 +1,8 @@
 import "server-only";
 
-import { gate, hitRate, noteUsageLimited } from "../gate";
+import { gate, hitRate, noteConcurrencyLimited, noteUsageLimited } from "../gate";
 import { messageLane } from "../lanes";
-import { PENDING_RETRY_SECONDS, releaseHold, reserveSpend } from "../spend-holds";
+import { CONCURRENCY_RETRY_SECONDS, PENDING_RETRY_SECONDS, releaseHold, reserveSpend } from "../spend-holds";
 import { anthropicFor } from "../refusals";
 import { relayAnswer } from "./answers";
 import { listOwnBatches } from "./batch-list";
@@ -17,8 +17,9 @@ import { prepareRequest } from "./prepare";
  * the path, the device (token, suspended, per minute, and the spend limits
  * for calls that start new spend), the server's key, the
  * request itself (a message's per minute check comes here, once its model
- * names its lane), batch ownership, the hold on the call's worst case, then
- * the forward and the answer.
+ * names its lane), batch ownership, the hold on the call's cost, then
+ * the forward and the answer. Every 429 says which of these refused it in
+ * `x-coere-limit` (limit-marker.ts).
  */
 
 /** Calls that start new spend, so the spend limits are checked first. Results of a batch already paid for are not held back. */
@@ -54,15 +55,21 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
     return listOwnBatches(g.account.userId, new URL(req.url).searchParams, { apiKey, version: req.headers.get("anthropic-version"), beta: prepared.beta });
   }
 
-  // The gate saw spend already recorded; this holds the call's worst case
-  // against what is left, counting every other call still in flight.
+  // The gate saw spend already recorded; this holds the call's cost against
+  // what is left, counting every other call still in flight.
   let holdId: string | null = null;
   if (STARTS_SPEND.has(op.op)) {
-    const held = await reserveSpend(g.account.userId, prepared.worstMicros, { batch: op.op === "batch_create" });
+    const cost = { worstMicros: prepared.worstMicros, expectedMicros: prepared.expectedMicros };
+    const held = await reserveSpend(g.account.userId, cost, { batch: op.op === "batch_create" });
     if (!held.ok && !held.refused) return anthropicError("unavailable");
-    // Other messages in flight fill the limit for now: a short wait, as a per minute refusal, so a
-    // first build keeps going as their holds go instead of stopping for an hour on a spent limit.
+    // Other messages in flight fill the limit for now: a short wait, as a rate limit, so a first
+    // build keeps going as their holds go instead of stopping for an hour on a spent limit.
     if (!held.ok && held.refused === "pending") return anthropicError("rate_limited", { retryAfter: PENDING_RETRY_SECONDS, source: "spend-pending" });
+    // Too many calls in flight at once, or their worst cases could pass the limit by more than the overrun.
+    if (!held.ok && held.refused === "concurrency") {
+      noteConcurrencyLimited(g.account, req.headers);
+      return anthropicError("rate_limited", { retryAfter: CONCURRENCY_RETRY_SECONDS, source: "concurrency" });
+    }
     if (!held.ok) {
       noteUsageLimited(g.account, req.headers);
       return anthropicError("usage_limit", { limit: held.refused ?? undefined });
