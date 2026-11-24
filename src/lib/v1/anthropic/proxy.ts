@@ -31,7 +31,8 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
 
   // A message's per minute bucket follows its model, read from the body, so its check waits for the body.
   const later = op.op === "message";
-  const g = await gate(req, { metered: STARTS_SPEND.has(op.op), lane: later ? "later" : op.op === "count_tokens" ? "count" : "default" });
+  // The batch calls count in the message lane, so the plan's own lane is left to the account, settings and memory routes.
+  const g = await gate(req, { metered: STARTS_SPEND.has(op.op), lane: later ? "later" : op.op === "count_tokens" ? "count" : "message" });
   if (!g.ok) return anthropicFor(g.refusal, g.retryAfter, g.limit);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return anthropicError("unavailable");
