@@ -2,7 +2,7 @@ import { readBody } from "../body";
 import type { AnthropicCase } from "./errors";
 import { checkBatchBody, checkBeta, checkParams } from "./params";
 import type { AnthropicOp } from "./paths";
-import { batchWorstCaseMicros, worstCaseMicros } from "./worst-case";
+import { batchWorstCaseMicros, expectedCaseMicros, worstCaseMicros } from "./worst-case";
 
 /**
  * Everything the proxy checks about a request before it is forwarded
@@ -22,6 +22,8 @@ export type Prepared =
       model?: string;
       /** The most the request can cost, for the spend reservation; 0 for a call that starts no spend. */
       worstMicros: number;
+      /** What a message will most likely cost, weighed against the limit while it runs; a batch's is its worst case. */
+      expectedMicros: number;
     }
   | { ok: false; error: AnthropicCase; model?: string };
 
@@ -30,7 +32,7 @@ const WITH_PARAMS = new Set(["message", "count_tokens", "batch_create"]);
 export async function prepareRequest(req: Request, op: AnthropicOp): Promise<Prepared> {
   const beta = checkBeta(req.headers.get("anthropic-beta"));
   if (beta === false) return { ok: false, error: "beta" };
-  if (!WITH_PARAMS.has(op.op)) return { ok: true, beta, body: null, requestCount: 0, worstMicros: 0 };
+  if (!WITH_PARAMS.has(op.op)) return { ok: true, beta, body: null, requestCount: 0, worstMicros: 0, expectedMicros: 0 };
 
   const read = await readBody(req, BODY_CAP);
   if (!read.ok) return { ok: false, error: read.reason };
@@ -46,8 +48,9 @@ export async function prepareRequest(req: Request, op: AnthropicOp): Promise<Pre
   const model = op.op === "message" ? ((parsed as { model?: string }).model ?? undefined) : undefined;
   const worstMicros =
     op.op === "message" ? worstCaseMicros(parsed as Record<string, unknown>, "direct") : op.op === "batch_create" ? batchWorstCaseMicros(parsed) : 0;
+  const expectedMicros = op.op === "message" ? expectedCaseMicros(parsed as Record<string, unknown>, "direct") : worstMicros;
   // What goes on is the parsed body written out again, so Anthropic reads exactly what was checked:
   // in the caller's own bytes a name given twice could read one way here and another way there.
   const body = new TextEncoder().encode(JSON.stringify(parsed));
-  return { ok: true, beta, body, requestCount, worstMicros, ...(model ? { model } : {}) };
+  return { ok: true, beta, body, requestCount, worstMicros, expectedMicros, ...(model ? { model } : {}) };
 }

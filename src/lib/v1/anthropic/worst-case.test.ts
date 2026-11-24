@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { costMicros } from "../prices";
-import { batchWorstCaseMicros, worstCaseMicros } from "./worst-case";
+import { batchWorstCaseMicros, expectedCaseMicros, HOLD_OUTPUT_TOKENS, worstCaseMicros } from "./worst-case";
 
 const message = (text: string, maxTokens?: number) => ({
   model: "claude-sonnet-5-5",
@@ -63,5 +63,50 @@ describe("batchWorstCaseMicros", () => {
     const negative = { custom_id: "b", params: message("hello", -1_000_000_000_000) };
     assert.ok(worstCaseMicros(negative.params, "batch") >= 0);
     assert.ok(batchWorstCaseMicros({ requests: [real, negative] }) >= worstCaseMicros(real.params, "batch"));
+  });
+});
+
+describe("expectedCaseMicros", () => {
+  it("prices three bytes a token as cache writes and at most 2,000 output tokens", () => {
+    assert.equal(HOLD_OUTPUT_TOKENS, 2_000);
+    const params = message("x".repeat(30_000), 16_000);
+    const bytes = JSON.stringify(params).length;
+    const expected = costMicros("claude-sonnet-5-5", { input: 0, output: 2_000, cacheRead: 0, cacheWrite: Math.ceil(bytes / 3) }, "direct");
+    assert.equal(expectedCaseMicros(params, "direct"), expected);
+  });
+
+  it("takes max_tokens when it is below 2,000, and the cap's 2,000 when it is missing", () => {
+    const small = message("hi", 500);
+    const bytes = JSON.stringify(small).length;
+    assert.equal(expectedCaseMicros(small, "direct"), costMicros("claude-sonnet-5-5", { input: 0, output: 500, cacheRead: 0, cacheWrite: Math.ceil(bytes / 3) }, "direct"));
+    const none = message("hi");
+    const noneBytes = JSON.stringify(none).length;
+    assert.equal(expectedCaseMicros(none, "direct"), costMicros("claude-sonnet-5-5", { input: 0, output: 2_000, cacheRead: 0, cacheWrite: Math.ceil(noneBytes / 3) }, "direct"));
+  });
+
+  it("is never above the worst case, and halves for a batch", () => {
+    for (const [text, max] of [["hi", 1], ["hi", 16_000], ["word ".repeat(20_000), 8_192], ["", 64_000]] as const) {
+      const params = message(text, max);
+      assert.ok(expectedCaseMicros(params, "direct") <= worstCaseMicros(params, "direct"), `${text.length} ${max}`);
+      assert.ok(Math.abs(expectedCaseMicros(params, "batch") * 2 - expectedCaseMicros(params, "direct")) <= 1);
+    }
+  });
+
+  it("holds a typical Sonnet extraction at about a third of its worst case", () => {
+    // About 20k tokens of prompt (80 kB of JSON) asking for 16,000 tokens at most.
+    const params = message("word ".repeat(16_000), 16_000);
+    const worst = worstCaseMicros(params, "direct");
+    const expected = expectedCaseMicros(params, "direct");
+    assert.ok(worst > 250_000 && worst < 270_000, String(worst));
+    assert.ok(expected > 80_000 && expected < 95_000, String(expected));
+    // So the $10 first build allowance weighs more than 100 of them at once before anything is spent.
+    assert.ok(Math.floor(10_000_000 / expected) >= 100);
+  });
+
+  it("still counts a full size picture", () => {
+    const picture = { type: "image", source: { type: "base64", media_type: "image/png", data: "iVBORw0KGgo=" } };
+    const params = { model: "claude-opus-5-5", max_tokens: 1, messages: [{ role: "user", content: [picture] }] };
+    const full = costMicros("claude-opus-5-5", { input: 4_784, output: 1, cacheRead: 0, cacheWrite: 0 }, "direct");
+    assert.ok(expectedCaseMicros(params, "direct") >= full);
   });
 });
