@@ -267,8 +267,13 @@ the local library and start Browser Use; it is gone.
   click or Settings names, and Settings has no Large reads choice. A
   batch's reservation holds its whole worst case until it is read, which
   refuses every other call meanwhile, and a first build must land chat by
-  chat (2026-11-11). Calls in flight start at 6 and may reach 12, and
-  Haiku sorts 8 chats at once, since the site has no Jev key.
+  chat (2026-11-11). Every call to Claude starts through one budget
+  (`runtime/ai-budget.ts`, the speed overhaul of 2026-11-24): at most 100
+  in flight, a start rate of 6 a second with a burst of 16, and a class
+  each for Sonnet (32 in flight at first, up to 100) and Haiku (32, up to
+  64), so a Haiku limit never holds Sonnet back. Haiku sorts 16 chats at
+  once, since the site has no Jev key. The extension waits 330 s for a
+  call, the route's 300 s and 30 s for the proxy.
 - `tools/lint-manifest` and the build scans learn the v4 rules: no model
   host, no key, no fake key, no v3 marker, `externally_connectable` only in
   v4 and only with the site origins, and the one web accessible entry that
@@ -541,11 +546,18 @@ address. Offline it opens the local Console as before.
 **One choice, then a background build.** The owner's ask of 2026-11-23
 streamlined it: v4's onboarding asks only which AIs, with every
 recommended setting on and a line that they can be changed later in the
-dashboard. Start writes the choices and runs Extract all as Save did, then
-makes the build step's calls in its order (the stored checklist,
-Automatically save new chats and Add my context to chats on, the finish
-owed, `memory.control` build from onboarding), so memory reads each chat
-as it is saved. The page goes straight to "Coere is saving your chats and
+dashboard. The form has no switch or other choice beyond the nine AI
+cards, Choose all, Clear and Start. Start writes the choices with Cori on
+and Always show Cori off, also over an Always show Cori the person turned
+on in Settings, and runs Extract all as Save did, then makes the build
+step's calls in its order (the stored checklist, Automatically save new
+chats on and Add my context to chats in Auto mode, written over any stored
+choice with the other context switches kept, the finish owed,
+`memory.control` build from onboarding), so memory reads each chat as it
+is saved. Auto adds memories, and saved chat excerpts until memory exists,
+on the person's own Enter. Tests pin these defaults
+(`onboarding/stream/start-build.test.ts`, `stream-onboarding.test.tsx`).
+The page goes straight to "Coere is saving your chats and
 building your memory." with "You can close this tab or keep browsing.
 We'll let you know when it's ready.", Open the dashboard, and a small live
 card of the chats saved and memory's step that counts from the first
@@ -555,9 +567,29 @@ for a click the same build call, and the finish tab waits for Extract all
 to end, since memory can finish one round before the last chats land
 (`background/account/onboarding-build.ts`). Until it ends, Recall's search
 as you type runs whatever its switch says (`recall/while-building.ts`), so
-typing brings up saved chats before there is a memory to add. Every page
-that shows a build says "Sorting your chats, 0 of N chats" or Preparing
-before the first progress (`console/memory/live/build-line.ts`).
+typing brings up saved chats before there is a memory to add.
+
+**Saved chats until memory exists** (the owner's ask, 2026-11-24). While
+the memory holds fewer than 50 memories and the selection adds nothing,
+`memory.contextFor` answers excerpts of the saved chats nearest the draft:
+at most 3 chats of 2 pieces each, each with its title, its AI and its date,
+redacted as Prepare redacts a request. In Auto they go in front of the
+draft inside the person's own Enter, as memories do; in Suggest they only
+show. A temporary chat, the chat in the tab, a chat already sent to it, an
+AI or chat left out of memory, a sensitive section without Include
+sensitive memories, a forgotten quote, a blocked topic and an excluded
+message never go. Once the memory holds 50 memories it answers from memory
+alone, whether the build came from onboarding or the dashboard. Recall's
+suggestions stay the fallback while the embedder loads. The excerpts go to
+the AI site with the person's message; nothing of them goes to coere.ai.
+
+Every page that shows a build says Preparing with "n of N chats ready"
+while memory plans the chats it was handed (the `memory.planning` event,
+counts only), filling the first 5% of the bar, or "Sorting your chats, 0
+of N chats" before the first progress (`console/memory/live/build-line.ts`).
+The activity log names each chat as Extract all saves it (Saving, then
+Saved), from the run's own `currentTitle`, which goes from the tab to the
+extension's pages only.
 
 **The live build.** In v4 the Memory page (a card at its top, the one
 place to watch a build) and the processing popup draw one live view
@@ -600,9 +632,24 @@ read as linking.
 
 While calls are still in flight the status reads `running`, never
 `waiting`, so the page offers Continue only for a wait it can shorten.
-coere.ai's `429` with `retry-after: 10` for spend held by other calls
-(section 8.10) waits those 10 s without lowering the calls in flight
-(`runtime/held-spend.ts`); a longer 429 still steps them down.
+The extension reacts to each 429 by its `x-coere-limit` marker (section
+8.4), never by its retry-after alone: `spend-pending` waits the 10 s and
+keeps 85% of the calls in flight, once a window
+(`runtime/held-spend.ts`); `per-minute`, `concurrency`, `upstream` or no
+marker keeps 60% and waits the retry-after, cut at 60 s; Anthropic's ramp
+limit also empties the start burst. The cap then climbs back no higher
+than one under the level that met the limit, until a minute passes with no
+429.
+
+**The waiting copy.** While it waits, the v4 status names whose limit
+holds the build (`waitReason`), and the Memory card, titled "Memory is
+waiting", says so: "Waiting on coere.ai's limit for your plan." for the
+site's three markers, "Anthropic is busy right now." for `upstream`, a ramp
+limit or a 529, "coere.ai is busy right now." for the site's 503, and
+"coere.ai asked Coere to slow down." for a 429 with no marker, each with
+"Continuing in" and the time. On the saving side v4 names Claude's site
+Claude.ai, so a limit from claude.ai is not read as Anthropic's limit on
+memory.
 
 **Sign out.** The v4 Console's rail has Sign out at its foot, always in
 view. It asks once ("Sign out of coere.ai on this browser?"), then
@@ -854,7 +901,19 @@ Another path answers 404. Before forwarding:
   `server-side-fallback-2026-07-01`. `x-api-key` is the server's
   `ANTHROPIC_API_KEY`. Nothing else is forwarded.
 - **Answer headers kept:** `content-type`, `request-id`, `retry-after`,
-  `x-should-retry`.
+  `x-should-retry`. On a 429 the site adds `x-coere-limit` and replaces
+  any the upstream sent under that name.
+
+**The limit marker.** Every 429 on these routes and on Jev's carries
+`x-coere-limit`, naming what refused the call: `spend-pending` (other
+calls' expected costs fill a limit, `retry-after: 10`), `per-minute` (a
+per minute lane, at most 30), `concurrency` (the live holds cap or the
+overrun bound, 2) or `upstream` (Anthropic's or Jev's own 429, with its
+own `retry-after`). The value is one of these four and carries nothing
+about the person. A Jev `usage_limit` 429 is a spent limit and carries
+none. An extension that does not know the header ignores it, and a 429
+without it reads as an ordinary rate limit. The site deploys before an
+extension that reads it.
 
 Errors on these routes use Anthropic's own shape, so the memory runtime's
 error classes keep working unchanged:
@@ -864,7 +923,9 @@ error classes keep working unchanged:
 | No, unknown or revoked token | `401 {type:'error', error:{type:'authentication_error', message:'signed_out'}}` |
 | Suspended | `403 {…permission_error, message:'account_suspended'}` |
 | Monthly, lifetime or daily limit, or the first build allowance, spent | `400 {…invalid_request_error, message:'You have reached your specified monthly usage limit on coere.ai.'}` (or `lifetime`, or `daily` for a daily limit the operator set; a spent first build allowance reads as `monthly`). The runtime reads a message that starts "You have reached your specified" as a spend limit: it holds the queue, tries again every hour and on Try now, so raising the limit in the admin panel lets work go on within the hour |
-| Per minute limit | `429 {…rate_limit_error, message:'rate_limited'}` with `retry-after` |
+| Per minute limit | `429 {…rate_limit_error, message:'rate_limited'}` with `retry-after` and `x-coere-limit: per-minute` |
+| Spend held by other calls (`pending`) | `429 {…rate_limit_error, message:'rate_limited'}` with `retry-after: 10` and `x-coere-limit: spend-pending` |
+| Too many calls at once (`concurrency`) | `429 {…rate_limit_error, message:'rate_limited'}` with `retry-after: 2` and `x-coere-limit: concurrency` |
 | Model not allowed | `404 {…not_found_error, message:'model: <name>'}` |
 | Beta not allowed | `400 {…invalid_request_error, message:'Unexpected value(s) for the \`anthropic-beta\` header.'}` |
 | Body too large | `413 {…request_too_large, message:'request_too_large'}` |
@@ -883,10 +944,12 @@ rather than deleting a batch that was not metered.
 
 `maxDuration` is 300 seconds on every route, which works on every Vercel
 plan: it is the most Hobby allows and Pro's default with Fluid compute. Most
-calls end well inside it. The extension waits up to 600 seconds for a non
-streaming call, so a rare answer that takes longer than 300 is cut off,
-billed upstream and never metered. A Pro team may raise the Claude route to
-800, Vercel's ceiling there, so the function outlasts the extension's wait.
+calls end well inside it. The v4 extension waits up to 330 seconds for a non
+streaming call (600 before 2026-11-24), so a rare answer that takes longer
+than 300 is cut off, billed upstream and never metered, and its hold goes
+60 seconds later (section 8.10). A Pro team may raise the Claude route to
+800, Vercel's ceiling there; then HOLD_SECONDS becomes 860 and the
+extension's wait 830 seconds.
 
 ### 8.5 Jev: `POST /api/v1/jev/v1/systemone`
 
@@ -895,7 +958,9 @@ Bearer <JEV_API_KEY>`. Body at most 256 KiB, `model` one of `jev-1.14.0`,
 `jev-1.13.0`. Metered from `usage.input_tokens`. With no `JEV_API_KEY` it
 answers `403`, which sends the extension's classifier to Haiku at once.
 Auth and limit errors are the same as 8.4's statuses with a plain
-`{error:'…'}` body.
+`{error:'…'}` body. A per minute 429 carries `x-coere-limit: per-minute`
+and Jev's own 429 `upstream`; a spent limit's `usage_limit` 429 carries
+none.
 
 ### 8.6 Memory
 
@@ -1087,7 +1152,7 @@ coere.ai/account and delete it there." The account is deleted on
 
 | What | Limit |
 |---|---|
-| Requests per minute per device | the plan's `requests_per_minute`, held in memory per server instance. Jev calls, `count_tokens` and Haiku messages each count in their own bucket per device, ten times that and at least 1,000, since the classifier sends one small call per item 16 at a time, and without Jev Haiku sorts every chat of a build. A message's bucket is chosen by its model, so its per minute check runs once the body is read. A refusal's `retry-after` is at most 30 seconds, the longest the extension waits before giving an item up |
+| Requests per minute per device | held in memory per server instance, in lanes (`src/lib/v1/lanes.ts`). The `default` lane, the plan's `requests_per_minute`, holds only the account, settings, events and memory routes, so a build never starves them. A message that is not Haiku, and every batch call, counts in `message`: five times that and at least 600, since a build with about 100 calls in flight starts about 300 a minute. A Haiku message counts in `haiku`, thirty times that and at least 2,000, since without Jev Haiku sorts every chat of a build. Jev calls and `count_tokens` each keep their own, ten times that and at least 1,000. A message's lane is chosen by its model, so its per minute check runs once the body is read. A refusal's `retry-after` is at most 30 seconds (MAX_RATE_RETRY_SECONDS), the longest the extension waits before giving an item up. The guard against a runaway loop on the model calls rests on the spend limits, the live holds cap and the overrun bound below |
 | Monthly spend | the person's own `monthly_limit_micros` when the operator set one, else the plan's ($5 on Free, $20 on Plus, $100 on Team), per UTC month, once the account's free first build has finished, against the month's spend after that build, checked before every metered call |
 | Lifetime spend | the person's own `lifetime_limit_micros` when set, else the plan's (null on every seeded plan, meaning none), against `user_totals.cost_micros`, checked before every metered call, always |
 | First build allowance | the person's own `first_build_limit_micros` when set, else the plan's ($10 on every seeded plan), in place of the monthly and daily limits until the first memory build finishes, against everything spent since the free build began |
@@ -1097,20 +1162,48 @@ coere.ai/account and delete it there." The account is deleted on
 
 **Spend reservations.** The checks above read spend
 already recorded, which lands only after Anthropic answers. So before a
-message or a batch is forwarded, the proxy holds its worst case with
-`reserve_spend()`: input counted as one token per two bytes of the
-request's JSON and 5,000 more for each picture, priced as cache writes,
-plus `max_tokens` (or 64,000) of output, at the asked model's price, half for a batch. Pending spend is every
-live hold (`spend_holds`, let go once the call is metered, and void after
-900 seconds) plus the `reserved_micros` of each batch not yet metered. A
-message must fit whole: the spend a limit is checked against, plus pending,
-plus its worst case, at most the limit, for every limit in force, or it gets
-the `usage_limit` 400. A message that would fit on its own, and is
-pushed past only by other messages' holds, is answered `429 rate_limited`
-with `retry-after: 10` instead (`reserve_spend()` names it `pending`):
-those holds go as each call answers, so a first build with many calls in
-flight slows near its allowance and never stops for an hour on a limit
-that is not spent. A batch may start while nothing is at a limit, since its worst case is
+message or a batch is forwarded, the proxy holds it with
+`reserve_spend()`. Each hold keeps two costs. Its worst case: input
+counted as one token per two bytes of the request's JSON and 5,000 more
+for each picture, priced as cache writes, plus `max_tokens` (or 64,000) of
+output, at the asked model's price, half for a batch. Its expected cost:
+input at three bytes a token, still as cache writes, plus
+min(`max_tokens`, HOLD_OUTPUT_TOKENS = 2,000) of output, never above the
+worst case (`anthropic/worst-case.ts`). A hold is let go once the call is
+metered, and is void after HOLD_SECONDS = 360 seconds, the route's 300
+second `maxDuration` and a minute (900 before 2026-11-24, which kept a hold
+ten minutes past a call Vercel cut off). Pending spend is every live hold
+plus the `reserved_micros` of each batch not yet metered. A message is
+checked against every limit in force and refused in this order:
+
+1. its spent limit, the `usage_limit` 400, when its own expected cost does
+   not fit beside the spend and the batches not yet metered;
+2. `pending`, `429 rate_limited` with `retry-after: 10` and
+   `x-coere-limit: spend-pending`, when spend plus every hold's expected
+   cost plus its own would pass the limit: those holds go as each call
+   answers, so a first build slows near its allowance and never stops for
+   an hour on a limit that is not spent;
+3. `concurrency`, `429` with `retry-after: 2` and `x-coere-limit:
+   concurrency`, when the account already has MAX_LIVE_HOLDS = 128 live
+   holds, or when spend plus every hold's worst case plus its own would
+   pass the limit by more than the overrun bound, $5 (OVERRUN_MICROS in
+   `src/lib/v1/hold-rules.ts`). With no other hold live, a call that alone
+   passes a limit by more than $5 gets its spent limit instead. A
+   concurrency refusal writes a `rate_limited` security event at most once
+   a minute per device.
+
+So all of an account's calls in flight together can pass a limit by at
+most $5 even if every one used its worst case. With Sonnet at 16,000
+`max_tokens` that bound is what limits calls in flight: for an extraction
+of about 20k tokens (worst case about $0.26, expected about $0.087), about
+57 Sonnet calls fit the $10 first build at once before anything is spent, about 38
+at $5 spent, and near the limit `pending` refuses first. Haiku calls meet
+the 128 cap. Holds made by the four argument `reserve_spend`, and the site
+before the migration `20261124000000_build_lane_holds.sql` has run (it
+falls back to that function on PostgREST's PGRST202), count at their worst
+case. A batch keeps its old rules: its hold is its worst case.
+
+A batch may start while nothing is at a limit, since its worst case is
 far above what it costs and a small plan could otherwise never batch; its
 reservation then holds every other call back until its results are metered.
 A batch never metered within 30 days (its results expire after 29), or
@@ -1200,7 +1293,7 @@ and is the only thing that writes.
 | `usage_daily` | `user_id cascade, day date (UTC), requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros, updated_at, pk (user_id, day)`. Today's row is what a daily limit reads, when one is set. | server only |
 | `usage_model_daily` | `day date, model text ('' when none), requests, input_tokens, output_tokens, cache_write_tokens, cache_read_tokens, cost_micros, updated_at, pk (day, model)`. No foreign key, so a deleted account's use stays. | server only |
 | `ai_batches` | `id text pk, user_id cascade, device_id set null, request_count, reserved_micros bigint, created_at, metered_at` | server only |
-| `spend_holds` | `id uuid pk, user_id cascade, amount_micros bigint, expires_at, created_at` | server only |
+| `spend_holds` | `id uuid pk, user_id cascade, amount_micros bigint, expected_micros bigint null, expires_at, created_at` | server only; `expected_micros` null on a hold the four argument `reserve_spend` made, read as its worst case |
 | `memory_files` | `user_id pk cascade, object_path, index_path, bytes, index_bytes, digest, format_version, generator_version, memories, entities, links, chats, documents, sections, includes_quotes, includes_sensitive, device_id set null, uploaded_at` | the owner |
 | `user_settings` | `user_id pk cascade, settings jsonb (object, at most 64 KiB), version bigint, updated_at, updated_by ('site'\|'extension')` | the owner |
 | `app_events` | `id bigint identity pk, user_id set null, device_id set null, kind (section 6.7), count, created_at` | server only |
@@ -1234,7 +1327,8 @@ come through signed upload URLs that the server makes.
 | `spend_state(p_user uuid)` | Every spend limit of one account resolved (the person's own, else the plan's), each with the spend it is checked against, and whether the first build is done (section 8.10). |
 | `reset_first_build(p_user uuid)` | The operator's reset: clears `first_build_at` and marks the spend so far, so the allowance counts from now and the monthly limit waits for the next finished build. False for no account. |
 | `charge_unmetered_batch(p_user uuid, p_batch text)` | Marks a batch deleted before it was metered as metered, and records its reservation as its cost. |
-| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under every limit in force from `spend_state()` with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`, or `pending` for a message that fits but for other messages' holds. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under every limit in force from `spend_state()` with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`, or `pending` for a message that fits but for other messages' holds. Kept unchanged for the site before 2026-11-24 and as the fallback. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean, p_expected bigint, p_overrun bigint, p_max_live integer)` | The same lock and batch charge. A message holds `p_amount` (its worst case) and `p_expected` (never read above it), and is refused as its spent limit, then `pending`, then `concurrency` at `p_max_live` holds or past `p_overrun` (section 8.10). A batch keeps the four argument rules. From `20261124000000_build_lane_holds.sql`, granted to `service_role` only. |
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `usage_daily`, `user_totals`, the person's `org_totals`, today's `daily_totals` and today's `usage_model_daily` row for its model in one statement. |
 | `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. The first `memory_built` sets `first_build_at`. |
@@ -1304,6 +1398,13 @@ The README's "What each version sends" gains a v4 paragraph:
   the account removes it.
 - Synced settings and feature counts are stored with the account.
 - Coere does not sell or share any of it, and does not train a model on it.
+- Until the memory holds enough, Add my context to chats in Auto puts short
+  excerpts of the closest saved chats in front of the person's message,
+  with each chat's title, AI and date, after removing API keys, card
+  numbers and passwords. They go to the AI site as part of the message,
+  never to coere.ai. Suggest only shows them. Temporary chats, the current
+  chat, AIs and chats left out of memory, sensitive chats unless Include
+  sensitive memories is on, and forgotten words never go (section 6.9).
 
 ## 14. Organizations
 
@@ -1530,6 +1631,12 @@ record_usage(p_user uuid, p_device uuid, p_kind text, p_model text,
 
 -- refused: 'lifetime', 'first_build', 'monthly', 'daily', or 'pending'
 reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)
+  returns table (hold_id uuid, refused text)
+
+-- 20261124000000_build_lane_holds.sql. refused: the five above or 'concurrency'.
+-- spend_holds gains expected_micros bigint (null reads as amount_micros).
+reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean,
+  p_expected bigint, p_overrun bigint, p_max_live integer)
   returns table (hold_id uuid, refused text)
 
 -- p_rows: [{"model", "input", "output", "cacheWrite", "cacheRead", "costMicros"}], one per model
