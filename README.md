@@ -531,7 +531,16 @@ The extension calls the site under `/api/v1` with `Authorization: Bearer
 - Answers are `no-store` and `noindex`, with no CORS headers: the extension
   holds the site as a host, and pages never call these routes.
 - Requests per minute come from the plan and are counted per device in each
-  server instance's memory. The spend limits (the person's own when the
+  server instance's memory, in lanes (`src/lib/v1/lanes.ts`): the plan's
+  rate for the account, settings, events and memory routes, five times it
+  (at least 600) for batch calls and messages that are not Haiku, thirty
+  times it (at least 2,000) for Haiku messages, and ten times it (at least 1,000) for Jev and
+  count_tokens. Every 429 on the model routes names what refused it in
+  `x-coere-limit`: `spend-pending`, `per-minute`, `concurrency` or
+  `upstream`. Each call holds its expected cost and its worst case while it
+  runs, for at most 360 seconds; a call is refused as `concurrency` at 128
+  live holds or when the worst cases could pass a limit by more than $5
+  (`src/lib/v1/hold-rules.ts`, `docs/accounts.md` 8.10). The spend limits (the person's own when the
   operator set one, else the plan's) are checked before every call that
   starts new spend: a $10 first build allowance until the account's first
   memory build has finished, then the monthly limit ($5 on Free), counting
