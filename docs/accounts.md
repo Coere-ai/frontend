@@ -271,7 +271,7 @@ the local library and start Browser Use; it is gone.
   (`runtime/ai-budget.ts`, the speed overhaul of 2026-11-24): at most 100
   in flight, a start rate of 6 a second with a burst of 16, and a class
   each for Sonnet (32 in flight at first, up to 100) and Haiku (32, up to
-  64), so a Haiku limit never holds Sonnet back. Haiku sorts 16 chats at
+  64), so a Haiku limit never holds Sonnet back. Haiku sorts 32 chats at
   once, since the site has no Jev key. The extension waits 330 s for a
   call, the route's 300 s and 30 s for the proxy.
 - `tools/lint-manifest` and the build scans learn the v4 rules: no model
@@ -637,9 +637,9 @@ The extension reacts to each 429 by its `x-coere-limit` marker (section
 keeps 85% of the calls in flight, once a window
 (`runtime/held-spend.ts`); `per-minute`, `concurrency`, `upstream` or no
 marker keeps 60% and waits the retry-after, cut at 60 s; Anthropic's ramp
-limit also empties the start burst. The cap then climbs back no higher
-than one under the level that met the limit, until a minute passes with no
-429.
+limit also empties the start burst and sets no ceiling, since the start
+rate answers it. After any other limit the cap climbs back no higher than
+one under the level that met the limit, until a minute passes with no 429.
 
 **The waiting copy.** While it waits, the v4 status names whose limit
 holds the build (`waitReason`), and the Memory card, titled "Memory is
