@@ -11,6 +11,8 @@ import {
   readReservation,
   reserveArgs,
   UNKNOWN_FUNCTION,
+  wantsWorstOnly,
+  worstOnlyArgs,
 } from "./hold-rules";
 
 describe("the hold numbers", () => {
@@ -73,6 +75,22 @@ describe("readReservation", () => {
 
   it("falls back on PostgREST's unknown function code", () => {
     assert.equal(UNKNOWN_FUNCTION, "PGRST202");
+    assert.equal(wantsWorstOnly({ code: "PGRST202" }), true);
+  });
+
+  it("does not fall back on any other error, or none", () => {
+    assert.equal(wantsWorstOnly(null), false);
+    assert.equal(wantsWorstOnly(undefined), false);
+    assert.equal(wantsWorstOnly({ code: "PGRST203" }), false);
+    assert.equal(wantsWorstOnly({ code: "57014" }), false);
+    assert.equal(wantsWorstOnly({}), false);
+  });
+
+  it("asks the four argument reserve_spend for the worst case alone", () => {
+    const message = reserveArgs("u1", { worstMicros: 260_000, expectedMicros: 87_000 }, { batch: false });
+    assert.deepEqual(worstOnlyArgs(message), { p_user: "u1", p_amount: 260_000, p_ttl_seconds: HOLD_SECONDS, p_batch: false });
+    const batch = reserveArgs("u2", { worstMicros: 40_000, expectedMicros: 1 }, { batch: true });
+    assert.deepEqual(worstOnlyArgs(batch), { p_user: "u2", p_amount: 40_000, p_ttl_seconds: HOLD_SECONDS, p_batch: true });
   });
 });
 

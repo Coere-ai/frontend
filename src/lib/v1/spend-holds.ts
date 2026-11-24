@@ -2,16 +2,9 @@ import "server-only";
 
 import { supabase } from "@/lib/supabase";
 
-import { HOLD_SECONDS, readReservation, reserveArgs, UNKNOWN_FUNCTION, type Reservation } from "./hold-rules";
+import { readReservation, reserveArgs, wantsWorstOnly, worstOnlyArgs, type Reservation } from "./hold-rules";
 
-export {
-  CONCURRENCY_RETRY_SECONDS,
-  HOLD_SECONDS,
-  MAX_LIVE_HOLDS,
-  OVERRUN_MICROS,
-  PENDING_RETRY_SECONDS,
-  type Reservation,
-} from "./hold-rules";
+export { HOLD_SECONDS, MAX_LIVE_HOLDS, OVERRUN_MICROS, type Reservation } from "./hold-rules";
 
 /**
  * Spend reservations (docs/accounts.md 8.10). The gate's check reads only
@@ -22,15 +15,17 @@ export {
  * then simply stops counting, so a killed call never blocks for long.
  *
  * Each hold keeps the call's worst case and its expected cost. The limit is
- * weighed by the expected costs, so about 100 Sonnet calls fit the $10 first
- * build at once, and the worst cases bound how far they could pass it
- * together (hold-rules.ts).
+ * weighed by the expected costs, and the worst cases bound how far the calls
+ * in flight could pass it together (hold-rules.ts). With Sonnet at 16,000
+ * max_tokens that bound is what binds: about 57 Sonnet calls fit the $10
+ * first build at once before anything is spent (38 before), and fewer as the
+ * build spends.
  */
 
 export async function reserveSpend(userId: string, cost: { worstMicros: number; expectedMicros: number }, o: { batch: boolean }): Promise<Reservation> {
   const args = reserveArgs(userId, cost, o);
   const { data, error } = await supabase().rpc("reserve_spend", args);
-  if (error?.code === UNKNOWN_FUNCTION) return reserveWorstOnly(args);
+  if (wantsWorstOnly(error)) return reserveWorstOnly(args);
   if (error) {
     console.error("reserve_spend failed", error.code);
     return { ok: false, refused: null };
@@ -45,12 +40,7 @@ export async function reserveSpend(userId: string, cost: { worstMicros: number; 
  */
 async function reserveWorstOnly(args: ReturnType<typeof reserveArgs>): Promise<Reservation> {
   console.error("reserve_spend has no expected cost yet, holding the worst case");
-  const { data, error } = await supabase().rpc("reserve_spend", {
-    p_user: args.p_user,
-    p_amount: args.p_amount,
-    p_ttl_seconds: HOLD_SECONDS,
-    p_batch: args.p_batch,
-  });
+  const { data, error } = await supabase().rpc("reserve_spend", worstOnlyArgs(args));
   if (error) {
     console.error("reserve_spend failed", error.code);
     return { ok: false, refused: null };

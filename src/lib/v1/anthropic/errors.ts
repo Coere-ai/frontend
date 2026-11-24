@@ -1,5 +1,6 @@
 import { limitWord, type SpentLimit } from "../gate-types";
 import { API_HEADERS } from "../http";
+import { CONCURRENCY_RETRY_SECONDS, PENDING_RETRY_SECONDS, type Reservation } from "../hold-rules";
 import { LIMIT_HEADER, type LimitSource } from "../limit-marker";
 
 /**
@@ -88,4 +89,19 @@ export function anthropicError(
   if (shape.status === 429) headers.set(LIMIT_HEADER, o.source ?? "per-minute");
   if (c !== "rate_limited" && c !== "unavailable" && c !== "upstream") headers.set("x-should-retry", "false");
   return new Response(JSON.stringify(anthropicErrorBody(c, o.model, o.limit)), { status: shape.status, headers });
+}
+
+/**
+ * The answer to a call whose hold reserve_spend refused. Other messages in
+ * flight filling the limit is a short wait as a rate limit, so a first build
+ * keeps going as their holds go instead of stopping for an hour on a spent
+ * limit. Too many calls in flight, or worst cases that could pass the limit
+ * by more than the overrun, is a shorter one. `null` means reserve_spend
+ * could not be asked.
+ */
+export function holdRefusedAnswer(refused: Extract<Reservation, { ok: false }>["refused"]): Response {
+  if (refused === null) return anthropicError("unavailable");
+  if (refused === "pending") return anthropicError("rate_limited", { retryAfter: PENDING_RETRY_SECONDS, source: "spend-pending" });
+  if (refused === "concurrency") return anthropicError("rate_limited", { retryAfter: CONCURRENCY_RETRY_SECONDS, source: "concurrency" });
+  return anthropicError("usage_limit", { limit: refused });
 }

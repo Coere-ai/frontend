@@ -23,7 +23,7 @@ export const HOLD_SECONDS = 360;
  */
 export const OVERRUN_MICROS = 5_000_000;
 
-/** The most holds an account may have at once, about 100 calls in flight and room to spare. */
+/** The most holds an account may have at once. Haiku calls meet it; Sonnet calls meet the overrun bound first. */
 export const MAX_LIVE_HOLDS = 128;
 
 /** The retry-after a pending refusal names: about how long a message call takes to answer. */
@@ -77,3 +77,13 @@ export function reserveArgs(userId: string, cost: { worstMicros: number; expecte
 
 /** PostgREST's code for a function it does not know: the migration has not run yet. */
 export const UNKNOWN_FUNCTION = "PGRST202";
+
+/** Whether reserve_spend's error means the seven argument function is not there yet, so the four argument one is asked. */
+export function wantsWorstOnly(error: { code?: string } | null | undefined): boolean {
+  return error?.code === UNKNOWN_FUNCTION;
+}
+
+/** The four argument reserve_spend's arguments, which hold the worst case alone. */
+export function worstOnlyArgs(args: ReturnType<typeof reserveArgs>) {
+  return { p_user: args.p_user, p_amount: args.p_amount, p_ttl_seconds: HOLD_SECONDS, p_batch: args.p_batch };
+}

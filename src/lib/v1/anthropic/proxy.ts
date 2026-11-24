@@ -2,12 +2,12 @@ import "server-only";
 
 import { gate, hitRate, noteConcurrencyLimited, noteUsageLimited } from "../gate";
 import { messageLane } from "../lanes";
-import { CONCURRENCY_RETRY_SECONDS, PENDING_RETRY_SECONDS, releaseHold, reserveSpend } from "../spend-holds";
+import { releaseHold, reserveSpend } from "../spend-holds";
 import { anthropicFor } from "../refusals";
 import { relayAnswer } from "./answers";
 import { listOwnBatches } from "./batch-list";
 import { ownsBatch } from "./batches";
-import { anthropicError } from "./errors";
+import { anthropicError, holdRefusedAnswer } from "./errors";
 import { forwardToAnthropic } from "./forward";
 import { matchAnthropicPath, outlivesCaller, upstreamSearch, upstreamUrl, type AnthropicOp } from "./paths";
 import { prepareRequest } from "./prepare";
@@ -61,18 +61,11 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   if (STARTS_SPEND.has(op.op)) {
     const cost = { worstMicros: prepared.worstMicros, expectedMicros: prepared.expectedMicros };
     const held = await reserveSpend(g.account.userId, cost, { batch: op.op === "batch_create" });
-    if (!held.ok && !held.refused) return anthropicError("unavailable");
-    // Other messages in flight fill the limit for now: a short wait, as a rate limit, so a first
-    // build keeps going as their holds go instead of stopping for an hour on a spent limit.
-    if (!held.ok && held.refused === "pending") return anthropicError("rate_limited", { retryAfter: PENDING_RETRY_SECONDS, source: "spend-pending" });
-    // Too many calls in flight at once, or their worst cases could pass the limit by more than the overrun.
-    if (!held.ok && held.refused === "concurrency") {
-      noteConcurrencyLimited(g.account, req.headers);
-      return anthropicError("rate_limited", { retryAfter: CONCURRENCY_RETRY_SECONDS, source: "concurrency" });
-    }
     if (!held.ok) {
-      noteUsageLimited(g.account, req.headers);
-      return anthropicError("usage_limit", { limit: held.refused ?? undefined });
+      // A concurrency refusal logs a security event once a minute; a spent limit counts as before.
+      if (held.refused === "concurrency") noteConcurrencyLimited(g.account, req.headers);
+      else if (held.refused !== null && held.refused !== "pending") noteUsageLimited(g.account, req.headers);
+      return holdRefusedAnswer(held.refused);
     }
     holdId = held.holdId;
   }

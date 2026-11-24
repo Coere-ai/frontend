@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { anthropicError, anthropicErrorBody } from "./errors";
+import { anthropicError, anthropicErrorBody, holdRefusedAnswer } from "./errors";
 
 describe("anthropicError", () => {
   it("answers each case of 8.4 with its status and Anthropic's body", async () => {
@@ -59,5 +59,39 @@ describe("anthropicError", () => {
     assert.equal(limited.headers.get("retry-after"), "30");
     assert.equal(limited.headers.get("x-should-retry"), null);
     assert.equal(anthropicError("signed_out").headers.get("x-should-retry"), "false");
+  });
+});
+
+describe("holdRefusedAnswer", () => {
+  it("answers a pending hold as a 10 s wait marked spend-pending", async () => {
+    const res = holdRefusedAnswer("pending");
+    assert.equal(res.status, 429);
+    assert.equal(res.headers.get("retry-after"), "10");
+    assert.equal(res.headers.get("x-coere-limit"), "spend-pending");
+    assert.equal(res.headers.get("x-should-retry"), null);
+    assert.deepEqual(await res.json(), { type: "error", error: { type: "rate_limit_error", message: "rate_limited" } });
+  });
+
+  it("answers a concurrency hold as a 2 s wait marked concurrency", () => {
+    const res = holdRefusedAnswer("concurrency");
+    assert.equal(res.status, 429);
+    assert.equal(res.headers.get("retry-after"), "2");
+    assert.equal(res.headers.get("x-coere-limit"), "concurrency");
+  });
+
+  it("answers each spent limit as Anthropic's spend limit 400 with no marker", async () => {
+    for (const limit of ["lifetime", "first_build", "monthly", "daily"] as const) {
+      const res = holdRefusedAnswer(limit);
+      assert.equal(res.status, 400, limit);
+      assert.equal(res.headers.get("x-coere-limit"), null, limit);
+      assert.equal(res.headers.get("x-should-retry"), "false", limit);
+      assert.deepEqual(await res.json(), anthropicErrorBody("usage_limit", undefined, limit));
+    }
+  });
+
+  it("answers a reserve_spend it could not ask as unavailable", () => {
+    const res = holdRefusedAnswer(null);
+    assert.equal(res.status, 503);
+    assert.equal(res.headers.get("x-coere-limit"), null);
   });
 });
