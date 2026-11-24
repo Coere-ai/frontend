@@ -4,6 +4,7 @@ import { json } from "@/lib/v1/http";
 import { JEV_BODY_CAP, JEV_URL, jevAnswerHeaders, jevModel, jevUsage } from "@/lib/v1/jev-rules";
 import { recordUsage } from "@/lib/v1/meter";
 import { costMicros } from "@/lib/v1/prices";
+import { markUpstream } from "@/lib/v1/limit-marker";
 import { jevFor } from "@/lib/v1/refusals";
 
 // POST /api/v1/jev/v1/systemone (docs/accounts.md 8.5)
@@ -62,5 +63,6 @@ export async function POST(req: Request): Promise<Response> {
       requestId: null,
     });
   }
-  return new Response(text, { status: up.status, headers: jevAnswerHeaders(up.headers) });
+  // Jev's own 429 is marked as the upstream's, so the extension can tell it from the site's lanes.
+  return new Response(text, { status: up.status, headers: markUpstream(jevAnswerHeaders(up.headers), up.status) });
 }

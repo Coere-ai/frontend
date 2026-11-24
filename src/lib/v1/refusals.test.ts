@@ -65,3 +65,18 @@ describe("refusals", () => {
     assert.equal(jevFor("rate_limited", 9).headers.get("retry-after"), "9");
   });
 });
+
+describe("the x-coere-limit marker on refusals", () => {
+  it("names the per minute lane on the proxy's and Jev's rate limits", () => {
+    const proxy = anthropicFor("rate_limited", 12);
+    assert.deepEqual([proxy.status, proxy.headers.get("x-coere-limit"), proxy.headers.get("retry-after")], [429, "per-minute", "12"]);
+    const jev = jevFor("rate_limited", 12);
+    assert.deepEqual([jev.status, jev.headers.get("x-coere-limit"), jev.headers.get("retry-after")], [429, "per-minute", "12"]);
+  });
+
+  it("leaves a spent limit unmarked, since it is no short wait", () => {
+    assert.equal(jevFor("usage_limit", 3600).headers.get("x-coere-limit"), null);
+    assert.equal(anthropicFor("usage_limit", 3600).headers.get("x-coere-limit"), null);
+    assert.equal(problemFor("rate_limited", 20).headers.get("x-coere-limit"), null);
+  });
+});

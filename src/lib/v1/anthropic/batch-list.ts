@@ -88,6 +88,6 @@ export async function listOwnBatches(userId: string, params: URLSearchParams, u:
     first_id: page[0]?.id ?? null,
     last_id: page.at(-1)?.id ?? null,
   };
-  const headers = answerHeaders(new Headers({ "content-type": "application/json" }));
+  const headers = answerHeaders(new Headers({ "content-type": "application/json" }), 200);
   return new Response(JSON.stringify(body), { status: 200, headers });
 }

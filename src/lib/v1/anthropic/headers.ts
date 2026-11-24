@@ -1,9 +1,12 @@
+import { markUpstream } from "../limit-marker";
+
 /**
  * Which headers cross the proxy (docs/accounts.md 8.4). Going up: the API
  * version, the content type, a checked beta header and Coere's key, and
  * nothing the extension sent besides. Coming back: the four the runtime
- * reads. Rate limit headers stay behind, since they describe Coere's whole
- * account rather than the person's.
+ * reads, and on a 429 the `x-coere-limit` marker naming Anthropic as the
+ * source (limit-marker.ts). Anthropic's rate limit headers stay behind, since
+ * they describe Coere's whole account rather than the person's.
  */
 
 const ANSWER_HEADERS = ["content-type", "request-id", "retry-after", "x-should-retry"] as const;
@@ -19,12 +22,12 @@ export function upstreamHeaders(incoming: Headers, o: { apiKey: string; beta: st
   return out;
 }
 
-/** The kept answer headers with the site's own no-store and noindex. */
-export function answerHeaders(upstream: Headers): Headers {
+/** The kept answer headers with the site's own no-store and noindex, and the marker on a 429. */
+export function answerHeaders(upstream: Headers, status: number): Headers {
   const out = new Headers({ "cache-control": "no-store", "x-robots-tag": "noindex" });
   for (const name of ANSWER_HEADERS) {
     const value = upstream.get(name);
     if (value !== null) out.set(name, value);
   }
-  return out;
+  return markUpstream(out, status);
 }

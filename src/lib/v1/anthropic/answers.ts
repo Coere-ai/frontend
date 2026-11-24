@@ -16,7 +16,8 @@ import { attemptsOf, byModel } from "./usage";
  * What the proxy does with Anthropic's answer, by path (docs/accounts.md
  * 8.4): meter a message, store a new batch as the caller's, forget a
  * deleted one, and meter batch results as they stream through. Only
- * the kept answer headers go back.
+ * the kept answer headers go back, with Anthropic's own 429 marked as
+ * `upstream` (limit-marker.ts).
  */
 
 interface AnswerContext {
@@ -44,7 +45,7 @@ function parse(text: string): unknown {
 }
 
 export async function relayAnswer(up: Response, c: AnswerContext): Promise<Response> {
-  const headers = answerHeaders(up.headers);
+  const headers = answerHeaders(up.headers, up.status);
   const requestId = up.headers.get("request-id");
   const status = up.status;
   const op = c.op;

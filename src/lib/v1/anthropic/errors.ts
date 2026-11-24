@@ -1,5 +1,6 @@
 import { limitWord, type SpentLimit } from "../gate-types";
 import { API_HEADERS } from "../http";
+import { LIMIT_HEADER, type LimitSource } from "../limit-marker";
 
 /**
  * Errors on the Anthropic routes in Anthropic's own shape (docs/accounts.md
@@ -73,12 +74,18 @@ export function anthropicErrorBody(c: AnthropicCase, model?: string, limit?: Spe
 
 /**
  * The answer. A refusal the client should not retry says so in
- * `x-should-retry`, and a rate limit carries `retry-after` in seconds.
+ * `x-should-retry`, and a rate limit carries `retry-after` in seconds and
+ * names what refused it in `x-coere-limit` (limit-marker.ts): `source`, or
+ * the per minute lane when none is given, since that is the gate's refusal.
  */
-export function anthropicError(c: AnthropicCase, o: { model?: string; retryAfter?: number; limit?: SpentLimit } = {}): Response {
+export function anthropicError(
+  c: AnthropicCase,
+  o: { model?: string; retryAfter?: number; limit?: SpentLimit; source?: LimitSource } = {},
+): Response {
   const shape = anthropicErrorShape(c, o.model, o.limit);
   const headers = new Headers({ ...API_HEADERS, "content-type": "application/json" });
   if (o.retryAfter !== undefined) headers.set("retry-after", String(Math.max(1, Math.ceil(o.retryAfter))));
+  if (shape.status === 429) headers.set(LIMIT_HEADER, o.source ?? "per-minute");
   if (c !== "rate_limited" && c !== "unavailable" && c !== "upstream") headers.set("x-should-retry", "false");
   return new Response(JSON.stringify(anthropicErrorBody(c, o.model, o.limit)), { status: shape.status, headers });
 }

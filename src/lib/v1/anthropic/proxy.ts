@@ -62,7 +62,7 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
     if (!held.ok && !held.refused) return anthropicError("unavailable");
     // Other messages in flight fill the limit for now: a short wait, as a per minute refusal, so a
     // first build keeps going as their holds go instead of stopping for an hour on a spent limit.
-    if (!held.ok && held.refused === "pending") return anthropicError("rate_limited", { retryAfter: PENDING_RETRY_SECONDS });
+    if (!held.ok && held.refused === "pending") return anthropicError("rate_limited", { retryAfter: PENDING_RETRY_SECONDS, source: "spend-pending" });
     if (!held.ok) {
       noteUsageLimited(g.account, req.headers);
       return anthropicError("usage_limit", { limit: held.refused ?? undefined });

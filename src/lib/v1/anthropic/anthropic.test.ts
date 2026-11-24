@@ -230,7 +230,7 @@ describe("headers", () => {
       "set-cookie": "x=y",
       "anthropic-organization-id": "org",
     });
-    const out = answerHeaders(upstream);
+    const out = answerHeaders(upstream, 200);
     assert.deepEqual([...out.entries()].sort(), [
       ["cache-control", "no-store"],
       ["content-type", "application/json"],
@@ -239,6 +239,16 @@ describe("headers", () => {
       ["x-robots-tag", "noindex"],
       ["x-should-retry", "true"],
     ]);
+  });
+
+  it("marks Anthropic's own 429 as upstream and keeps its retry-after", () => {
+    const upstream = new Headers({ "content-type": "application/json", "retry-after": "7", "x-coere-limit": "per-minute" });
+    const limited = answerHeaders(upstream, 429);
+    assert.equal(limited.get("x-coere-limit"), "upstream");
+    assert.equal(limited.get("retry-after"), "7");
+    // Any other answer carries no marker, whatever the upstream sent under the name.
+    assert.equal(answerHeaders(upstream, 200).get("x-coere-limit"), null);
+    assert.equal(answerHeaders(upstream, 529).get("x-coere-limit"), null);
   });
 });
 

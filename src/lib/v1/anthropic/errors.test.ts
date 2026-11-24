@@ -42,6 +42,18 @@ describe("anthropicError", () => {
     });
   });
 
+  it("names what refused every 429, and puts no marker on any other answer", () => {
+    assert.equal(anthropicError("rate_limited", { retryAfter: 30 }).headers.get("x-coere-limit"), "per-minute");
+    for (const source of ["spend-pending", "per-minute", "concurrency", "upstream"] as const) {
+      assert.equal(anthropicError("rate_limited", { retryAfter: 2, source }).headers.get("x-coere-limit"), source);
+    }
+    for (const c of ["signed_out", "suspended", "usage_limit", "model", "beta", "too_large", "unavailable", "not_found", "bad_request", "upstream"] as const) {
+      const res = anthropicError(c);
+      assert.notEqual(res.status, 429, c);
+      assert.equal(res.headers.get("x-coere-limit"), null, c);
+    }
+  });
+
   it("sets retry-after on a rate limit and tells the client not to retry a refusal", () => {
     const limited = anthropicError("rate_limited", { retryAfter: 30 });
     assert.equal(limited.headers.get("retry-after"), "30");
