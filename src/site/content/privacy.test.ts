@@ -39,3 +39,13 @@ test("the effective date reads as the date it holds", () => {
   const shown = new Date(`${PRIVACY_EFFECTIVE}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
   assert.equal(PRIVACY_EFFECTIVE_LABEL, shown);
 });
+
+test("the policy says saved chat excerpts may go in front of a message before memory exists", () => {
+  // coere-v2 import-context/smart/saved-chats.ts: local, redacted, and never from these chats.
+  const said = text("extension");
+  for (const words of ["Until your memory has enough in it", "short excerpts of the closest chats", "API keys, card numbers and passwords taken out", "In Suggest, it only shows them", "temporary chat", "the chat you are in", "Include sensitive memories"]) {
+    assert.ok(said.includes(words), words);
+  }
+  // The draft itself still never leaves the browser.
+  assert.ok(said.includes("Your draft is never saved, never logged and never sent to coere.ai or to a model."));
+});
