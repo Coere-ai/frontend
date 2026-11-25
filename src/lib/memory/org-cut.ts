@@ -1,10 +1,11 @@
-import { sectionKeyOf } from "./build-index";
+import { SENSITIVE_SECTIONS, sectionKeyOf } from "./build-index";
 import type { MemoryIndex } from "./index-types";
 
 /**
  * Cutting an index down to some sections (docs/accounts.md 14.2, 8.11). A
  * member's part of the organization graph is their index cut to the
- * organization's shared sections with every sensitive memory dropped; a
+ * organization's shared sections with every sensitive memory and every
+ * sensitive section dropped; a
  * member's read of the merged graph is the graph cut to the sections their
  * access lets them read.
  */
@@ -19,7 +20,8 @@ export function factSectionOf(
 }
 
 export function cutToSections(index: MemoryIndex, sections: readonly string[], o: { dropSensitive: boolean }): MemoryIndex {
-  const keep = new Set(sections);
+  // Health, Money and Beliefs are sensitive as a whole, so a shared part never holds them, whoever picked them.
+  const keep = new Set(o.dropSensitive ? sections.filter((k) => !SENSITIVE_SECTIONS.has(k)) : sections);
   const allSections = new Map(index.entities.map((e) => [e.id, e.section]));
   const entities = index.entities.filter((e) => keep.has(e.section));
   const kept = new Set(entities.map((e) => e.id));
@@ -42,7 +44,7 @@ export function cutToSections(index: MemoryIndex, sections: readonly string[], o
     facts,
     relations: index.relations.filter((r) => kept.has(r.from) && kept.has(r.to)),
     sources,
-    documents: index.documents.filter((d) => sections.some((k) => d.path.startsWith(`sections/${k}/`))),
+    documents: index.documents.filter((d) => [...keep].some((k) => d.path.startsWith(`sections/${k}/`))),
   };
 }
 

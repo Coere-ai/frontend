@@ -7,8 +7,14 @@ import { readRecords, type Raw } from "./records";
  * records, so the dashboard reads one small JSON file instead of unzipping.
  * Quotes, values and evidence stay in the file. A fact's `sources` is the
  * number of chats its evidence points into. With sensitive memories off,
- * facts with a sensitivity are left out. Past `maxFacts` the most important
- * are kept and `truncated` is set.
+ * facts with a sensitivity are left out, and so is everything in a
+ * sensitive section: its folders, the facts filed there, its documents and
+ * the chats only they came from. Past `maxFacts` the most important are
+ * kept and `truncated` is set.
+ *
+ * `includesSensitive` counts both, so commit refuses (412) a file an older
+ * extension exported with a Health folder or a letter kept there, and the
+ * extension exports again.
  *
  * Each entity's `section` is the section's key (`work`), which is what an
  * organization's shared sections name. A fact's `under` stays the raw id
@@ -20,6 +26,15 @@ export const MAX_INDEX_FACTS = 50_000;
 const str = (v: unknown): string | null => (typeof v === "string" ? v : null);
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 const isRecord = (v: unknown): v is Raw => typeof v === "object" && v !== null && !Array.isArray(v);
+
+/**
+ * The top levels that are sensitive as a whole, as coere-v2's
+ * resolve/section-sensitivity.ts names them: whatever is filed there is.
+ */
+export const SENSITIVE_SECTIONS: ReadonlySet<string> = new Set(["health", "money", "beliefs"]);
+
+/** Whether a document's path in the file sits under a sensitive section. */
+export const sensitivePath = (path: string): boolean => [...SENSITIVE_SECTIONS].some((k) => path.startsWith(`sections/${k}/`));
 
 /** The section key for a section id: `sec_work` is `work`. */
 export const sectionKeyOf = (id: string): string => (id.startsWith("sec_") ? id.slice(4) : id);
@@ -56,7 +71,7 @@ export function buildIndex(
     });
   const keyOf = (id: string) => sectionOfId.get(id) ?? sectionKeyOf(id);
 
-  const entities: IndexEntity[] = rec.entities
+  const allEntities: IndexEntity[] = rec.entities
     .filter((e) => str(e.id) && str(e.section))
     .map((e) => ({
       id: String(e.id),
@@ -66,15 +81,20 @@ export function buildIndex(
       parent: str(e.parent),
       importance: num(e.importance),
     }));
-  const entitySection = new Map(entities.map((e) => [e.id, e.section]));
+  const entitySection = new Map(allEntities.map((e) => [e.id, e.section]));
   /** A fact's section: where it is filed, else its subject's. */
   const sectionOfFact = (f: Raw): string | null => {
     const home = str(f.under) ?? str(f.subject);
     if (!home) return null;
     return entitySection.get(home) ?? (home.startsWith("sec_") ? keyOf(home) : null);
   };
+  const inSensitive = (section: string | null) => section !== null && SENSITIVE_SECTIONS.has(section);
+  const entities = o.includeSensitive ? allEntities : allEntities.filter((e) => !inSensitive(e.section));
 
-  const includesSensitive = rec.facts.some((f) => str(f.sensitivity) !== null);
+  const includesSensitive =
+    rec.facts.some((f) => str(f.sensitivity) !== null || inSensitive(sectionOfFact(f))) ||
+    allEntities.some((e) => inSensitive(e.section)) ||
+    rec.documents.some((d) => sensitivePath(d.path));
   const chatSections = new Map<string, Set<string>>();
   const sensitiveChatSections = new Map<string, Set<string>>();
   const noteIn = (into: Map<string, Set<string>>, r: Raw, section: string | null) => {
@@ -83,14 +103,17 @@ export function buildIndex(
   };
   const note = (r: Raw, section: string | null) => noteIn(chatSections, r, section);
   for (const e of rec.entities) note(e, str(e.section) ? keyOf(String(e.section)) : null);
+  // With sensitive memories off, the chats that reach a sensitive section count there only, as a sensitive fact's do.
+  const noteFact = (f: Raw, sensitive: boolean) => noteIn(sensitive ? sensitiveChatSections : chatSections, f, sectionOfFact(f));
 
   let facts: IndexFact[] = [];
   for (const f of rec.facts) {
     const sensitivity = str(f.sensitivity);
-    if (!str(f.id) || !str(f.subject) || (sensitivity !== null && !o.includeSensitive)) continue;
+    const sensitive = sensitivity !== null || inSensitive(sectionOfFact(f));
+    if (!str(f.id) || !str(f.subject) || (sensitive && !o.includeSensitive)) continue;
     const recorded = isRecord(f.recorded) ? f.recorded : {};
     // A sensitive fact files its chats apart, so dropping the fact also drops them from a shared part.
-    noteIn(sensitivity === null ? chatSections : sensitiveChatSections, f, sectionOfFact(f));
+    noteFact(f, sensitivity !== null);
     facts.push({
       id: String(f.id),
       subject: String(f.subject),
@@ -111,8 +134,10 @@ export function buildIndex(
   if (truncated) facts = [...facts].sort(factOrder).slice(0, max);
 
   for (const r of rec.relations) note(r, entitySection.get(str(r.from) ?? "") ?? null);
+  const kept = new Set(entities.map((e) => e.id));
   const relations: IndexRelation[] = rec.relations
     .filter((r) => str(r.id) && str(r.from) && str(r.to))
+    .filter((r) => o.includeSensitive || (kept.has(String(r.from)) && kept.has(String(r.to))))
     .map((r) => ({ id: String(r.id), from: String(r.from), type: str(r.type) ?? "related_to", to: String(r.to) }));
 
   const sensitiveOnly = (id: string): { sensitiveSections?: string[] } => {
@@ -120,15 +145,21 @@ export function buildIndex(
     const only = [...(sensitiveChatSections.get(id) ?? [])].filter((k) => !plain.has(k)).sort();
     return only.length > 0 ? { sensitiveSections: only } : {};
   };
+  /** With sensitive memories off, a chat whose records all sit in sensitive sections names nothing the person kept. */
+  const onlySensitive = (id: string): boolean => {
+    const reached = [...(chatSections.get(id) ?? [])];
+    return reached.length > 0 && reached.every((k) => SENSITIVE_SECTIONS.has(k));
+  };
   const sources: IndexSource[] = rec.sources
     .filter((s) => str(s.id))
+    .filter((s) => o.includeSensitive || !onlySensitive(String(s.id)))
     .map((s) => ({
       id: String(s.id),
       platform: str(s.platform) ?? "",
       title: str(s.title) ?? "",
       capturedAt: str(s.capturedAt),
       messages: num(s.messages),
-      sections: [...(chatSections.get(String(s.id)) ?? [])].sort(),
+      sections: [...(chatSections.get(String(s.id)) ?? [])].filter((k) => o.includeSensitive || !SENSITIVE_SECTIONS.has(k)).sort(),
       ...sensitiveOnly(String(s.id)),
     }));
 
@@ -143,7 +174,7 @@ export function buildIndex(
     facts,
     relations,
     sources,
-    documents: rec.documents,
+    documents: o.includeSensitive ? rec.documents : rec.documents.filter((d) => !sensitivePath(d.path)),
     truncated,
   };
   return { index, includesQuotes: rec.includesQuotes, includesSensitive };

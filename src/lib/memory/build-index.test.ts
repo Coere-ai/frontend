@@ -7,6 +7,8 @@ import { buildIndex, MAX_INDEX_FACTS } from "./build-index";
 import { openCoere, wantedEntry } from "./coere-zip";
 import { countsFromManifest } from "./counts";
 import { SAM_FOLDER, zipFolder } from "./fixture-zip";
+import type { MemoryIndex } from "./index-types";
+import { cutToSections, memberPart } from "./org-cut";
 
 const SELF = "ent_0199a5c1-8a00-7000-8000-000000000010";
 
@@ -135,5 +137,66 @@ describe("buildIndex", () => {
     assert.equal(index.facts.length, 3);
     assert.ok(index.facts.every((f) => f.importance === 5));
     assert.equal(MAX_INDEX_FACTS, 50_000);
+  });
+});
+
+/**
+ * Health, Money and Beliefs are sensitive as a whole (coere-v2
+ * resolve/section-sensitivity.ts). An older extension cut only the facts
+ * that carry a sensitivity, so its file can still hold a Health folder, a
+ * fact filed there with none, or a letter kept there. The server counts
+ * any of them as sensitive, so commit refuses the file with 412 and the
+ * extension exports again. Synthetic records only.
+ */
+describe("sensitive sections as a whole", () => {
+  const HEALTH = "ent_0199a5c1-8a00-7000-8000-000000000901";
+  const folder = JSON.stringify({ t: "entity", id: HEALTH, kind: "folder", name: "Asthma care", section: "sec_health", importance: 3, evidence: [{ src: "claude:demo-clinic#m1" }] });
+  const filed = JSON.stringify({ t: "fact", id: "fact_0199a5c1-8a00-7000-8000-000000000903", subject: SELF, under: HEALTH, key: "condition", text: "Sam has mild asthma.", importance: 3, evidence: [{ src: "claude:demo-clinic#m1" }] });
+  const source = JSON.stringify({ t: "source", id: "claude:demo-clinic", platform: "claude", title: "Asthma questions", messages: 2 });
+  const letter = `---\n${JSON.stringify({ t: "document", id: "doc_1", title: "Letter to Dr Lee" })}\n---\nDear Dr Lee.\n`;
+  const open = (extra: Record<string, string>) => {
+    const opened = openCoere(zipFolder(SAM_FOLDER, extra));
+    if (!opened.ok) throw new Error(opened.reason);
+    // The example's one fact with a sensitivity goes, so only the planted records can count.
+    const files = new Map([...opened.files].map(([k, v]) => [k, v.split("\n").filter((l) => !l.includes('"sensitivity"')).join("\n")]));
+    return { manifest: opened.manifest, files };
+  };
+
+  it("reads a plain file as plain once its sensitive fact is gone", () => {
+    const o = open({});
+    assert.equal(buildIndex(o.manifest, o.files, { includeSensitive: false }).includesSensitive, false);
+  });
+
+  it("counts a folder, a fact filed there or a document kept there", () => {
+    const cases: Array<[string, Record<string, string>]> = [
+      ["a folder", { "sections/health/asthma-care/_folder.json": folder }],
+      ["a fact filed under a health folder", { "sections/health/asthma-care/_folder.json": folder, "sections/health/asthma-care/_facts.jsonl": filed }],
+      ["a fact filed under the section", { "sections/personal/_facts.jsonl": filed.replace(HEALTH, "sec_health") }],
+      ["a document", { "sections/health/asthma-care/letter.md": letter }],
+    ];
+    for (const [label, extra] of cases) {
+      const o = open(extra);
+      assert.equal(buildIndex(o.manifest, o.files, { includeSensitive: false }).includesSensitive, true, label);
+    }
+  });
+
+  it("keeps none of it in the index when sensitive memories are off", () => {
+    const o = open({ "sections/health/asthma-care/_folder.json": folder, "sections/health/asthma-care/_facts.jsonl": filed, "clinic-sources.jsonl": source, "sections/health/asthma-care/letter.md": letter });
+    const { index } = buildIndex(o.manifest, o.files, { includeSensitive: false });
+    const text = JSON.stringify(index);
+    for (const gone of ["Asthma care", "mild asthma", "Letter to Dr Lee", "Asthma questions"]) assert.ok(!text.includes(gone), gone);
+    const all = buildIndex(o.manifest, o.files, { includeSensitive: true }).index;
+    assert.ok(JSON.stringify(all).includes("Asthma care"));
+  });
+
+  it("drops a sensitive section from an organization part even when an admin shares it", () => {
+    const o = open({ "sections/health/asthma-care/_folder.json": folder, "sections/health/asthma-care/_facts.jsonl": filed, "sections/health/asthma-care/letter.md": letter });
+    const index: MemoryIndex = buildIndex(o.manifest, o.files, { includeSensitive: true }).index;
+    const part = memberPart(index, ["health", "school"]);
+    assert.ok(!JSON.stringify(part).includes("Asthma"), "no health folder");
+    assert.ok(!part.documents.some((d) => d.path.startsWith("sections/health/")));
+    assert.ok(part.entities.some((e) => e.section === "school"));
+    // The person's own read keeps it.
+    assert.ok(JSON.stringify(cutToSections(index, ["health"], { dropSensitive: false })).includes("Asthma care"));
   });
 });
