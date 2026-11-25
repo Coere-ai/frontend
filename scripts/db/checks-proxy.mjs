@@ -1,9 +1,11 @@
 // Checks of 20261125000000_proxy_settle.sql (docs/accounts.md 8.4, 8.9,
 // 8.10, 16): settle_call records a call and lets its hold go in one
-// transaction, and a failed record keeps the hold; the site wide first build
-// budget refuses a first build call as `site_budget`; a batch that only the
+// transaction, and a failed record keeps the hold; store_batch stores a new
+// batch and lets its hold go in one transaction; the site wide first build
+// budget refuses a first build call as `site_budget`, counting first build
+// batches not yet metered; a batch that only the
 // message holds in flight fill is `pending`; the durable sign up limit; and
-// the daily bound on feature counts. Runs after checkLiveHolds, while C has
+// the daily bound on feature counts per account. Runs after checkLiveHolds, while C has
 // spent nothing and its first build is not done. Every check that writes is
 // rolled back.
 
@@ -79,6 +81,37 @@ export async function checkSettleCall(db) {
   });
 }
 
+export async function checkStoreBatch(db) {
+  const reserve = reserveOf(db);
+  const store = (hold, id, user) =>
+    asServer(db, () => one(db, `store ${id}`, "select public.store_batch($1, $2, $3, null, 3, 40000)", [hold, id, user]));
+  await db.exec("begin");
+  await db.query("delete from public.site_settings where key = 'budget.first_build_daily'");
+  const hold = (await reserve(40_000, 0, { batch: true }))?.hold_id;
+  equal("store_batch answers true", await store(hold, "msgbatch_store_1", C), true);
+  equal(
+    "it stores the batch as the caller's with its reservation",
+    await rows(db, "row", "select user_id, request_count, reserved_micros::int as reserved, metered_at from public.ai_batches where id = 'msgbatch_store_1'"),
+    [{ user_id: C, request_count: 3, reserved: 40_000, metered_at: null }],
+  );
+  equal("and lets the hold go in the same call", await one(db, "hold gone", "select count(*)::int from public.spend_holds where id = $1", [hold]), 0);
+  equal("a second store of the same batch changes nothing", await store(null, "msgbatch_store_1", C), true);
+  equal("and keeps one row", await one(db, "one row", "select count(*)::int from public.ai_batches where id = 'msgbatch_store_1'"), 1);
+
+  // An id already stored as another account's is not the caller's: the hold stays.
+  const kept = (await reserve(40_000, 0, { batch: true }))?.hold_id;
+  equal("a batch id another account holds is refused", await store(kept, "msgbatch_store_1", A), false);
+  equal("its hold stays", await one(db, "hold kept", "select count(*)::int from public.spend_holds where id = $1", [kept]), 1);
+  equal("and the row stays the first account's", await one(db, "owner", "select user_id from public.ai_batches where id = 'msgbatch_store_1'"), C);
+  await asServer(db, () => one(db, "store other", "select public.store_batch($1, 'msgbatch_store_2', $2, null, 1, 1)", [kept, A]));
+  equal("a store for another account leaves the hold", await one(db, "hold still kept", "select count(*)::int from public.spend_holds where id = $1", [kept]), 1);
+  await db.exec("rollback");
+
+  await as(db, "authenticated", C, async () => {
+    await refused(db, "a person cannot call store_batch", "select public.store_batch(null, 'msgbatch_x', $1, null, 1, 1)", /permission denied/, [C]);
+  });
+}
+
 export async function checkFirstBuildBudget(db) {
   const reserve = reserveOf(db);
   const today = "select cost_micros::int from public.first_build_daily where day = (now() at time zone 'utc')::date";
@@ -100,6 +133,22 @@ export async function checkFirstBuildBudget(db) {
   await db.query("update public.profiles set lifetime_limit_micros = 1 where id = $1", [C]);
   equal("the account's own spent limit is named first", (await reserve(2, 2))?.refused, "lifetime");
   await db.query("update public.profiles set lifetime_limit_micros = null where id = $1", [C]);
+
+  // Batches are counted at their worst case, and a first build batch counts until it is metered,
+  // since its cost lands in the day's row only when its results are read, often on another day.
+  await db.query("delete from public.first_build_daily");
+  const store = (hold, id) => asServer(db, () => one(db, `store ${id}`, "select public.store_batch($1, $2, $3, null, 1, 600000)", [hold, id, C]));
+  const first = (await reserve(600_000, 0, { batch: true }))?.hold_id;
+  check("a batch within the budget starts", first != null);
+  await store(first, "msgbatch_budget_1");
+  equal("a second batch past the budget is refused as site_budget before either is metered", (await reserve(600_000, 0, { batch: true }))?.refused, "site_budget");
+  equal("and so is a message the batch leaves no room for", (await reserve(800_000, 500_000))?.refused, "site_budget");
+  check("one that still fits starts", (await reserve(800_000, 300_000))?.hold_id != null);
+  await db.query("delete from public.spend_holds where user_id = $1", [C]);
+  await db.query("update public.ai_batches set metered_at = now() where id = 'msgbatch_budget_1'");
+  check("a metered batch no longer counts as in flight", (await reserve(600_000, 0, { batch: true }))?.hold_id != null);
+  await db.query("delete from public.spend_holds where user_id = $1", [C]);
+  await db.query("insert into public.first_build_daily (day, cost_micros) values ((now() at time zone 'utc')::date, 1000000)");
 
   await db.query("delete from public.site_settings where key = 'budget.first_build_daily'");
   check("with no budget set there is no ceiling", (await reserve(200_000, 100_000))?.hold_id != null);
@@ -177,6 +226,20 @@ export async function checkAppEventsCapped(db) {
   await db.query("update public.app_events set created_at = now() - interval '1 day' where device_id = $1", [device]);
   await send([{ kind: "extract_chat", count: 3 }]);
   equal("the next UTC day starts afresh", ((await totals())?.[0]?.extractions ?? 0) - was.extractions, 13);
+
+  // A second device of the same account shares the day's room: a new token adds nothing past the bound.
+  const second = await one(db, "second device", "insert into public.devices (user_id, name, token_hash, token_hint) values ($1, 'Chrome', 'hash_cap_2', 'dddd') returning id", [C]);
+  const sendFrom = (from, events) =>
+    asServer(db, () => rows(db, "capped", "select public.record_app_events_capped($1, $2, $3::jsonb, 10, 1000)", [C, from, JSON.stringify(events)]));
+  await sendFrom(second, [{ kind: "extract_chat", count: 9 }, { kind: "context_import", count: 1, tokensSaved: 900 }]);
+  const later = (await totals())?.[0];
+  equal(
+    "two devices of one account share the day's bound",
+    { extractions: later.extractions - was.extractions, saved: later.saved - was.saved },
+    { extractions: 13 + 7, saved: 1000 + 900 },
+  );
+  await sendFrom(device, [{ kind: "context_import", count: 1, tokensSaved: 900 }]);
+  equal("and the first device gets only what is left", ((await totals())?.[0]?.saved ?? 0) - was.saved, 1000 + 1000);
   await db.exec("rollback");
 
   await as(db, "authenticated", C, async () => {

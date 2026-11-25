@@ -61,7 +61,7 @@ describe("the caps on one batch", () => {
     assert.equal(parseEvents({ events: [{ kind: "extract_chat", count: 100_000 }] })?.[0].count, perRequestCount("extract_chat"));
   });
 
-  it("sends record_app_events_capped the day's bounds for the device", () => {
+  it("sends record_app_events_capped the day's bounds for the account", () => {
     assert.deepEqual(dailyCapArgs("u1", "d1", [{ kind: "voice", count: 1 }]), {
       p_user: "u1",
       p_device: "d1",

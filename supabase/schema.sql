@@ -652,6 +652,10 @@ create table if not exists public.ai_batches (
 
 create index if not exists ai_batches_user_idx on public.ai_batches (user_id, created_at desc);
 
+-- Batches not yet metered, which the first build budget counts as in flight
+-- across the site (migration 20261125000000_proxy_settle).
+create index if not exists ai_batches_unmetered_idx on public.ai_batches (user_id) where metered_at is null;
+
 -- Spend promised to calls still in flight. Cost is recorded only once
 -- Anthropic answers, so each metered call first holds its worst case here,
 -- and reserve_spend() counts every live hold against the limits. A hold is
@@ -1628,8 +1632,10 @@ $$;
 -- The four argument one above stays as it was for a site not yet updated.
 -- Migration 20261125000000_proxy_settle adds two rules: while the account is
 -- in its first build, the call is refused as `site_budget` once today's first
--- build spend across the site passes budget.first_build_daily; and a batch
--- that only the message holds in flight keep from fitting is `pending`.
+-- build spend across the site, with every first build batch not yet
+-- metered and the call's own cost (a batch's worst case), passes
+-- budget.first_build_daily; and a batch that only the message holds in
+-- flight keep from fitting is `pending`.
 -- Holds a call's spend before it is forwarded, as the four argument
 -- reserve_spend does, with the rules above. p_expected is the call's
 -- expected cost, never read above p_amount, its worst case. Answers the
@@ -1742,7 +1748,10 @@ begin
       from public.site_settings ss where ss.key = 'budget.first_build_daily';
     if v_budget is not null
        and coalesce((select f.cost_micros from public.first_build_daily f where f.day = (now() at time zone 'utc')::date), 0)
-           + (case when p_batch then 1 else v_expected end) > v_budget then
+           + (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b
+                join public.profiles p on p.id = b.user_id
+               where b.metered_at is null and p.first_build_at is null)
+           + v_expected > v_budget then
       return query select null::uuid, 'site_budget'::text;
       return;
     end if;
@@ -1771,7 +1780,8 @@ $$;
 
 -- From migration 20261125000000_proxy_settle (docs/accounts.md 8.4, 8.9,
 -- 8.10, 16): the site wide first build budget, one settle call per metered
--- answer, a durable sign up limit and a daily bound on feature counts.
+-- answer, one call to store a new batch, a durable sign up limit and a daily
+-- bound on feature counts per account.
 
 -- The site wide first build budget ------------------------------------------
 
@@ -1859,6 +1869,38 @@ revoke all on function public.settle_call(uuid, uuid, uuid, text, jsonb, integer
 grant execute on function public.settle_call(uuid, uuid, uuid, text, jsonb, integer, integer, text) to service_role;
 
 
+-- One call to store a new batch ----------------------------------------------
+
+-- Stores a new batch as its caller's, with its worst case as its
+-- reservation, and lets the create's hold go in the same transaction, so
+-- the cost is never held twice: a hold left behind is charged its worst
+-- case when it runs out, beside the batch's own reservation. Answers false,
+-- and keeps the hold, when the id is already another account's.
+create or replace function public.store_batch(
+  p_hold uuid, p_id text, p_user uuid, p_device uuid, p_request_count integer, p_reserved bigint
+) returns boolean
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+begin
+  insert into public.ai_batches (id, user_id, device_id, request_count, reserved_micros)
+  values (p_id, p_user, p_device, greatest(coalesce(p_request_count, 0), 0), greatest(coalesce(p_reserved, 0), 0))
+  on conflict (id) do nothing;
+  if not exists (select 1 from public.ai_batches b where b.id = p_id and b.user_id = p_user) then
+    return false;
+  end if;
+  if p_hold is not null then
+    delete from public.spend_holds h where h.id = p_hold and h.user_id = p_user;
+  end if;
+  return true;
+end;
+$$;
+
+revoke all on function public.store_batch(uuid, text, uuid, uuid, integer, bigint) from public, anon, authenticated;
+grant execute on function public.store_batch(uuid, text, uuid, uuid, integer, bigint) to service_role;
+
+
 -- A durable sign up limit -----------------------------------------------------
 
 -- Sign up attempts per address, as the keyed hash security_events uses, in a
@@ -1906,12 +1948,12 @@ grant execute on function public.hit_sign_up_limit(text, integer, integer) to se
 
 -- A daily bound on feature counts --------------------------------------------
 
-create index if not exists app_events_device_idx on public.app_events (device_id, created_at desc);
-
--- record_app_events, with each entry clamped to what the device has left
--- today: p_day_count per kind, and p_day_saved tokens saved in all. An entry
--- with nothing left is dropped. Calls of one device take turns, so two at
--- once cannot both spend the same room.
+-- record_app_events, with each entry clamped to what the account has left
+-- today across all its devices: p_day_count per kind, and p_day_saved tokens
+-- saved in all. A device token costs nothing to mint, so a bound per device
+-- would bound nothing. An entry with nothing left is dropped. Calls of one
+-- account take turns, so two at once cannot both spend the same room. A call
+-- with no account is not bounded; the events route always names one.
 create or replace function public.record_app_events_capped(
   p_user uuid, p_device uuid, p_events jsonb, p_day_count integer, p_day_saved bigint
 ) returns void
@@ -1930,18 +1972,18 @@ begin
   if p_events is null or jsonb_typeof(p_events) <> 'array' or jsonb_array_length(p_events) = 0 then
     return;
   end if;
-  if p_device is not null then
-    perform pg_advisory_xact_lock(hashtextextended('app_events:' || p_device::text, 0));
+  if p_user is not null then
+    perform pg_advisory_xact_lock(hashtextextended('app_events:' || p_user::text, 0));
   end if;
   v_saved := greatest(coalesce(p_day_saved, 0) - coalesce((select sum(a.tokens_saved) from public.app_events a
-    where p_device is not null and a.device_id = p_device and a.created_at >= v_since), 0), 0);
+    where p_user is not null and a.user_id = p_user and a.created_at >= v_since), 0), 0);
 
   for e in
     select x.kind, x.count, x."tokensSaved" as saved
       from jsonb_to_recordset(p_events) as x(kind text, count integer, "tokensSaved" bigint)
   loop
     v_count := least(greatest(coalesce(e.count, 0), 0), greatest(coalesce(p_day_count, 0) - coalesce((select sum(a.count) from public.app_events a
-      where p_device is not null and a.device_id = p_device and a.created_at >= v_since and a.kind = e.kind), 0), 0))::integer;
+      where p_user is not null and a.user_id = p_user and a.created_at >= v_since and a.kind = e.kind), 0), 0))::integer;
     continue when v_count < 1;
     if e.saved is null then
       v_out := v_out || jsonb_build_array(jsonb_build_object('kind', e.kind, 'count', v_count));

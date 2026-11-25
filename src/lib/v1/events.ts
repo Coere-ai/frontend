@@ -54,10 +54,11 @@ export function perRequestCount(kind: AppEventKind): number {
 export const SAVED_PER_USE = 1_000_000;
 
 /**
- * What one device may add in a UTC day, per kind and in tokens saved, which
- * record_app_events_capped holds it to. One device token at the event
- * lane's rate could otherwise add billions a minute to the organization's
- * rankings and the launch numbers.
+ * What one account may add in a UTC day, across all its devices, per kind
+ * and in tokens saved, which record_app_events_capped holds it to. One
+ * device token at the event lane's rate could otherwise add billions a
+ * minute to the organization's rankings and the launch numbers, and a
+ * device token costs nothing to mint, so the bound is the account's.
  */
 export const DAY_COUNT_PER_KIND = 20_000;
 export const DAY_SAVED = 200_000_000;
@@ -92,7 +93,7 @@ export function parseEvents(body: unknown): AppEvent[] | null {
   });
 }
 
-/** The arguments of record_app_events_capped, which also holds the device to the day's bounds. */
+/** The arguments of record_app_events_capped, which also holds the account to the day's bounds. */
 export function dailyCapArgs(userId: string, deviceId: string, events: AppEvent[]) {
   return { p_user: userId, p_device: deviceId, p_events: events, p_day_count: DAY_COUNT_PER_KIND, p_day_saved: DAY_SAVED };
 }

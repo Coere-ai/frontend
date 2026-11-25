@@ -1,11 +1,11 @@
--- Coere: one settle call per answer, a site wide first build budget, the
--- batch pending answer, a durable sign up limit and a daily bound on feature
--- counts.
+-- Coere: one settle call per answer, one call to store a new batch, a site
+-- wide first build budget, the batch pending answer, a durable sign up limit
+-- and a daily bound on feature counts per account.
 --
 -- Runs after 20261124000000_build_lane_holds.sql. Paste into the Supabase SQL
 -- editor and run, before the site that calls it deploys. It only adds: two
 -- tables, one nullable column, one trigger, one index, one seeded setting
--- and four functions, and
+-- and five functions, and
 -- it replaces the body of the seven argument reserve_spend with the same
 -- rules plus three (below). The four argument reserve_spend, record_usage and
 -- record_app_events stay exactly as they were, so the live site keeps
@@ -19,16 +19,19 @@
 --
 --   * settle_call records a message's usage rows and lets its hold go in one
 --     transaction, so the answer waits one round trip instead of two, and a
---     failed record keeps the hold by construction.
+--     failed record keeps the hold by construction. store_batch does the same
+--     for a new batch's row, so its cost is never held twice.
 --   * A site wide daily budget on first build spend (site_settings
 --     budget.first_build_daily), checked in reserve_spend, so a wave of new
---     accounts cannot drain Coere's key. Each new account gets a $10 first
+--     accounts cannot drain Coere's key. First build batches not yet metered
+--     count in it, since a batch's cost lands only when its results are read. Each new account gets a $10 first
 --     build, and sign up needs only a username.
 --   * A batch that only the message holds in flight keep from fitting is
 --     told `pending` (wait 10 s), not that its limit is spent (wait an hour).
 --   * Sign up attempts are counted per address hash in the database, not per
 --     server instance.
---   * Feature counts are held to a daily bound per device.
+--   * Feature counts are held to a daily bound per account, across all of
+--     its devices, since a device token costs nothing to mint.
 --   * A hold that runs out without being let go is charged as spend, its
 --     charge_micros or else its worst case, where it used to be deleted for
 --     free: a call that outran the route could be repeated forever with
@@ -83,6 +86,10 @@ insert into public.site_settings (key, value) values
 on conflict (key) do nothing;
 
 
+-- Batches not yet metered, which the budget counts as in flight across the site.
+create index if not exists ai_batches_unmetered_idx on public.ai_batches (user_id) where metered_at is null;
+
+
 -- Expired holds -------------------------------------------------------------
 
 -- What an expired hold is charged when it was never let go (section 8.10):
@@ -95,9 +102,11 @@ alter table public.spend_holds add column if not exists charge_micros bigint che
 -- As in 20261124000000_build_lane_holds, plus three rules:
 --
 --   * While the account is in its first build, the call is refused as
---     `site_budget` once today's first build spend across the site plus its
---     expected cost (1 for a batch) passes budget.first_build_daily. A spent
---     limit of the account's own is named first.
+--     `site_budget` once today's first build spend across the site, plus the
+--     reservations of every first build batch not yet metered, plus the
+--     call's expected cost (a batch's worst case), passes
+--     budget.first_build_daily. A spent limit of the account's own is named
+--     first.
 --   * A batch that does not fit only because of the message holds in flight
 --     (spend and batches not yet metered alone leave room) is `pending`, as
 --     a message is. Spend and batches filling the limit are still its name.
@@ -206,7 +215,10 @@ begin
       from public.site_settings ss where ss.key = 'budget.first_build_daily';
     if v_budget is not null
        and coalesce((select f.cost_micros from public.first_build_daily f where f.day = (now() at time zone 'utc')::date), 0)
-           + (case when p_batch then 1 else v_expected end) > v_budget then
+           + (select coalesce(sum(b.reserved_micros), 0) from public.ai_batches b
+                join public.profiles p on p.id = b.user_id
+               where b.metered_at is null and p.first_build_at is null)
+           + v_expected > v_budget then
       return query select null::uuid, 'site_budget'::text;
       return;
     end if;
@@ -275,6 +287,38 @@ revoke all on function public.settle_call(uuid, uuid, uuid, text, jsonb, integer
 grant execute on function public.settle_call(uuid, uuid, uuid, text, jsonb, integer, integer, text) to service_role;
 
 
+-- One call to store a new batch ----------------------------------------------
+
+-- Stores a new batch as its caller's, with its worst case as its
+-- reservation, and lets the create's hold go in the same transaction, so
+-- the cost is never held twice: a hold left behind is charged its worst
+-- case when it runs out, beside the batch's own reservation. Answers false,
+-- and keeps the hold, when the id is already another account's.
+create or replace function public.store_batch(
+  p_hold uuid, p_id text, p_user uuid, p_device uuid, p_request_count integer, p_reserved bigint
+) returns boolean
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+begin
+  insert into public.ai_batches (id, user_id, device_id, request_count, reserved_micros)
+  values (p_id, p_user, p_device, greatest(coalesce(p_request_count, 0), 0), greatest(coalesce(p_reserved, 0), 0))
+  on conflict (id) do nothing;
+  if not exists (select 1 from public.ai_batches b where b.id = p_id and b.user_id = p_user) then
+    return false;
+  end if;
+  if p_hold is not null then
+    delete from public.spend_holds h where h.id = p_hold and h.user_id = p_user;
+  end if;
+  return true;
+end;
+$$;
+
+revoke all on function public.store_batch(uuid, text, uuid, uuid, integer, bigint) from public, anon, authenticated;
+grant execute on function public.store_batch(uuid, text, uuid, uuid, integer, bigint) to service_role;
+
+
 -- A durable sign up limit -----------------------------------------------------
 
 -- Sign up attempts per address, as the keyed hash security_events uses, in a
@@ -322,12 +366,12 @@ grant execute on function public.hit_sign_up_limit(text, integer, integer) to se
 
 -- A daily bound on feature counts --------------------------------------------
 
-create index if not exists app_events_device_idx on public.app_events (device_id, created_at desc);
-
--- record_app_events, with each entry clamped to what the device has left
--- today: p_day_count per kind, and p_day_saved tokens saved in all. An entry
--- with nothing left is dropped. Calls of one device take turns, so two at
--- once cannot both spend the same room.
+-- record_app_events, with each entry clamped to what the account has left
+-- today across all its devices: p_day_count per kind, and p_day_saved tokens
+-- saved in all. A device token costs nothing to mint, so a bound per device
+-- would bound nothing. An entry with nothing left is dropped. Calls of one
+-- account take turns, so two at once cannot both spend the same room. A call
+-- with no account is not bounded; the events route always names one.
 create or replace function public.record_app_events_capped(
   p_user uuid, p_device uuid, p_events jsonb, p_day_count integer, p_day_saved bigint
 ) returns void
@@ -346,18 +390,18 @@ begin
   if p_events is null or jsonb_typeof(p_events) <> 'array' or jsonb_array_length(p_events) = 0 then
     return;
   end if;
-  if p_device is not null then
-    perform pg_advisory_xact_lock(hashtextextended('app_events:' || p_device::text, 0));
+  if p_user is not null then
+    perform pg_advisory_xact_lock(hashtextextended('app_events:' || p_user::text, 0));
   end if;
   v_saved := greatest(coalesce(p_day_saved, 0) - coalesce((select sum(a.tokens_saved) from public.app_events a
-    where p_device is not null and a.device_id = p_device and a.created_at >= v_since), 0), 0);
+    where p_user is not null and a.user_id = p_user and a.created_at >= v_since), 0), 0);
 
   for e in
     select x.kind, x.count, x."tokensSaved" as saved
       from jsonb_to_recordset(p_events) as x(kind text, count integer, "tokensSaved" bigint)
   loop
     v_count := least(greatest(coalesce(e.count, 0), 0), greatest(coalesce(p_day_count, 0) - coalesce((select sum(a.count) from public.app_events a
-      where p_device is not null and a.device_id = p_device and a.created_at >= v_since and a.kind = e.kind), 0), 0))::integer;
+      where p_user is not null and a.user_id = p_user and a.created_at >= v_since and a.kind = e.kind), 0), 0))::integer;
     continue when v_count < 1;
     if e.saved is null then
       v_out := v_out || jsonb_build_array(jsonb_build_object('kind', e.kind, 'count', v_count));

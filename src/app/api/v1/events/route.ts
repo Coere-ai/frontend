@@ -9,9 +9,9 @@ import { problemFor } from "@/lib/v1/refusals";
 // POST /api/v1/events (docs/accounts.md 6.7, 8.9)
 //
 // A batch of feature counts. One record_app_events_capped call holds it to
-// the device's daily bounds, stores it and adds it to the person's, their
-// organization's and today's totals, including the tokens saved by context
-// imports and transfers. Before migration 20261125000000_proxy_settle has
+// the account's daily bounds, across all its devices, stores it and adds it
+// to the person's, their organization's and today's totals, including the
+// tokens saved by context imports and transfers. Before migration 20261125000000_proxy_settle has
 // run, record_app_events takes it with the per request caps alone.
 
 export const runtime = "nodejs";
