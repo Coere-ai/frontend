@@ -1,5 +1,3 @@
-import "server-only";
-
 import type { Messages } from "@/site/i18n/messages/types";
 
 import { readingMinutes, type Post, type PostInput } from "./post-parts";
@@ -9,7 +7,9 @@ export { blockText, CATEGORIES, formatPostDate, postAuthor, readingMinutes, type
 /**
  * Blog posts, read on the server only. The menus get the three newest
  * posts' slug, title and cover from the site layout (navPosts), so no post
- * body ships in a client chunk. A post that is not out yet stays out of
+ * body ships in a client chunk. posts.test.ts fails if any client module
+ * comes to import this file, directly or through another; the file is not
+ * marked server-only, since the sitemap's own test reads it under Node. A post that is not out yet stays out of
  * this repository until it is: a filter in a module the build imports is
  * not a guard, and this repository is public. The posts here are
  * placeholder posts written to fill the blog while the real ones are

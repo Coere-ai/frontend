@@ -7,8 +7,7 @@ import { describe, it } from "node:test";
  * The post list stays on the server. Every client module, and every module
  * a client module imports, ships in the browser's chunks, so a post that
  * reached one would be readable on every page. These read the source, and
- * the built chunks when there are any, rather than importing posts.ts,
- * which is server only.
+ * the built chunks when there are any.
  */
 
 const root = join(import.meta.dirname, "..", "..", "..");
@@ -47,11 +46,6 @@ function resolveSpec(from: string, spec: string): string | null {
 const isClient = (file: string) => /^\s*["']use client["']/.test(readFileSync(file, "utf8"));
 
 describe("the post list", () => {
-  it("is marked server only", () => {
-    // Tested with ok, not match, so a failure does not print the file.
-    assert.ok(/^import "server-only";$/m.test(readFileSync(POSTS, "utf8")), "posts.ts is not server only");
-  });
-
   it("is never imported by a client module, directly or through another", () => {
     const seen = new Set<string>();
     const todo = sourceFiles(src).filter(isClient);
