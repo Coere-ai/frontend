@@ -15,11 +15,12 @@ import { checkInterestKept, checkInterestTables } from "./checks-interest.mjs";
 import { checkLimitColumns, checkLimitResolution, checkOwnLimitsLocked, checkSameFingerprint, schemaFingerprint } from "./checks-limits.mjs";
 import { checkOrganizationRows, checkOwnRows, checkServerWrites, checkStorage } from "./checks-rls.mjs";
 import { checkAdminReaders, checkAppEvents, checkInvites, checkMemoryTotals, checkRecordUsage } from "./checks-totals.mjs";
+import { checkLabKept, checkLabTables } from "./checks-lab.mjs";
 import { checkHoldColumns, checkLiveHolds, checkUpgradeKeepsHolds } from "./checks-holds.mjs";
 import { bootDatabase, check, equal, failureCount, one, passCount } from "./harness.mjs";
 
 // In the order they run. The first builds the whole database; each later one only adds to it.
-const MIGRATIONS = ["20261103000000_coere.sql", "20261124000000_build_lane_holds.sql"].map((name) =>
+const MIGRATIONS = ["20261103000000_coere.sql", "20261124000000_build_lane_holds.sql", "20261125000000_lab.sql"].map((name) =>
   fileURLToPath(new URL(`../../supabase/migrations/${name}`, import.meta.url)),
 );
 
@@ -67,6 +68,7 @@ async function main() {
   await checkStorage(db);
   await checkServerWrites(db);
   await checkInterestTables(db);
+  await checkLabTables(db);
 
   // A third run over real rows must keep them all.
   await setSpendValues(db);
@@ -76,6 +78,7 @@ async function main() {
   equal("a rerun keeps the accounts", await one(db, "profiles", "select count(*)::int from public.profiles"), 3);
   await checkInterestKept(db);
   await checkSpendKept(db);
+  await checkLabKept(db);
 
   await db.close();
 
