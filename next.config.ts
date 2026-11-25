@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|sign-out$|auth(?:/|$)|connect$|account$|welcome$|dashboard(?:/|$)).*)",
+        source: "/:path((?!admin(?:/|$)|sign-in$|sign-up$|sign-out$|auth(?:/|$)|connect$|account$|welcome$|lab(?:/|$)|dashboard(?:/|$)).*)",
         headers: [
           { key: "Content-Security-Policy", value: "frame-src 'self' https://app.cal.com; frame-ancestors 'self'" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },

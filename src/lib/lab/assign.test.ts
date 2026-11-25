@@ -79,3 +79,20 @@ test("the starter chat carries every rule and number a later task checks", () =>
 test("no case copy uses dashes as punctuation", () => {
   for (const c of LAB_CASES) assert.ok(!/[–—]|\s--\s/.test(JSON.stringify(c)), c.id);
 });
+
+test("progress follows the stage and the student's own rows", async () => {
+  const { caseProgress, taskStatus } = await import("./progress");
+  const { labCase } = await import("./cases");
+  const a = assignFor(0);
+  const first = labCase(a.cases[0])!;
+  const work = [
+    { caseId: first.id, taskId: "t1", submittedAt: "2026-11-25T10:00:00Z", answer: "x" },
+    { caseId: first.id, taskId: "t2", submittedAt: null, answer: null },
+  ];
+  assert.equal(taskStatus(a, first, "t1", 1, work), "submitted");
+  assert.equal(taskStatus(a, first, "t2", 1, work), "started");
+  assert.equal(taskStatus(a, first, "t3", 1, work), "ready");
+  assert.equal(taskStatus(a, first, "t4", 1, work), "locked");
+  assert.deepEqual(caseProgress(a, first, 1, work), { caseId: first.id, slot: 1, condition: "coere", done: 1, open: 3, total: 5, finished: false });
+  assert.equal(caseProgress(a, first, 2, work).open, 5);
+});
