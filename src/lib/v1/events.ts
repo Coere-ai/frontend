@@ -36,21 +36,61 @@ const SAVES_TOKENS: ReadonlySet<string> = new Set(["context_import", "transfer"]
 const intIn = (v: unknown, min: number, max: number): v is number =>
   typeof v === "number" && Number.isInteger(v) && v >= min && v <= max;
 
-/** The batch as `record_app_events` takes it, or null when any entry is off. */
+/**
+ * What one request may add, per kind once its entries are summed. The
+ * extension sends every 10 minutes, and these sit far above what it sends:
+ * a busy build extracts some hundreds of chats in that time, so a whole
+ * backfill of chats gets the most room. Above the cap a batch is clamped,
+ * not refused, since the extension keeps a refused batch and sends it again.
+ */
+const PER_REQUEST_COUNT: Partial<Record<AppEventKind, number>> = { extract_chat: 5_000 };
+const PER_REQUEST_DEFAULT = 1_000;
+
+export function perRequestCount(kind: AppEventKind): number {
+  return PER_REQUEST_COUNT[kind] ?? PER_REQUEST_DEFAULT;
+}
+
+/** The most one import or transfer can save: a whole context window of a million tokens. */
+export const SAVED_PER_USE = 1_000_000;
+
+/**
+ * What one device may add in a UTC day, per kind and in tokens saved, which
+ * record_app_events_capped holds it to. One device token at the event
+ * lane's rate could otherwise add billions a minute to the organization's
+ * rankings and the launch numbers.
+ */
+export const DAY_COUNT_PER_KIND = 20_000;
+export const DAY_SAVED = 200_000_000;
+
+/**
+ * The batch as `record_app_events` takes it, or null when any entry is off.
+ * Entries of one kind are summed into one, the count clamped to the kind's
+ * cap and tokens saved to SAVED_PER_USE for each use counted.
+ */
 export function parseEvents(body: unknown): AppEvent[] | null {
   if (!isRecord(body) || !Array.isArray(body.events)) return null;
   const list = body.events as unknown[];
   if (list.length === 0 || list.length > MAX_EVENTS) return null;
-  const out: AppEvent[] = [];
+  const byKind = new Map<AppEventKind, AppEvent>();
   for (const e of list) {
     if (!isRecord(e) || typeof e.kind !== "string" || !KINDS.has(e.kind)) return null;
     if (!intIn(e.count, 1, 100_000)) return null;
-    const event: AppEvent = { kind: e.kind as AppEventKind, count: e.count };
+    const kind = e.kind as AppEventKind;
+    const event = byKind.get(kind) ?? { kind, count: 0 };
+    event.count += e.count;
     if (e.tokensSaved !== undefined) {
       if (!SAVES_TOKENS.has(e.kind) || !intIn(e.tokensSaved, 0, 100_000_000)) return null;
-      event.tokensSaved = e.tokensSaved;
+      event.tokensSaved = (event.tokensSaved ?? 0) + e.tokensSaved;
     }
-    out.push(event);
+    byKind.set(kind, event);
   }
-  return out;
+  return [...byKind.values()].map((event) => {
+    const count = Math.min(event.count, perRequestCount(event.kind));
+    return event.tokensSaved === undefined ? { kind: event.kind, count } : { kind: event.kind, count, tokensSaved: Math.min(event.tokensSaved, count * SAVED_PER_USE) };
+  });
+}
+
+/** The arguments of record_app_events_capped, which also holds the device to the day's bounds. */
+export function dailyCapArgs(userId: string, deviceId: string, events: AppEvent[]) {
+  return { p_user: userId, p_device: deviceId, p_events: events, p_day_count: DAY_COUNT_PER_KIND, p_day_saved: DAY_SAVED };
 }
