@@ -5,6 +5,8 @@ import { expectedCaseMicros, worstCaseMicros } from "./anthropic/worst-case";
 import {
   CONCURRENCY_RETRY_SECONDS,
   holdOutcome,
+  keptCharge,
+  MAX_OUTPUT_TOKENS_PER_SECOND,
   settleArgs,
   HOLD_SECONDS,
   MAX_LIVE_HOLDS,
@@ -178,5 +180,34 @@ describe("settleArgs", () => {
 describe("the site's first build budget", () => {
   it("reads reserve_spend's site_budget refusal as its own", () => {
     assert.deepEqual(readReservation([{ hold_id: null, refused: "site_budget" }]), { ok: false, refused: "site_budget" });
+  });
+});
+
+describe("keptCharge", () => {
+  // A Sonnet call: about $0.087 expected and $0.26 at worst. Sonnet output is $10 a million, 10 micro dollars a token.
+  const call = { model: "claude-sonnet-5-5", worstMicros: 260_000, expectedMicros: 87_000 };
+
+  it("charges a call the proxy cut, or one whose fate is unknown, its worst case when its hold runs out", () => {
+    assert.equal(keptCharge("timeout", { ...call, elapsedMs: 285_000 }), null);
+    assert.equal(keptCharge("record_failed", { ...call, elapsedMs: 5_000 }), null);
+  });
+
+  it("charges a call that ended early no more than it could have made in the time it ran", () => {
+    // Ten seconds at most MAX_OUTPUT_TOKENS_PER_SECOND tokens a second, beside the expected cost.
+    assert.equal(keptCharge("aborted", { ...call, elapsedMs: 10_000 }), 87_000 + 10 * MAX_OUTPUT_TOKENS_PER_SECOND * 10);
+    assert.equal(keptCharge("read_failed", { ...call, elapsedMs: 0 }), 87_000);
+    assert.equal(keptCharge("unreachable", { ...call, elapsedMs: 1_500 }), 87_000 + 2 * MAX_OUTPUT_TOKENS_PER_SECOND * 10);
+  });
+
+  it("never charges above the worst case, so an abort just before the cut costs what the cut would", () => {
+    assert.equal(keptCharge("aborted", { ...call, elapsedMs: 280_000 }), 260_000);
+  });
+
+  it("charges a known cost that could not be recorded at that cost", () => {
+    assert.equal(keptCharge("record_failed", { ...call, elapsedMs: 5_000, knownMicros: 91_234 }), 91_234);
+  });
+
+  it("is only asked for holds that are kept", () => {
+    for (const event of ["settled", "upstream_error", "stored", "not_stored"] as const) assert.equal(keptCharge(event, { ...call, elapsedMs: 1 }), null);
   });
 });

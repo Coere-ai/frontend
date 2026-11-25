@@ -672,6 +672,12 @@ create index if not exists spend_holds_user_idx on public.spend_holds (user_id, 
 -- made, which is read as its worst case.
 alter table public.spend_holds add column if not exists expected_micros bigint check (expected_micros >= 0);
 
+-- What an expired hold is charged when it was never let go (section 8.10,
+-- migration 20261125000000_proxy_settle):
+-- set by the proxy for a call that ended early, null for its worst case.
+alter table public.spend_holds add column if not exists charge_micros bigint check (charge_micros >= 0);
+
+
 
 -- The memory copy
 
@@ -1677,7 +1683,16 @@ begin
       r.reserved_micros, 200, 0, left(r.id, 120));
   end loop;
 
-  delete from public.spend_holds h where h.user_id = p_user and h.expires_at <= now();
+  -- A hold that ran out without being let go stands for a call whose cost was never recorded:
+  -- one the proxy cut, kept, or that died with its function. It is charged, never dropped for free.
+  for r in
+    delete from public.spend_holds h where h.user_id = p_user and h.expires_at <= now()
+    returning coalesce(h.charge_micros, h.amount_micros) as charge
+  loop
+    if r.charge > 0 then
+      perform public.record_usage(p_user, null, 'message', null, 0, 0, 0, 0, r.charge, 504, 0, 'expired_hold');
+    end if;
+  end loop;
 
   -- Every live hold's worst case, its expected cost, and how many there are.
   select coalesce(sum(h.amount_micros), 0), coalesce(sum(coalesce(h.expected_micros, h.amount_micros)), 0), count(*)

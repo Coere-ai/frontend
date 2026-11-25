@@ -183,3 +183,34 @@ export async function checkAppEventsCapped(db) {
     await refused(db, "a person cannot call record_app_events_capped", "select public.record_app_events_capped($1, null, '[]'::jsonb, 1, 1)", /permission denied/, [C]);
   });
 }
+
+// An expired hold that was never let go is charged as spend before it is
+// deleted: its charge_micros when the proxy set one, else its worst case.
+// A hold settle_call or the proxy let go is never charged.
+export async function checkExpiredHolds(db) {
+  const reserve = reserveOf(db);
+  const spent = () => one(db, "spent", "select coalesce(sum(cost_micros), 0)::int from public.usage_events where user_id = $1", [C]);
+  await db.exec("begin");
+  await db.query("delete from public.site_settings where key = 'budget.first_build_daily'");
+  const before = await spent();
+  const cut = (await reserve(260_000, 87_000))?.hold_id;
+  const early = (await reserve(260_000, 87_000))?.hold_id;
+  const settled = (await reserve(260_000, 87_000))?.hold_id;
+  const released = (await reserve(260_000, 87_000))?.hold_id;
+  await db.query("update public.spend_holds set charge_micros = 90000 where id = $1", [early]);
+  await asServer(db, () => one(db, "settle", "select public.settle_call($1, $2, null, 'message', $3::jsonb, 200, 1, 'req_settled')", [settled, C, JSON.stringify([usageRows[1]])]));
+  await db.query("delete from public.spend_holds where id = $1", [released]);
+  await db.query("update public.spend_holds set expires_at = now() - interval '1 second' where user_id = $1", [C]);
+  check("the next call starts", (await reserve(1, 1))?.hold_id != null);
+  equal("an expired hold is charged its worst case, or the charge the proxy set, and a settled one only its own cost", (await spent()) - before, 260_000 + 90_000 + 7_200);
+  equal(
+    "each charge is one usage row named for the expired hold",
+    await rows(db, "expired rows", "select cost_micros::int as cost, status::int from public.usage_events where user_id = $1 and request_id = 'expired_hold' order by cost_micros", [C]),
+    [{ cost: 90_000, status: 504 }, { cost: 260_000, status: 504 }],
+  );
+  equal("and the expired holds are gone", await one(db, "gone", "select count(*)::int from public.spend_holds where id = any($1)", [[cut, early]]), 0);
+  await db.exec("rollback");
+  await as(db, "authenticated", C, async () => {
+    await refused(db, "a person cannot set a hold's charge", "update public.spend_holds set charge_micros = 0", /permission denied/);
+  });
+}

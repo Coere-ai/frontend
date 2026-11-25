@@ -44,6 +44,8 @@ interface AnswerContext {
 export interface Relayed {
   res: Response;
   event: HoldEvent;
+  /** A cost known but not recorded, which the kept hold is charged when it runs out. */
+  knownMicros?: number;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -126,7 +128,8 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Relay
     // The rows and the hold's release are one round trip; the person's answer waits for it, so the limits never lose sight of the cost.
     const settled = await settleCall(c.account, c.holdId, "message", rows, timing());
     if (!settled) console.error("message cost not recorded, hold kept to run out");
-    return { ...answered(), event: settled ? "settled" : "record_failed" };
+    if (settled) return { ...answered(), event: "settled" };
+    return { ...answered(), event: "record_failed", knownMicros: rows.reduce((sum, r) => sum + r.costMicros, 0) };
   }
   if (op.op === "count_tokens") {
     // Counting is free; the row counts the request without adding tokens to the totals.

@@ -3,10 +3,11 @@
 -- counts.
 --
 -- Runs after 20261124000000_build_lane_holds.sql. Paste into the Supabase SQL
--- editor and run, before the site that calls it deploys. It only adds: three
--- tables, one trigger, one index, one seeded setting and four functions, and
+-- editor and run, before the site that calls it deploys. It only adds: two
+-- tables, one nullable column, one trigger, one index, one seeded setting
+-- and four functions, and
 -- it replaces the body of the seven argument reserve_spend with the same
--- rules plus two (below). The four argument reserve_spend, record_usage and
+-- rules plus three (below). The four argument reserve_spend, record_usage and
 -- record_app_events stay exactly as they were, so the live site keeps
 -- working while this runs and until the new site is live, and the new site
 -- falls back to the old calls on PostgREST's PGRST202 for the minutes before
@@ -28,6 +29,10 @@
 --   * Sign up attempts are counted per address hash in the database, not per
 --     server instance.
 --   * Feature counts are held to a daily bound per device.
+--   * A hold that runs out without being let go is charged as spend, its
+--     charge_micros or else its worst case, where it used to be deleted for
+--     free: a call that outran the route could be repeated forever with
+--     recorded spend stuck at nothing.
 
 
 -- The site wide first build budget ------------------------------------------
@@ -78,9 +83,16 @@ insert into public.site_settings (key, value) values
 on conflict (key) do nothing;
 
 
+-- Expired holds -------------------------------------------------------------
+
+-- What an expired hold is charged when it was never let go (section 8.10):
+-- set by the proxy for a call that ended early, null for its worst case.
+alter table public.spend_holds add column if not exists charge_micros bigint check (charge_micros >= 0);
+
+
 -- The seven argument reserve_spend, with the budget and the batch pending answer.
 --
--- As in 20261124000000_build_lane_holds, plus two rules:
+-- As in 20261124000000_build_lane_holds, plus three rules:
 --
 --   * While the account is in its first build, the call is refused as
 --     `site_budget` once today's first build spend across the site plus its
@@ -89,6 +101,7 @@ on conflict (key) do nothing;
 --   * A batch that does not fit only because of the message holds in flight
 --     (spend and batches not yet metered alone leave room) is `pending`, as
 --     a message is. Spend and batches filling the limit are still its name.
+--   * An expired hold is charged before it is deleted (above).
 create or replace function public.reserve_spend(
   p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean,
   p_expected bigint, p_overrun bigint, p_max_live integer
@@ -134,7 +147,16 @@ begin
       r.reserved_micros, 200, 0, left(r.id, 120));
   end loop;
 
-  delete from public.spend_holds h where h.user_id = p_user and h.expires_at <= now();
+  -- A hold that ran out without being let go stands for a call whose cost was never recorded:
+  -- one the proxy cut, kept, or that died with its function. It is charged, never dropped for free.
+  for r in
+    delete from public.spend_holds h where h.user_id = p_user and h.expires_at <= now()
+    returning coalesce(h.charge_micros, h.amount_micros) as charge
+  loop
+    if r.charge > 0 then
+      perform public.record_usage(p_user, null, 'message', null, 0, 0, 0, 0, r.charge, 504, 0, 'expired_hold');
+    end if;
+  end loop;
 
   -- Every live hold's worst case, its expected cost, and how many there are.
   select coalesce(sum(h.amount_micros), 0), coalesce(sum(coalesce(h.expected_micros, h.amount_micros)), 0), count(*)

@@ -16,7 +16,7 @@ import { checkLimitColumns, checkLimitResolution, checkOwnLimitsLocked, checkSam
 import { checkOrganizationRows, checkOwnRows, checkServerWrites, checkStorage } from "./checks-rls.mjs";
 import { checkAdminReaders, checkAppEvents, checkInvites, checkMemoryTotals, checkRecordUsage } from "./checks-totals.mjs";
 import { checkHoldColumns, checkLiveHolds, checkUpgradeKeepsHolds } from "./checks-holds.mjs";
-import { checkAppEventsCapped, checkBatchPending, checkFirstBuildBudget, checkSettleCall, checkSignUpLimit } from "./checks-proxy.mjs";
+import { checkAppEventsCapped, checkBatchPending, checkExpiredHolds, checkFirstBuildBudget, checkSettleCall, checkSignUpLimit } from "./checks-proxy.mjs";
 import { bootDatabase, check, equal, failureCount, one, passCount } from "./harness.mjs";
 
 // In the order they run. The first builds the whole database; each later one only adds to it.
@@ -62,6 +62,7 @@ async function main() {
   await checkBatchPending(db);
   await checkSignUpLimit(db);
   await checkAppEventsCapped(db);
+  await checkExpiredHolds(db);
   await checkCostReaders(db);
   await checkSpendLocked(db);
   await checkAppEvents(db, org);

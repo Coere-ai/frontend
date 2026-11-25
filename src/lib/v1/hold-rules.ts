@@ -1,5 +1,5 @@
 import type { SpentLimit } from "./gate-types";
-import type { TokenCounts } from "./prices";
+import { PRICES, type TokenCounts } from "./prices";
 import { refusedLimit } from "./spend";
 
 /**
@@ -143,6 +143,37 @@ export function holdOutcome(event: HoldEvent): "none" | "release" | "keep" {
     default:
       return "keep";
   }
+}
+
+/**
+ * The most output a model can make in a second, well above any rate
+ * measured on the account, for bounding what a call that ended early could
+ * have been billed.
+ */
+export const MAX_OUTPUT_TOKENS_PER_SECOND = 300;
+
+/**
+ * What a kept hold is charged when it runs out unreleased (charge_micros;
+ * reserve_spend records it as spend before it deletes the hold), or null
+ * for its worst case. An expired hold used to be deleted for free, so a
+ * call that outran the route could be repeated forever with nothing
+ * charged. The proxy's 285 s cut, a lost record and a killed function
+ * charge the worst case. A call that ended early (its caller went, no
+ * connection, a failed read) is charged its expected cost and the most
+ * output it could have made in the time it ran, never above its worst
+ * case, so a person who closes a tab mid build is not charged every call's
+ * worst case. A cost known but not recorded is charged as it is.
+ */
+export function keptCharge(
+  event: HoldEvent,
+  call: { model: string | null; worstMicros: number; expectedMicros: number; elapsedMs: number; knownMicros?: number },
+): number | null {
+  if (holdOutcome(event) !== "keep") return null;
+  if (event === "record_failed") return call.knownMicros === undefined ? null : Math.max(0, Math.ceil(call.knownMicros));
+  if (event === "timeout") return null;
+  const perToken = (PRICES[call.model ?? ""] ?? PRICES["claude-opus-5-5"])!.base.output;
+  const made = Math.ceil(Math.max(0, call.elapsedMs) / 1000) * MAX_OUTPUT_TOKENS_PER_SECOND * perToken;
+  return Math.ceil(Math.min(call.worstMicros, call.expectedMicros + made));
 }
 
 /** One model's share of a call, as settle_call and meter_batch take it. */

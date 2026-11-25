@@ -1,9 +1,9 @@
 import "server-only";
 
 import { gate, hitRate, noteConcurrencyLimited, noteUsageLimited } from "../gate";
-import { holdOutcome, type HoldEvent } from "../hold-rules";
+import { holdOutcome, keptCharge, type HoldEvent } from "../hold-rules";
 import { messageLane } from "../lanes";
-import { releaseHold, reserveSpend } from "../spend-holds";
+import { releaseHold, reserveSpend, setHoldCharge } from "../spend-holds";
 import { anthropicFor } from "../refusals";
 import { parseBearer } from "../token";
 import { relayAnswer } from "./answers";
@@ -26,7 +26,8 @@ import { prepareRequest } from "./prepare";
  * the header has a token's shape, so that lookup hides behind the upload.
  * A message's usage and its hold's release are one settle_call before the
  * answer goes; a hold whose call may have been billed unrecorded is kept to
- * run out (holdOutcome in hold-rules.ts).
+ * run out (holdOutcome in hold-rules.ts), and is charged as spend when it
+ * does (keptCharge), so a call that outruns the route is never free.
  */
 
 /** Calls that start new spend, so the spend limits are checked first. Results of a batch already paid for are not held back. */
@@ -81,6 +82,8 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
   }
   // Until the call says otherwise, its cost is unknown and its hold stays.
   let event: HoldEvent = "unreachable";
+  let knownMicros: number | undefined;
+  const forwarded = Date.now();
   try {
     const url = upstreamUrl(segments, upstreamSearch(new URL(req.url).searchParams));
     const up = await forwardToAnthropic(req, { url, apiKey, beta: prepared.beta, body: prepared.body, seenThrough: outlivesCaller(op) });
@@ -100,10 +103,16 @@ export async function proxyAnthropic(req: Request, segments: string[]): Promise<
       cut: up.cut,
     });
     event = relayed.event;
+    knownMicros = relayed.knownMicros;
     return relayed.res;
   } finally {
     const outcome = holdOutcome(event);
     if (holdId && outcome === "release") await releaseHold(holdId);
-    if (holdId && outcome === "keep") console.error("hold kept to run out", event);
+    if (holdId && outcome === "keep") {
+      console.error("hold kept to run out", event);
+      const call = { model: prepared.model ?? null, worstMicros: prepared.worstMicros, expectedMicros: prepared.expectedMicros, elapsedMs: Date.now() - forwarded, knownMicros };
+      const charge = keptCharge(event, call);
+      if (charge !== null) await setHoldCharge(holdId, charge);
+    }
   }
 }

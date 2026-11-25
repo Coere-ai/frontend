@@ -1218,10 +1218,20 @@ error, which it does not bill, or once a batch's reservation is stored.
 When Anthropic may have billed a call whose cost was not recorded (the
 caller went, the 285 second cut, no connection, a failed read of the
 answer, or a record that failed twice), the hold stays and runs out, so
-that spend keeps counting instead of vanishing at once. Whether Anthropic
-bills a call its caller aborted is still to be measured; if it does, the
-hold's expected cost should be charged then. A hold is void after
-HOLD_SECONDS = 360 seconds, the route's 300
+that spend keeps counting instead of vanishing at once. When it runs out
+unreleased, the next `reserve_spend` of the account records it as spend
+(a `usage_events` row with status 504 and request id `expired_hold`)
+before deleting it: its `charge_micros` when the proxy set one, else its
+worst case (`keptCharge` in `hold-rules.ts`). The 285 second cut, a record
+that failed with its cost unknown, and a function that died charge the
+worst case. A call that ended early (its caller went, no connection, a
+failed read) is charged its expected cost and the most output it could
+have made in the time it ran, at 300 tokens a second, never above its
+worst case, so closing a tab mid build does not charge every call's worst
+case. A cost known but not recorded is charged as it is. Until migration
+20261125000000_proxy_settle, an expired hold was deleted for free, so a
+call that outran the route could be repeated without end with nothing
+charged. A hold is void after HOLD_SECONDS = 360 seconds, the route's 300
 second `maxDuration` and a minute (900 before 2026-11-24, which kept a hold
 ten minutes past a call Vercel cut off). Pending spend is every live hold
 plus the `reserved_micros` of each batch not yet metered. A message is
@@ -1400,7 +1410,7 @@ come through signed upload URLs that the server makes.
 | `reset_first_build(p_user uuid)` | The operator's reset: clears `first_build_at` and marks the spend so far, so the allowance counts from now and the monthly limit waits for the next finished build. False for no account. |
 | `charge_unmetered_batch(p_user uuid, p_batch text)` | Marks a batch deleted before it was metered as metered, and records its reservation as its cost. |
 | `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under every limit in force from `spend_state()` with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`, or `pending` for a message that fits but for other messages' holds. Kept unchanged for the site before 2026-11-24 and as the fallback. |
-| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean, p_expected bigint, p_overrun bigint, p_max_live integer)` | The same lock and batch charge. A message holds `p_amount` (its worst case) and `p_expected` (never read above it), and is refused as its spent limit, then `pending`, then `concurrency` at `p_max_live` holds or past `p_overrun` (section 8.10). A batch keeps the four argument rules, but for `pending` when only message holds keep it out. While the account is in its first build it is also refused as `site_budget` once the site's first build spend today passes `budget.first_build_daily`. From `20261124000000_build_lane_holds.sql`, with the last two rules from `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean, p_expected bigint, p_overrun bigint, p_max_live integer)` | The same lock and batch charge. A message holds `p_amount` (its worst case) and `p_expected` (never read above it), and is refused as its spent limit, then `pending`, then `concurrency` at `p_max_live` holds or past `p_overrun` (section 8.10). A batch keeps the four argument rules, but for `pending` when only message holds keep it out. Expired holds are charged as spend before they are deleted. While the account is in its first build it is also refused as `site_budget` once the site's first build spend today passes `budget.first_build_daily`. From `20261124000000_build_lane_holds.sql`, with the last two rules from `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
 | `settle_call(p_hold uuid, p_user uuid, p_device uuid, p_kind text, p_rows jsonb, p_status integer, p_duration_ms integer, p_request_id text)` | Writes a message's or a count's usage rows, one per model through `record_usage`, then deletes the call's hold (when `p_hold` is set and the account's), in one transaction, so a failed write keeps the hold (section 8.4). From `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
 | `hit_sign_up_limit(p_hash text, p_max integer, p_window_seconds integer)` | Counts one sign up attempt for an address hash in a fixed window and answers true past `p_max` (section 3.1). From `20261125000000_proxy_settle.sql`. |
 | `record_app_events_capped(p_user uuid, p_device uuid, p_events jsonb, p_day_count integer, p_day_saved bigint)` | Clamps each entry to what the device has left today, `p_day_count` a kind and `p_day_saved` tokens saved in all, drops an entry with none left, then calls `record_app_events` (section 8.9). Calls of one device take turns. From `20261125000000_proxy_settle.sql`. |
@@ -1721,6 +1731,7 @@ reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boole
 -- refuse 'site_budget', and answers 'pending' for a batch kept out by message holds alone.
 -- first_build_daily: day date pk, cost_micros bigint, updated_at timestamptz
 -- sign_up_attempts: ip_hash text pk, window_start timestamptz, attempts integer
+-- spend_holds gains charge_micros bigint: what it is charged when it runs out unreleased (null reads as amount_micros)
 -- site_settings key budget.first_build_daily: {"micros": 1000000000}
 
 -- p_rows as meter_batch takes them. Deletes p_hold only when it is p_user's.

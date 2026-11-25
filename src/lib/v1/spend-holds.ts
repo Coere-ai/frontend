@@ -51,10 +51,30 @@ async function reserveWorstOnly(args: ReturnType<typeof reserveArgs>): Promise<R
   return readReservation(data);
 }
 
-/** Lets a hold go once its call's cost is recorded, or the call failed. A failure only leaves it to run out. */
+/**
+ * Sets what a kept hold is charged when it runs out (keptCharge in
+ * hold-rules.ts). A failure leaves its worst case, the safe side.
+ */
+export async function setHoldCharge(holdId: string, micros: number): Promise<void> {
+  const { error } = await supabase().from("spend_holds").update({ charge_micros: Math.max(0, Math.ceil(micros)) }).eq("id", holdId);
+  if (error) console.error("hold charge not set", error.code);
+}
+
+/**
+ * Lets a hold go once its call's cost is known to be nothing or stored
+ * elsewhere. Tried twice: a hold left behind is charged its worst case
+ * when it runs out, which would charge a call that cost nothing.
+ */
 export async function releaseHold(holdId: string): Promise<void> {
-  const { error } = await supabase().from("spend_holds").delete().eq("id", holdId);
-  if (error) console.error("hold not released", error.code);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { error } = await supabase().from("spend_holds").delete().eq("id", holdId);
+      if (!error) return;
+      console.error("hold not released", error.code);
+    } catch {
+      console.error("hold not released");
+    }
+  }
 }
 
 /**
