@@ -14,6 +14,7 @@ export const ADMIN_SECTIONS = [
   { href: "/admin/users", label: "Users" },
   { href: "/admin/organizations", label: "Organizations" },
   { href: "/admin/interested", label: "Interested" },
+  { href: "/admin/lab", label: "Lab" },
   { href: "/admin/launch", label: "Launch" },
   { href: "/admin/database", label: "Database" },
   { href: "/admin/security", label: "Security" },
