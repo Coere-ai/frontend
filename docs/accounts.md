@@ -130,6 +130,12 @@ in 15 minutes. The trade-off: usernames are public to an organization's
 members, so someone with five or more addresses can still keep one
 username locked while they keep trying. A wrong username or password waits
 at least 800 ms and about 1.5 seconds in all, like the admin guard.
+These limits are held per server instance. Sign up also counts in the
+database (`hit_sign_up_limit`, a `sign_up_attempts` row per address hash):
+10 accounts an hour from one address, across every instance, since each
+new account gets a first build on Coere's key. When the database cannot
+answer, sign up goes on under the instance limits alone. The site wide
+first build budget (section 8.10) bounds what many addresses can spend.
 Supabase's own refusals (its shared sign in limit, an outage) read the same
 to the person, so the form never says which usernames exist, and the
 server logs their code. Each outcome writes a `security_events` row
@@ -890,8 +896,20 @@ Another path answers 404. Before forwarding:
   stored file, and a PDF, are refused, since the spend reservation counts
   the request's bytes and these cost far more than their bytes say
   (section 8.10).
+- **Coere's own prompts.** A message, and each entry of a batch, opens with
+  one of the extension's pinned system prompts: the SHA-256 of its first
+  system block (the whole `system` when it is a string) is one of those
+  listed in `src/lib/v1/anthropic/prompt-shas.ts`, each the SHA coere-v2
+  pins for that prompt. What changes per call goes in the messages, so the
+  first block is always a whole pinned prompt. A token count is not held to
+  it, since it costs nothing. From 2026-11-25 the check reports only: a
+  miss is logged by its SHA, never its text, and the call goes on. Once the
+  logs show every v2 to v4 prompt, `PROMPT_CHECK` turns to `enforce` and a
+  miss is a `400 bad_request`. A package that adds a prompt version adds
+  its SHA to the list first, and the site deploys before the extension.
 - **The body forwarded** is the parsed body written out again, so Anthropic
-  reads exactly what was checked.
+  reads exactly what was checked. It is read while the device check runs,
+  once the `authorization` header has a token's shape.
 - **A batch** has at most 500 entries, and each names `max_tokens` of at
   most 16,000: the extension's own ceilings, which bound how far one batch's
   worst case can reach past a limit (section 8.10).
@@ -909,8 +927,9 @@ Another path answers 404. Before forwarding:
 calls' expected costs fill a limit, `retry-after: 10`), `per-minute` (a
 per minute lane, at most 30), `concurrency` (the live holds cap or the
 overrun bound, 2) or `upstream` (Anthropic's or Jev's own 429, with its
-own `retry-after`). The value is one of these four and carries nothing
-about the person. A Jev `usage_limit` 429 is a spent limit and carries
+own `retry-after`). The proxy's 504 for a call it cut at 285 seconds
+carries `duration` (below). The value is one of these five and carries
+nothing about the person. A Jev `usage_limit` 429 is a spent limit and carries
 none. An extension that does not know the header ignores it, and a 429
 without it reads as an ordinary rate limit. The site deploys before an
 extension that reads it.
@@ -929,13 +948,23 @@ error classes keep working unchanged:
 | Model not allowed | `404 {…not_found_error, message:'model: <name>'}` |
 | Beta not allowed | `400 {…invalid_request_error, message:'Unexpected value(s) for the \`anthropic-beta\` header.'}` |
 | Body too large | `413 {…request_too_large, message:'request_too_large'}` |
+| The site's first build budget for the day is spent (section 8.10) | the spent limit `400` above, reading `daily` |
+| Anthropic's own 429, 529 or other 5xx | its status and error type with a fixed message: `rate_limited` for a 429, `overloaded` for an overload, `upstream_error` for the rest. Anthropic's message names Coere's organization and its per minute limits, so it stays behind. `retry-after` and the 429's `x-coere-limit: upstream` are kept. A 4xx about the caller's own request passes as it is |
+| The call ran past the proxy's 285 second cut | `504 {…timeout_error, message:'duration'}` with `x-coere-limit: duration` and `x-should-retry: false`. The same call would be cut again, so the extension splits the work or stops |
 | Server has no key, or Anthropic refuses Coere's own account (upstream 401, 402 or 403, a 400 "Your credit balance is too low" or "You have reached your specified", a 429 `enforced_spend_limit_reached`) | `503 {…api_error, message:'unavailable'}`, which the runtime retries on its own |
 
 **Metering.** A successful message writes one usage row per model from its
 `usage` (input, output, cache write, cache read) priced by the table in
 section 11. With a refusal fallback, each entry of `usage.iterations` is
 priced at its own model, the declined attempt included, as the extension's
-own counter does.
+own counter does. The rows and the call's hold go in one `settle_call`
+before the answer is sent: one round trip after Anthropic answers, where
+there were two (`record_usage`, then the hold's delete). It is tried twice;
+a retry after a first try that landed but whose answer was lost counts
+the call twice, which over counts and only then. Before migration
+20261125000000_proxy_settle has run, PostgREST answers `PGRST202` and the
+proxy makes the two calls as before, deleting the hold only once every row
+landed.
 Batch results are read as they stream through; when the stream ends, one
 row per model is written at half price and the batch is marked metered, so
 reading the results twice counts once. When that write fails twice, the
@@ -945,9 +974,14 @@ rather than deleting a batch that was not metered.
 `maxDuration` is 300 seconds on every route, which works on every Vercel
 plan: it is the most Hobby allows and Pro's default with Fluid compute. Most
 calls end well inside it. The v4 extension waits up to 330 seconds for a non
-streaming call (600 before 2026-11-24), so a rare answer that takes longer
-than 300 is cut off, billed upstream and never metered, and its hold goes
-60 seconds later (section 8.10). A Pro team may raise the Claude route to
+streaming call (600 before 2026-11-24). From 2026-11-25 the proxy ends the
+upstream fetch itself at 285 seconds (`UPSTREAM_CUT_MS`), with the caller's
+own abort beside it, and answers the marked `504` above, so the extension
+no longer reads Vercel's bare 504 as a passing server error and sends the
+same too long call again. A batch create and a batch delete are not cut,
+since once Anthropic has either the proxy must store or forget its row.
+The cut call may be billed upstream and is not metered; its hold stays
+until it runs out (section 8.10). A Pro team may raise the Claude route to
 800, Vercel's ceiling there; then HOLD_SECONDS becomes 860 and the
 extension's wait 830 seconds.
 
@@ -1044,8 +1078,16 @@ A value must be a JSON object of at most 8 KiB. An unknown key, or
 **`POST /api/v1/events`** `{ events: [{ kind, count, tokensSaved? }] }`,
 at most 50 entries, each kind from section 6.7, each count from 1 to
 100,000, `tokensSaved` from 0 to 100,000,000 and only on `context_import`
-and `transfer`. `204`. One `record_app_events` call stores the batch and
-adds it to the totals.
+and `transfer`. `204`. Entries of one kind are summed and clamped: 5,000
+`extract_chat` and 1,000 of any other kind a request, and `tokensSaved` at
+most 1,000,000 for each use counted (`src/lib/v1/events.ts`). One
+`record_app_events_capped` call then holds the device to 20,000 of a kind
+and 200,000,000 tokens saved a UTC day, drops an entry with no room left,
+stores the rest and adds it to the totals. Real batches sit far below
+both bounds. A batch is clamped rather than refused, since the extension
+keeps a refused batch and sends it again. Before migration
+20261125000000_proxy_settle has run, `record_app_events` takes the batch
+with the per request caps alone.
 
 ### 8.11 Organization
 
@@ -1169,8 +1211,17 @@ for each picture, priced as cache writes, plus `max_tokens` (or 64,000) of
 output, at the asked model's price, half for a batch. Its expected cost:
 input at three bytes a token, still as cache writes, plus
 min(`max_tokens`, HOLD_OUTPUT_TOKENS = 2,000) of output, never above the
-worst case (`anthropic/worst-case.ts`). A hold is let go once the call is
-metered, and is void after HOLD_SECONDS = 360 seconds, the route's 300
+worst case (`anthropic/worst-case.ts`). A hold is let go once the call's
+cost is known (`holdOutcome` in `src/lib/v1/hold-rules.ts`): in the same
+`settle_call` that records a message's usage, when Anthropic answers an
+error, which it does not bill, or once a batch's reservation is stored.
+When Anthropic may have billed a call whose cost was not recorded (the
+caller went, the 285 second cut, no connection, a failed read of the
+answer, or a record that failed twice), the hold stays and runs out, so
+that spend keeps counting instead of vanishing at once. Whether Anthropic
+bills a call its caller aborted is still to be measured; if it does, the
+hold's expected cost should be charged then. A hold is void after
+HOLD_SECONDS = 360 seconds, the route's 300
 second `maxDuration` and a minute (900 before 2026-11-24, which kept a hold
 ten minutes past a call Vercel cut off). Pending spend is every live hold
 plus the `reserved_micros` of each batch not yet metered. A message is
@@ -1201,7 +1252,28 @@ at $5 spent, and near the limit `pending` refuses first. Haiku calls meet
 the 128 cap. Holds made by the four argument `reserve_spend`, and the site
 before the migration `20261124000000_build_lane_holds.sql` has run (it
 falls back to that function on PostgREST's PGRST202), count at their worst
-case. A batch keeps its old rules: its hold is its worst case.
+case. A batch keeps its old rules: its hold is its worst case. From
+migration 20261125000000_proxy_settle, a batch that does not fit only
+because of the message holds in flight (spend and the batches not yet
+metered alone leave room) is `pending`, as a message is, not its spent
+limit, which the extension would hold for an hour; spend or batches
+filling the limit are still the limit. The four argument function keeps
+the old answer.
+
+**The site's first build budget.** Every new account gets a $10 first
+build on Coere's key, and sign up needs only a username. So the seven
+argument `reserve_spend` also refuses a call of an account still in its
+first build as `site_budget` once today's first build spend across the
+whole site (`first_build_daily`, kept per UTC day by a trigger on
+`usage_events`) plus the call's expected cost, or 1 for a batch, passes
+`site_settings` key `budget.first_build_daily`, `{"micros": N}`. The
+migration seeds it at $1,000 a day, about a hundred whole first builds;
+the operator changes it in the SQL editor, or deletes the row for no
+ceiling. An account's own spent limit is named first. The proxy answers
+it as the spent limit 400 reading `daily`, so the extension holds its
+queue and tries again hourly, and logs that the budget is spent. Calls in
+flight are not counted, so the budget can be passed by what is in flight
+when it fills.
 
 A batch may start while nothing is at a limit, since its worst case is
 far above what it costs and a small plan could otherwise never batch; its
@@ -1328,7 +1400,10 @@ come through signed upload URLs that the server makes.
 | `reset_first_build(p_user uuid)` | The operator's reset: clears `first_build_at` and marks the spend so far, so the allowance counts from now and the monthly limit waits for the next finished build. False for no account. |
 | `charge_unmetered_batch(p_user uuid, p_batch text)` | Marks a batch deleted before it was metered as metered, and records its reservation as its cost. |
 | `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under every limit in force from `spend_state()` with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`, or `pending` for a message that fits but for other messages' holds. Kept unchanged for the site before 2026-11-24 and as the fallback. |
-| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean, p_expected bigint, p_overrun bigint, p_max_live integer)` | The same lock and batch charge. A message holds `p_amount` (its worst case) and `p_expected` (never read above it), and is refused as its spent limit, then `pending`, then `concurrency` at `p_max_live` holds or past `p_overrun` (section 8.10). A batch keeps the four argument rules. From `20261124000000_build_lane_holds.sql`, granted to `service_role` only. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean, p_expected bigint, p_overrun bigint, p_max_live integer)` | The same lock and batch charge. A message holds `p_amount` (its worst case) and `p_expected` (never read above it), and is refused as its spent limit, then `pending`, then `concurrency` at `p_max_live` holds or past `p_overrun` (section 8.10). A batch keeps the four argument rules, but for `pending` when only message holds keep it out. While the account is in its first build it is also refused as `site_budget` once the site's first build spend today passes `budget.first_build_daily`. From `20261124000000_build_lane_holds.sql`, with the last two rules from `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
+| `settle_call(p_hold uuid, p_user uuid, p_device uuid, p_kind text, p_rows jsonb, p_status integer, p_duration_ms integer, p_request_id text)` | Writes a message's or a count's usage rows, one per model through `record_usage`, then deletes the call's hold (when `p_hold` is set and the account's), in one transaction, so a failed write keeps the hold (section 8.4). From `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
+| `hit_sign_up_limit(p_hash text, p_max integer, p_window_seconds integer)` | Counts one sign up attempt for an address hash in a fixed window and answers true past `p_max` (section 3.1). From `20261125000000_proxy_settle.sql`. |
+| `record_app_events_capped(p_user uuid, p_device uuid, p_events jsonb, p_day_count integer, p_day_saved bigint)` | Clamps each entry to what the device has left today, `p_day_count` a kind and `p_day_saved` tokens saved in all, drops an entry with none left, then calls `record_app_events` (section 8.9). Calls of one device take turns. From `20261125000000_proxy_settle.sql`. |
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `usage_daily`, `user_totals`, the person's `org_totals`, today's `daily_totals` and today's `usage_model_daily` row for its model in one statement. |
 | `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. The first `memory_built` sets `first_build_at`. |
@@ -1343,14 +1418,17 @@ come through signed upload URLs that the server makes.
 
 ## 11. Prices
 
-The site meters with the same table as `packages/memory/src/ai/prices.ts`
-(dated 2026-10-22), USD per million tokens. Cache writes cost 1.25 times
-input. Batch results cost half.
+The site meters with the table dated 2026-11-25, USD per million tokens.
+Cache writes cost 1.25 times input. Batch results cost half. It is the
+table of `packages/memory/src/ai/prices.ts` as v4 builds it. v2 and v3
+keep Sonnet 5.5 cache reads at $0.20 (the 2026-10-22 table) for their
+local cap, so it can only stop early; the site meters Anthropic's $0.10,
+since what it meters counts against the person's real limits.
 
 | Model | Input | Output | Cache read | Cache write |
 |---|---|---|---|---|
 | `claude-opus-5-5` | 4 | 20 | 0.2 | 5 |
-| `claude-sonnet-5-5` | 2 | 10 | 0.2 | 2.5 |
+| `claude-sonnet-5-5` | 2 | 10 | 0.1 | 2.5 |
 | `claude-haiku-5-5` | 0.1 | 0.5 | 0.01 | 0.125 |
 | `claude-haiku-5-5`, prompt over 100K | 0.5 | 2.5 | 0.05 | 0.625 |
 | `jev-1.14.0`, `jev-1.13.0` | 0.042 | 0 | 0 | 0.0525 |
@@ -1638,6 +1716,21 @@ reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boole
 reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean,
   p_expected bigint, p_overrun bigint, p_max_live integer)
   returns table (hold_id uuid, refused text)
+
+-- 20261125000000_proxy_settle.sql: the seven argument reserve_spend may also
+-- refuse 'site_budget', and answers 'pending' for a batch kept out by message holds alone.
+-- first_build_daily: day date pk, cost_micros bigint, updated_at timestamptz
+-- sign_up_attempts: ip_hash text pk, window_start timestamptz, attempts integer
+-- site_settings key budget.first_build_daily: {"micros": 1000000000}
+
+-- p_rows as meter_batch takes them. Deletes p_hold only when it is p_user's.
+settle_call(p_hold uuid, p_user uuid, p_device uuid, p_kind text, p_rows jsonb,
+  p_status integer, p_duration_ms integer, p_request_id text) returns boolean
+
+hit_sign_up_limit(p_hash text, p_max integer, p_window_seconds integer) returns boolean
+
+record_app_events_capped(p_user uuid, p_device uuid, p_events jsonb,
+  p_day_count integer, p_day_saved bigint) returns void
 
 -- p_rows: [{"model", "input", "output", "cacheWrite", "cacheRead", "costMicros"}], one per model
 meter_batch(p_user uuid, p_device uuid, p_batch text, p_rows jsonb,
