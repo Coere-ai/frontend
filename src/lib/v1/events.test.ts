@@ -46,6 +46,8 @@ describe("the caps on one batch", () => {
     assert.equal(out.length, 1);
     assert.equal(out[0].count, perRequestCount("context_import"));
     assert.ok(out[0].count <= 1_000);
+    // One stored row may hold at most 100,000,000 tokens saved (app_events_saved_sane).
+    assert.equal(out[0].tokensSaved, 100_000_000);
   });
 
   it("clamps tokens saved to what that many imports can save", () => {

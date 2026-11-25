@@ -86,7 +86,9 @@ export function parseEvents(body: unknown): AppEvent[] | null {
   }
   return [...byKind.values()].map((event) => {
     const count = Math.min(event.count, perRequestCount(event.kind));
-    return event.tokensSaved === undefined ? { kind: event.kind, count } : { kind: event.kind, count, tokensSaved: Math.min(event.tokensSaved, count * SAVED_PER_USE) };
+    // A stored row holds at most 100,000,000 tokens saved, as one entry may.
+    const saved = event.tokensSaved === undefined ? undefined : Math.min(event.tokensSaved, count * SAVED_PER_USE, 100_000_000);
+    return saved === undefined ? { kind: event.kind, count } : { kind: event.kind, count, tokensSaved: saved };
   });
 }
 
