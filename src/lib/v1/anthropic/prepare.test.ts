@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it, mock } from "node:test";
 
-import { BODY_CAP, prepareRequest } from "./prepare";
+import { BODY_CAP, checkRequest, MISSES_PER_ACCOUNT, prepareRequest, readRequest } from "./prepare";
 import { PROMPT_CHECK, PROMPT_SHAS } from "./prompt-shas";
 
 const req = (body: string | null, headers: Record<string, string> = {}, method = "POST") =>
@@ -107,6 +109,54 @@ describe("the prompt check", () => {
   it("leaves a token count alone, which costs nothing", async () => {
     const p = await prepareRequest(req(withSystem("anything")), { op: "count_tokens" }, { prompts: known, mode: "enforce" });
     assert.equal(p.ok, true);
+  });
+
+  it("reads the body before the device is known without parsing it or logging", async () => {
+    const logged = mock.method(console, "error", () => {});
+    try {
+      const raw = await readRequest(req(withSystem("An unlisted prompt from a caller nobody has checked yet.")), { op: "message" });
+      assert.equal(raw.ok, true);
+      assert.equal(logged.mock.callCount(), 0);
+      // Not JSON at all still reads: the parse waits for the gate.
+      assert.equal((await readRequest(req("{"), { op: "message" })).ok, true);
+      assert.deepEqual(await readRequest(req("x".repeat(BODY_CAP + 1)), { op: "message" }), { ok: false, error: "too_large" });
+      assert.deepEqual(await readRequest(req("{}", { "anthropic-beta": "files-api-2025-04-14" }), { op: "message" }), { ok: false, error: "beta" });
+      assert.deepEqual(checkRequest(await readRequest(req("{"), { op: "message" }), { op: "message" }, { prompts: known, mode: "report" }, "u1"), { ok: false, error: "bad_request" });
+    } finally {
+      logged.mock.restore();
+    }
+  });
+
+  it("logs a signed in account's misses at most a few times, each with the account's short hash and never its id", async () => {
+    const logged = mock.method(console, "error", () => {});
+    try {
+      const user = "6f0c1d1e-0000-4000-8000-00000000abcd";
+      for (let i = 0; i < MISSES_PER_ACCOUNT + 20; i++) {
+        const p = checkRequest(await readRequest(req(withSystem(`changing prompt ${i}`)), { op: "message" }), { op: "message" }, { prompts: known, mode: "report" }, user);
+        assert.equal(p.ok, true);
+      }
+      const lines = logged.mock.calls.map((c) => c.arguments.join(" "));
+      assert.equal(lines.length, MISSES_PER_ACCOUNT);
+      const short = createHash("sha256").update(user, "utf8").digest("hex").slice(0, 12);
+      for (const line of lines) {
+        assert.ok(line.includes(short));
+        assert.ok(!line.includes(user));
+      }
+      // Another account still gets its own lines.
+      checkRequest(await readRequest(req(withSystem("changing prompt 0")), { op: "message" }), { op: "message" }, { prompts: known, mode: "report" }, "u2");
+      assert.equal(logged.mock.callCount(), MISSES_PER_ACCOUNT + 1);
+    } finally {
+      logged.mock.restore();
+    }
+  });
+
+  it("is run by the proxy only once the gate has passed the device", () => {
+    const proxy = readFileSync(join(import.meta.dirname, "proxy.ts"), "utf8");
+    const gated = proxy.indexOf("if (!g.ok)");
+    assert.ok(gated > 0);
+    assert.ok(!proxy.includes("prepareRequest("), "the proxy reads and checks in two steps");
+    assert.ok(proxy.indexOf("readRequest(") < gated, "the body is read while device_auth runs");
+    assert.ok(proxy.indexOf("checkRequest(") > gated, "the parse and the prompt check wait for the gate");
   });
 
   it("ships in report mode with only well formed SHAs listed", () => {

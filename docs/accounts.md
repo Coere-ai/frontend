@@ -903,13 +903,19 @@ Another path answers 404. Before forwarding:
   pins for that prompt. What changes per call goes in the messages, so the
   first block is always a whole pinned prompt. A token count is not held to
   it, since it costs nothing. From 2026-11-25 the check reports only: a
-  miss is logged by its SHA, never its text, and the call goes on. Once the
+  miss is logged by its SHA and a 12 character hash of the account's id,
+  never the prompt's text or the id, at most once per SHA and five SHAs an
+  account an hour on each server instance, and the call goes on. Once the
   logs show every v2 to v4 prompt, `PROMPT_CHECK` turns to `enforce` and a
   miss is a `400 bad_request`. A package that adds a prompt version adds
   its SHA to the list first, and the site deploys before the extension.
 - **The body forwarded** is the parsed body written out again, so Anthropic
-  reads exactly what was checked. It is read while the device check runs,
-  once the `authorization` header has a token's shape.
+  reads exactly what was checked. Its bytes are read under the cap while
+  the device check runs, once the `authorization` header has a token's
+  shape (`readRequest` in `anthropic/prepare.ts`). The parse, these checks
+  and the prompt log wait until the gate has passed the device
+  (`checkRequest`), so a caller with a made up token costs no parse and
+  writes no line.
 - **A batch** has at most 500 entries, and each names `max_tokens` of at
   most 16,000: the extension's own ceilings, which bound how far one batch's
   worst case can reach past a limit (section 8.10).
@@ -1081,8 +1087,10 @@ at most 50 entries, each kind from section 6.7, each count from 1 to
 and `transfer`. `204`. Entries of one kind are summed and clamped: 5,000
 `extract_chat` and 1,000 of any other kind a request, and `tokensSaved` at
 most 1,000,000 for each use counted (`src/lib/v1/events.ts`). One
-`record_app_events_capped` call then holds the device to 20,000 of a kind
-and 200,000,000 tokens saved a UTC day, drops an entry with no room left,
+`record_app_events_capped` call then holds the account, across all its
+devices, to 20,000 of a kind and 200,000,000 tokens saved a UTC day (a
+device token costs nothing to mint, so a bound per device would bound
+nothing), drops an entry with no room left,
 stores the rest and adds it to the totals. Real batches sit far below
 both bounds. A batch is clamped rather than refused, since the extension
 keeps a refused batch and sends it again. Before migration
@@ -1213,19 +1221,29 @@ input at three bytes a token, still as cache writes, plus
 min(`max_tokens`, HOLD_OUTPUT_TOKENS = 2,000) of output, never above the
 worst case (`anthropic/worst-case.ts`). A hold is let go once the call's
 cost is known (`holdOutcome` in `src/lib/v1/hold-rules.ts`): in the same
-`settle_call` that records a message's usage, when Anthropic answers an
-error, which it does not bill, or once a batch's reservation is stored.
-When Anthropic may have billed a call whose cost was not recorded (the
-caller went, the 285 second cut, no connection, a failed read of the
-answer, or a record that failed twice), the hold stays and runs out, so
-that spend keeps counting instead of vanishing at once. When it runs out
+`settle_call` that records a message's usage, in the same `store_batch`
+that stores a new batch's reservation, when Anthropic answers an error,
+which it does not bill, or when the connection to Anthropic never opened
+(a refused connection, a name that did not resolve, a connect timeout or a
+certificate the handshake refused: `neverSent` in
+`anthropic/upstream-cut.ts`). A hold let go apart from a record is
+deleted, then set to charge nothing if the delete failed, then deleted
+again (`letHoldGo`), so one left behind never charges a call that cost
+nothing. When Anthropic may have billed a call whose cost was not recorded
+(the caller went, the 285 second cut, a connection that broke after it
+opened, a failed read of the answer, or a record that failed twice), the
+hold stays and runs out, so that spend keeps counting instead of
+vanishing at once. A batch create is the exception: when its forward
+fails its hold goes, since a batch the proxy never stored can be read by
+no one, and its worst case may be more than the person has left. Its hold
+stays only when the answer came and could not be read. When it runs out
 unreleased, the next `reserve_spend` of the account records it as spend
 (a `usage_events` row with status 504 and request id `expired_hold`)
 before deleting it: its `charge_micros` when the proxy set one, else its
 worst case (`keptCharge` in `hold-rules.ts`). The 285 second cut, a record
 that failed with its cost unknown, and a function that died charge the
-worst case. A call that ended early (its caller went, no connection, a
-failed read) is charged its expected cost and the most output it could
+worst case. A call that ended early (its caller went, a connection that
+broke, a failed read) is charged its expected cost and the most output it could
 have made in the time it ran, at 300 tokens a second, never above its
 worst case, so closing a tab mid build does not charge every call's worst
 case. A cost known but not recorded is charged as it is. Until migration
@@ -1275,15 +1293,18 @@ build on Coere's key, and sign up needs only a username. So the seven
 argument `reserve_spend` also refuses a call of an account still in its
 first build as `site_budget` once today's first build spend across the
 whole site (`first_build_daily`, kept per UTC day by a trigger on
-`usage_events`) plus the call's expected cost, or 1 for a batch, passes
+`usage_events`), plus the reservations of every first build batch not yet
+metered, plus the call's expected cost (a batch's worst case), passes
 `site_settings` key `budget.first_build_daily`, `{"micros": N}`. The
 migration seeds it at $1,000 a day, about a hundred whole first builds;
 the operator changes it in the SQL editor, or deletes the row for no
 ceiling. An account's own spent limit is named first. The proxy answers
 it as the spent limit 400 reading `daily`, so the extension holds its
-queue and tries again hourly, and logs that the budget is spent. Calls in
-flight are not counted, so the budget can be passed by what is in flight
-when it fills.
+queue and tries again hourly, and logs that the budget is spent. A
+batch's cost lands in the day's row only when its results are read, often
+hours later or on another day, so first build batches count in flight
+until they are metered. Message holds in flight are not counted, so the
+budget can be passed by the messages in flight when it fills.
 
 A batch may start while nothing is at a limit, since its worst case is
 far above what it costs and a small plan could otherwise never batch; its
@@ -1410,10 +1431,11 @@ come through signed upload URLs that the server makes.
 | `reset_first_build(p_user uuid)` | The operator's reset: clears `first_build_at` and marks the spend so far, so the allowance counts from now and the monthly limit waits for the next finished build. False for no account. |
 | `charge_unmetered_batch(p_user uuid, p_batch text)` | Marks a batch deleted before it was metered as metered, and records its reservation as its cost. |
 | `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean)` | Locks the profile, charges batches left unmetered for 30 days, and holds `p_amount` when it fits under every limit in force from `spend_state()` with every pending hold and batch reservation (section 8.10). Answers `hold_id`, or `refused` naming the limit: `lifetime`, `first_build`, `monthly` or `daily`, or `pending` for a message that fits but for other messages' holds. Kept unchanged for the site before 2026-11-24 and as the fallback. |
-| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean, p_expected bigint, p_overrun bigint, p_max_live integer)` | The same lock and batch charge. A message holds `p_amount` (its worst case) and `p_expected` (never read above it), and is refused as its spent limit, then `pending`, then `concurrency` at `p_max_live` holds or past `p_overrun` (section 8.10). A batch keeps the four argument rules, but for `pending` when only message holds keep it out. Expired holds are charged as spend before they are deleted. While the account is in its first build it is also refused as `site_budget` once the site's first build spend today passes `budget.first_build_daily`. From `20261124000000_build_lane_holds.sql`, with the last two rules from `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
+| `reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boolean, p_expected bigint, p_overrun bigint, p_max_live integer)` | The same lock and batch charge. A message holds `p_amount` (its worst case) and `p_expected` (never read above it), and is refused as its spent limit, then `pending`, then `concurrency` at `p_max_live` holds or past `p_overrun` (section 8.10). A batch keeps the four argument rules, but for `pending` when only message holds keep it out. Expired holds are charged as spend before they are deleted. While the account is in its first build it is also refused as `site_budget` once the site's first build spend today, with every first build batch not yet metered and the call's own cost, passes `budget.first_build_daily`. From `20261124000000_build_lane_holds.sql`, with the last two rules from `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
 | `settle_call(p_hold uuid, p_user uuid, p_device uuid, p_kind text, p_rows jsonb, p_status integer, p_duration_ms integer, p_request_id text)` | Writes a message's or a count's usage rows, one per model through `record_usage`, then deletes the call's hold (when `p_hold` is set and the account's), in one transaction, so a failed write keeps the hold (section 8.4). From `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
+| `store_batch(p_hold uuid, p_id text, p_user uuid, p_device uuid, p_request_count integer, p_reserved bigint)` | Stores a new batch as the caller's with its worst case as `reserved_micros`, and deletes the create's hold (when set and the account's) in the same transaction, so its cost is never held twice (section 8.4). False, with the hold kept, when the id is another account's. From `20261125000000_proxy_settle.sql`, granted to `service_role` only. |
 | `hit_sign_up_limit(p_hash text, p_max integer, p_window_seconds integer)` | Counts one sign up attempt for an address hash in a fixed window and answers true past `p_max` (section 3.1). From `20261125000000_proxy_settle.sql`. |
-| `record_app_events_capped(p_user uuid, p_device uuid, p_events jsonb, p_day_count integer, p_day_saved bigint)` | Clamps each entry to what the device has left today, `p_day_count` a kind and `p_day_saved` tokens saved in all, drops an entry with none left, then calls `record_app_events` (section 8.9). Calls of one device take turns. From `20261125000000_proxy_settle.sql`. |
+| `record_app_events_capped(p_user uuid, p_device uuid, p_events jsonb, p_day_count integer, p_day_saved bigint)` | Clamps each entry to what the account has left today across all its devices, `p_day_count` a kind and `p_day_saved` tokens saved in all, drops an entry with none left, then calls `record_app_events` (section 8.9). Calls of one account take turns. From `20261125000000_proxy_settle.sql`. |
 | `record_usage(...)` | Inserts a `usage_events` row and adds it to `usage_monthly`, `usage_daily`, `user_totals`, the person's `org_totals`, today's `daily_totals` and today's `usage_model_daily` row for its model in one statement. |
 | `meter_batch(p_user, p_device, p_batch, p_rows jsonb, p_status, p_duration_ms, p_request_id)` | Marks a batch metered and writes its usage rows, one per model through `record_usage`, in one transaction, so a failed write leaves the batch unmetered for the next read. False when it is not the caller's or was metered already. |
 | `record_app_events(p_user uuid, p_device uuid, p_events jsonb)` | Inserts the `app_events` rows of one batch and adds their counts and tokens saved to the same three totals. The first `memory_built` sets `first_build_at`. |
@@ -1737,6 +1759,10 @@ reserve_spend(p_user uuid, p_amount bigint, p_ttl_seconds integer, p_batch boole
 -- p_rows as meter_batch takes them. Deletes p_hold only when it is p_user's.
 settle_call(p_hold uuid, p_user uuid, p_device uuid, p_kind text, p_rows jsonb,
   p_status integer, p_duration_ms integer, p_request_id text) returns boolean
+
+-- Deletes p_hold only once p_id is stored as p_user's.
+store_batch(p_hold uuid, p_id text, p_user uuid, p_device uuid,
+  p_request_count integer, p_reserved bigint) returns boolean
 
 hit_sign_up_limit(p_hash text, p_max integer, p_window_seconds integer) returns boolean
 
