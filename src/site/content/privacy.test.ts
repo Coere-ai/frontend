@@ -57,7 +57,10 @@ test("the policy names what v4 sends through coere.ai and what the backup leaves
     assert.ok(sent.includes(words), words);
   }
   const backup = text("backup");
-  for (const words of ["their addresses or the projects they sit in", "word for word from a chat", "Health, Money, and Beliefs and values sections are left out whole", "never in the copy"]) {
+  for (const words of ["their links or the projects they sit in", "word for word from a chat", "Health, Money, and Beliefs and values sections are left out whole", "never in the copy"]) {
     assert.ok(backup.includes(words), words);
   }
+  // The copy keeps each chat's id (chatgpt:<id>), which is most of its link, so the page must not promise more.
+  assert.ok(backup.includes("It keeps each chat's id on its AI's site, which is part of the chat's link"));
+  assert.ok(!backup.includes("their addresses"));
 });
