@@ -49,3 +49,15 @@ test("the policy says saved chat excerpts may go in front of a message before me
   // The draft itself still never leaves the browser.
   assert.ok(said.includes("Your draft is never saved, never logged and never sent to coere.ai or to a model."));
 });
+
+test("the policy names what v4 sends through coere.ai and what the backup leaves out", () => {
+  // coere-v2 docs/architecture.md "What each version sends", v4, and format/cloud-copy.ts.
+  const sent = text("extension") + " " + text("requests");
+  for (const words of ["Rewrite sends the text you selected", "Coere Forms and Apply", "workers send the text of every page they read", "the email you are answering", "each line you type to Cori", "for Ask for more", "for Ask Cori", "Add memory on any website", "Anthropic's id for the request"]) {
+    assert.ok(sent.includes(words), words);
+  }
+  const backup = text("backup");
+  for (const words of ["their addresses or the projects they sit in", "word for word from a chat", "Health, Money, and Beliefs and values sections are left out whole", "never in the copy"]) {
+    assert.ok(backup.includes(words), words);
+  }
+});

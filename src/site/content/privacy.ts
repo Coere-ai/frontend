@@ -6,8 +6,8 @@
  */
 
 /** The day this text took effect, as a date and as the page says it. */
-export const PRIVACY_EFFECTIVE = "2026-11-24";
-export const PRIVACY_EFFECTIVE_LABEL = "November 24, 2026";
+export const PRIVACY_EFFECTIVE = "2026-11-25";
+export const PRIVACY_EFFECTIVE_LABEL = "November 25, 2026";
 
 /** One part of the policy: a heading, its paragraphs, and an optional list after them. */
 export type PrivacySection = { id: string; title: string; paragraphs: string[]; list?: string[]; after?: string[] };
@@ -46,7 +46,9 @@ export const privacySections: PrivacySection[] = [
     ],
     after: [
       "Your draft is never saved, never logged and never sent to coere.ai or to a model.",
-      "Browser Use is off until you turn it on. When you then ask Cori to act on a page, Coere reads that page and sends a short text view of it to Claude, and the names of its buttons and fields to Jev (below). When a page can only be read as a picture, it sends a screenshot of that tab for that step and keeps no copy. To write an email it sends your request, your writing style, related memories and up to three of your past emails it found in Gmail. It never sends passwords, card numbers or one time codes.",
+      "Browser Use is off until you turn it on. When you then ask Cori to act on a page, Coere reads that page and sends a short text view of it to Claude, and the names of its buttons and fields to Jev (below). When a page can only be read as a picture, it sends a screenshot of that tab for that step and keeps no copy. To write an email it sends your request, your writing style, related memories and up to three of your past emails it found in Gmail, and for a reply the email you are answering. For a task that uses workers, Chrome asks for access to all sites while it runs; the workers send the text of every page they read to Claude, and Coere gives the access back when the task ends. It never sends passwords, card numbers or one time codes.",
+      "Coere Actions send Claude what each one needs. Rewrite sends the text you selected, in Google Docs or any text box, with your writing style and related memories. Coere Forms and Apply send a form's field names to Jev to match them to your memories, and send Claude only the questions that need a written answer, with the memories that may answer them, such as your name, contact details, schooling and past jobs. Apply also sends the job's text from its page. You review every answer before anything is sent to the form.",
+      "With Add memory on any website turned on, Coere reads the text of the box you are in only when you press its shortcut or the toolbar button. It uses those words in your browser to choose memories and never keeps them. Nothing goes to the site until you press Add, and then only the memories you left ticked. Sensitive memories are always left out.",
       "Voice mode turns your speech into text on your computer. The audio never leaves it and is never stored. The words then go to Cori like a typed line. The speech models download once from Hugging Face.",
     ],
   },
@@ -62,18 +64,18 @@ export const privacySections: PrivacySection[] = [
     id: "requests",
     title: "What goes to coere.ai and on to Anthropic",
     paragraphs: [
-      "Coere builds your memory with Claude, Anthropic's model. When a chat is saved, Coere sends its new messages, a few earlier messages for context, and the memories they may update. Before sending, it removes API keys, card numbers and passwords it finds. A question you ask Cori, and the page text Browser Use reads, go the same way.",
+      "Coere builds your memory with Claude, Anthropic's model. When a chat is saved, Coere sends its new messages, a few earlier messages for context, and the memories they may update. Before sending, it removes API keys, card numbers and passwords it finds. A question you ask Cori, the page text Browser Use and its workers read, and what Rewrite, Coere Forms and Apply send go the same way.",
       "These requests go to coere.ai, which checks your account, adds Coere's own key and forwards them to Anthropic's API. Anthropic's terms for API data apply to them. Large reads can go as a batch, which Anthropic keeps for 29 days.",
-      "Some short pieces of your saved chats also go through coere.ai to Jev, a classifier run by TypeSafe, which sorts them into categories. When coere.ai has no Jev key, those pieces go to Claude instead.",
-      "coere.ai keeps no request and no answer. For each one it records only counts: the account, the device, the model, the token numbers, the cost, the status and how long it took.",
+      "Some text also goes through coere.ai to Jev, a classifier run by TypeSafe: short pieces of your saved chats, which it sorts into categories; each line you type to Cori that its own rules do not understand, so Jev can tell what you are asking before Claude sees it; for Ask for more, your request with the names and first lines of the memories it may add; for Ask Cori, the names of the memories your draft matched, never the draft; and the names of a page's buttons and fields for Browser Use. When coere.ai has no Jev key, the chat pieces and Cori's lines go to Claude instead.",
+      "coere.ai keeps no request and no answer. For each one it records only the account, the device, the model, the token numbers, the cost, the status, how long it took and Anthropic's id for the request.",
     ],
   },
   {
     id: "backup",
     title: "The memory backup",
     paragraphs: [
-      "The backup is on by default. With it on, the extension uploads a copy of your memory to coere.ai a few minutes after your memory changes. The copy holds your memories with their quotes, the documents Coere writes from them (such as a project's notes or plan), and the titles of the chats they come from. It never holds the chats themselves.",
-      "Memories Coere marks sensitive, such as health and money, are left out unless you turn on Include sensitive memories.",
+      "The backup is on by default. With it on, the extension uploads a copy of your memory to coere.ai a few minutes after your memory changes. The copy holds your memories with their quotes, the documents Coere writes from them (such as a project's notes or plan), and the titles of the chats they come from. It never holds the chats themselves, their addresses or the projects they sit in, or a document Coere keeps word for word from a chat, such as a resume, offer or contract you pasted, your own draft or code you used.",
+      "Memories Coere marks sensitive are left out unless you turn on Include sensitive memories. With it off, the Health, Money, and Beliefs and values sections are left out whole, with their folders, their documents and the titles of chats only they came from. A memory Coere holds for you to confirm is never in the copy.",
       "coere.ai uses the copy to show your memory and the titles of its chats in your dashboard, to let you download it, and to build your organization's shared memory if you are in one.",
       "To turn it off, open your dashboard on coere.ai, go to Settings and turn off Back up memory to coere.ai. That deletes the stored copy, its index and your part of your organization's shared memory, and the extension stops uploading. Your memory in Coere stays in your browser. Delete memory copy, beside it, deletes the stored copy too, but with the backup on a new copy arrives at the next upload.",
     ],
@@ -106,7 +108,7 @@ export const privacySections: PrivacySection[] = [
     title: "Organizations",
     paragraphs: [
       "Coere for Teams lets a company's people read one shared memory. Only the Coere operator creates an organization, and a person is in at most one.",
-      "A member's memories in the organization's shared sections (Work, unless an admin picks others) go into the shared memory, with the titles of the chats they come from. Sensitive memories never go in. Every member sees who brought each shared memory, the list of members with their roles and join dates, how many tokens each saved and memories each shared, and the organization's totals, including its AI cost this month. Your memory outside the shared sections stays yours.",
+      "A member's memories in the organization's shared sections (Work, unless an admin picks others) go into the shared memory, with the titles of the chats they come from. Sensitive memories, and the Health, Money, and Beliefs and values sections, never go in. Every member sees who brought each shared memory, the list of members with their roles and join dates, how many tokens each saved and memories each shared, and the organization's totals, including its AI cost this month. Your memory outside the shared sections stays yours.",
       "Admins also invite coworkers, remove members, change roles and the shared sections, and decide what each member may read and whether their memory goes in. You can turn off Share my memory or leave at any time, though an organization's only admin must name another admin before leaving. Either removes your part of the shared memory.",
       "The person who runs Coere can open an account's or an organization's memory in Coere's admin panel, for support. It is never opened on its own, and every view is logged. The admin panel also shows each account's username, plan, devices and usage.",
     ],
