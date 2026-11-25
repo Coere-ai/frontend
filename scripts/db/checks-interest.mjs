@@ -78,5 +78,6 @@ export async function checkInterestTables(db) {
 export async function checkInterestKept(db) {
   equal("a rerun keeps the interest rows", await one(db, "interest kept", "select count(*)::int from public.product_interest"), 2);
   equal("a rerun keeps the operator's launch moment", await one(db, "moment kept", "select value from public.site_settings where key = 'launch.teams'"), { at: "2026-12-01T09:00:00.000Z", show: false });
-  equal("a rerun adds no setting", await one(db, "settings kept", "select count(*)::int from public.site_settings"), 2);
+  // The two launch moments and the first build budget.
+  equal("a rerun adds no setting", await one(db, "settings kept", "select count(*)::int from public.site_settings"), 3);
 }

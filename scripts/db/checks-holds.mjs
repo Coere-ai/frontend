@@ -82,11 +82,12 @@ export async function checkLiveHolds(db) {
   equal("an older hold counts at its worst case", (await reserve(1_000_000, 600_000))?.refused, "pending");
   await clear();
 
-  // A batch keeps the four argument rules: every hold's worst case counts, and it is refused only as the limit.
+  // A batch counts every hold's worst case. Since 20261125000000_proxy_settle, when only holds in
+  // flight fill the limit it waits as pending (checks-proxy.mjs); the four argument function still refuses it.
   await reserve(9_000_000, 1_000_000);
   check("a batch starts while worst cases leave room", (await reserve(1_000_000, 0, { batch: true }))?.hold_id != null);
-  equal("and is refused as the limit once they fill it", (await reserve(1, 0, { batch: true }))?.refused, "first_build");
-  equal("as the four argument function refuses it", (await oldReserve(1, true))?.refused, "first_build");
+  equal("and waits as pending once holds in flight fill them", (await reserve(1, 0, { batch: true }))?.refused, "pending");
+  equal("where the four argument function refuses it as the limit", (await oldReserve(1, true))?.refused, "first_build");
   await clear();
 
   // After the first build: the month, then the day, and the lifetime limit first.
