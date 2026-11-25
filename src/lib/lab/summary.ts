@@ -56,17 +56,21 @@ export function median(xs: number[]): number | null {
 export function caseWindow(work: readonly SumWork[], userId: string, caseId: string, now: string): { from: string; to: string } | null {
   const rows = work.filter((w) => w.userId === userId && w.caseId === caseId);
   if (!rows.length) return null;
-  const from = rows.map((r) => r.startedAt).sort()[0]!;
+  // Compared as moments, not strings: Postgres writes +00:00 and a JavaScript Date writes Z.
+  const byTime = (a: string, b: string) => Date.parse(a) - Date.parse(b);
+  const from = rows.map((r) => r.startedAt).sort(byTime)[0]!;
   const ends = rows.map((r) => r.submittedAt);
-  const to = ends.every(Boolean) ? (ends as string[]).sort().at(-1)! : now;
+  const to = ends.every(Boolean) ? (ends as string[]).sort(byTime).at(-1)! : now;
   return { from, to };
 }
 
 /** How many times Coere was used for this student inside a window. */
 export function coereUses(events: readonly SumEvent[], userId: string, w: { from: string; to: string } | null): number {
   if (!w) return 0;
+  const from = Date.parse(w.from);
+  const to = Date.parse(w.to);
   return events
-    .filter((e) => e.userId === userId && (COERE_USE_KINDS as readonly string[]).includes(e.kind) && e.createdAt >= w.from && e.createdAt <= w.to)
+    .filter((e) => e.userId === userId && (COERE_USE_KINDS as readonly string[]).includes(e.kind) && Date.parse(e.createdAt) >= from && Date.parse(e.createdAt) <= to)
     .reduce((s, e) => s + e.count, 0);
 }
 

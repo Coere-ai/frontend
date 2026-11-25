@@ -5,7 +5,6 @@ import { labCase } from "@/lib/lab/cases";
 import { caseProgress } from "@/lib/lab/progress";
 import { readParticipant, readStudy, readSurveyDone, readWork } from "@/lib/lab/store";
 import { supabaseConfigured } from "@/lib/supabase";
-import { CONDITION_COPY } from "@/site/lab/condition";
 import { JoinForm } from "@/site/lab/join-form";
 import { LabShell } from "@/site/lab/lab-shell";
 import { OptIn } from "@/site/lab/opt-in";
@@ -56,7 +55,7 @@ export default async function LabPage() {
             <li key={id} className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
               <div>
                 <p className="text-[13px] text-white/55">
-                  Case {p.slot}, {CONDITION_COPY[p.condition].label.toLowerCase()}
+                  Case {p.slot}, {p.condition === "coere" ? "with Coere" : "without Coere"}
                 </p>
                 <p className="mt-1 text-[20px] font-medium text-white">{c.name}</p>
                 <p className="text-[14px] text-white/60">{c.tagline}</p>

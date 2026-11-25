@@ -36,6 +36,8 @@ test("only Coere's own memory uses inside the window count", () => {
     { userId: "u2", kind: "context_import", count: 5, createdAt: at(10) },
   ];
   assert.equal(coereUses(events, "u1", { from: at(0), to: at(50) }), 3);
+  // Postgres writes +00:00, a Date writes Z; both are the same moment.
+  assert.equal(coereUses([{ userId: "u1", kind: "transfer", count: 1, createdAt: "2026-11-25T10:20:00.5+00:00" }], "u1", { from: at(0), to: "2026-11-25T10:20:01Z" }), 1);
 });
 
 test("stats and paired deltas compare the same student on the same task", () => {
