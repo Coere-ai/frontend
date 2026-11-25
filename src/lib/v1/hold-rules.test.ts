@@ -4,6 +4,8 @@ import { describe, it } from "node:test";
 import { expectedCaseMicros, worstCaseMicros } from "./anthropic/worst-case";
 import {
   CONCURRENCY_RETRY_SECONDS,
+  holdOutcome,
+  settleArgs,
   HOLD_SECONDS,
   MAX_LIVE_HOLDS,
   OVERRUN_MICROS,
@@ -121,5 +123,60 @@ describe("what a build fits at once", () => {
   it("fits the live holds cap of Haiku calls at once", () => {
     const c = { ...call(4_096), model: "claude-haiku-5-5" };
     assert.equal(fits(worstCaseMicros(c, "direct"), expectedCaseMicros(c, "direct"), 10_000_000), MAX_LIVE_HOLDS);
+  });
+});
+
+describe("holdOutcome", () => {
+  it("lets a hold go only once the call's cost is known", () => {
+    // Anthropic answered an error, which it does not bill, or a batch's reservation now counts in its place.
+    assert.equal(holdOutcome("upstream_error"), "release");
+    assert.equal(holdOutcome("stored"), "release");
+    assert.equal(holdOutcome("not_stored"), "release");
+    // settle_call recorded the cost and let the hold go in the same transaction.
+    assert.equal(holdOutcome("settled"), "none");
+  });
+
+  it("keeps the hold to run out when the cost may have been billed and was not recorded", () => {
+    for (const event of ["aborted", "timeout", "unreachable", "read_failed", "record_failed"] as const) {
+      assert.equal(holdOutcome(event), "keep", event);
+    }
+  });
+});
+
+describe("settleArgs", () => {
+  const tokens = { input: 1000, output: 400, cacheRead: 2000, cacheWrite: 0 };
+
+  it("carries the hold and one row per model, as settle_call takes them", () => {
+    const args = settleArgs({ userId: "u1", deviceId: "d1" }, "h1", "message", [
+      { model: "claude-opus-5-5", tokens: { ...tokens, output: 10 }, costMicros: 4200 },
+      { model: "claude-sonnet-5-5", tokens, costMicros: 6200 },
+    ], { status: 200, durationMs: 1234.6, requestId: "r".repeat(200) });
+    assert.deepEqual(args, {
+      p_hold: "h1",
+      p_user: "u1",
+      p_device: "d1",
+      p_kind: "message",
+      p_rows: [
+        { model: "claude-opus-5-5", input: 1000, output: 10, cacheWrite: 0, cacheRead: 2000, costMicros: 4200 },
+        { model: "claude-sonnet-5-5", input: 1000, output: 400, cacheWrite: 0, cacheRead: 2000, costMicros: 6200 },
+      ],
+      p_status: 200,
+      p_duration_ms: 1235,
+      p_request_id: "r".repeat(120),
+    });
+  });
+
+  it("sends no hold for a call that has none, and null for a model the answer did not name", () => {
+    const args = settleArgs({ userId: "u1", deviceId: "d1" }, null, "count_tokens", [{ model: "", tokens, costMicros: 0 }], { status: 200, durationMs: -5, requestId: null });
+    assert.equal(args.p_hold, null);
+    assert.equal(args.p_rows[0]?.model, null);
+    assert.equal(args.p_duration_ms, 0);
+    assert.equal(args.p_request_id, null);
+  });
+});
+
+describe("the site's first build budget", () => {
+  it("reads reserve_spend's site_budget refusal as its own", () => {
+    assert.deepEqual(readReservation([{ hold_id: null, refused: "site_budget" }]), { ok: false, refused: "site_budget" });
   });
 });
