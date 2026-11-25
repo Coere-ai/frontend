@@ -1,11 +1,11 @@
 // A stand in for a Supabase project, for the screenshot tool only: the
-// real migration in PGlite (with the db:check harness's stand ins for what
+// real migrations in PGlite (with the db:check harness's stand ins for what
 // Supabase provides) behind the REST, Auth and Storage routes supabase-js
 // calls. The site talks to it exactly as it talks to Supabase, through
 // SUPABASE_URL and its two keys, so no page code changes for a picture.
 
 import { createServer } from "node:https";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { bootDatabase } from "../../db/harness.mjs";
 import { runCert } from "../lib/tls.mjs";
@@ -13,7 +13,8 @@ import { createAuth, verify } from "./auth.mjs";
 import { createRest, restError } from "./rest.mjs";
 import { createStorage } from "./storage.mjs";
 
-const MIGRATION = fileURLToPath(new URL("../../../supabase/migrations/20261103000000_coere.sql", import.meta.url));
+// Every migration, in name order, so the pictures run on the schema the live site runs.
+const MIGRATIONS = fileURLToPath(new URL("../../../supabase/migrations/", import.meta.url));
 
 export const SECRET_KEY = "sb_secret_screenshots_only_000000000000";
 export const PUBLISHABLE_KEY = "sb_publishable_screenshots_only_0000000";
@@ -53,7 +54,7 @@ function serial() {
  */
 export async function startFakeSupabase({ port = 0 } = {}) {
   const db = await bootDatabase();
-  await db.exec(await readFile(MIGRATION, "utf8"));
+  for (const name of (await readdir(MIGRATIONS)).filter((n) => n.endsWith(".sql")).sort()) await db.exec(await readFile(`${MIGRATIONS}${name}`, "utf8"));
   const passwords = new Map();
   const rest = await createRest(db);
   const auth = createAuth(db, passwords);

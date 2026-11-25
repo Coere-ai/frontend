@@ -30,7 +30,7 @@ import { refreshSession } from "@/lib/supabase/refresh";
  * nonce Content-Security-Policy.
  *
  * The account pages (sign in, sign up, /connect, /account, the
- * person's dashboard) pass through here too, for two things only: the
+ * person's dashboard, the Coere Lab study at /lab) pass through here too, for two things only: the
  * Supabase session is refreshed before they render, and they get the same
  * nonce policy and noindex. Who may see what is decided by each page, action
  * and route itself.
@@ -76,7 +76,7 @@ function notFound(): NextResponse {
 }
 
 /** The private account paths. Keep in step with the matcher below. */
-const ACCOUNT_PATH = /^\/(sign-in|sign-up|sign-out|connect|account|welcome)$|^\/dashboard(\/|$)/;
+const ACCOUNT_PATH = /^\/(sign-in|sign-up|sign-out|connect|account|welcome)$|^\/(dashboard|lab)(\/|$)/;
 
 /** The dashboard and welcome host pages, the two places an extension frame may load. */
 const DASHBOARD_PATH = /^\/dashboard(\/|$)|^\/welcome$/;
@@ -157,5 +157,7 @@ export const config = {
     "/account",
     "/dashboard/:path*",
     "/welcome",
+    "/lab",
+    "/lab/:path*",
   ],
 };
