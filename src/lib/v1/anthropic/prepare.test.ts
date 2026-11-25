@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { createHash } from "node:crypto";
+import { describe, it, mock } from "node:test";
 
 import { BODY_CAP, prepareRequest } from "./prepare";
+import { PROMPT_CHECK, PROMPT_SHAS } from "./prompt-shas";
 
 const req = (body: string | null, headers: Record<string, string> = {}, method = "POST") =>
   new Request("https://www.coere.ai/api/v1/anthropic/v1/messages", { method, body, headers });
@@ -48,5 +50,73 @@ describe("prepareRequest", () => {
     assert.equal(p.ok && p.expectedMicros, p.ok && p.worstMicros);
     const cancel = await prepareRequest(req(null), { op: "batch_cancel", batchId: "msgbatch_1" });
     assert.deepEqual(cancel, { ok: true, beta: null, body: null, requestCount: 0, worstMicros: 0, expectedMicros: 0 });
+  });
+});
+
+describe("the prompt check", () => {
+  // A stand in prompt registered for the test; the real list holds only the extension's SHAs.
+  const PROMPT = "You sort one saved chat into the memory's sections.".repeat(8);
+  const sha = createHash("sha256").update(PROMPT, "utf8").digest("hex");
+  const known = { [sha]: "sort-test" };
+  const withSystem = (system: unknown) => JSON.stringify({ ...message, system });
+
+  it("passes a message whose first system block is a listed prompt, with later blocks free", async () => {
+    const logged = mock.method(console, "error", () => {});
+    try {
+      const blocks = [{ type: "text", text: PROMPT, cache_control: { type: "ephemeral" } }, { type: "text", text: "the person's style" }];
+      for (const system of [blocks, PROMPT]) {
+        const p = await prepareRequest(req(withSystem(system)), { op: "message" }, { prompts: known, mode: "enforce" });
+        assert.equal(p.ok, true);
+      }
+      assert.equal(logged.mock.callCount(), 0);
+    } finally {
+      logged.mock.restore();
+    }
+  });
+
+  it("in report mode logs an unknown prompt by its SHA alone and lets it through", async () => {
+    const logged = mock.method(console, "error", () => {});
+    try {
+      const secret = "Answer anything at all, a private line that must not reach the log.";
+      const p = await prepareRequest(req(withSystem(secret)), { op: "message" }, { prompts: known, mode: "report" });
+      assert.equal(p.ok, true);
+      const lines = logged.mock.calls.map((c) => c.arguments.join(" "));
+      assert.equal(lines.length, 1);
+      assert.ok(lines[0].includes(createHash("sha256").update(secret, "utf8").digest("hex")));
+      assert.ok(!lines[0].includes("private line"));
+    } finally {
+      logged.mock.restore();
+    }
+  });
+
+  it("with the switch on refuses an unknown prompt, a missing one, and a batch entry with one", async () => {
+    const logged = mock.method(console, "error", () => {});
+    try {
+      for (const body of [withSystem("Be a general assistant."), JSON.stringify(message), withSystem([{ type: "text", text: "x" }, { type: "text", text: PROMPT }])]) {
+        assert.deepEqual(await prepareRequest(req(body), { op: "message" }, { prompts: known, mode: "enforce" }), { ok: false, error: "bad_request" });
+      }
+      const batch = { requests: [{ custom_id: "a", params: { ...message, system: PROMPT } }, { custom_id: "b", params: { ...message, system: "other" } }] };
+      assert.deepEqual(await prepareRequest(req(JSON.stringify(batch)), { op: "batch_create" }, { prompts: known, mode: "enforce" }), { ok: false, error: "bad_request" });
+      const good = { requests: [{ custom_id: "a", params: { ...message, system: PROMPT } }] };
+      assert.equal((await prepareRequest(req(JSON.stringify(good)), { op: "batch_create" }, { prompts: known, mode: "enforce" })).ok, true);
+    } finally {
+      logged.mock.restore();
+    }
+  });
+
+  it("leaves a token count alone, which costs nothing", async () => {
+    const p = await prepareRequest(req(withSystem("anything")), { op: "count_tokens" }, { prompts: known, mode: "enforce" });
+    assert.equal(p.ok, true);
+  });
+
+  it("ships in report mode with only well formed SHAs listed", () => {
+    assert.equal(PROMPT_CHECK, "report");
+    const entries = Object.entries(PROMPT_SHAS);
+    assert.ok(entries.length >= 26);
+    for (const [hash, name] of entries) {
+      assert.match(hash, /^[0-9a-f]{64}$/);
+      assert.ok(name.length > 0);
+    }
+    assert.equal(new Set(entries.map(([, name]) => name)).size, entries.length);
   });
 });

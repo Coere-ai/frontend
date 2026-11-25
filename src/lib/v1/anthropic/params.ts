@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 /**
  * The checks on each request's params before it is forwarded
  * (docs/accounts.md 8.4): one for a message, each entry for a batch. They
@@ -151,4 +153,22 @@ export function checkBeta(header: string | null): string | null | false {
   const values = header.split(",").map((v) => v.trim()).filter(Boolean);
   if (values.length === 0) return null;
   return values.every((v) => ALLOWED_BETAS.has(v)) ? values.join(",") : false;
+}
+
+/**
+ * The text of a request's first system block: the whole `system` when it is
+ * a string, else its first block's text. Null when there is none.
+ */
+export function firstSystemText(params: Record<string, unknown>): string | null {
+  const system = params.system;
+  if (typeof system === "string") return system;
+  if (!Array.isArray(system)) return null;
+  const first: unknown = system[0];
+  return isRecord(first) && first.type === "text" && typeof first.text === "string" ? first.text : null;
+}
+
+/** The SHA-256 of the first system block as hex, the form prompt-shas.ts lists, or null when there is none. */
+export function promptSha(params: Record<string, unknown>): string | null {
+  const text = firstSystemText(params);
+  return text === null ? null : createHash("sha256").update(text, "utf8").digest("hex");
 }
