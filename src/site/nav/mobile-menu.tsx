@@ -5,7 +5,6 @@ import Link from "@/site/i18n/link";
 import { useEffect, useState } from "react";
 import { industriesIn } from "@/site/content/industries";
 import { navTabs, startHref, type NavTabId } from "@/site/content/navigation";
-import { posts } from "@/site/content/posts";
 import { productsIn } from "@/site/content/products";
 import { useMessages } from "@/site/i18n/client";
 import type { Messages } from "@/site/i18n/messages/types";
@@ -13,11 +12,12 @@ import { ChevronDownIcon } from "@/site/ui/icons/interface-icons";
 import { SoftLink } from "@/site/ui/soft-button";
 import { AccountLink } from "./account-link";
 import { LanguageMenu } from "./language-menu";
+import type { NavPost } from "./nav-posts";
 
 type Item = { href: string; label: string };
 
 /** The links each tab shows on small screens, where there is no room for the full menus, in the page's language. */
-const itemsIn = ({ chrome: { nav }, catalog }: Pick<Messages, "chrome" | "catalog">): Record<NavTabId, Item[]> => ({
+const itemsIn = ({ chrome: { nav }, catalog }: Pick<Messages, "chrome" | "catalog">, posts: readonly NavPost[]): Record<NavTabId, Item[]> => ({
   products: [...productsIn(catalog).map((p) => ({ href: `/products/${p.slug}`, label: p.name })), { href: "/pricing", label: nav.pricing }],
   industries: [{ href: "/industries", label: nav.allIndustries }, ...industriesIn(catalog).slice(0, 6).map((i) => ({ href: `/industries/${i.slug}`, label: i.name }))],
   resources: [
@@ -39,13 +39,13 @@ const itemsIn = ({ chrome: { nav }, catalog }: Pick<Messages, "chrome" | "catalo
  * The menu below lg: a dark glass card under the glass bar, filling the rest of
  * the screen. Each tab folds open to its links, then come Start for free,
  * Log in and the language. While it is open the page behind it doesn't
- * scroll.
+ * scroll. `posts` are the newest posts the navbar was given.
  */
-export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function MobileMenu({ open, onClose, posts }: { open: boolean; onClose: () => void; posts: readonly NavPost[] }) {
   const [expanded, setExpanded] = useState<NavTabId | null>("products");
   const chrome = useMessages("chrome");
   const catalog = useMessages("catalog");
-  const items = itemsIn({ chrome, catalog });
+  const items = itemsIn({ chrome, catalog }, posts);
   const t = chrome.nav;
 
   useEffect(() => {

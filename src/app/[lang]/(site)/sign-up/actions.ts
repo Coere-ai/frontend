@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { newPasswordProblem } from "@/lib/account/password-change";
 import { createAccount, type Created } from "@/lib/auth/create-account";
-import { overLimit } from "@/lib/auth/guard";
+import { overLimit, signUpOverLimit } from "@/lib/auth/guard";
 import { markSignedIn } from "@/lib/auth/hint-cookie";
 import { normalizeUsername, passwordProblem, usernameProblem } from "@/lib/auth/identity";
 import { usernameTaken } from "@/lib/auth/lookup";
@@ -45,7 +45,7 @@ export async function signUp(_prev: SignUpState, form: FormData): Promise<SignUp
     return { ...base, error: "Making an account is not available right now. Try again later." };
   }
   const head = await headers();
-  if (await overLimit(head, username)) return { ...base, error: "Too many tries. Wait a few minutes and try again." };
+  if ((await overLimit(head, username)) || (await signUpOverLimit(head))) return { ...base, error: "Too many tries. Wait a few minutes and try again." };
 
   let made: Created;
   try {

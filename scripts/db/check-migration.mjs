@@ -16,10 +16,11 @@ import { checkLimitColumns, checkLimitResolution, checkOwnLimitsLocked, checkSam
 import { checkOrganizationRows, checkOwnRows, checkServerWrites, checkStorage } from "./checks-rls.mjs";
 import { checkAdminReaders, checkAppEvents, checkInvites, checkMemoryTotals, checkRecordUsage } from "./checks-totals.mjs";
 import { checkHoldColumns, checkLiveHolds, checkUpgradeKeepsHolds } from "./checks-holds.mjs";
+import { checkAppEventsCapped, checkBatchPending, checkExpiredHolds, checkFirstBuildBudget, checkSettleCall, checkSignUpLimit, checkStoreBatch } from "./checks-proxy.mjs";
 import { bootDatabase, check, equal, failureCount, one, passCount } from "./harness.mjs";
 
 // In the order they run. The first builds the whole database; each later one only adds to it.
-const MIGRATIONS = ["20261103000000_coere.sql", "20261124000000_build_lane_holds.sql"].map((name) =>
+const MIGRATIONS = ["20261103000000_coere.sql", "20261124000000_build_lane_holds.sql", "20261125000000_proxy_settle.sql"].map((name) =>
   fileURLToPath(new URL(`../../supabase/migrations/${name}`, import.meta.url)),
 );
 
@@ -56,6 +57,13 @@ async function main() {
   await checkSpendReserve(db);
   await checkHoldColumns(db);
   await checkLiveHolds(db);
+  await checkSettleCall(db);
+  await checkStoreBatch(db);
+  await checkFirstBuildBudget(db);
+  await checkBatchPending(db);
+  await checkSignUpLimit(db);
+  await checkAppEventsCapped(db);
+  await checkExpiredHolds(db);
   await checkCostReaders(db);
   await checkSpendLocked(db);
   await checkAppEvents(db, org);

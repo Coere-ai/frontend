@@ -3,7 +3,9 @@ import "server-only";
 import { supabase } from "@/lib/supabase";
 
 import type { DeviceAccount } from "../device-auth";
+import { isUnknownFunction } from "../hold-rules";
 import type { TokenCounts } from "../prices";
+import { releaseHold } from "../spend-holds";
 
 /**
  * Batch ownership (docs/accounts.md 8.4). Every batch runs under Coere's one
@@ -14,14 +16,41 @@ import type { TokenCounts } from "../prices";
 
 /**
  * Stores a new batch as the caller's, with its worst case, which counts
- * against the limits until it is metered. Tried twice, since a batch that is
- * not stored can never be read through the proxy. False when both failed.
+ * against the limits until it is metered, and lets the create's hold go in
+ * the same transaction (store_batch), so the batch's cost is never held
+ * twice: a hold left behind would be charged its worst case when it ran
+ * out, beside the batch's own reservation. Tried twice, since a batch that
+ * is not stored can never be read through the proxy. False when both
+ * failed, and the hold is let go by the caller once the batch is
+ * cancelled. Before migration 20261125000000_proxy_settle has run, the row
+ * is upserted and the hold deleted apart.
  */
-export async function storeBatch(a: DeviceAccount, id: string, requestCount: number, reservedMicros: number): Promise<boolean> {
-  const row = { id, user_id: a.userId, device_id: a.deviceId, request_count: requestCount, reserved_micros: Math.max(0, Math.ceil(reservedMicros)) };
+export async function storeBatch(a: DeviceAccount, id: string, requestCount: number, reservedMicros: number, holdId: string | null): Promise<boolean> {
+  const reserved = Math.max(0, Math.ceil(reservedMicros));
+  const args = { p_hold: holdId, p_id: id, p_user: a.userId, p_device: a.deviceId, p_request_count: requestCount, p_reserved: reserved };
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { data, error } = await supabase().rpc("store_batch", args);
+      // False: the id is already another account's, so it is not stored as the caller's.
+      if (!error) return data !== false;
+      if (isUnknownFunction(error)) return storeApart(a, id, requestCount, reserved, holdId);
+      console.error("batch not stored", error.code);
+    } catch {
+      console.error("batch not stored");
+    }
+  }
+  return false;
+}
+
+/** The upsert and the delete store_batch replaced, for the minutes before its migration has run. */
+async function storeApart(a: DeviceAccount, id: string, requestCount: number, reserved: number, holdId: string | null): Promise<boolean> {
+  const row = { id, user_id: a.userId, device_id: a.deviceId, request_count: requestCount, reserved_micros: reserved };
   for (let attempt = 0; attempt < 2; attempt++) {
     const { error } = await supabase().from("ai_batches").upsert(row, { onConflict: "id", ignoreDuplicates: true });
-    if (!error) return true;
+    if (!error) {
+      if (holdId) await releaseHold(holdId);
+      return true;
+    }
     console.error("batch not stored", error.code);
   }
   return false;

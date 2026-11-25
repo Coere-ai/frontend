@@ -1,6 +1,7 @@
 import "server-only";
 
-import { addressOf, logSecurityEvent } from "@/lib/security/events";
+import { addressOf, ipHash, logSecurityEvent } from "@/lib/security/events";
+import { supabase, supabaseConfigured } from "@/lib/supabase";
 
 import { createSignInLimiter } from "./attempts";
 import { WRONG_GUESS_DELAY_MS } from "./credentials";
@@ -19,6 +20,42 @@ export async function overLimit(headers: Headers, username: string | null): Prom
   const spent = limiter.hit(`ip:${addressOf(headers) ?? "unknown"}`, username ? `username:${username}` : null);
   if (spent) await logSecurityEvent("rate_limited", { headers });
   return spent;
+}
+
+/**
+ * Sign up's own limit, kept in the database (hit_sign_up_limit, migration
+ * 20261125000000_proxy_settle) so it holds across server instances: 10
+ * accounts an hour from one address, counted by the address's keyed hash.
+ * Sign up needs only a username and each new account gets a first build on
+ * Coere's key, so a limit per instance let a script make accounts as fast as
+ * new instances started. A school or an office behind one address still
+ * fits. The site wide first build budget (reserve_spend) bounds the rest.
+ */
+export const SIGN_UPS_PER_ADDRESS = 10;
+export const SIGN_UP_WINDOW_SECONDS = 3600;
+
+/**
+ * Counts one sign up attempt for the caller's address; true, and a
+ * `rate_limited` event, when its hour is spent. With no address, no
+ * database or the function not there yet it answers false and leaves the
+ * limit per instance (overLimit) to hold, so sign up never fails shut.
+ */
+export async function signUpOverLimit(headers: Headers): Promise<boolean> {
+  const hash = ipHash(headers);
+  if (!hash || !supabaseConfigured()) return false;
+  try {
+    const { data, error } = await supabase().rpc("hit_sign_up_limit", { p_hash: hash, p_max: SIGN_UPS_PER_ADDRESS, p_window_seconds: SIGN_UP_WINDOW_SECONDS });
+    if (error) {
+      console.error("hit_sign_up_limit failed", error.code);
+      return false;
+    }
+    if (data !== true) return false;
+  } catch {
+    console.error("hit_sign_up_limit failed");
+    return false;
+  }
+  await logSecurityEvent("rate_limited", { headers });
+  return true;
 }
 
 /**

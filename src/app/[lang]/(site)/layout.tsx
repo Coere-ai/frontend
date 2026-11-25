@@ -1,4 +1,5 @@
 import { darkViewport } from "@/lib/seo";
+import { navPosts } from "@/site/content/posts";
 import { ContactLayer } from "@/site/contact/contact-layer";
 import { I18nProvider } from "@/site/i18n/client";
 import { getLocale, getMessages } from "@/site/i18n/server";
@@ -16,14 +17,16 @@ export const viewport = darkViewport;
  * Titles, descriptions and keywords come from the root layout and each page.
  * The navbar, its menus and the footer read their words from the page's
  * language, given here once. The contact layer turns every link that
- * writes to the team, and every Book a demo, into its pop up.
+ * writes to the team, and every Book a demo, into its pop up. The navbar
+ * gets the newest posts' slug, title and cover here, on the server, so the
+ * post list never ships to the browser.
  */
 export default async function SiteLayout({ children }: LayoutProps<"/[lang]">) {
   const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
   return (
     <I18nProvider locale={locale} messages={{ chrome: messages.chrome, catalog: messages.catalog }}>
       <div className="flex min-h-dvh flex-col bg-(--background) text-neutral-950">
-        <Navbar />
+        <Navbar posts={navPosts()} />
         <main className="flex-1">{children}</main>
         <Footer />
         <SiteTracker />

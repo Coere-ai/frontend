@@ -6,10 +6,11 @@ import { costMicros, hasPrice, PRICE_TABLE_DATE, PRICES } from "./prices";
 const t = (input: number, output = 0, cacheRead = 0, cacheWrite = 0) => ({ input, output, cacheRead, cacheWrite });
 
 describe("the price table", () => {
-  it("is the 2026-10-22 table of section 11", () => {
-    assert.equal(PRICE_TABLE_DATE, "2026-10-22");
+  it("is the 2026-11-25 table of section 11", () => {
+    assert.equal(PRICE_TABLE_DATE, "2026-11-25");
     assert.deepEqual(PRICES["claude-opus-5-5"]?.base, { input: 4, output: 20, cacheRead: 0.2, cacheWrite: 5 });
-    assert.deepEqual(PRICES["claude-sonnet-5-5"]?.base, { input: 2, output: 10, cacheRead: 0.2, cacheWrite: 2.5 });
+    // Anthropic's price for a Sonnet 5.5 cache read is $0.10; the table charged $0.20 until 2026-11-25.
+    assert.deepEqual(PRICES["claude-sonnet-5-5"]?.base, { input: 2, output: 10, cacheRead: 0.1, cacheWrite: 2.5 });
     assert.deepEqual(PRICES["claude-haiku-5-5"]?.base, { input: 0.1, output: 0.5, cacheRead: 0.01, cacheWrite: 0.125 });
     assert.deepEqual(PRICES["claude-haiku-5-5"]?.above100k, { input: 0.5, output: 2.5, cacheRead: 0.05, cacheWrite: 0.625 });
     const jev = PRICES["jev-1.14.0"]?.base;
@@ -23,7 +24,7 @@ describe("the price table", () => {
 
 describe("costMicros", () => {
   it("prices each kind of token", () => {
-    assert.equal(costMicros("claude-sonnet-5-5", t(1000, 500, 2000, 400), "direct"), 2000 + 5000 + 400 + 1000);
+    assert.equal(costMicros("claude-sonnet-5-5", t(1000, 500, 2000, 400), "direct"), 2000 + 5000 + 200 + 1000);
     assert.equal(costMicros("claude-opus-5-5", t(1_000_000), "direct"), 4_000_000);
   });
 

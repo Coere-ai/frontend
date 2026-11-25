@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { anthropicError, anthropicErrorBody, holdRefusedAnswer } from "./errors";
+import { anthropicError, anthropicErrorBody, holdRefusedAnswer, upstreamErrorText } from "./errors";
 
 describe("anthropicError", () => {
   it("answers each case of 8.4 with its status and Anthropic's body", async () => {
@@ -93,5 +93,56 @@ describe("holdRefusedAnswer", () => {
     const res = holdRefusedAnswer(null);
     assert.equal(res.status, 503);
     assert.equal(res.headers.get("x-coere-limit"), null);
+  });
+});
+
+describe("upstreamErrorText", () => {
+  // The shape of Anthropic's own 429, which names Coere's organization and its limit.
+  const limited = JSON.stringify({
+    type: "error",
+    error: { type: "rate_limit_error", message: "This request would exceed the rate limit for your organization (org-id-x) of 400,000 input tokens per minute." },
+  });
+
+  it("answers an upstream 429 with a fixed message and the same type", () => {
+    const text = upstreamErrorText(429, limited);
+    assert.ok(text !== null);
+    assert.deepEqual(JSON.parse(text), { type: "error", error: { type: "rate_limit_error", message: "rate_limited" } });
+    assert.ok(!text.includes("org-id-x"));
+  });
+
+  it("answers an overload and every other 5xx with a fixed message and the same type", () => {
+    const overloaded = JSON.stringify({ type: "error", error: { type: "overloaded_error", message: "Overloaded for org-id-x" } });
+    assert.deepEqual(JSON.parse(upstreamErrorText(529, overloaded) ?? ""), { type: "error", error: { type: "overloaded_error", message: "overloaded" } });
+    assert.deepEqual(JSON.parse(upstreamErrorText(500, "not json") ?? ""), { type: "error", error: { type: "api_error", message: "upstream_error" } });
+    assert.deepEqual(JSON.parse(upstreamErrorText(429, "{}") ?? ""), { type: "error", error: { type: "rate_limit_error", message: "rate_limited" } });
+  });
+
+  it("keeps a type that is not one of Anthropic's own out", () => {
+    const odd = JSON.stringify({ type: "error", error: { type: "org-id-x", message: "m" } });
+    assert.equal(JSON.parse(upstreamErrorText(503, odd) ?? "").error.type, "api_error");
+  });
+
+  it("leaves a 4xx about the caller's own request as it was", () => {
+    assert.equal(upstreamErrorText(400, '{"type":"error","error":{"type":"invalid_request_error","message":"max_tokens: too big"}}'), null);
+    assert.equal(upstreamErrorText(404, "{}"), null);
+  });
+});
+
+describe("the duration cut", () => {
+  it("answers a call cut at the proxy's limit as a 504 marked duration, not to be retried as it is", async () => {
+    const res = anthropicError("duration");
+    assert.equal(res.status, 504);
+    assert.equal(res.headers.get("x-coere-limit"), "duration");
+    assert.equal(res.headers.get("x-should-retry"), "false");
+    assert.deepEqual(await res.json(), { type: "error", error: { type: "timeout_error", message: "duration" } });
+  });
+});
+
+describe("the site's first build budget", () => {
+  it("answers it as Anthropic's spend limit 400, so the extension holds its queue and tries hourly", async () => {
+    const res = holdRefusedAnswer("site_budget");
+    assert.equal(res.status, 400);
+    assert.equal(res.headers.get("x-should-retry"), "false");
+    assert.match((await res.json()).error.message, /^You have reached your specified daily usage limit/);
   });
 });

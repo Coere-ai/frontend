@@ -1,6 +1,6 @@
 "use client";
 
-import { formatPostDate, postAuthor, type Post } from "@/site/content/posts";
+import { formatPostDate, postAuthor, type Post } from "@/site/content/post-parts";
 import { useLocale, useMessages } from "@/site/i18n/client";
 import { format } from "@/site/i18n/types";
 

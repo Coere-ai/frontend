@@ -1,89 +1,24 @@
-import type { CoverKind } from "@/site/blog/covers";
-import { founders } from "@/lib/site";
-import type { Locale } from "@/site/i18n/locales";
 import type { Messages } from "@/site/i18n/messages/types";
 
+import { readingMinutes, type Post, type PostInput } from "./post-parts";
+
+export { blockText, CATEGORIES, formatPostDate, postAuthor, readingMinutes, type Block, type Category, type Post } from "./post-parts";
+
 /**
- * Blog posts. The funding post is the owner's news, hidden for now. The others are
+ * Blog posts, read on the server only. The menus get the three newest
+ * posts' slug, title and cover from the site layout (navPosts), so no post
+ * body ships in a client chunk. posts.test.ts fails if any client module
+ * comes to import this file, directly or through another; the file is not
+ * marked server-only, since the sitemap's own test reads it under Node. A post that is not out yet stays out of
+ * this repository until it is: a filter in a module the build imports is
+ * not a guard, and this repository is public. The posts here are
  * placeholder posts written to fill the blog while the real ones are
  * drafted, marked `placeholder` so search engines skip them.
  *
  * A body is a list of blocks. A plain string is a paragraph, and inside it
  * [words](/path) makes a link, **words** bold and `words` code.
  */
-export type Block =
-  | string
-  | { h2: string }
-  | { list: string[]; ordered?: boolean }
-  | { quote: string; cite?: string }
-  | { code: string };
-
-/** What a post is about, for the blog's filters. */
-export const CATEGORIES = ["Company", "Product", "Developers"] as const;
-export type Category = (typeof CATEGORIES)[number];
-
-type PostInput = {
-  slug: string;
-  title: string;
-  /** The one line under the title on the post page, and the card's summary. */
-  excerpt: string;
-  /** ISO date, shown as "October 28, 2026". */
-  date: string;
-  category: Category;
-  /** The cover art drawn for this post (src/site/blog/covers); the plain mark if unset. */
-  cover?: CoverKind;
-  /** A founder's name, as on the About page. Anyone else, or no one, reads as the Coere team. */
-  author?: string;
-  body: Block[];
-  /** A button under the post, for a post that asks the reader to do something. */
-  cta?: { href: string; label: string };
-  /** Written to fill the blog until a real post replaces it, so kept out of search. */
-  placeholder?: boolean;
-  /** Kept in the source but off the site: not listed, not linked, and its page is not built. */
-  hidden?: boolean;
-};
-
-export type Post = PostInput & {
-  /** The cover's address, drawn at build time by the cover route. */
-  image: string;
-  readMinutes: number;
-};
-
 const input: PostInput[] = [
-  {
-    slug: "coere-is-venture-backed",
-    // Hidden for now, at the owner's request; set to false to publish it.
-    hidden: true,
-    title: "Coere is now venture backed",
-    excerpt: "We raised venture funding at a $2 million valuation. Here is what the money is for, and what stays the same.",
-    date: "2026-11-20",
-    category: "Company",
-    cover: "venture",
-    body: [
-      "Today we have news to share. Coere is now venture backed, at a $2 million valuation.",
-      "It is an early step, and an important one for a small team. Investors looked at what we are building and decided to back it. We are grateful for that trust, and we plan to earn it.",
-      { h2: "Why we started Coere" },
-      "Most people now use more than one AI. You might plan a trip in ChatGPT, write code in Claude and research in Gemini. Each one keeps its own piece of you, and none of them share it. Open a new AI and you explain yourself from the beginning.",
-      "We think that memory should belong to the person, not to the app. So we built Coere, a portable AI memory layer you own. It saves your chats from the AIs you use, builds one memory from them that you can see and edit, and brings the right context into each new chat.",
-      { h2: "What the money is for" },
-      "The funding goes to work that is already on our roadmap. The plan stays the same. We can now build it faster.",
-      {
-        ordered: true,
-        list: [
-          "**Coere Connect on the Chrome Web Store**, so anyone can add [Coere Connect](/products/connect) to Chrome in a click.",
-          "**Coere for Teams**, with a free week to try it with your team. It brings [Coere Solutions](/products/solutions) to the whole company.",
-          "**A hosted Coere API at coere.ai**, so developers can build on [Coere Forge](/products/forge) without running their own server.",
-        ],
-      },
-      { h2: "We are hiring" },
-      "The funding also lets us grow the team. We are hiring a founding team in San Francisco, in engineering, business and marketing. If you want to help build memory that people own, [email the founders](mailto:coereagent@gmail.com).",
-      { h2: "What does not change" },
-      "Funding changes how fast we build. It does not change who your memory belongs to.",
-      "Your memory stays yours. You can see everything Coere remembers, edit it or forget it, and you decide which AIs and apps may read it.",
-      "If you have not tried Coere yet, now is a good time. Coere Connect is coming soon. Say you are interested and we will email you the day it is out.",
-    ],
-    cta: { href: "/install", label: "Get Coere Connect" },
-  },
   {
     slug: "introducing-coere-connect",
     title: "Introducing Coere Connect, one memory across every AI",
@@ -143,20 +78,16 @@ const input: PostInput[] = [
   },
 ];
 
-/** A block's words without the inline marks, for counting and for search snippets. */
-export function blockText(block: Block): string {
-  const raw = typeof block === "string" ? block : "h2" in block ? block.h2 : "list" in block ? block.list.join(" ") : "quote" in block ? block.quote : block.code;
-  return raw.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\*\*|`/g, "");
-}
-
-/** Minutes to read at about 220 words a minute, never less than one. */
-export function readingMinutes(body: Block[]): number {
-  const words = body.map(blockText).join(" ").split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 220));
-}
-
 /** Newest first. The first is the blog's featured post, and the blog menu shows the first three. */
-export const posts: Post[] = input.filter((post) => !post.hidden).map((post) => ({ ...post, image: `/blog/${post.slug}/cover.svg`, readMinutes: readingMinutes(post.body) }));
+export const posts: Post[] = input.map((post) => ({ ...post, image: `/blog/${post.slug}/cover.svg`, readMinutes: readingMinutes(post.body) }));
+
+/** What the menus show of a post: its address, its title and its cover. */
+export type NavPost = Pick<Post, "slug" | "title" | "image">;
+
+/** The three newest posts for the navbar's blog menu and the small screen menu, with nothing else of them. */
+export function navPosts(): NavPost[] {
+  return posts.slice(0, 3).map(({ slug, title, image }) => ({ slug, title, image }));
+}
 
 /**
  * The posts with their titles and summaries in a language, for the lists
@@ -170,28 +101,9 @@ export function postBySlug(slug: string): Post | undefined {
   return posts.find((p) => p.slug === slug);
 }
 
-/** Who wrote a post: a founder it names, else the Coere team. */
-export function postAuthor(post: Post): { name: string; role?: string } {
-  const founder = founders.find((f) => f.name === post.author);
-  return founder ? { name: founder.name, role: founder.role } : { name: "The Coere team" };
-}
-
 /** Up to `count` other posts to read next: the same category first, then the newest. */
 export function readNext(post: Post, count = 3): Post[] {
   const others = posts.filter((p) => p.slug !== post.slug);
   const same = others.filter((p) => p.category === post.category);
   return [...same, ...others.filter((p) => p.category !== post.category)].slice(0, count);
-}
-
-/** The date style each language writes: "October 28, 2026", "28 de octubre de 2026", "2026年10月28日". */
-const DATE_LOCALES: Record<Locale, string> = { en: "en-US", es: "es-ES", fr: "fr-FR", nl: "nl-NL", ja: "ja-JP" };
-
-/** "2026-10-28" as "October 28, 2026" in English, fixed to UTC so server and browser agree. */
-export function formatPostDate(iso: string, locale: Locale = "en"): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(DATE_LOCALES[locale], {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
 }

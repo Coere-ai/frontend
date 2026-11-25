@@ -15,7 +15,8 @@ describe("markUpstream", () => {
     assert.equal(markUpstream(new Headers({ [LIMIT_HEADER]: "anything" }), 200).get(LIMIT_HEADER), null);
   });
 
-  it("keeps the values to the fixed four of the contract", () => {
-    assert.deepEqual([...LIMIT_SOURCES], ["spend-pending", "per-minute", "concurrency", "upstream"]);
+  it("keeps the values to the fixed five of the contract", () => {
+    // `duration` joined on 2026-11-25, on the proxy's 504 for a call cut at 285 s.
+    assert.deepEqual([...LIMIT_SOURCES], ["spend-pending", "per-minute", "concurrency", "upstream", "duration"]);
   });
 });

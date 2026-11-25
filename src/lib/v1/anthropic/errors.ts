@@ -23,7 +23,8 @@ export type AnthropicCase =
   | "unavailable"
   | "not_found"
   | "bad_request"
-  | "upstream";
+  | "upstream"
+  | "duration";
 
 interface ErrorShape {
   status: number;
@@ -64,6 +65,9 @@ export function anthropicErrorShape(c: AnthropicCase, model?: string, limit: Spe
       return { status: 400, type: "invalid_request_error", message: "bad_request" };
     case "upstream":
       return { status: 502, type: "api_error", message: "upstream_unreachable" };
+    case "duration":
+      // The proxy ended the call at its 285 s cut (upstream-cut.ts): the work is too long for one call.
+      return { status: 504, type: "timeout_error", message: "duration" };
   }
 }
 
@@ -78,6 +82,7 @@ export function anthropicErrorBody(c: AnthropicCase, model?: string, limit?: Spe
  * `x-should-retry`, and a rate limit carries `retry-after` in seconds and
  * names what refused it in `x-coere-limit` (limit-marker.ts): `source`, or
  * the per minute lane when none is given, since that is the gate's refusal.
+ * A call cut at the proxy's 285 s limit is marked `duration`.
  */
 export function anthropicError(
   c: AnthropicCase,
@@ -87,6 +92,7 @@ export function anthropicError(
   const headers = new Headers({ ...API_HEADERS, "content-type": "application/json" });
   if (o.retryAfter !== undefined) headers.set("retry-after", String(Math.max(1, Math.ceil(o.retryAfter))));
   if (shape.status === 429) headers.set(LIMIT_HEADER, o.source ?? "per-minute");
+  if (c === "duration") headers.set(LIMIT_HEADER, "duration");
   if (c !== "rate_limited" && c !== "unavailable" && c !== "upstream") headers.set("x-should-retry", "false");
   return new Response(JSON.stringify(anthropicErrorBody(c, o.model, o.limit)), { status: shape.status, headers });
 }
@@ -96,12 +102,39 @@ export function anthropicError(
  * flight filling the limit is a short wait as a rate limit, so a first build
  * keeps going as their holds go instead of stopping for an hour on a spent
  * limit. Too many calls in flight, or worst cases that could pass the limit
- * by more than the overrun, is a shorter one. `null` means reserve_spend
- * could not be asked.
+ * by more than the overrun, is a shorter one. The site's first build budget
+ * is a spent limit for the day. `null` means reserve_spend could not be asked.
  */
 export function holdRefusedAnswer(refused: Extract<Reservation, { ok: false }>["refused"]): Response {
   if (refused === null) return anthropicError("unavailable");
   if (refused === "pending") return anthropicError("rate_limited", { retryAfter: PENDING_RETRY_SECONDS, source: "spend-pending" });
   if (refused === "concurrency") return anthropicError("rate_limited", { retryAfter: CONCURRENCY_RETRY_SECONDS, source: "concurrency" });
+  if (refused === "site_budget") return anthropicError("usage_limit", { limit: "daily" });
   return anthropicError("usage_limit", { limit: refused });
+}
+
+/** Anthropic's own error types for a 429 or a 5xx; anything else reads as the status's default. */
+const UPSTREAM_TYPES = new Set(["rate_limit_error", "overloaded_error", "api_error", "timeout_error"]);
+
+/**
+ * The body to pass on for Anthropic's own 429 or 5xx: its error type, which
+ * the runtime classes errors by along with the status, with a fixed
+ * message. Anthropic's 429 message names Coere's organization and its per
+ * minute limit, facts about Coere's whole account that the answer headers
+ * already keep back. Null for any other status: a 4xx describes the
+ * caller's own request and passes as it is.
+ */
+export function upstreamErrorText(status: number, body: string): string | null {
+  if (status !== 429 && status < 500) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    parsed = null;
+  }
+  const error = typeof parsed === "object" && parsed !== null ? (parsed as { error?: { type?: unknown } }).error : undefined;
+  const sent = typeof error?.type === "string" && UPSTREAM_TYPES.has(error.type) ? error.type : null;
+  const type = sent ?? (status === 429 ? "rate_limit_error" : status === 529 ? "overloaded_error" : "api_error");
+  const message = status === 429 ? "rate_limited" : status === 529 || type === "overloaded_error" ? "overloaded" : "upstream_error";
+  return JSON.stringify({ type: "error", error: { type, message } });
 }

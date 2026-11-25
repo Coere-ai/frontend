@@ -12,10 +12,6 @@ export const blog: Messages["blog"] = {
   countIn: { one: "{count} article dans {category}", other: "{count} articles dans {category}" },
   minutes: "{minutes} min de lecture",
   posts: {
-    "coere-is-venture-backed": {
-      title: "Coere est désormais soutenu par du capital-risque",
-      excerpt: "Nous avons levé des fonds de capital-risque sur une valorisation de 2 millions de dollars. Voici à quoi servira cet argent, et ce qui ne change pas.",
-    },
     "introducing-coere-connect": {
       title: "Voici Coere Connect, une seule mémoire dans toutes les IA",
       excerpt: "Vos conversations avec toutes les IA, réunies au même endroit et apportées à chaque nouvelle conversation.",

@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it } from "node:test";
 
 import { answerHeaders, upstreamHeaders } from "./headers";
 import { checkBatchBody, checkBeta, checkParams } from "./params";
+import { PROMPT_SHAS } from "./prompt-shas";
 import { goneUpstream, matchAnthropicPath, outlivesCaller, upstreamSearch, upstreamUrl } from "./paths";
+import { cutSignal, neverSent, UPSTREAM_CUT_MS } from "./upstream-cut";
 import { attemptsOf, byModel, createBatchTally, usageOf } from "./usage";
 
 const seg = (p: string) => p.split("/");
@@ -329,5 +334,85 @@ describe("usage", () => {
     });
     assert.equal(totals.get("claude-haiku-5-5")?.costMicros, 30_000);
     assert.equal(totals.size, 2);
+  });
+});
+
+describe("the upstream cut", () => {
+  it("ends a call at 285 s, before Vercel's 300 s route ceiling would cut it unmarked", () => {
+    assert.equal(UPSTREAM_CUT_MS, 285_000);
+    assert.ok(UPSTREAM_CUT_MS < 300_000);
+  });
+
+  it("follows the caller's abort and the cut, and tells them apart", async () => {
+    const caller = new AbortController();
+    const cut = cutSignal(caller.signal, { seenThrough: false, ms: 20 });
+    assert.ok(cut.signal);
+    assert.equal(cut.reason(), "unreachable");
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    assert.equal(cut.signal?.aborted, true);
+    assert.equal(cut.cut(), true);
+    assert.equal(cut.reason(), "timeout");
+
+    const gone = new AbortController();
+    const early = cutSignal(gone.signal, { seenThrough: false, ms: 10_000 });
+    gone.abort();
+    assert.equal(early.signal?.aborted, true);
+    assert.equal(early.cut(), false);
+    assert.equal(early.reason(), "aborted");
+  });
+
+  it("tells a connection that never opened from one that broke after the request went", () => {
+    // How undici's fetch throws: a TypeError whose cause carries the socket's code.
+    const failed = (cause: unknown) => new TypeError("fetch failed", { cause });
+    const coded = (code: string) => Object.assign(new Error(code), { code });
+    for (const code of ["ECONNREFUSED", "ENOTFOUND", "EAI_AGAIN", "EHOSTUNREACH", "ENETUNREACH", "UND_ERR_CONNECT_TIMEOUT", "CERT_HAS_EXPIRED"]) {
+      assert.equal(neverSent(failed(coded(code))), true, code);
+    }
+    // Both addresses of a host refused: Node gives an AggregateError of them.
+    assert.equal(neverSent(failed(new AggregateError([coded("ECONNREFUSED"), coded("ECONNREFUSED")], "x"))), true);
+    // A reset or a closed socket may come after Anthropic read the whole request.
+    for (const code of ["ECONNRESET", "UND_ERR_SOCKET", "EPIPE", "UND_ERR_HEADERS_TIMEOUT"]) assert.equal(neverSent(failed(coded(code))), false, code);
+    assert.equal(neverSent(failed(new AggregateError([coded("ECONNREFUSED"), coded("ECONNRESET")], "x"))), false);
+    assert.equal(neverSent(new DOMException("aborted", "AbortError")), false);
+    assert.equal(neverSent(failed(undefined)), false);
+    assert.equal(neverSent(null), false);
+  });
+
+  it("is not set on a call the proxy sees through, which must be stored or forgotten once Anthropic has it", () => {
+    const caller = new AbortController();
+    const through = cutSignal(caller.signal, { seenThrough: true, ms: 1 });
+    assert.equal(through.signal, undefined);
+    caller.abort();
+    assert.equal(through.cut(), false);
+  });
+});
+
+/**
+ * Every prompt coere-v2 pins hashes to a SHA prompt-shas.ts lists, read from
+ * a coere-v2 checkout beside this one (or COERE_V2_DIR) when there is one.
+ * A prompt file there is one exported constant with no imports.
+ */
+describe("the prompt list against coere-v2", () => {
+  const base = process.env.COERE_V2_DIR ?? join(import.meta.dirname, "..", "..", "..", "..", "..", "coere-v2");
+  const dirs = [join(base, "packages", "memory", "src", "prompts"), join(base, "packages", "solution", "src", "prompts")];
+  const there = dirs.every((dir) => existsSync(dir));
+
+  it("lists every prompt the extension sends", { skip: there ? false : "no coere-v2 checkout here" }, async () => {
+    let seen = 0;
+    for (const dir of dirs) {
+      for (const name of readdirSync(dir)) {
+        if (!name.endsWith(".ts") || name.includes(".test.")) continue;
+        const path = join(dir, name);
+        if (/^import /m.test(readFileSync(path, "utf8"))) continue;
+        const mod = (await import(path)) as Record<string, unknown>;
+        for (const [key, value] of Object.entries(mod)) {
+          if (typeof value !== "string" || value.length < 200) continue;
+          seen += 1;
+          const hash = createHash("sha256").update(value, "utf8").digest("hex");
+          assert.ok(hash in PROMPT_SHAS, `${name} ${key} is not in prompt-shas.ts`);
+        }
+      }
+    }
+    assert.ok(seen >= 26, `read ${seen} prompts`);
   });
 });

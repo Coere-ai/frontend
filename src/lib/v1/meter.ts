@@ -9,7 +9,9 @@ import type { TokenCounts } from "./prices";
  * Metering: one `record_usage` call per metered answer (docs/accounts.md
  * 8.4, 10), which logs the row and adds it to this month's spend and the
  * running totals in one statement. A failure is logged by its code and never
- * fails the answer the person already has.
+ * fails the answer the person already has; the answer says whether the row
+ * landed. A message's rows go through settle_call instead (spend-holds.ts),
+ * which records them and lets the call's hold go in one transaction.
  */
 
 export type UsageKind = "message" | "count_tokens" | "batch_result" | "jev";
@@ -24,7 +26,7 @@ export interface UsageRow {
   requestId: string | null;
 }
 
-export async function recordUsage(account: Pick<DeviceAccount, "userId" | "deviceId">, row: UsageRow): Promise<void> {
+export async function recordUsage(account: Pick<DeviceAccount, "userId" | "deviceId">, row: UsageRow): Promise<boolean> {
   try {
     const { error } = await supabase().rpc("record_usage", {
       p_user: account.userId,
@@ -40,10 +42,12 @@ export async function recordUsage(account: Pick<DeviceAccount, "userId" | "devic
       p_duration_ms: Math.max(0, Math.round(row.durationMs)),
       p_request_id: row.requestId?.slice(0, 120) ?? null,
     });
-    if (error) console.error("record_usage failed", error.code);
+    if (!error) return true;
+    console.error("record_usage failed", error.code);
   } catch {
     console.error("record_usage failed");
   }
+  return false;
 }
 
 export const NO_TOKENS: TokenCounts = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CATEGORIES, type Category, type Post } from "@/site/content/posts";
+import { CATEGORIES, type Category, type Post } from "@/site/content/post-parts";
 import { useMessages } from "@/site/i18n/client";
 import { format } from "@/site/i18n/types";
 import { PostCard } from "./post-card";
