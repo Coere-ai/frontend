@@ -11,6 +11,7 @@ import {
   recordSections,
   recordView,
 } from "@/lib/analytics/record";
+import { readBeaconBody } from "@/lib/analytics/ingest/beacon-body";
 import { clientIp, rateLimited } from "@/lib/analytics/ingest/rate-limit";
 import {
   id,
@@ -73,14 +74,10 @@ export async function POST(req: Request): Promise<Response> {
   if (rateLimited(clientIp(req))) return noContent();
   if (!supabaseConfigured()) return noContent();
 
-  let body: Body;
-  try {
-    const raw = await req.text();
-    if (raw.length > MAX_BODY_BYTES) return noContent();
-    body = JSON.parse(raw) as Body;
-  } catch {
-    return noContent();
-  }
+  // Read under the cap as it arrives, so a forged body is never buffered whole.
+  const parsed = await readBeaconBody(req, MAX_BODY_BYTES);
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return noContent();
+  const body = parsed as Body;
 
   const sessionId = id(body.sessionId);
   const visitorId = id(body.visitorId);
