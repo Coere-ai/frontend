@@ -9,6 +9,7 @@ import { countsFromManifest, type MemoryCounts } from "./counts";
 import { userIndexPath, userMemoryPath } from "./index-types";
 import { refreshMemberPart } from "./org-index";
 import { getBytes, objectSize, putFile, putJson, removePaths } from "./storage";
+import { storedHoldsSensitive } from "./stored-sensitive";
 import { fileLimit } from "./upload-rules";
 import { deleteMemory } from "./user-memory";
 
@@ -67,6 +68,9 @@ export async function commitMemory(a: DeviceAccount, staged: string): Promise<Co
   // refused rather than kept with what the person opted out of.
   if (!a.includeSensitive && built.includesSensitive) {
     await removePaths([staged]);
+    // An extension from before the sensitive sections rule is refused at every push, so its stored
+    // copy, checked then by the facts only rule, would never be replaced. Read by today's rule, it goes.
+    if (storedHoldsSensitive(await getBytes(userMemoryPath(a.userId)))) await deleteMemory(a.userId, a.orgId);
     return { ok: false, reason: "sensitive_off" };
   }
 

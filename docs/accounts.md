@@ -1001,7 +1001,13 @@ none.
   `<user id>/index.json`, removes its own staged file, and upserts
   `memory_files`. A file holding sensitive memories while the person has
   them off is removed and answered `412 sensitive_off`, so the stored copy
-  never holds what they opted out of. Answer
+  never holds what they opted out of. On that answer the stored file is
+  read again by today's rule (a fact with a sensitivity, or anything in
+  Health, Money, or Beliefs and values) and removed when it fails, since a
+  copy stored before that rule has `includes_sensitive` false when only its
+  facts were checked. Turning sensitive memories off reads it the same way
+  (`stored-sensitive.ts`), and `scripts/memory/sweep-sensitive.mts` runs
+  that check once over every such account at deploy. Answer
   `200 { bytes, digest, uploadedAt, counts: { memories, entities, links, chats, documents, sections } }`.
 - **`GET /api/v1/memory`** answers `200 { url }`, a download link that lives
   60 seconds, or `404`.

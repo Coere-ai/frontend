@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it } from "node:test";
 
 import { strToU8, zipSync } from "fflate";
@@ -7,6 +9,7 @@ import { buildIndex, MAX_INDEX_FACTS } from "./build-index";
 import { openCoere, wantedEntry } from "./coere-zip";
 import { countsFromManifest } from "./counts";
 import { SAM_FOLDER, zipFolder } from "./fixture-zip";
+import { storedHoldsSensitive } from "./stored-sensitive";
 import type { MemoryIndex } from "./index-types";
 import { cutToSections, memberPart } from "./org-cut";
 
@@ -198,5 +201,22 @@ describe("sensitive sections as a whole", () => {
     assert.ok(part.entities.some((e) => e.section === "school"));
     // The person's own read keeps it.
     assert.ok(JSON.stringify(cutToSections(index, ["health"], { dropSensitive: false })).includes("Asthma care"));
+  });
+
+  /**
+   * A copy stored before this rule has a row that says it holds nothing
+   * sensitive, since the facts only rule made it. The stored file read again
+   * decides: commit removes it when an older extension's push is refused,
+   * and turning sensitive memories off removes it (memory-backup.ts).
+   */
+  it("finds a stored copy whose row said plain holding a Health folder or a letter, read by today's rule", () => {
+    const personal = readFileSync(join(SAM_FOLDER, "sections/personal/_facts.jsonl"), "utf8");
+    const plain = { "sections/personal/_facts.jsonl": personal.split("\n").filter((l) => !l.includes('"sensitivity"')).join("\n") };
+    assert.equal(storedHoldsSensitive(zipFolder(SAM_FOLDER, plain)), false);
+    assert.equal(storedHoldsSensitive(zipFolder(SAM_FOLDER, { ...plain, "sections/health/asthma-care/_folder.json": folder })), true);
+    assert.equal(storedHoldsSensitive(zipFolder(SAM_FOLDER, { ...plain, "sections/health/asthma-care/letter.md": letter })), true);
+    // No stored file holds nothing; a stored file that no longer opens cannot be shown to be plain.
+    assert.equal(storedHoldsSensitive(null), false);
+    assert.equal(storedHoldsSensitive(new Uint8Array([1, 2, 3])), true);
   });
 });

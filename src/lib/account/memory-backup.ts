@@ -1,3 +1,6 @@
+import { userMemoryPath } from "@/lib/memory/index-types";
+import { getBytes } from "@/lib/memory/storage";
+import { storedHoldsSensitive } from "@/lib/memory/stored-sensitive";
 import { deleteMemory } from "@/lib/memory/user-memory";
 import { supabase } from "@/lib/supabase";
 
@@ -32,5 +35,7 @@ async function storedCopy(userId: string, change: BackupChange): Promise<{ inclu
     .eq("user_id", userId)
     .maybeSingle<{ includes_sensitive: boolean }>();
   if (error) throw new Error(`memory_files read failed: ${error.code}`);
-  return data ? { includesSensitive: data.includes_sensitive } : null;
+  if (!data) return null;
+  // A row stored before the sensitive sections rule can say plain while its file holds a Health folder.
+  return { includesSensitive: data.includes_sensitive || storedHoldsSensitive(await getBytes(userMemoryPath(userId))) };
 }
