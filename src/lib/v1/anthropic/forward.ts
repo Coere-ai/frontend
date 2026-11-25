@@ -1,16 +1,17 @@
 import "server-only";
 
 import { upstreamHeaders } from "./headers";
-import { cutSignal, type CutReason } from "./upstream-cut";
+import { cutSignal, neverSent, type CutReason } from "./upstream-cut";
 
 /**
  * One request to Anthropic with Coere's key. The caller's abort signal goes
  * along unless `seenThrough` is set, so a closed extension tab stops the
  * upstream call too, and so does the proxy's 285 s cut (upstream-cut.ts).
  * A failed connection never throws: the answer says why the call ended,
- * and `cut` says later whether the cut ended the body's read.
+ * `unsent` when the connection never opened, and `cut` says later whether
+ * the cut ended the body's read.
  */
-export type Forwarded = { ok: true; res: Response; cut: () => boolean } | { ok: false; why: CutReason };
+export type Forwarded = { ok: true; res: Response; cut: () => boolean } | { ok: false; why: CutReason | "unsent" };
 
 export async function forwardToAnthropic(
   req: Request,
@@ -27,8 +28,8 @@ export async function forwardToAnthropic(
       redirect: "manual",
     });
     return { ok: true, res, cut: cut.cut };
-  } catch {
-    return { ok: false, why: cut.reason() };
+  } catch (error) {
+    return { ok: false, why: neverSent(error) ? "unsent" : cut.reason() };
   }
 }
 

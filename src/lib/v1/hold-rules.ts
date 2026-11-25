@@ -104,9 +104,12 @@ export function worstOnlyArgs(args: ReturnType<typeof reserveArgs>) {
  * What happened to a call that holds spend, for what becomes of its hold.
  *
  * - `settled`: settle_call recorded the cost and let the hold go itself.
+ * - `stored`: store_batch stored a new batch, whose reservation now counts
+ *   in the hold's place, and let the hold go in the same transaction.
  * - `upstream_error`: Anthropic answered an error, which it does not bill.
- * - `stored` / `not_stored`: a batch's reservation now counts in the hold's
- *   place, or the batch was cancelled because it could not be stored.
+ * - `not_stored`: the batch was cancelled because it could not be stored.
+ * - `unsent`: the connection to Anthropic never opened (neverSent in
+ *   upstream-cut.ts), so Anthropic never had the request.
  * - `aborted`, `timeout`, `unreachable`: the call ended without an answer,
  *   after the request may have reached Anthropic.
  * - `read_failed`: the answer's body could not be read.
@@ -118,6 +121,7 @@ export type HoldEvent =
   | "upstream_error"
   | "stored"
   | "not_stored"
+  | "unsent"
   | "aborted"
   | "timeout"
   | "unreachable"
@@ -131,18 +135,49 @@ export type HoldEvent =
  * keeps counting against the limits instead of vanishing at once. Whether
  * Anthropic bills a call its caller aborted is still to be measured; if it
  * does, the hold's expected cost should be charged on abort.
+ *
+ * A batch create whose forward failed lets its hold go. Anthropic may hold
+ * the batch if the connection broke after the request went, but the proxy
+ * never stored it, so no one can read its results or gain from it, and its
+ * worst case may be more than the person has left. Its hold is kept only
+ * when the answer came and its body could not be read.
  */
-export function holdOutcome(event: HoldEvent): "none" | "release" | "keep" {
+export function holdOutcome(event: HoldEvent, o: { batch?: boolean } = {}): "none" | "release" | "keep" {
   switch (event) {
     case "settled":
+    case "stored":
       return "none";
     case "upstream_error":
-    case "stored":
     case "not_stored":
+    case "unsent":
       return "release";
+    case "aborted":
+    case "timeout":
+    case "unreachable":
+      return o.batch ? "release" : "keep";
     default:
       return "keep";
   }
+}
+
+/**
+ * Lets a hold go whose call cost nothing or whose cost is counted elsewhere.
+ * The delete is tried, then the hold's charge is set to nothing, then the
+ * delete once more: a hold left behind is charged when it runs out, and a
+ * charge of nothing keeps that from charging a call Anthropic never billed.
+ * True when the hold went or will charge nothing.
+ */
+export async function letHoldGo(steps: { remove: () => Promise<boolean>; zero: () => Promise<boolean> }): Promise<boolean> {
+  const tried = async (step: () => Promise<boolean>) => {
+    try {
+      return await step();
+    } catch {
+      return false;
+    }
+  };
+  if (await tried(steps.remove)) return true;
+  const zeroed = await tried(steps.zero);
+  return (await tried(steps.remove)) || zeroed;
 }
 
 /**
@@ -158,17 +193,19 @@ export const MAX_OUTPUT_TOKENS_PER_SECOND = 300;
  * for its worst case. An expired hold used to be deleted for free, so a
  * call that outran the route could be repeated forever with nothing
  * charged. The proxy's 285 s cut, a lost record and a killed function
- * charge the worst case. A call that ended early (its caller went, no
- * connection, a failed read) is charged its expected cost and the most
- * output it could have made in the time it ran, never above its worst
- * case, so a person who closes a tab mid build is not charged every call's
- * worst case. A cost known but not recorded is charged as it is.
+ * charge the worst case. A call that ended early (its caller went, a
+ * connection that broke, a failed read) is charged its expected cost and
+ * the most output it could have made in the time it ran, never above its
+ * worst case, so a person who closes a tab mid build is not charged every
+ * call's worst case. A cost known but not recorded is charged as it is.
+ * A batch create's hold is kept only on a failed read, and is charged its
+ * worst case, which is also its expected cost.
  */
 export function keptCharge(
   event: HoldEvent,
-  call: { model: string | null; worstMicros: number; expectedMicros: number; elapsedMs: number; knownMicros?: number },
+  call: { model: string | null; worstMicros: number; expectedMicros: number; elapsedMs: number; knownMicros?: number; batch?: boolean },
 ): number | null {
-  if (holdOutcome(event) !== "keep") return null;
+  if (holdOutcome(event, { batch: call.batch }) !== "keep") return null;
   if (event === "record_failed") return call.knownMicros === undefined ? null : Math.max(0, Math.ceil(call.knownMicros));
   if (event === "timeout") return null;
   const perToken = (PRICES[call.model ?? ""] ?? PRICES["claude-opus-5-5"])!.base.output;

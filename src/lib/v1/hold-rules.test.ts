@@ -6,6 +6,7 @@ import {
   CONCURRENCY_RETRY_SECONDS,
   holdOutcome,
   keptCharge,
+  letHoldGo,
   MAX_OUTPUT_TOKENS_PER_SECOND,
   settleArgs,
   HOLD_SECONDS,
@@ -130,18 +131,70 @@ describe("what a build fits at once", () => {
 
 describe("holdOutcome", () => {
   it("lets a hold go only once the call's cost is known", () => {
-    // Anthropic answered an error, which it does not bill, or a batch's reservation now counts in its place.
+    // Anthropic answered an error, which it does not bill, or the batch was cancelled because it could not be stored.
     assert.equal(holdOutcome("upstream_error"), "release");
-    assert.equal(holdOutcome("stored"), "release");
     assert.equal(holdOutcome("not_stored"), "release");
-    // settle_call recorded the cost and let the hold go in the same transaction.
+    // settle_call recorded the cost, or store_batch stored the batch's reservation, and let the hold go in the same transaction.
     assert.equal(holdOutcome("settled"), "none");
+    assert.equal(holdOutcome("stored", { batch: true }), "none");
   });
 
   it("keeps the hold to run out when the cost may have been billed and was not recorded", () => {
     for (const event of ["aborted", "timeout", "unreachable", "read_failed", "record_failed"] as const) {
       assert.equal(holdOutcome(event), "keep", event);
     }
+  });
+
+  it("lets the hold of a call that never reached Anthropic go", () => {
+    assert.equal(holdOutcome("unsent"), "release");
+    assert.equal(holdOutcome("unsent", { batch: true }), "release");
+  });
+
+  it("lets a batch create's hold go when the forward failed, and keeps it only when the answer could not be read", () => {
+    // A batch Anthropic may hold but the proxy never stored cannot be read by anyone, so nothing is gained by it.
+    for (const event of ["unreachable", "aborted", "timeout"] as const) assert.equal(holdOutcome(event, { batch: true }), "release", event);
+    assert.equal(holdOutcome("read_failed", { batch: true }), "keep");
+  });
+});
+
+describe("letHoldGo", () => {
+  const steps = (removes: boolean[], zeroes: boolean[]) => {
+    const calls: string[] = [];
+    return {
+      calls,
+      remove: async () => {
+        calls.push("remove");
+        const ok = removes.shift();
+        if (ok === undefined) throw new Error("down");
+        return ok;
+      },
+      zero: async () => {
+        calls.push("zero");
+        const ok = zeroes.shift();
+        if (ok === undefined) throw new Error("down");
+        return ok;
+      },
+    };
+  };
+
+  it("deletes the hold once when it can", async () => {
+    const s = steps([true], []);
+    assert.equal(await letHoldGo(s), true);
+    assert.deepEqual(s.calls, ["remove"]);
+  });
+
+  it("sets its charge to nothing when the delete fails, so a hold left behind is never charged", async () => {
+    const s = steps([false, false], [true]);
+    assert.equal(await letHoldGo(s), true);
+    assert.deepEqual(s.calls, ["remove", "zero", "remove"]);
+  });
+
+  it("tries the delete again after the charge, and answers false only when every write failed", async () => {
+    const thrown = steps([], []);
+    assert.equal(await letHoldGo(thrown), false);
+    assert.deepEqual(thrown.calls, ["remove", "zero", "remove"]);
+    const late = steps([false, true], [false]);
+    assert.equal(await letHoldGo(late), true);
   });
 });
 
@@ -208,6 +261,19 @@ describe("keptCharge", () => {
   });
 
   it("is only asked for holds that are kept", () => {
-    for (const event of ["settled", "upstream_error", "stored", "not_stored"] as const) assert.equal(keptCharge(event, { ...call, elapsedMs: 1 }), null);
+    for (const event of ["settled", "upstream_error", "stored", "not_stored", "unsent"] as const) assert.equal(keptCharge(event, { ...call, elapsedMs: 1 }), null);
+  });
+
+  it("charges nothing for a call that never reached Anthropic", () => {
+    // A refused connection or a name that did not resolve: Anthropic never had the request.
+    assert.equal(holdOutcome("unsent"), "release");
+    assert.equal(keptCharge("unsent", { ...call, elapsedMs: 30 }), null);
+  });
+
+  it("charges a batch create only when its answer came and could not be read", () => {
+    // 200 Sonnet entries at 16,000 max_tokens: about $16 at worst, held whole.
+    const batch = { model: null, worstMicros: 16_000_000, expectedMicros: 16_000_000, batch: true };
+    for (const event of ["unreachable", "aborted", "timeout", "unsent"] as const) assert.equal(keptCharge(event, { ...batch, elapsedMs: 2_000 }), null, event);
+    assert.equal(keptCharge("read_failed", { ...batch, elapsedMs: 2_000 }), 16_000_000);
   });
 });

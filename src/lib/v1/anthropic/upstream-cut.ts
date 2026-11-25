@@ -31,3 +31,37 @@ export function cutSignal(caller: AbortSignal, o: { seenThrough: boolean; ms?: n
     reason: () => (caller.aborted ? "aborted" : timer.aborted ? "timeout" : "unreachable"),
   };
 }
+
+/**
+ * Socket codes that mean the connection to Anthropic never opened: no
+ * address, refused, unreachable, the connect timed out, or a certificate
+ * the handshake would not take. The request was never sent, so nothing
+ * was billed. A reset or a closed socket is not here: it may come after
+ * Anthropic read the whole request.
+ */
+const NEVER_OPENED = new Set([
+  "ECONNREFUSED",
+  "ENOTFOUND",
+  "EAI_AGAIN",
+  "EHOSTUNREACH",
+  "ENETUNREACH",
+  "UND_ERR_CONNECT_TIMEOUT",
+  "CERT_HAS_EXPIRED",
+  "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
+  "SELF_SIGNED_CERT_IN_CHAIN",
+  "DEPTH_ZERO_SELF_SIGNED_CERT",
+  "ERR_TLS_CERT_ALTNAME_INVALID",
+]);
+
+function opened(cause: unknown): boolean {
+  if (cause instanceof AggregateError) return cause.errors.length === 0 || cause.errors.some(opened);
+  const code = typeof cause === "object" && cause !== null ? (cause as { code?: unknown }).code : undefined;
+  return typeof code !== "string" || !NEVER_OPENED.has(code);
+}
+
+/** True when fetch failed before its connection opened (undici puts the socket's error in `cause`). */
+export function neverSent(error: unknown): boolean {
+  if (!(error instanceof TypeError)) return false;
+  const cause = (error as { cause?: unknown }).cause;
+  return cause !== undefined && cause !== null && !opened(cause);
+}

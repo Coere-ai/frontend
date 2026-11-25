@@ -17,8 +17,9 @@ import { attemptsOf, byModel } from "./usage";
 /**
  * What the proxy does with Anthropic's answer, by path (docs/accounts.md
  * 8.4): meter a message and let its hold go (settle_call), store a new
- * batch as the caller's, forget a deleted one, and meter batch results as
- * they stream through. Only the kept answer headers go back, with
+ * batch as the caller's and let its hold go (store_batch), forget a
+ * deleted one, and meter batch results as they stream through. Only the
+ * kept answer headers go back, with
  * Anthropic's own 429 marked as `upstream` (limit-marker.ts), and its 429
  * and 5xx bodies with a fixed message. The answer comes with what happened
  * to the call, which says what becomes of its hold (holdOutcome).
@@ -35,7 +36,7 @@ interface AnswerContext {
   worstMicros: number;
   /** What a follow up call to Anthropic needs: Coere's key and the caller's version and beta. */
   upstream: { apiKey: string; version: string | null; beta: string | null };
-  /** The call's hold, which settle_call lets go with a message's usage rows. */
+  /** The call's hold, which settle_call lets go with a message's usage rows, and store_batch with a new batch's row. */
   holdId: string | null;
   /** True once the proxy's 285 s cut ended the call (upstream-cut.ts). */
   cut: () => boolean;
@@ -138,7 +139,7 @@ export async function relayAnswer(up: Response, c: AnswerContext): Promise<Relay
   }
   if (op.op === "batch_create") {
     if (!isRecord(data) || typeof data.id !== "string") return { ...answered(), event: "not_stored" };
-    if (!(await storeBatch(c.account, data.id, c.requestCount, c.worstMicros))) {
+    if (!(await storeBatch(c.account, data.id, c.requestCount, c.worstMicros, c.holdId))) {
       // Unrecorded, the batch would run and bill while every read of it
       // answered 404. Stop it and answer 503, so the extension submits again.
       await cancelUpstreamBatch(data.id, c.upstream);

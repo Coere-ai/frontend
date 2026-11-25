@@ -3,7 +3,7 @@ import "server-only";
 import { supabase } from "@/lib/supabase";
 
 import type { DeviceAccount } from "./device-auth";
-import { isUnknownFunction, readReservation, reserveArgs, settleArgs, wantsWorstOnly, worstOnlyArgs, type Reservation, type UsageShare } from "./hold-rules";
+import { isUnknownFunction, letHoldGo, readReservation, reserveArgs, settleArgs, wantsWorstOnly, worstOnlyArgs, type Reservation, type UsageShare } from "./hold-rules";
 import { recordUsage } from "./meter";
 
 export { HOLD_SECONDS, MAX_LIVE_HOLDS, OVERRUN_MICROS, type Reservation } from "./hold-rules";
@@ -62,19 +62,24 @@ export async function setHoldCharge(holdId: string, micros: number): Promise<voi
 
 /**
  * Lets a hold go once its call's cost is known to be nothing or stored
- * elsewhere. Tried twice: a hold left behind is charged its worst case
- * when it runs out, which would charge a call that cost nothing.
+ * elsewhere (letHoldGo in hold-rules.ts): the delete, then a charge of
+ * nothing if it failed, then the delete again. A hold left behind is
+ * charged when it runs out, which would charge a call that cost nothing.
  */
 export async function releaseHold(holdId: string): Promise<void> {
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
+  const gone = await letHoldGo({
+    remove: async () => {
       const { error } = await supabase().from("spend_holds").delete().eq("id", holdId);
-      if (!error) return;
-      console.error("hold not released", error.code);
-    } catch {
-      console.error("hold not released");
-    }
-  }
+      if (error) console.error("hold not released", error.code);
+      return !error;
+    },
+    zero: async () => {
+      const { error } = await supabase().from("spend_holds").update({ charge_micros: 0 }).eq("id", holdId);
+      if (error) console.error("hold charge not cleared", error.code);
+      return !error;
+    },
+  });
+  if (!gone) console.error("hold left to run out at its worst case");
 }
 
 /**

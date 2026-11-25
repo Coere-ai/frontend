@@ -8,7 +8,7 @@ import { answerHeaders, upstreamHeaders } from "./headers";
 import { checkBatchBody, checkBeta, checkParams } from "./params";
 import { PROMPT_SHAS } from "./prompt-shas";
 import { goneUpstream, matchAnthropicPath, outlivesCaller, upstreamSearch, upstreamUrl } from "./paths";
-import { cutSignal, UPSTREAM_CUT_MS } from "./upstream-cut";
+import { cutSignal, neverSent, UPSTREAM_CUT_MS } from "./upstream-cut";
 import { attemptsOf, byModel, createBatchTally, usageOf } from "./usage";
 
 const seg = (p: string) => p.split("/");
@@ -359,6 +359,23 @@ describe("the upstream cut", () => {
     assert.equal(early.signal?.aborted, true);
     assert.equal(early.cut(), false);
     assert.equal(early.reason(), "aborted");
+  });
+
+  it("tells a connection that never opened from one that broke after the request went", () => {
+    // How undici's fetch throws: a TypeError whose cause carries the socket's code.
+    const failed = (cause: unknown) => new TypeError("fetch failed", { cause });
+    const coded = (code: string) => Object.assign(new Error(code), { code });
+    for (const code of ["ECONNREFUSED", "ENOTFOUND", "EAI_AGAIN", "EHOSTUNREACH", "ENETUNREACH", "UND_ERR_CONNECT_TIMEOUT", "CERT_HAS_EXPIRED"]) {
+      assert.equal(neverSent(failed(coded(code))), true, code);
+    }
+    // Both addresses of a host refused: Node gives an AggregateError of them.
+    assert.equal(neverSent(failed(new AggregateError([coded("ECONNREFUSED"), coded("ECONNREFUSED")], "x"))), true);
+    // A reset or a closed socket may come after Anthropic read the whole request.
+    for (const code of ["ECONNRESET", "UND_ERR_SOCKET", "EPIPE", "UND_ERR_HEADERS_TIMEOUT"]) assert.equal(neverSent(failed(coded(code))), false, code);
+    assert.equal(neverSent(failed(new AggregateError([coded("ECONNREFUSED"), coded("ECONNRESET")], "x"))), false);
+    assert.equal(neverSent(new DOMException("aborted", "AbortError")), false);
+    assert.equal(neverSent(failed(undefined)), false);
+    assert.equal(neverSent(null), false);
   });
 
   it("is not set on a call the proxy sees through, which must be stored or forgotten once Anthropic has it", () => {
