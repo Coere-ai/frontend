@@ -1,8 +1,11 @@
 /**
  * What a Claude or Jev call costs (docs/accounts.md section 11). A copy of
- * coere-v2's `packages/memory/src/ai/prices.ts`, so the site meters exactly
- * what the extension's own counter would. When that table changes, change
- * this one in the same week.
+ * coere-v2's `packages/memory/src/ai/prices.ts`, so the site meters what the
+ * extension's own counter would. When that table changes, change this one in
+ * the same week. One deliberate difference: v2 and v3 of the extension keep
+ * Sonnet 5.5 cache reads at $0.20 for their local cap, so it can only stop
+ * early, while the site meters Anthropic's price of $0.10, since what it
+ * meters counts against the person's real limits and Coere's cost reports.
  *
  * Prices are US dollars per million tokens, which is also micro dollars per
  * token, so a cost in micro dollars is tokens times the price.
@@ -24,7 +27,7 @@ export interface PriceEntry {
 }
 
 /** The table's date: a price change is a new table with a new date. */
-export const PRICE_TABLE_DATE = "2026-10-22";
+export const PRICE_TABLE_DATE = "2026-11-25";
 
 const price = (input: number, output: number, cacheRead: number): ModelPrice => ({
   input,
@@ -35,7 +38,7 @@ const price = (input: number, output: number, cacheRead: number): ModelPrice => 
 
 export const PRICES: Readonly<Record<string, PriceEntry>> = {
   "claude-opus-5-5": { base: price(4, 20, 0.2) },
-  "claude-sonnet-5-5": { base: price(2, 10, 0.2) },
+  "claude-sonnet-5-5": { base: price(2, 10, 0.1) },
   "claude-haiku-5-5": { base: price(0.1, 0.5, 0.01), above100k: price(0.5, 2.5, 0.05) },
   // Jev bills input only. Both versions are listed, since the answer may name the older one.
   "jev-1.14.0": { base: price(0.042, 0, 0) },
