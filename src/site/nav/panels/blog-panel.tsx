@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "@/site/i18n/link";
-import { posts } from "@/site/content/posts";
 import { ArrowRightIcon } from "@/site/ui/icons/interface-icons";
 import { PanelMore } from "./panel-parts";
 import { Underlined } from "@/site/ui/underlined";
+import { useNavPosts } from "../nav-posts";
 
 /** A title whose last word and arrow never part across a line break. */
 function TitleWithArrow({ title }: { title: string }) {
@@ -21,9 +21,10 @@ function TitleWithArrow({ title }: { title: string }) {
 
 /**
  * Blog menu: the title and a Read more link on the left, and the three newest
- * posts as image cards to the right.
+ * posts as image cards to the right, as the site layout gave them to the navbar.
  */
 export function BlogPanel() {
+  const posts = useNavPosts();
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,3fr)] gap-10">
       <div className="flex flex-col justify-between py-1">

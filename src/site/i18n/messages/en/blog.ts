@@ -15,10 +15,6 @@ export const blog = {
   countIn: { one: "{count} post in {category}", other: "{count} posts in {category}" },
   minutes: "{minutes} min read",
   posts: {
-    "coere-is-venture-backed": {
-      title: "Coere is now venture backed",
-      excerpt: "We raised venture funding at a $2 million valuation. Here is what the money is for, and what stays the same.",
-    },
     "introducing-coere-connect": {
       title: "Introducing Coere Connect, one memory across every AI",
       excerpt: "Your chats with every AI, saved in one place and brought into each new chat.",

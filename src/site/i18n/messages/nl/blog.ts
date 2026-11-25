@@ -12,10 +12,6 @@ export const blog: Messages["blog"] = {
   countIn: { one: "{count} bericht in {category}", other: "{count} berichten in {category}" },
   minutes: "{minutes} min lezen",
   posts: {
-    "coere-is-venture-backed": {
-      title: "Coere heeft nu durfkapitaal",
-      excerpt: "We haalden durfkapitaal op bij een waardering van 2 miljoen dollar. Dit is waar het geld voor is, en wat hetzelfde blijft.",
-    },
     "introducing-coere-connect": {
       title: "Maak kennis met Coere Connect, één geheugen in elke AI",
       excerpt: "Je chats met elke AI, op één plek bewaard en meegenomen naar elke nieuwe chat.",

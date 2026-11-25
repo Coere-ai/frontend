@@ -12,10 +12,6 @@ export const blog: Messages["blog"] = {
   countIn: { one: "{category}の記事{count}件", other: "{category}の記事{count}件" },
   minutes: "{minutes}分で読めます",
   posts: {
-    "coere-is-venture-backed": {
-      title: "Coereがベンチャー資金を調達",
-      excerpt: "評価額200万ドルでベンチャー資金を調達しました。資金の使い道と、変わらないことをお伝えします。",
-    },
     "introducing-coere-connect": {
       title: "Coere Connectの紹介：すべてのAIで、ひとつの記憶",
       excerpt: "すべてのAIとのチャットを一か所に保存し、新しいチャットのたびに届けます。",
