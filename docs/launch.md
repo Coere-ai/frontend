@@ -312,13 +312,17 @@ cut off.
      - `downloads`: saves chats or the memory file when the person presses
        Download or Export, and a file a Cori task they started downloads.
      - `scripting`: puts Cori's page script, which ships in the extension,
-       into the one tab the person asked Cori to work on.
+       into the one tab the person asked Cori to work on, and puts Coere's
+       own panel into the page where the person presses Add memory, for
+       that press only.
      - `offscreen`: runs the local database, the search model and voice
        mode, which a service worker cannot hold.
      - `tabGroups`: puts the tabs Extract all and Cori open into one Coere
        group.
      - `activeTab`: lets Cori read the page the person is on only when they
-       press the Coere button or a Coere menu item.
+       press the Coere button or a Coere menu item. It also lets Coere
+       reach the page where the person presses Add memory, for that press
+       only.
      - `contextMenus`: Rewrite with Cori and Ask Cori on selected text.
      - `search`: runs a search the person asked Cori for in their own search
        engine.
