@@ -53,9 +53,9 @@ export const productPages: Messages["productPages"] = {
       },
     ],
     compare: {
-      title: "El mismo chat, con un 97,7 % menos de tokens",
+      title: "El mismo chat, 60 veces más rápido",
       line: "Sin Coere, pegas archivos y notas en cada chat nuevo. Con Coere, nombras el proyecto y el contexto adecuado entra por ti.",
-      label: "Sin Coere: 10.400 tokens y 4 minutos y 12 segundos. Con Coere: 240 tokens y 5 segundos.",
+      label: "Sin Coere: 10.400 tokens y 5 minutos. Con Coere: 240 tokens y 5 segundos.",
     },
     everything: "Todo lo que incluye Coere Connect",
     grid: [

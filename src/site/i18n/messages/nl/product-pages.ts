@@ -53,9 +53,9 @@ export const productPages: Messages["productPages"] = {
       },
     ],
     compare: {
-      title: "Dezelfde chat, 97,7% minder tokens",
+      title: "Dezelfde chat, 60 keer sneller",
       line: "Zonder Coere plak je bestanden en notities in elke nieuwe chat. Met Coere noem je het project en gaat de juiste context vanzelf mee.",
-      label: "Zonder Coere: 10.400 tokens en 4 minuten 12 seconden. Met Coere: 240 tokens en 5 seconden.",
+      label: "Zonder Coere: 10.400 tokens en 5 minuten. Met Coere: 240 tokens en 5 seconden.",
     },
     everything: "Alles in Coere Connect",
     grid: [

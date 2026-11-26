@@ -53,9 +53,9 @@ export const productPages: Messages["productPages"] = {
       },
     ],
     compare: {
-      title: "La même conversation, 97,7 % de tokens en moins",
+      title: "La même conversation, 60 fois plus vite",
       line: "Sans Coere, vous collez fichiers et notes dans chaque nouvelle conversation. Avec Coere, vous nommez le projet et le bon contexte s’ajoute pour vous.",
-      label: "Sans Coere : 10 400 tokens et 4 minutes 12 secondes. Avec Coere : 240 tokens et 5 secondes.",
+      label: "Sans Coere : 10 400 tokens et 5 minutes. Avec Coere : 240 tokens et 5 secondes.",
     },
     everything: "Tout ce que fait Coere Connect",
     grid: [

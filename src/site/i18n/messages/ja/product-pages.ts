@@ -53,9 +53,9 @@ export const productPages: Messages["productPages"] = {
       },
     ],
     compare: {
-      title: "同じチャットで、トークンを97.7%削減",
+      title: "同じチャットが、60倍速く",
       line: "Coereがなければ、新しいチャットのたびにファイルやメモを貼り付けます。Coereがあれば、プロジェクト名を伝えるだけで、ふさわしいコンテキストが入ります。",
-      label: "Coereなし：1万400トークン、4分12秒。Coereあり：240トークン、5秒。",
+      label: "Coereなし：1万400トークン、5分。Coereあり：240トークン、5秒。",
     },
     everything: "Coere Connectのすべて",
     grid: [
